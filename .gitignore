@@ -1,0 +1,53 @@
+# tmp & compiled output
+dist
+/tmp
+/bundle-stats.html
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.eslintcache
+.stylelintcache
+pnpm-debug.log*
+yarn.lock
+
+# OS
+.DS_Store
+node_modules
+
+# Tests
+/coverage
+/.nyc_output
+
+# Editor directories and files
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Configs
+
+.env
+.env.*
+!.env.example
+/old/
+dist-ssr
+*.local
+

@@ -1,0 +1,21 @@
+button {
+	font-family: var(--el-font-family);
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+	font-weight: normal;
+}
+
+html {
+	color: tomato !important;
+	min-height: 100vh;
+	font-family: Inter, sans-serif;
+	font-size: 14px;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}

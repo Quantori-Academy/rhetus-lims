@@ -1,0 +1,21 @@
+{
+	"name": "rhetus-lims",
+	"private": "true",
+	"type": "module",
+	"main": "index.js",
+	"license": "MIT",
+	"engines": {
+		"pnpm": "^9.0.0"
+	},
+	"scripts": {
+		"dev": "pnpm run '/^dev:.*/'",
+		"build": "pnpm run '/^build:.*/'",
+		"dev:fe": "pnpm --filter rhetus-fe dev",
+		"dev:be": "pnpm --filter rhetus-be dev",
+		"build:fe": "pnpm --filter=fe build",
+		"build:be": "pnpm --filter=be build"
+	},
+	"devDependencies": {
+		"globals": "^15.9.0"
+	}
+}

@@ -1,0 +1,34 @@
+/* #app {
+	--el-font-family: Inter, sans-serif;
+	--el-color-primary: green;
+	--el-color-success: #00ae44;
+	--el-color-warning: #ff6b12;
+	--el-color-danger: #9b1a2f;
+	--el-background-color-base: #f2f3f7;
+	--el-color-text-primary: #242526;
+	--el-color-text-regular: #444;
+	--el-color-text-secondary: #979797;
+	--el-color-black: #444;
+
+	--el-color-secondary: #00aeef;
+	--el-color-info: #007483;
+
+	--el-button-border-radius: --el-border-radius-round;
+	--el-button-medium-border-radius: --el-border-radius-round;
+	--el-button-small-border-radius: --el-border-radius-round;
+	--el-button-mini-border-radius: --el-border-radius-round;
+
+	--el-button-secondary-font-color: --el-color-white;
+	--el-button-secondary-background-color: --el-color-secondary;
+	--el-button-secondary-border-color: --el-color-secondary;
+} */
+
+/* color palette  */
+:root {
+	--rh-color-black: #181818;
+}
+
+/* semantic color variables for this project */
+:root {
+	--color-text: var(--rh-color-black);
+}
