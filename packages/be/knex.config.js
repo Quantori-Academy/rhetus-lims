@@ -11,5 +11,13 @@ export default {
 			directory: './knex/migrations'
 		},
 		useNullAsDefault: true
+	},
+	production: {
+		client: 'pg',
+		connection: config.database.pg.url,
+		migrations: {
+			directory: './knex/migrations'
+		},
+		useNullAsDefault: true
 	}
 };
