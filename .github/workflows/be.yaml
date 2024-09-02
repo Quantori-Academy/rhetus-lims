@@ -78,6 +78,8 @@ jobs:
       - name: Create .env file with all secrets
         run: |
           echo "MODE=production" > /tmp/.env
+          echo "API_HOST=0.0.0.0" >> /tmp/.env
+          echo "API_PORT=3000" >> /tmp/.env
           echo "LOG_LEVEL=info" >> /tmp/.env
           echo "PG_DATABASE_URL=${{ secrets.DATABASE_URL }}" >> /tmp/.env
 
