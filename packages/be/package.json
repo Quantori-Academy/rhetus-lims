@@ -8,7 +8,7 @@
 	},
 	"scripts": {
 		"dev": "node --watch --env-file .env src/server.js",
-		"start": "node src/server.js",
+		"start": "node --env-file .env src/server.js",
 		"lint": "eslint"
 	},
 	"dependencies": {

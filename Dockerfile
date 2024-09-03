@@ -1,3 +1,4 @@
+# Build
 FROM node:22-alpine AS build
 
 ENV PNPM_HOME="/pnpm"
@@ -15,17 +16,26 @@ ENV NODE_ENV="production"
 RUN pnpm run build
 
 # Deploy Frontend
-FROM nginx:alpine AS fe
+FROM georgjung/nginx-brotli:latest AS fe
 
+COPY .github/workflows/nginx.conf /etc/nginx/nginx.conf
 COPY --chown=node:node --from=build /usr/src/app/packages/fe/dist /usr/share/nginx/html
 
 EXPOSE 80
 
+CMD ["nginx", "-g", "daemon off;"]
+
+
 # Deploy backend
 FROM node:22-alpine AS be
 
-COPY --chown=node:node --from=build /usr/src/app/packages/be ./dist
-COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
-COPY --chown=node:node --from=build /usr/src/app/packages/be/node_modules ./node_modules
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
-CMD [ "node", "dist/src/server.js" ]
+COPY --chown=node:node --from=build /usr/src/app/packages/be .
+COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
+
+ENV NODE_ENV="production"
+
+CMD [ "pnpm", "start" ]

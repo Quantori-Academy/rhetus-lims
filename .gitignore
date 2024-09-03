@@ -51,3 +51,5 @@ node_modules
 dist-ssr
 *.local
 
+# actions
+!.github/actions/auto-mention-action/dist

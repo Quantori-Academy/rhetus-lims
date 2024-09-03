@@ -1,0 +1,82 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  install-and-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm run lint
+
+      # - name: Tests
+      #   run: pnpm run test:fe
+
+      - name: Build
+        run: pnpm run build
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: install-and-validate
+
+    steps:
+      - name: Install OpenVPN
+        run: |
+          sudo apt update
+          sudo apt install -y openvpn openvpn-systemd-resolved
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          path: lims
+
+      - name: Connect to VPN
+        uses: 'kota65535/github-openvpn-connect-action@v2'
+        with:
+          config_file: ./lims/.github/workflows/client.ovpn
+
+      - name: Create .env file with all secrets
+        run: |
+          echo "MODE=production" > ./lims/packages/be/.env
+          echo "API_HOST=0.0.0.0" >> ./lims/packages/be/.env
+          echo "API_PORT=3000" >> ./lims/packages/be/.env
+          echo "LOG_LEVEL=info" >> ./lims/packages/be/.env
+          echo "PG_DATABASE_URL=${{ secrets.DATABASE_URL }}" >> ./lims/packages/be/.env
+
+      - name: Copy code to VM
+        env:
+          SSH_KEY: ${{secrets.SSH_KEY}}
+          SSH_USER: ${{secrets.SSH_USER}}
+          VM_IP: ${{vars.VM_IP}}
+        run: |
+          echo "${SSH_KEY}" >> /tmp/ssh_key
+          chmod 400 /tmp/ssh_key
+          scp -o KexAlgorithms=ecdh-sha2-nistp521 -o 'StrictHostKeyChecking no' -i /tmp/ssh_key -r ./lims ${SSH_USER}@$VM_IP:~
+
+      - name: Run latest version
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ vars.VM_IP }}
+          username: ${{ secrets.SSH_USER }}
+          cipher: ecdh-sha2-nistp521
+          key: ${{secrets.SSH_KEY}}
+          script: |
+            cd ~/lims
+            sudo docker compose stop
+            sudo docker compose up -d --build
+            rm -rf ./.git

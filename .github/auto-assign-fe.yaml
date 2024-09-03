@@ -1,0 +1,13 @@
+addReviewers: true
+addAssignees: false
+
+numberOfReviewers: 2
+
+useReviewGroups: true
+
+reviewGroups:
+  reviewer:
+    - andreypoletaev2
+  maintainer:
+    - dsavitskiiquantori
+    - PavelYakupov-FOG
