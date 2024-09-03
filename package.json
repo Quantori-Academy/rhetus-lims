@@ -11,6 +11,7 @@
 	"scripts": {
 		"dev": "pnpm run '/^dev:.*/'",
 		"build": "pnpm run '/^build:.*/'",
+		"lint": "pnpm run '/^lint:.*/'",
 		"dev:fe": "pnpm --filter rhetus-fe dev",
 		"dev:be": "pnpm --filter rhetus-be dev",
 		"lint:fe": "pnpm --filter rhetus-be lint",

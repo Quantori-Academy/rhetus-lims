@@ -15,12 +15,14 @@ Prototype link: `TBD`
 - [Tools](#tools)
 - [Scripts](#scripts)
 - [Git](#git)
-
   - [Branches](#branches)
   - [Code Review](#code-review)
-
+    - [Reviewer vs Maintainer](#reviewer-vs-maintainer)
 - [Test Strategy](#test-strategy)
 - [Visual Language](#visual-language)
+  - [Keyboard accessible](#keyboard-accessible)
+  - [Tried to make input parsing friendly](#tried-to-make-input-parsing-friendly)
+  - [Made error messages actually useful](#made-error-messages-actually-useful)
 - [Dependencies](#dependencies)
 - [Guides](#guides)
 
@@ -151,6 +153,26 @@ How to work with repo in git:
 - Rebase your work if there are many new changes in main
 - Get at least 1 approval from mentors or team lead
 - Squash commits and merge PR
+
+#### Reviewer vs Maintainer
+
+**Reviewers:**
+
+- Responsible for reviewing the specifics of the proposed solution in an PR, ensuring it meets the acceptance criteria.
+- Recommend splitting large or complex MRs into smaller parts to simplify the review process.
+
+**Maintainers:**
+
+- Responsible for maintaining the overall quality, structure, and consistency of the codebase.
+- Focus on reviewing architecture, readability, and adherence to code standards to avoid technical debt.
+
+**Comparison:**
+
+- **Scope of Responsibility**: Maintainers are responsible for the overall quality and architecture of the codebase, while reviewers focus on the specifics of technical solutions and details within an PR.
+- **Role in the Process**: Maintainers can approve and merge PRs with broad competence across the project, while reviewers can only review and approve MRs.
+- **Managing MRs**: Maintainers oversee the entire process up to merging, while reviewers focus more on initial analysis and providing recommendations for improvements.
+
+This is a subset of the rules taken from: [Code Review Guidelines](https://docs.gitlab.com/ee/development/code_review.html#:~:text=Maintainers%20are%20responsible%20for%20the,DRYness%2C%20consistency%2C%20and%20readability.)
 
 ## Test Strategy
 
