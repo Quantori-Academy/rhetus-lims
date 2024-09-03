@@ -1,0 +1,9 @@
+backend:
+  - changed-files:
+      - any-glob-to-any-file: packages/be/**
+frontend:
+  - changed-files:
+      - any-glob-to-any-file: packages/fe/**
+docs:
+  - changed-files:
+      - any-glob-to-any-file: '**/*.md'
