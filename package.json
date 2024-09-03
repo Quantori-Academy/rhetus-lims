@@ -17,7 +17,8 @@
 		"lint:fe": "pnpm --filter rhetus-be lint",
 		"lint:be": "pnpm --filter rhetus-be lint",
 		"build:fe": "pnpm --filter rhetus-fe build",
-		"build:be": "pnpm --filter rhetus-be build"
+		"build:be": "pnpm --filter rhetus-be build",
+		"start:be": "pnpm --filter rhetus-be start"
 	},
 	"devDependencies": {
 		"globals": "^15.9.0"

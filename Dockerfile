@@ -24,8 +24,12 @@ EXPOSE 80
 # Deploy backend
 FROM node:22-alpine AS be
 
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
 COPY --chown=node:node --from=build /usr/src/app/packages/be ./dist
 COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
 COPY --chown=node:node --from=build /usr/src/app/packages/be/node_modules ./node_modules
 
-CMD [ "node", "dist/src/server.js" ]
+CMD [ "pnpm", "start:be" ]

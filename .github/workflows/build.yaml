@@ -52,11 +52,11 @@ jobs:
 
       - name: Create .env file with all secrets
         run: |
-          echo "MODE=production" > ./lims/.env
-          echo "API_HOST=0.0.0.0" >> ./lims/.env
-          echo "API_PORT=3000" >> ./lims/.env
-          echo "LOG_LEVEL=info" >> ./lims/.env
-          echo "PG_DATABASE_URL=${{ secrets.DATABASE_URL }}" >> ./lims/.env
+          echo "MODE=production" > ./lims/packages/be/.env
+          echo "API_HOST=0.0.0.0" >> ./lims/packages/be/.env
+          echo "API_PORT=3000" >> ./lims/packages/be/.env
+          echo "LOG_LEVEL=info" >> ./lims/packages/be/.env
+          echo "PG_DATABASE_URL=${{ secrets.DATABASE_URL }}" >> ./lims/packages/be/.env
 
       - name: Copy code to VM
         env:
