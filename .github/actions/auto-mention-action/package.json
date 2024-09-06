@@ -1,6 +1,7 @@
 {
 	"name": "auto-mention-action",
 	"private": "true",
+	"type": "module",
 	"devDependencies": {
 		"@vercel/ncc": "^0.38.1",
 		"lodash.samplesize": "^4.2.0",
