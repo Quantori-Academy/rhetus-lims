@@ -13,12 +13,12 @@ jobs:
 
       - name: Auto-assign for FE
         if: contains(github.event.pull_request.labels.*.name, 'frontend')
-        uses: kentaro-m/auto-assign-action@v2
+        uses: kentaro-m/auto-assign-action@v2.0.0
         with:
           configuration-path: '.github/auto-assign-fe.yaml'
 
       - name: Auto-assign for BE
         if: contains(github.event.pull_request.labels.*.name, 'backend')
-        uses: kentaro-m/auto-assign-action@v2
+        uses: kentaro-m/auto-assign-action@v2.0.0
         with:
           configuration-path: '.github/auto-assign-be.yaml'

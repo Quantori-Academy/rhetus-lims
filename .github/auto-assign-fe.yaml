@@ -7,7 +7,7 @@ useReviewGroups: true
 
 reviewGroups:
   reviewer:
-    - reviewerA
+    - andreypoletaev2
   maintainer:
     - dsavitskiiquantori
     - PavelYakupov-FOG
