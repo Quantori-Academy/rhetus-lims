@@ -11,12 +11,12 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/labeler@v5
   add-reviews:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Auto-assign for FE
         if: contains(github.event.pull_request.labels.*.name, 'frontend')
