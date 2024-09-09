@@ -2,7 +2,7 @@
 
 Rhetus LIMS is a repository for a efficient system that stores, manages, and analyzes laboratory data.
 
-Prototype link: `TBD`
+Prototype link: [dev](https://vm3.quantori.academy:8080/)
 
 ---
 
@@ -11,10 +11,13 @@ Prototype link: `TBD`
   - [Efficiency](#efficiency)
   - [Iterativeness](#iterativeness)
   - [Transparency](#transparency)
+- [Guides](#guides)
+- [Development](#development)
+  - [Contract First](#contract-first)
 - [Project Structure](#project-structure)
 - [Tools](#tools)
 - [Scripts](#scripts)
-- [Git](#git)
+- [Contributing](#contributing)
   - [Branches](#branches)
   - [Code Review](#code-review)
     - [Reviewer vs Maintainer](#reviewer-vs-maintainer)
@@ -24,7 +27,6 @@ Prototype link: `TBD`
   - [Tried to make input parsing friendly](#tried-to-make-input-parsing-friendly)
   - [Made error messages actually useful](#made-error-messages-actually-useful)
 - [Dependencies](#dependencies)
-- [Guides](#guides)
 
 ## Principles
 
@@ -45,6 +47,8 @@ This is a subset of the rules taken from: [Gitlab Values](https://handbook.gitla
 **Support the success of others.**
 
 **People are not their work** — Talk about the work, not the person doing it (“You didn’t send feedback on the new design” instead of “You never listen to me”).
+
+**First unblock others** — in the context of collaboration, if anyone is blocked by you on a question, your approval, or a merge request review, you should prioritize unblocking them, either directly or through helping them find someone else who can.
 
 **Make an effort to know each other better** — Get to know the person behind the lines of text in chats and emails. Encourage people to learn more about each other on a personal level.
 
@@ -94,13 +98,30 @@ At first, quick decision-making and realizing that things change with less consu
 
 **Disagree, but commit**. Everything can be questioned, but if a decision is not overturned, it must be followed — this is a general principle.
 
+## Guides
+
+- [Team Onboarding](./docs/onboarding.md)
+- [Processes](./docs/processes.md)
+
+Guides will help you understand some aspects of the work.
+
+## Development
+
+### Contract First
+
+We use Contract First to significantly speed up development.
+
+Usually FE cannot start work before BE, but if both participants in the process know the API in advance, then development can be started together.
+
+**Note:** With this approach, you will be able to find problems in the requirements and find out about them earlier.
+
 ## Project Structure
 
 - **Development**
   - [`be/`](./packages/be/): server's logic and UI.
     - See **[`packages/be/README.md`](./packages/be/README.md)** for BE docs.
   - [`fe/`](./packages/fe/): client’s logic and UI.
-    - See **[`./packages/fe/README.md`](./packages/fe/README.md)** for FE docs.
+    - See **[`packages/fe/README.md`](./packages/fe/README.md)** for FE docs.
 - [`docs/`](./docs/): guides for developers.
 - [`static/`](./static/): images for guides.
 - [`.github/`](./.github/): scripts to test projects on CI.
@@ -123,23 +144,17 @@ Each project has its own tools, too.
 - `pnpm dev`: run BE and FE.
 - `pnpm build`: build BE and FE.
 
-## Git
+## Contributing
 
-How to work with repo in git:
-
-1. Clone the repository.
-2. Create a new branch for your feature or fix [{ISSUE_NUMBER}-{SOME_FEATURE}] (example: 4-storage-dashboard-filters).
-3. Edit the files as needed.
-4. Stage your changes.
-5. Commit your changes.
-6. Push your branch to the remote repository
-7. Create a pull request (PR)
-
-**Important:** We use squash merging only!
+We use **squash merging** only in order to keep our git commit history clean.
 
 - Ensure your PR has a clear, concise commit history.
 - When merging, select "Squash and merge" to combine all commits into a single one.
 - This keeps the main branch clean and easy to follow.
+
+Note: Take a look on the interactive rebase, it will help you understand that you have full power over the commits
+
+When giving Pull Request review feedback, we aim to provide additional context by utilizing the conventional: [comments standard](https://conventionalcomments.org/).
 
 ### Branches
 
@@ -148,11 +163,7 @@ How to work with repo in git:
 
 ### Code Review
 
-- Target your pull-requests to main branch
-- Request code review using GitHub
-- Rebase your work if there are many new changes in main
-- Get at least 1 approval from mentors or team lead
-- Squash commits and merge PR
+Don't forget about "First unblock others" in [collaboration](#collaboration) section
 
 #### Reviewer vs Maintainer
 
@@ -225,7 +236,3 @@ pnpm update -r --include-workspace-root
 ```
 
 We can update all dependencies at least once per week.
-
-## Guides
-
-- [Team Onboarding](./docs/onboarding.md)

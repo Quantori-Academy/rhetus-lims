@@ -16,7 +16,6 @@ We use **fastify** as the server.
 - [`src/`](./src): app entry point.
   - [`app.js`](./src/app.js): application instance.
   - [`server.js`](./src/server.js): server file.
-  - [`runtimeEnv.js`](./src/runtimeEnv.js): all envs available in up at runtime
 - [`src/lib/`](./src/lib): common parts of app.
   - [`plugins/`](./src/lib/plugins/): global plugins.
   - [`config/`](./src/lib/config/): env and configs.
