@@ -1,0 +1,14 @@
+name: 'auto-mention-action'
+description: 'This is a action that mention pull request reviewers'
+runs:
+  using: 'node20'
+  main: 'src/main.js'
+
+inputs:
+  repo-token:
+    description: 'A token for the repo'
+    default: ${{ github.token }}
+    required: false
+  configuration-path:
+    description: 'A path for the auto-mention configuration'
+    default: '.github/auto_assign.yml'

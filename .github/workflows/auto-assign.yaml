@@ -5,20 +5,27 @@ on:
     types: [labeled, opened, synchronize, reopened]
 
 jobs:
+  labeler:
+    permissions:
+      contents: read
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/labeler@v5
   add-reviews:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Auto-assign for FE
         if: contains(github.event.pull_request.labels.*.name, 'frontend')
-        uses: kentaro-m/auto-assign-action@v2.0.0
+        uses: ./.github/actions/auto-mention-action
         with:
           configuration-path: '.github/auto-assign-fe.yaml'
 
       - name: Auto-assign for BE
         if: contains(github.event.pull_request.labels.*.name, 'backend')
-        uses: kentaro-m/auto-assign-action@v2.0.0
+        uses: ./.github/actions/auto-mention-action
         with:
           configuration-path: '.github/auto-assign-be.yaml'
