@@ -1,7 +1,7 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
-import * as utils from './utils';
-import * as handler from './handler';
+import * as utils from './utils.js';
+import * as handler from './handler.js';
 
 export async function run() {
 	try {
