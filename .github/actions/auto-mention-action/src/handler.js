@@ -1,6 +1,6 @@
 import * as core from '@actions/core';
 import * as utils from './utils.js';
-import { PullRequest } from './pull_request.js';
+import { PullRequest } from './pull-request.js';
 
 export async function handlePullRequest(client, context, config) {
 	if (!context.payload.pull_request) {

@@ -2,7 +2,7 @@ name: 'auto-mention-action'
 description: 'This is a action that mention pull request reviewers'
 runs:
   using: 'node20'
-  main: 'src/main.js'
+  main: 'dist/index.js'
 
 inputs:
   repo-token:

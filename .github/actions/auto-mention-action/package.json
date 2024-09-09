@@ -1,9 +1,12 @@
 {
 	"name": "auto-mention-action",
 	"private": "true",
-	"type": "module",
+	"scripts": {
+		"build": "esbuild src/main.js --bundle --platform=node --outfile=dist/index.js"
+	},
 	"devDependencies": {
 		"@vercel/ncc": "^0.38.1",
+		"esbuild": "^0.23.1",
 		"lodash.samplesize": "^4.2.0",
 		"prettier": "^3.2.5"
 	},

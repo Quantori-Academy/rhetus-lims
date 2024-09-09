@@ -1,4 +1,5 @@
 import sampleSize from 'lodash.samplesize';
+import { parseYAML } from 'confbox';
 
 export function chooseUsers(candidates, desiredNumber, filterUser) {
 	const filteredCandidates = candidates.filter(reviewer => {
@@ -51,7 +52,7 @@ export async function fetchConfigurationFile(client, options) {
 	}
 
 	const configString = Buffer.from(data.content, 'base64').toString();
-	const config = yaml.safeLoad(configString);
+	const config = parseYAML(configString);
 
 	return config;
 }

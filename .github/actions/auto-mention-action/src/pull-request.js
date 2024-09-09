@@ -33,7 +33,7 @@ export class PullRequest {
 
 	async mentionInComments(reviewers) {
 		const { owner, repo, number: prNumber } = this.#context.issue;
-		const result = await octokit.issues.createComment({
+		const result = await this.#client.rest.issues.createComment({
 			owner,
 			repo,
 			issue_number: prNumber,
