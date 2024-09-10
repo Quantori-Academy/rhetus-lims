@@ -36,11 +36,9 @@ async function swaggerGenerator(fastify) {
 		exposeRoute: fastify.config.mode !== 'production'
 	});
 
-	if (fastify.config.mode !== 'production') {
-		await fastify.register(fastifySwaggerUi, {
-			routePrefix: '/documentation'
-		});
-	}
+	await fastify.register(fastifySwaggerUi, {
+		routePrefix: '/documentation'
+	});
 }
 
 export default fp(swaggerGenerator);

@@ -11,6 +11,7 @@ export async function build(opts = {}) {
 
 	app.register(autoload, {
 		dir: join(import.meta.dirname, 'routes'),
+		matchFilter: path => path.endsWith('-route.js'),
 		dirNameRoutePrefix: false
 	});
 

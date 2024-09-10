@@ -42,7 +42,7 @@ Files, folder name, components — kebab-case
 
 General Vue.js style guide — [style guide](https://vuejs.org/style-guide/) (A, B, C)
 
-Prefix for internal common components — `rh-`  (example: `rh-form`)
+Prefix for internal common components — `rh-` (example: `rh-form`)
 
 **Composables**
 

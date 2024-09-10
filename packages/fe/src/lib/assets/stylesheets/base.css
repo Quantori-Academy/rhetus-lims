@@ -5,17 +5,17 @@ button {
 *,
 *::before,
 *::after {
-	box-sizing: border-box;
 	margin: 0;
+	box-sizing: border-box;
 	font-weight: normal;
 }
 
 html {
-	color: tomato !important;
-	min-height: 100vh;
-	font-family: Inter, sans-serif;
-	font-size: 14px;
 	text-rendering: optimizeLegibility;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+	min-height: 100vh;
+	color: tomato !important;
+	font-size: 14px;
+	font-family: Inter, sans-serif;
 }

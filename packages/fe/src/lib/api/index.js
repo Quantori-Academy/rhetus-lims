@@ -1,6 +1,6 @@
-import rickandmorty from './rickandmorty';
+import cities from './cities.js';
 import { http } from './http';
 
 export const $api = {
-	rickandmorty: rickandmorty(http)
+	cities: cities(http)
 };

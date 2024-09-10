@@ -2,10 +2,12 @@
 
 _See the [full doc](../README.md) first._
 
-- [Project Structure](#project-structure)
-- [Style Guide](#style-guide)
-- [Tools](#tools)
-- [Scripts](#scripts)
+- [Rhetus BE](#rhetus-be)
+	- [Project Structure](#project-structure)
+	- [Style Guide](#style-guide)
+		- [Naming](#naming)
+	- [Tools](#tools)
+	- [Scripts](#scripts)
 
 ## Project Structure
 
@@ -22,7 +24,7 @@ We use **fastify** as the server.
 - [`src/models/`](./src/models): defines data structure and database interactions.
 - [`src/routes/`](./src/routes): handles request with file base routing.
 - [`src/services/`](./src/services): implements core business logic.
-- [`knex/`](./knex): list of migrations.
+- [`drizzle/`](./drizzle): drizzle internal working dir.
 
 ## Style Guide
 
@@ -33,7 +35,7 @@ Files, folder name — kebab-case.
 ## Tools
 
 - [Fastify](https://fastify.dev/) - Fast and low overhead web framework.
-- [knex](https://knexjs.org/) - SQL query builder
+- [drizzle](https://orm.drizzle.team/) - ORM for you to ship ship ship
 
 ## Scripts
 

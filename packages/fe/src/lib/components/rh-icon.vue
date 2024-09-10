@@ -16,9 +16,11 @@ const props = defineProps({
 	}
 });
 
-const iconsClass = computed(() => `pi pi-${props.name}`);
+const symbolId = computed(() => `/spritemap.svg#${props.name}`);
 </script>
 
 <template>
-	<span :class="iconsClass" :style="{ color: color, fontSize: `${size}px` }"></span>
+	<svg :width="size" :height="size" :style="{ fill: color }">
+		<use :xlink:href="symbolId"></use>
+	</svg>
 </template>
