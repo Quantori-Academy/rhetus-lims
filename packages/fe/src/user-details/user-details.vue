@@ -2,6 +2,7 @@
 import { ElForm, ElInput, ElButton, ElFormItem } from 'element-plus';
 import {  ref } from 'vue';
 const editingForm = ref(false);
+const repeat_password = ref('');
 const user = ref({
 	// test values
 	username: 'annabee',
@@ -10,7 +11,6 @@ const user = ref({
   email: 'annasmith@gmail.com',
 	role: 'Admin',
 	password: 'testing!',
-	repeat_password: 'testing!',
 	creation_date: '12.04.22'
 });
 const toggleEdit = () => {
@@ -49,8 +49,8 @@ const cancelEdit = () => {
         <el-input v-model="user.password" type="password" :disabled="!editingForm" />
         <el-input
           v-if="editingForm"
-          v-model="repeatPassword"
-          type="repeat_password"
+          v-model="repeat_password"
+          type="password"
           placeholder="Repeat password"
         />
 			</el-form-item>
