@@ -1,5 +1,5 @@
 <script setup>
-import { ElForm, ElInput, ElButton, ElFormItem, ElSelect, ElOption,ElMessage } from 'element-plus';
+import { ElForm, ElInput, ElButton, ElFormItem, ElSelect, ElOption,ElMessage } from "element-plus";
 // import { $api } from '../lib/api';
 import "./user-details.css"
 import "/src/lib/assets/stylesheets/colors.css"
@@ -126,7 +126,7 @@ const changePassword = async () => {
 			</el-form-item>
       <el-button  type="primary"  @click="handleButtonClick">{{ editingForm ? 'Save' : 'Edit profile' }}</el-button>
       <el-button v-if="editingForm" @click="cancelEdit">Cancel</el-button>
-			<el-button type="warning" @click="changePassword">Change password</el-button>
+			<el-button v-if="!editingForm" type="warning" @click="changePassword">Change password</el-button>
 		</el-form>
 		</div>
 </template>
@@ -139,11 +139,15 @@ const changePassword = async () => {
 	margin-bottom:  10px;
 }
 .el-form {
-	width: 30rem;
-	max-width: 30rem;
+	width: 50vw;
 }
 .el-form-item:last-of-type {
 	margin-bottom: 20px;
+}
+@media screen and (max-width: 750px) {
+	.el-form {
+	width: 80vw;
+}
 }
 
 </style>
