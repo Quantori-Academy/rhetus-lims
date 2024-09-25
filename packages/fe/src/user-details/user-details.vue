@@ -1,71 +1,149 @@
 <script setup>
-import { ElForm, ElInput, ElButton, ElFormItem } from 'element-plus';
+import { ElForm, ElInput, ElButton, ElFormItem, ElSelect, ElOption,ElMessage } from 'element-plus';
+// import { $api } from '../lib/api';
+import "./user-details.css"
+import "/src/lib/assets/stylesheets/colors.css"
+// refs
 import {  ref } from 'vue';
 const editingForm = ref(false);
-const repeat_password = ref('');
+const formRef = ref(null);
+// test values
 const user = ref({
-	// test values
 	username: 'annabee',
-  firstname: 'Anna',
-  lastname: 'Smith',
+  firstName: 'Anna',
+  lastName: 'Smith',
   email: 'annasmith@gmail.com',
 	role: 'Admin',
-	password: 'testing!',
-	creation_date: '12.04.22'
+	creationDate: '12.04.22'
 });
+// make original user copy
+const originalUser = ref({ ...user.value });
+// validation rules
+const rules = ref({
+  firstName: [
+    { required: true, message: 'First name can\'t be empty' }
+  ],
+  lastName: [
+    { required: true, message: 'Last name can\'t be empty' }
+  ],
+  email: [
+    { required: true, message: 'Email can\'t be empty' },
+    {  type: 'email', message: 'Please input a valid email address', trigger: 'blur'}
+  ]
+});
+
+// toggle edit form
 const toggleEdit = () => {
   editingForm.value = !editingForm.value;
-  if (!editingForm.value) {
-    // API calls later
+};
+
+// cancel editing
+const cancelEdit = () => {
+  editingForm.value = false;
+	user.value = { ...originalUser.value };
+};
+// handle form submission
+const handleSubmit = async () => {
+  try {
+    // Validate the form
+    const valid = await formRef.value.validate();
+    if (valid) {
+			originalUser.value = { ...user.value };
+			//Ready to submit to API
+			toggleEdit();
+      // update user details with API
+      // const response = await $api.users.updateUser(user.value);
+      // console.log("User updated:", response);
+      // originalUser.value = { ...user.value };
+      // cancelEdit();
+    }
+  } catch (error) {
+    console.error('Error updating user:', error);
+  }
+};
+// toggle edit or form submission
+const handleButtonClick = () => {
+  if (editingForm.value) {
+		// compare new values with original values
+		const hasChanges =
+    user.value.firstName !== originalUser.value.firstName ||
+    user.value.lastName !== originalUser.value.lastName ||
+    user.value.email !== originalUser.value.email ||
+    user.value.role !== originalUser.value.role;
+		if(hasChanges) {
+			handleSubmit();
+		}
+		else {
+	// There is nothing to submit
+			toggleEdit();
+		}
+  } else {
+    toggleEdit();
   }
 };
 
-const cancelEdit = () => {
-  editingForm.value = false;
-};
+//  request password change
+const changePassword = async () => {
+  try {
+		// Suggestion: add additional check that the password change for this user was really made
+    // const response = await $api.users.updatePasswordChange({ username: user.value.username, mustChangePassword: true });
+    // console.log("Password change request sent:", response);
 
+    // a success message
+    ElMessage({ message: 'Password change request has been set!', type: 'success' });
+  } catch (error) {
+    console.error('Error requesting password change:', error);
+  }
+};
+;
 </script>
 
 <template>
 		<div class="wrapper">
 			<h1>User Details</h1>
-			<el-form :model="user" @submit.prevent="toggleEdit">
-        <el-form-item>Username:
+			<el-form ref="formRef" :model="user" :rules="rules" @submit.prevent="handleButtonClick" >
+        <el-form-item prop="username">Username
 				<el-input v-model="user.username" :disabled="true" />
 			</el-form-item>
-        <el-form-item>First name:
-        <el-input v-model="user.firstname" :disabled="!editingForm" />
+        <el-form-item prop="firstName">First name
+        <el-input v-model="user.firstName" :disabled="!editingForm" />
 			</el-form-item>
-        <el-form-item>Last name:
-        <el-input v-model="user.lastname" :disabled="!editingForm" />
+        <el-form-item prop="lastName">Last name
+        <el-input v-model="user.lastName" :disabled="!editingForm" />
 			</el-form-item>
-        <el-form-item>Email:
+        <el-form-item prop="email">Email
         <el-input v-model="user.email" :disabled="!editingForm" />
 			</el-form-item>
-        <el-form-item>Role:
-        <el-input v-model="user.role" :disabled="!editingForm" />
+        <el-form-item>Role
+				<el-select  v-model="user.role" :disabled="!editingForm" :placeholder="user.role">
+					<el-option label="Admin" value="admin" />
+					<el-option label="Procurement officer" value="procurement_officer" />
+					<el-option label="Researcher" value="researcher" />
+				</el-select>
 			</el-form-item>
-        <el-form-item>Password:
-        <el-input v-model="user.password" type="password" :disabled="!editingForm" />
-        <el-input
-          v-if="editingForm"
-          v-model="repeat_password"
-          type="password"
-          placeholder="Repeat password"
-        />
+        <el-form-item class="last-input" prop="creationDate">Creation date
+				<el-input v-model="user.creationDate" :disabled="true" />
 			</el-form-item>
-        <el-form-item>Creation date:
-				<el-input v-model="user.creation_date" :disabled="true" />
-			</el-form-item>
-      <el-button  type="primary" @click="toggleEdit">{{ editingForm ? 'Save' : 'Edit profile' }}</el-button>
+      <el-button  type="primary"  @click="handleButtonClick">{{ editingForm ? 'Save' : 'Edit profile' }}</el-button>
       <el-button v-if="editingForm" @click="cancelEdit">Cancel</el-button>
-    </el-form>
+			<el-button type="warning" @click="changePassword">Change password</el-button>
+		</el-form>
 		</div>
 </template>
 
 <style scoped>
 .wrapper {
-	color: black;
+	color: var(--el-color-text-primary);
+}
+.el-form-item {
+	margin-bottom:  10px;
+}
+.el-form {
+	width: 30rem;
+	max-width: 30rem;
+}
+.el-form-item:last-of-type {
+	margin-bottom: 20px;
 }
 
 </style>
