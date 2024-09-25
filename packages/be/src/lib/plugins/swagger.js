@@ -2,10 +2,13 @@ import fp from 'fastify-plugin';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 import fastifySwagger from '@fastify/swagger';
 import { getConfig } from '../config/config.js';
+import { getConfig } from '../config/config.js';
 
 const version = '0.0.1';
 
 async function swaggerGenerator(fastify) {
+	const config = getConfig();
+
 	const config = getConfig();
 	await fastify.register(fastifySwagger, {
 		swagger: {
