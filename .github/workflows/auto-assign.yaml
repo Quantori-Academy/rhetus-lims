@@ -2,34 +2,28 @@ name: Auto Assign
 
 on:
   pull_request:
-    types: [labeled, opened, synchronize, reopened]
+    types: [opened]
 
 jobs:
-  labeler:
+  code-review:
     permissions:
       contents: read
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/labeler@v5
-  add-reviews:
-    needs: labeler
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-    steps:
+      - id: labeler
+        uses: actions/labeler@v5
+
       - uses: actions/checkout@v4
 
       - name: Auto-assign for FE
-        if: contains(github.event.pull_request.labels.*.name, 'frontend')
+        if: contains(steps.labeler.outputs.all-labels, 'frontend')
         uses: ./.github/actions/auto-mention-action
         with:
           configuration-path: '.github/auto-assign-fe.yaml'
 
       - name: Auto-assign for BE
-        if: contains(github.event.pull_request.labels.*.name, 'backend')
+        if: contains(steps.labeler.outputs.all-labels, 'backend')
         uses: ./.github/actions/auto-mention-action
         with:
           configuration-path: '.github/auto-assign-be.yaml'
