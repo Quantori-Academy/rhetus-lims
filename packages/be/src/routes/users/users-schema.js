@@ -1,20 +1,9 @@
 import S from 'fluent-json-schema';
-
-// TODO: replace with Role schema import?
-const roles = {
-	admin: 'admin',
-	'procurement officer': 'procurement officer',
-	researcher: 'researcher'
-};
+import { Role } from '../roles/roles-schema.js';
 
 const statusMessage = S.object()
 	.prop('status', S.string().required())
 	.prop('message', S.string().required());
-
-// TODO: replace to role folder
-const Role = S.object()
-	.prop('id', S.number().minimum(1))
-	.prop('name', S.string().enum(Object.values(roles)));
 
 const User = S.object()
 	.prop('id', S.number().required().minimum(1))
@@ -49,10 +38,7 @@ const getUsers = {
 			.prop(
 				'users',
 				S.array().items(
-					User.without(['password', 'createdAt'])
-						// TODO: update when roles
-						// .prop('role', Role).required()
-						.prop('roleId', S.number().minimum(1).maximum(3))
+					User.without(['password', 'createdAt', 'roleId']).prop('role', Role).required()
 				)
 			)
 			.prop('count', S.number()),
