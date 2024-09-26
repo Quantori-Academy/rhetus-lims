@@ -1,4 +1,4 @@
-#app {
+/* #app {
 	--el-font-family: Inter, sans-serif;
 	--el-color-primary: green;
 	--el-color-success: #00ae44;
@@ -21,7 +21,7 @@
 	--el-button-secondary-font-color: --el-color-white;
 	--el-button-secondary-background-color: --el-color-secondary;
 	--el-button-secondary-border-color: --el-color-secondary;
-}
+} */
 
 /* color palette  */
 :root {

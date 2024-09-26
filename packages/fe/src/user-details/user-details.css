@@ -1,4 +1,0 @@
-.el-form-item .el-input.is-disabled .el-input__wrapper,
-.el-form-item .el-select .el-select__wrapper.is-disabled {
-	background-color: transparent;
-}

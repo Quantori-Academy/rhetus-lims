@@ -1,7 +1,7 @@
 <script setup>
 import { ElForm, ElInput, ElButton, ElFormItem, ElSelect, ElOption,ElMessage } from "element-plus";
 // import { $api } from '../lib/api';
-import "./user-details.css"
+
 import "/src/lib/assets/stylesheets/colors.css"
 // refs
 import {  ref } from 'vue';
@@ -133,7 +133,7 @@ const changePassword = async () => {
 
 <style scoped>
 .wrapper {
-	color: var(--el-color-text-primary);
+	color: black;
 }
 .el-form-item {
 	margin-bottom:  10px;
@@ -143,6 +143,10 @@ const changePassword = async () => {
 }
 .el-form-item:last-of-type {
 	margin-bottom: 20px;
+}
+.el-form-item .el-input.is-disabled .el-input__wrapper,
+.el-form-item .el-select .el-select__wrapper.is-disabled {
+	background-color: transparent;
 }
 @media screen and (max-width: 750px) {
 	.el-form {
