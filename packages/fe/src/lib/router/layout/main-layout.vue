@@ -6,6 +6,7 @@
 		<nav class="main-navigation">
 			<router-link to="/">Table</router-link>
 			<router-link to="/form">Form</router-link>
+			<router-link to="/users/list">Users</router-link>
 		</nav>
 		<router-view></router-view>
 	</div>
