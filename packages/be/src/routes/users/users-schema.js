@@ -1,6 +1,6 @@
 import S from 'fluent-json-schema';
 
-// TODO: replace with Role schema import?s
+// TODO: replace with Role schema import?
 const roles = {
 	admin: 'admin',
 	'procurement officer': 'procurement officer',
@@ -11,70 +11,92 @@ const statusMessage = S.object()
 	.prop('status', S.string().required())
 	.prop('message', S.string().required());
 
+// TODO: replace to role folder
+const Role = S.object()
+	.prop('id', S.number().minimum(1))
+	.prop('name', S.string().enum(Object.values(roles)));
+
 const User = S.object()
 	.prop('id', S.number().required().minimum(1))
 	.prop('username', S.string().required())
 	.prop('firstName', S.string().required())
 	.prop('lastName', S.string().required())
 	.prop('email', S.string().format(S.FORMATS.EMAIL).required())
-	.prop('password', S.string().required())
+	.prop('password', S.string().required().minLength(8))
 	.prop('lastLogin', S.string().format(S.FORMATS.DATE_TIME).required())
 	.prop('createdAt', S.string().format(S.FORMATS.DATE_TIME).required())
-	.prop(
-		'role',
-		S.object()
-			.prop('id', S.number().minimum(1).required())
-			.prop('name', S.string().enum(Object.values(roles)).required())
-	);
+	.prop('roleId', S.number().required().minimum(1));
 
 const createUser = {
 	body: User.without(['id', 'lastLogin', 'createdAt']),
 	response: {
 		201: statusMessage,
 		403: statusMessage,
-		409: statusMessage
+		409: statusMessage,
+		500: statusMessage
 	}
 };
 
 const getUsers = {
-	params: S.object().prop('page', S.string()).prop('limit', S.string()),
+	query: S.object()
+		.prop('page', S.string())
+		.prop('limit', S.string())
+		.prop('filter', S.string())
+		.prop('search', S.string())
+		.prop('sort', S.string()),
 	response: {
-		200: S.object().prop('users', S.array().items(User.without(['password', 'createdAt']))),
-		403: statusMessage
+		200: S.object()
+			.prop(
+				'users',
+				S.array().items(
+					User.without(['password', 'createdAt'])
+						// TODO: update when roles
+						// .prop('role', Role).required()
+						.prop('roleId', S.number().minimum(1).maximum(3))
+				)
+			)
+			.prop('count', S.number()),
+		403: statusMessage,
+		500: statusMessage
 	}
 };
 
 const getUser = {
+	params: S.object().prop('id', S.string()),
 	response: {
-		200: S.object().prop('user', User.without(['password', 'lastLogin'])),
-		403: statusMessage
+		200: User.without(['password', 'lastLogin', 'roleId']).prop('role', Role).required(),
+		403: statusMessage,
+		404: statusMessage,
+		500: statusMessage
 	}
 };
 
+const updateUserSchema = S.object()
+	.additionalProperties(false)
+	.prop('firstName', S.string())
+	.prop('lastName', S.string())
+	.prop('email', S.string().format(S.FORMATS.EMAIL))
+	.prop('password', S.string())
+	.prop('roleId', S.number().minimum(1));
+
 const updateUser = {
-	body: S.object()
-		.prop('firstName', S.string())
-		.prop('lastName', S.string())
-		.prop('email', S.string().format(S.FORMATS.EMAIL))
-		.prop('password', S.string())
-		.prop(
-			'role',
-			S.object()
-				.prop('id', S.number().minimum(1))
-				.prop('name', S.string().enum(Object.values(roles)))
-		),
+	params: S.object().prop('id', S.string()),
+	body: updateUserSchema,
 	response: {
 		200: statusMessage,
 		403: statusMessage,
-		404: statusMessage
+		404: statusMessage,
+		500: statusMessage
 	}
 };
 
 const deleteUser = {
+	params: S.object().prop('id', S.string()),
 	response: {
 		200: statusMessage,
 		403: statusMessage,
-		404: statusMessage
+		404: statusMessage,
+		500: statusMessage
 	}
 };
 
