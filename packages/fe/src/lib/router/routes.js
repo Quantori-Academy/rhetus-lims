@@ -8,5 +8,10 @@ export const routes = [
 		path: '/form',
 		name: 'form',
 		component: () => import('../../form/main-form.vue')
+	},
+	{
+		path: '/users/list',
+		name: 'users-list',
+		component: () => import('../../users/list/user-list.vue')
 	}
 ];
