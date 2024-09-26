@@ -1,5 +1,6 @@
 <script setup>
-import { ElForm, ElInput, ElButton, ElFormItem, ElSelect, ElOption, ElMessage } from 'element-plus';
+import { ElForm, ElInput, ElButton, ElFormItem, ElSelect, ElOption } from 'element-plus';
+import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg';
 import { computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { ref } from 'vue';
@@ -70,7 +71,7 @@ const handleSubmit = async () => {
 			// cancelEdit();
 		}
 	} catch (error) {
-		console.error('Error updating user:', error);
+		$notifyUserAboutError(error.message || 'Error updating user');
 	}
 	editingForm.value = !editingForm.value;
 };
@@ -78,10 +79,13 @@ const handleSubmit = async () => {
 const changePassword = async () => {
 	try {
 		// const response = await $api.users.updatePasswordChange({ username: user.value.username, mustChangePassword: true });
-		// console.log("Password change request sent:", response);
-		ElMessage({ message: 'Password change request has been set!', type: 'success' });
+		$notify({
+			title: 'Success',
+			message: 'Password change request has been sent',
+			type: 'success'
+		});
 	} catch (error) {
-		console.error('Error requesting password change:', error);
+		$notifyUserAboutError(error.message || 'Error requesting password change');
 	}
 };
 </script>
