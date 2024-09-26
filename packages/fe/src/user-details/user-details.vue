@@ -1,14 +1,11 @@
 <script setup>
 import { ElForm, ElInput, ElButton, ElFormItem, ElSelect, ElOption, ElMessage } from 'element-plus';
-// import { $api } from '../lib/api';
-import '/src/lib/assets/stylesheets/colors.css';
-// refs
+import { computed, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { ref } from 'vue';
+
 const editingForm = ref(false);
 const formRef = ref(null);
-import { onMounted } from 'vue';
-import { useRoute } from 'vue-router';
-
 const route = useRoute();
 
 // test values
@@ -36,19 +33,29 @@ const rules = ref({
 		{ type: 'email', message: 'Please input a valid email address', trigger: 'blur' }
 	]
 });
+const formHasChanges = computed(() => {
+	return (
+		user.value.firstName !== originalUser.value.firstName ||
+		user.value.lastName !== originalUser.value.lastName ||
+		user.value.email !== originalUser.value.email ||
+		user.value.role !== originalUser.value.role
+	);
+});
 
-// toggle edit form
 const toggleEdit = () => {
 	editingForm.value = !editingForm.value;
 };
 
-// cancel editing
 const cancelEdit = () => {
 	editingForm.value = false;
 	user.value = { ...originalUser.value };
 };
-// handle form submission
+
 const handleSubmit = async () => {
+	editingForm.value = !editingForm.value;
+	if (!formHasChanges.value) {
+		return;
+	}
 	try {
 		// Validate the form
 		const valid = await formRef.value.validate();
@@ -65,35 +72,13 @@ const handleSubmit = async () => {
 	} catch (error) {
 		console.error('Error updating user:', error);
 	}
-};
-// toggle edit or form submission
-const handleButtonClick = () => {
-	if (editingForm.value) {
-		// compare new values with original values
-		const hasChanges =
-			user.value.firstName !== originalUser.value.firstName ||
-			user.value.lastName !== originalUser.value.lastName ||
-			user.value.email !== originalUser.value.email ||
-			user.value.role !== originalUser.value.role;
-		if (hasChanges) {
-			handleSubmit();
-		} else {
-			// There is nothing to submit
-			toggleEdit();
-		}
-	} else {
-		toggleEdit();
-	}
+	editingForm.value = !editingForm.value;
 };
 
-//  request password change
 const changePassword = async () => {
 	try {
-		// Suggestion: add additional check that the password change for this user was really made
 		// const response = await $api.users.updatePasswordChange({ username: user.value.username, mustChangePassword: true });
 		// console.log("Password change request sent:", response);
-
-		// a success message
 		ElMessage({ message: 'Password change request has been set!', type: 'success' });
 	} catch (error) {
 		console.error('Error requesting password change:', error);
@@ -104,7 +89,7 @@ const changePassword = async () => {
 <template>
 	<div class="wrapper">
 		<h1>User Details</h1>
-		<el-form ref="formRef" :model="user" :rules="rules" @submit.prevent="handleButtonClick">
+		<el-form ref="formRef" :model="user" :rules="rules" @submit.prevent="handleSubmit">
 			<el-form-item prop="username"
 				>Username
 				<el-input v-model="user.username" :disabled="true" />
@@ -133,7 +118,7 @@ const changePassword = async () => {
 				>Creation date
 				<el-input v-model="user.creationDate" :disabled="true" />
 			</el-form-item>
-			<el-button type="primary" @click="handleButtonClick">{{
+			<el-button type="primary" @click="handleSubmit">{{
 				editingForm ? 'Save' : 'Edit profile'
 			}}</el-button>
 			<el-button v-if="editingForm" @click="cancelEdit">Cancel</el-button>
