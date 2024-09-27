@@ -89,36 +89,28 @@ async function usersService(server) {
 			if (options) {
 				const parsedOptions = JSON.parse(options);
 
-				const filterSubQueries = Object.entries(parsedOptions).reduce(
-					(subQueries, [key, value]) => {
-						const optionProperty = optionsEnum[key.toLowerCase()];
+				const filterSubQueries = Object.entries(parsedOptions).map(([key, value]) => {
+					const optionProperty = optionsEnum[key.toLowerCase()];
 
-						if (!optionProperty) {
-							return subQueries;
-						}
+					if (!optionProperty) {
+						return;
+					}
 
-						if (optionProperty === 'lastLogin') {
-							subQueries.push(eq(schema.users.lastLogin, new Date(value)));
-							return subQueries;
-						}
+					if (optionProperty === 'lastLogin') {
+						return eq(schema.users.lastLogin, new Date(value));
+					}
 
-						if (optionProperty === 'role') {
-							!Array.isArray(value)
-								? subQueries.push(eq(schema.roles.name, value.toLowerCase()))
-								: subQueries.push(
-										inArray(
-											schema.roles.name,
-											value.map(roleName => roleName.toLowerCase())
-										)
-									);
-							return subQueries;
-						}
+					if (optionProperty === 'role') {
+						return !Array.isArray(value)
+							? eq(schema.roles.name, value.toLowerCase())
+							: inArray(
+									schema.roles.name,
+									value.map(roleName => roleName.toLowerCase())
+								);
+					}
 
-						subQueries.push(eq(schema.users[optionProperty], formatMapping[optionProperty](value)));
-						return subQueries;
-					},
-					[]
-				);
+					return eq(schema.users[optionProperty], formatMapping[optionProperty](value));
+				});
 
 				query.where(and(...filterSubQueries));
 			}

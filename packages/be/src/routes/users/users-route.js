@@ -8,7 +8,6 @@ const USER_ID = 20;
 
 async function users(server, options) {
 	await server.register(usersService);
-	// await server.register(usersService);
 
 	server.route({
 		method: 'POST',
@@ -42,9 +41,6 @@ async function users(server, options) {
 			}
 
 			const username = await server.usersService.createUser(req.body);
-			if (!username) {
-				throw new Error('Sorry. User was not created');
-			}
 
 			reply.code(201);
 			return { status: 'success', message: `User '${username}' was created` };
@@ -162,18 +158,16 @@ async function users(server, options) {
 					return { status: 'error', message: `No such role` };
 				}
 
-				// Admin updating himself
-				if (Number(req.params.id) === USER_ID) {
-					const isRoleDowngrading = targetRole.name !== 'administrator';
-					const isLastAdmin = await server.usersService.isLastAdmin(Number(req.params.id));
+				const isRoleDowngrading = targetRole.name !== 'administrator';
+				const isLastAdmin = await server.usersService.isLastAdmin(Number(req.params.id));
 
-					if (isRoleDowngrading && isLastAdmin) {
-						reply.code(409);
-						return {
-							status: 'error',
-							message: `Sorry. You cannot update your role. You are the only system administrator.`
-						};
-					}
+				// Admin updating himself
+				if (Number(req.params.id) === USER_ID && isRoleDowngrading && isLastAdmin) {
+					reply.code(409);
+					return {
+						status: 'error',
+						message: `Sorry. You cannot update your role. You are the only system administrator.`
+					};
 				}
 			}
 
@@ -217,24 +211,18 @@ async function users(server, options) {
 				return { status: 'error', message: `No such user` };
 			}
 
-			// Admin deleting himself
-			if (Number(req.params.id) === USER_ID) {
-				const isLastAdmin = await server.usersService.isLastAdmin(Number(req.params.id));
+			const isLastAdmin = await server.usersService.isLastAdmin(Number(req.params.id));
 
-				if (isLastAdmin) {
-					reply.code(409);
-					return {
-						status: 'error',
-						message: `Sorry. You cannot delete your profile. You are the only system administrator.`
-					};
-				}
+			// Admin deleting himself
+			if (Number(req.params.id) === USER_ID && isLastAdmin) {
+				reply.code(409);
+				return {
+					status: 'error',
+					message: `Sorry. You cannot delete your profile. You are the only system administrator.`
+				};
 			}
 
 			const username = await server.usersService.deleteUser(Number(req.params.id));
-
-			if (!username) {
-				throw new Error('Sorry. User was not deleted');
-			}
 
 			reply.code(200);
 			return { status: 'success', message: `User '${username}' was deleted` };
