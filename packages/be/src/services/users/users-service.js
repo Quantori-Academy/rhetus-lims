@@ -1,4 +1,4 @@
-import { count, eq } from 'drizzle-orm';
+import { eq, inArray, and } from 'drizzle-orm';
 import fp from 'fastify-plugin';
 import bcrypt from 'bcrypt';
 import { schema } from '../../lib/db/schema/index.js';
@@ -11,6 +11,15 @@ const formatMapping = {
 	password: string => bcrypt.hashSync(string, BCRYPT_SALT),
 	email: string => string.toLowerCase(),
 	username: string => string.toLowerCase()
+};
+
+const optionsEnum = {
+	role: 'role',
+	lastlogin: 'lastLogin',
+	firstname: 'firstName',
+	lastname: 'lastName',
+	username: 'username',
+	email: 'email'
 };
 
 async function usersService(server) {
@@ -57,12 +66,11 @@ async function usersService(server) {
 		getUsers: async queryParams => {
 			const limit = Number(queryParams.limit) || 10;
 			const page = Number(queryParams.page) || 1;
+			const options = queryParams.options || null;
 
 			const offset = page === 1 ? 0 : (page - 1) * limit;
 
-			// TODO: filter, search
-
-			const result = await server.db
+			let query = server.db
 				.select({
 					id: schema.users.id,
 					username: schema.users.username,
@@ -76,17 +84,57 @@ async function usersService(server) {
 					lastLogin: schema.users.lastLogin
 				})
 				.from(schema.users)
-				.innerJoin(schema.roles, eq(schema.users.roleId, schema.roles.id))
-				.limit(limit)
-				.offset(offset);
+				.innerJoin(schema.roles, eq(schema.users.roleId, schema.roles.id));
 
-			return result;
-		},
+			if (options) {
+				const parsedOptions = JSON.parse(options);
 
-		getUsersCount: async () => {
-			const result = await server.db.select({ value: count() }).from(schema.users);
+				const filterSubQueries = Object.entries(parsedOptions).reduce(
+					(subQueries, [key, value]) => {
+						const optionProperty = optionsEnum[key.toLowerCase()];
 
-			return result[0].value;
+						if (!optionProperty) {
+							return subQueries;
+						}
+
+						if (optionProperty === 'lastLogin') {
+							subQueries.push(eq(schema.users.lastLogin, new Date(value)));
+							return subQueries;
+						}
+
+						if (optionProperty === 'role') {
+							!Array.isArray(value)
+								? subQueries.push(eq(schema.roles.name, value.toLowerCase()))
+								: subQueries.push(
+										inArray(
+											schema.roles.name,
+											value.map(roleName => roleName.toLowerCase())
+										)
+									);
+							return subQueries;
+						}
+
+						subQueries.push(eq(schema.users[optionProperty], formatMapping[optionProperty](value)));
+						return subQueries;
+					},
+					[]
+				);
+
+				query.where(and(...filterSubQueries));
+			}
+
+			const count = await query;
+
+			if (limit && page) {
+				query.limit(limit).offset(offset);
+			}
+
+			const users = await query;
+
+			return {
+				users,
+				count: count.length
+			};
 		},
 
 		updateUser: async (id, data) => {

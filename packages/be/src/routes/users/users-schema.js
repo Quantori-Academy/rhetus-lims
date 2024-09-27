@@ -27,12 +27,7 @@ const createUser = {
 };
 
 const getUsers = {
-	query: S.object()
-		.prop('page', S.string())
-		.prop('limit', S.string())
-		.prop('filter', S.string())
-		.prop('search', S.string())
-		.prop('sort', S.string()),
+	query: S.object().prop('page', S.string()).prop('limit', S.string()).prop('options', S.string()),
 	response: {
 		200: S.object()
 			.prop(

@@ -78,7 +78,7 @@ async function users(server, options) {
 			}
 
 			const {
-				users: { id, username, firstName, lastName, email, roleId, createdAt },
+				users: { id, username, firstName, lastName, email, createdAt },
 				roles: { id: rolesId, name }
 			} = user;
 
@@ -117,11 +117,10 @@ async function users(server, options) {
 				return { status: 'error', message: `Sorry. You have no permissions to view users` };
 			}
 
-			const users = await server.usersService.getUsers(req.query);
-			const count = await server.usersService.getUsersCount();
+			const data = await server.usersService.getUsers(req.query);
 
 			reply.code(200);
-			return { count, users };
+			return data;
 		} catch (err) {
 			reply.code(500);
 			return { status: 'error', message: `Internal Server Error! ${err.message}` };
