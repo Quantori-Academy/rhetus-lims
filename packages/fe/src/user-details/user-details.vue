@@ -3,6 +3,7 @@ import { ElForm, ElInput, ElButton, ElFormItem, ElSelect, ElOption } from 'eleme
 import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg';
 import { computed, onMounted } from 'vue';
 import { ref } from 'vue';
+import { $api } from '../lib/api/index.js';
 
 const editingForm = ref(false);
 const formRef = ref(null);
@@ -19,16 +20,12 @@ const rules = ref({
 });
 
 onMounted(() => {
-	retrieveUser('c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d');
+	setUser('c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d');
 });
 
-const retrieveUser = async id => {
+const setUser = async id => {
 	try {
-		const response = await fetch(`/api/users/${id}`);
-		if (!response.ok) {
-			$notifyUserAboutError(response.message || 'Error updating user');
-		}
-		const data = await response.json();
+		const data = await $api.users.fetchUser(id);
 		user.value = data;
 		originalUser.value = { ...data };
 	} catch (error) {
@@ -57,34 +54,21 @@ const cancelEdit = () => {
 };
 
 const handleSubmit = async () => {
-	const valid = await new Promise(resolve => {
-		formRef.value?.validate(valid => {
-			resolve(valid);
-		});
-	});
 	if (!formHasChanges.value) {
 		toggleEdit();
 		return;
 	}
-	if (!valid) {
-		return;
-	}
-
 	try {
-		const response = await fetch(`/api/users/${user.value.id}`, {
-			method: 'PUT',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(user.value)
-		});
-		const updatedUser = await response.json();
-		user.value = updatedUser;
-		originalUser.value = { ...updatedUser };
+		const valid = await formRef.value?.validate();
+		if (valid === true) {
+			const updatedUser = await $api.users.updateUser(user.value.id, user.value);
+			user.value = updatedUser;
+			originalUser.value = { ...updatedUser };
+			toggleEdit();
+		}
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating user');
 	}
-	toggleEdit();
 };
 
 const changePassword = async () => {
@@ -108,7 +92,7 @@ const changePassword = async () => {
 			ref="formRef"
 			:model="user"
 			:rules="rules"
-			@submit.prevent="handleSubmit"
+			@submit="handleSubmit"
 		>
 			<el-form-item prop="username"
 				>Username

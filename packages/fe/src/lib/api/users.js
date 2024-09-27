@@ -7,5 +7,14 @@ export default http => ({
 			method: 'POST',
 			body: user
 		});
+	},
+	async fetchUser(id) {
+		return await http(`/users/${id}`);
+	},
+	async updateUser(id, user) {
+		return await http(`/users/${id}`, {
+			method: 'PUT',
+			body: JSON.stringify(user)
+		});
 	}
 });

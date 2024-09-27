@@ -22,7 +22,7 @@
 		"eslint-plugin-vue": "^9.23.0",
 		"fast-glob": "^3.3.2",
 		"jsdom": "^24.1.0",
-		"msw": "^2.4.9",
+		"msw": "^2.3.5",
 		"postcss": "^8.4.45",
 		"prettier": "^3.2.5",
 		"prettier-plugin-css-order": "^2.1.2",
