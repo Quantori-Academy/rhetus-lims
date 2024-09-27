@@ -3,8 +3,8 @@ import bcrypt from 'bcrypt';
 import * as schema from './auth-schema.js';
 
 const users = [
-	{ username: 'user1', password: await bcrypt.hash('password', 10) },
-	{ username: 'user2', password: await bcrypt.hash('password', 10) }
+	{ username: 'user1', password: await bcrypt.hash('password', 10), id: 1 },
+	{ username: 'user2', password: await bcrypt.hash('password', 10), id: 2 }
 ];
 
 const getUserByUsername = async username => {
@@ -17,7 +17,6 @@ async function auth(server, options) {
 	server.route({
 		method: 'POST',
 		path: options.prefix + 'login',
-		// onRequest: [server.authenticate],
 		schema: schema.login,
 		handler: onLogin
 	});
@@ -39,6 +38,8 @@ async function auth(server, options) {
 				reply.code(401);
 				return { error: 'Invalid credentials.' };
 			}
+
+			req.session.user = { id: user.id };
 
 			reply.code(200);
 			return { message: 'Successfully logged in.' };

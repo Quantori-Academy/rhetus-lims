@@ -24,6 +24,11 @@ async function swaggerGenerator(fastify) {
 			consumes: ['application/json'],
 			produces: ['application/json', 'text/html'],
 			securityDefinitions: {
+				Session: {
+					type: 'apiKey',
+					name: 'Cookie',
+					in: 'header',
+				},
 				Bearer: {
 					type: 'apiKey',
 					name: 'Bearer',
