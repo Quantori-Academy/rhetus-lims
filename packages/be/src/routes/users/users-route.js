@@ -4,7 +4,7 @@ import * as schema from './users-schema.js';
 import usersService from '../../services/users/users-service.js';
 
 // TODO: delete after info about use id from request
-const USER_ID = 16;
+const USER_ID = 20;
 
 async function users(server, options) {
 	await server.register(usersService);
@@ -27,11 +27,18 @@ async function users(server, options) {
 				return { status: 'error', message: `Sorry. You have no permissions to add new user` };
 			}
 
-			const isExist = await server.usersService.getUserByUsername(req.body.username);
+			const isUserExist = await server.usersService.getUserByUsername(req.body.username);
 
-			if (isExist) {
+			if (isUserExist) {
 				reply.code(409);
 				return { status: 'error', message: `Sorry. User '${req.body.username}' already exists` };
+			}
+
+			const isRoleExist = await server.rolesService.getRoleById(req.body.roleId);
+
+			if (!isRoleExist) {
+				reply.code(409);
+				return { status: 'error', message: 'No such role' };
 			}
 
 			const username = await server.usersService.createUser(req.body);
@@ -130,7 +137,6 @@ async function users(server, options) {
 	});
 	async function onUpdateUser(req, reply) {
 		try {
-			// TODO: checking for last admin
 			const isAdmin = await server.usersService.isAdmin(USER_ID);
 
 			// username will be cut by validation, but it is more safer
@@ -139,14 +145,37 @@ async function users(server, options) {
 				return { status: 'error', message: `Sorry. Username cannot be changed` };
 			}
 
-			if ('roleId' in req.body && !isAdmin) {
-				reply.code(403);
-				return { status: 'error', message: `Sorry. You have no permissions to change role` };
-			}
-
 			if (!isAdmin && USER_ID !== Number(req.params.id)) {
 				reply.code(403);
 				return { status: 'error', message: `Sorry. You have no permissions to change this user` };
+			}
+
+			if ('roleId' in req.body) {
+				if (!isAdmin) {
+					reply.code(403);
+					return { status: 'error', message: `Sorry. You have no permissions to change role` };
+				}
+
+				const targetRole = await server.rolesService.getRoleById(req.body.roleId);
+
+				if (!targetRole) {
+					reply.code(404);
+					return { status: 'error', message: `No such role` };
+				}
+
+				// Admin updating himself
+				if (Number(req.params.id) === USER_ID) {
+					const isRoleDowngrading = targetRole.name !== 'administrator';
+					const isLastAdmin = await server.usersService.isLastAdmin(Number(req.params.id));
+
+					if (isRoleDowngrading && isLastAdmin) {
+						reply.code(409);
+						return {
+							status: 'error',
+							message: `Sorry. You cannot update your role. You are the only system administrator.`
+						};
+					}
+				}
 			}
 
 			const user = await server.usersService.getUserById(Number(req.params.id));
@@ -175,7 +204,6 @@ async function users(server, options) {
 	});
 	async function onDeleteUser(req, reply) {
 		try {
-			// TODO: checking for last admin
 			const isAdmin = await server.usersService.isAdmin(USER_ID);
 
 			if (!isAdmin) {
@@ -188,6 +216,19 @@ async function users(server, options) {
 			if (!user) {
 				reply.code(404);
 				return { status: 'error', message: `No such user` };
+			}
+
+			// Admin deleting himself
+			if (Number(req.params.id) === USER_ID) {
+				const isLastAdmin = await server.usersService.isLastAdmin(Number(req.params.id));
+
+				if (isLastAdmin) {
+					reply.code(409);
+					return {
+						status: 'error',
+						message: `Sorry. You cannot delete your profile. You are the only system administrator.`
+					};
+				}
 			}
 
 			const username = await server.usersService.deleteUser(Number(req.params.id));

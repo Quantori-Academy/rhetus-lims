@@ -5,21 +5,27 @@ import { schema } from '../../lib/db/schema/index.js';
 
 const BCRYPT_SALT = 10;
 
+const formatMapping = {
+	firstName: string => `${string.charAt(0).toUpperCase()}${string.slice(1).toLowerCase()}`,
+	lastName: string => `${string.charAt(0).toUpperCase()}${string.slice(1).toLowerCase()}`,
+	password: string => bcrypt.hashSync(string, BCRYPT_SALT),
+	email: string => string.toLowerCase(),
+	username: string => string.toLowerCase()
+};
+
 async function usersService(server) {
 	server.decorate('usersService', {
 		createUser: async data => {
 			const { username, firstName, lastName, email, password, roleId } = data;
 
-			const hash = await bcrypt.hash(password, BCRYPT_SALT);
-
 			const result = await server.db
 				.insert(schema.users)
 				.values({
-					username: username.toLowerCase(),
-					password: hash,
-					firstName: `${firstName.charAt(0).toUpperCase()}${firstName.slice(1)}`,
-					lastName: `${lastName.charAt(0).toUpperCase()}${lastName.slice(1)}`,
-					email,
+					username: formatMapping.username(username),
+					password: formatMapping.password(password),
+					firstName: formatMapping.firstName(firstName),
+					lastName: formatMapping.lastName(lastName),
+					email: formatMapping.email(email),
 					roleId,
 					lastLogin: null,
 					createdAt: new Date()
@@ -49,12 +55,12 @@ async function usersService(server) {
 		},
 
 		getUsers: async queryParams => {
-			const limit = Number(queryParams.limit) || 5;
+			const limit = Number(queryParams.limit) || 10;
 			const page = Number(queryParams.page) || 1;
 
 			const offset = page === 1 ? 0 : (page - 1) * limit;
 
-			// TODO: sort, filter, search
+			// TODO: filter, search
 
 			const result = await server.db
 				.select({
@@ -84,13 +90,15 @@ async function usersService(server) {
 		},
 
 		updateUser: async (id, data) => {
-			if ('password' in data) {
-				data.password = await bcrypt.hash(data.password, BCRYPT_SALT);
-			}
+			const dataForUpdate = Object.fromEntries(
+				Object.entries(data).map(([key, value]) =>
+					key === 'roleId' ? [key, value] : [key, formatMapping[key](value)]
+				)
+			);
 
 			const result = await server.db
 				.update(schema.users)
-				.set(data)
+				.set(dataForUpdate)
 				.where(eq(schema.users.id, id))
 				.returning({ username: schema.users.username });
 
@@ -110,6 +118,18 @@ async function usersService(server) {
 			const result = await server.usersService.getUserById(id);
 
 			return result.roles.name === 'administrator';
+		},
+
+		isLastAdmin: async id => {
+			const result = await server.db
+				.select({
+					id: schema.users.id
+				})
+				.from(schema.users)
+				.innerJoin(schema.roles, eq(schema.users.roleId, schema.roles.id))
+				.where(eq(schema.roles.name, 'administrator'));
+
+			return result.length === 1 && result[0].id === id;
 		}
 	});
 }
