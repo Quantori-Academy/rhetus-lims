@@ -7,5 +7,10 @@ export default http => ({
 			method: 'POST',
 			body: user
 		});
+	},
+	async deleteUser(id) {
+		return await http(`/users/${id}`, {
+			method: 'DELETE'
+		})
 	}
 });
