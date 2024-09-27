@@ -10,6 +10,12 @@ const formRef = ref(null);
 const user = ref(null);
 const originalUser = ref(null);
 const loading = ref(true);
+const props = defineProps({
+	id: {
+		type: String,
+		default: null
+	}
+});
 const rules = ref({
 	firstName: [{ required: true, message: "First name can't be empty" }],
 	lastName: [{ required: true, message: "Last name can't be empty", trigger: 'change' }],
@@ -20,9 +26,8 @@ const rules = ref({
 });
 
 onMounted(() => {
-	setUser('c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d');
+	setUser(props.id);
 });
-
 const setUser = async id => {
 	try {
 		const data = await $api.users.fetchUser(id);
