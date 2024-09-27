@@ -7,7 +7,7 @@ import { startWorker } from '../spec/mocks/browser/browser';
 import { env } from './env';
 import { ElLoading } from 'element-plus';
 
-if (env.msw.browser) startWorker();
+if (process.env.NODE_ENV === 'development') startWorker();
 
 const app = createApp(App);
 

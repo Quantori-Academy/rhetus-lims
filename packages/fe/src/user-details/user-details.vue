@@ -2,39 +2,43 @@
 import { ElForm, ElInput, ElButton, ElFormItem, ElSelect, ElOption } from 'element-plus';
 import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg';
 import { computed, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
 import { ref } from 'vue';
 
 const editingForm = ref(false);
 const formRef = ref(null);
-const route = useRoute();
-
-// test values
-const user = ref({
-	username: 'annabee',
-	firstName: 'Anna',
-	lastName: 'Smith',
-	email: 'annasmith@gmail.com',
-	role: 'Admin',
-	creationDate: '12.04.22'
-});
-// make original user copy
-const originalUser = ref({ ...user.value });
-// validation rules
-onMounted(() => {
-	const userId = route.params.id;
-	console.log(userId);
-	// Fetch user details based on the userId
-});
+const user = ref(null);
+const originalUser = ref(null);
+const loading = ref(true);
 const rules = ref({
 	firstName: [{ required: true, message: "First name can't be empty" }],
-	lastName: [{ required: true, message: "Last name can't be empty" }],
+	lastName: [{ required: true, message: "Last name can't be empty", trigger: 'change' }],
 	email: [
 		{ required: true, message: "Email can't be empty" },
 		{ type: 'email', message: 'Please input a valid email address', trigger: 'blur' }
 	]
 });
+
+onMounted(() => {
+	retrieveUser('c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d');
+});
+
+const retrieveUser = async id => {
+	try {
+		const response = await fetch(`/api/users/${id}`);
+		if (!response.ok) {
+			$notifyUserAboutError(response.message || 'Error updating user');
+		}
+		const data = await response.json();
+		user.value = data;
+		originalUser.value = { ...data };
+	} catch (error) {
+		$notifyUserAboutError(error.message || 'Error updating user');
+	} finally {
+		loading.value = false;
+	}
+};
 const formHasChanges = computed(() => {
+	if (!originalUser.value) return false;
 	return (
 		user.value.firstName !== originalUser.value.firstName ||
 		user.value.lastName !== originalUser.value.lastName ||
@@ -53,32 +57,38 @@ const cancelEdit = () => {
 };
 
 const handleSubmit = async () => {
-	editingForm.value = !editingForm.value;
+	const valid = await new Promise(resolve => {
+		formRef.value?.validate(valid => {
+			resolve(valid);
+		});
+	});
 	if (!formHasChanges.value) {
+		toggleEdit();
 		return;
 	}
+	if (!valid) {
+		return;
+	}
+
 	try {
-		// Validate the form
-		const valid = await formRef.value.validate();
-		if (valid) {
-			originalUser.value = { ...user.value };
-			//Ready to submit to API
-			toggleEdit();
-			// update user details with API
-			// const response = await $api.users.updateUser(user.value);
-			// console.log("User updated:", response);
-			// originalUser.value = { ...user.value };
-			// cancelEdit();
-		}
+		const response = await fetch(`/api/users/${user.value.id}`, {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(user.value)
+		});
+		const updatedUser = await response.json();
+		user.value = updatedUser;
+		originalUser.value = { ...updatedUser };
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating user');
 	}
-	editingForm.value = !editingForm.value;
+	toggleEdit();
 };
 
 const changePassword = async () => {
 	try {
-		// const response = await $api.users.updatePasswordChange({ username: user.value.username, mustChangePassword: true });
 		$notify({
 			title: 'Success',
 			message: 'Password change request has been sent',
@@ -93,7 +103,13 @@ const changePassword = async () => {
 <template>
 	<div class="wrapper">
 		<h1>User Details</h1>
-		<el-form ref="formRef" :model="user" :rules="rules" @submit.prevent="handleSubmit">
+		<el-form
+			v-if="user && !loading"
+			ref="formRef"
+			:model="user"
+			:rules="rules"
+			@submit.prevent="handleSubmit"
+		>
 			<el-form-item prop="username"
 				>Username
 				<el-input v-model="user.username" :disabled="true" />
@@ -122,14 +138,14 @@ const changePassword = async () => {
 				>Creation date
 				<el-input v-model="user.creationDate" :disabled="true" />
 			</el-form-item>
-			<el-button type="primary" @click="handleSubmit">{{
-				editingForm ? 'Save' : 'Edit profile'
-			}}</el-button>
+			<el-button v-if="editingForm" type="primary" @click="handleSubmit">{{ '		Save' }}</el-button>
+			<el-button v-else type="primary" @click="toggleEdit">{{ 'Edit profile' }}</el-button>
 			<el-button v-if="editingForm" @click="cancelEdit">Cancel</el-button>
 			<el-button v-if="!editingForm" type="warning" @click="changePassword"
 				>Change password</el-button
 			>
 		</el-form>
+		<div v-else>Loading user data...</div>
 	</div>
 </template>
 
