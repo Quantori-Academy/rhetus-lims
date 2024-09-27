@@ -3,7 +3,7 @@ export const $error = (statusCode, message) => {
         case 400:
           return `Bad Request: ${message}`;
         case 401:
-         return "Unauthorized: Redirecting to login."
+         return "Unauthorized user, please login"
         case 403:
           return "Forbidden: Access denied."
         case 404:
