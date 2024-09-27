@@ -92,5 +92,18 @@ export const usersHandlers = [
     } else {
         return HttpResponse.json({ message: 'User not found' }, { status: 404 });
     }
+	}),
+	http.delete(api('/users/:id'), async ({ params }) => {
+		const { id } = params;
+		if(!id){
+			return HttpResponse.json({
+				status: 'error',
+				message: `User ${id} not found`
+			}, {status: 404})
+		}
+		return HttpResponse.json({
+			status: 'success',
+			message: `User ${id} was deleted`
+		})
 })
 ];
