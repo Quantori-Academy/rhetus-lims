@@ -1,8 +1,8 @@
 <script setup>
-import 'primeicons/primeicons.css';
-import { ElTable, ElTableColumn, ElMenu, ElIcon, ElRow, ElMenuItem, ElButton } from 'element-plus';
 import { onMounted, ref } from 'vue';
 import { $api } from '../lib/api';
+import 'primeicons/primeicons.css';
+import { ElTable, ElTableColumn, ElMenu, ElIcon, ElRow, ElMenuItem, ElButton } from 'element-plus';
 
 const data = ref([]);
 
@@ -13,11 +13,11 @@ onMounted(async () => {
 
 const menu = ref(true);
 
-const handleClose = () => {
+const handleSidebarClose = () => {
 	menu.value = false;
 };
 
-const handleOpen = () => {
+const handleSidebarOpen = () => {
 	menu.value = true;
 };
 </script>
@@ -27,7 +27,7 @@ const handleOpen = () => {
 		<el-menu v-if="menu" active-text-color="#ffd04b" class="el-menu-vertical">
 			<el-row class="show-row">
 				<img class="logo" src="../lib/assets/images/logo.svg" />
-				<el-button circle class="mobile" @click="handleClose" >
+				<el-button circle class="mobile" @click="handleSidebarClose" >
 					<i class="pi pi-angle-left"></i>
 				</el-button>
 			</el-row>
@@ -61,7 +61,7 @@ const handleOpen = () => {
 
 	<div v-if="!menu" class="header">
 		<el-row class="show-row">
-			<el-button circle @click="handleOpen" >
+			<el-button circle @click="handleSidebarOpen" >
 				<i class="pi pi-angle-right"></i>
 			</el-button>
 		</el-row>
