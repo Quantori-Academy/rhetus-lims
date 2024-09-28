@@ -126,7 +126,7 @@ importers:
         specifier: ^24.1.0
         version: 24.1.1
       msw:
-        specifier: ^2.4.9
+        specifier: ^2.3.5
         version: 2.4.9
       postcss:
         specifier: ^8.4.45
@@ -6121,8 +6121,7 @@ snapshots:
 
   escalade@3.1.2: {}
 
-  escalade@3.2.0:
-    optional: true
+  escalade@3.2.0: {}
 
   escape-html@1.0.3: {}
 
@@ -8308,7 +8307,7 @@ snapshots:
   yargs@17.7.2:
     dependencies:
       cliui: 8.0.1
-      escalade: 3.1.2
+      escalade: 3.2.0
       get-caller-file: 2.0.5
       require-directory: 2.1.1
       string-width: 4.2.3
