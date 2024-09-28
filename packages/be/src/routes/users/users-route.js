@@ -2,6 +2,7 @@ import fp from 'fastify-plugin';
 
 import * as schema from './users-schema.js';
 import usersService from '../../services/users/users-service.js';
+import { http } from '../../lib/utils/index.js';
 
 // TODO: delete after info about use id from request
 const USER_ID = 20;
@@ -17,39 +18,6 @@ async function users(server, options) {
 		handler: onCreateUser
 	});
 
-	async function onCreateUser(req, reply) {
-		try {
-			const isAdmin = await server.usersService.isAdmin(USER_ID);
-
-			if (!isAdmin) {
-				reply.code(403);
-				return { status: 'error', message: `Sorry. You have no permissions to add new user` };
-			}
-
-			const isUserExist = await server.usersService.getUserByUsername(req.body.username);
-
-			if (isUserExist) {
-				reply.code(409);
-				return { status: 'error', message: `Sorry. User '${req.body.username}' already exists` };
-			}
-
-			const isRoleExist = await server.rolesService.getRoleById(req.body.roleId);
-
-			if (!isRoleExist) {
-				reply.code(409);
-				return { status: 'error', message: 'No such role' };
-			}
-
-			const username = await server.usersService.createUser(req.body);
-
-			reply.code(201);
-			return { status: 'success', message: `User '${username}' was created` };
-		} catch (err) {
-			reply.code(500);
-			return { status: 'error', message: `Internal Server Error! ${err.message}` };
-		}
-	}
-
 	server.route({
 		method: 'GET',
 		path: options.prefix + 'users/:id',
@@ -57,45 +25,6 @@ async function users(server, options) {
 		schema: schema.getUser,
 		handler: onGetUser
 	});
-	async function onGetUser(req, reply) {
-		try {
-			const isAdmin = await server.usersService.isAdmin(USER_ID);
-
-			if (!isAdmin && USER_ID !== Number(req.params.id)) {
-				reply.code(403);
-				return { status: 'error', message: `Sorry. You have no permissions to view this user` };
-			}
-
-			const user = await server.usersService.getUserById(Number(req.params.id));
-
-			if (!user) {
-				reply.code(404);
-				return { status: 'error', message: `No such user` };
-			}
-
-			const {
-				users: { id, username, firstName, lastName, email, createdAt },
-				roles: { id: rolesId, name }
-			} = user;
-
-			reply.code(200);
-			return {
-				id,
-				username,
-				firstName,
-				lastName,
-				email,
-				role: {
-					id: rolesId,
-					name
-				},
-				createdAt
-			};
-		} catch (err) {
-			reply.code(500);
-			return { status: 'error', message: `Internal Server Error! ${err.message}` };
-		}
-	}
 
 	server.route({
 		method: 'GET',
@@ -104,24 +33,6 @@ async function users(server, options) {
 		schema: schema.getUsers,
 		handler: onGetUsers
 	});
-	async function onGetUsers(req, reply) {
-		try {
-			const isAdmin = await server.usersService.isAdmin(USER_ID);
-
-			if (!isAdmin) {
-				reply.code(403);
-				return { status: 'error', message: `Sorry. You have no permissions to view users` };
-			}
-
-			const data = await server.usersService.getUsers(req.query);
-
-			reply.code(200);
-			return data;
-		} catch (err) {
-			reply.code(500);
-			return { status: 'error', message: `Internal Server Error! ${err.message}` };
-		}
-	}
 
 	server.route({
 		method: 'PATCH',
@@ -130,63 +41,6 @@ async function users(server, options) {
 		schema: schema.updateUser,
 		handler: onUpdateUser
 	});
-	async function onUpdateUser(req, reply) {
-		try {
-			const isAdmin = await server.usersService.isAdmin(USER_ID);
-
-			// username will be cut by validation, but it is more safer
-			if ('username' in req.body) {
-				reply.code(403);
-				return { status: 'error', message: `Sorry. Username cannot be changed` };
-			}
-
-			if (!isAdmin && USER_ID !== Number(req.params.id)) {
-				reply.code(403);
-				return { status: 'error', message: `Sorry. You have no permissions to change this user` };
-			}
-
-			if ('roleId' in req.body) {
-				if (!isAdmin) {
-					reply.code(403);
-					return { status: 'error', message: `Sorry. You have no permissions to change role` };
-				}
-
-				const targetRole = await server.rolesService.getRoleById(req.body.roleId);
-
-				if (!targetRole) {
-					reply.code(404);
-					return { status: 'error', message: `No such role` };
-				}
-
-				const isRoleDowngrading = targetRole.name !== 'administrator';
-				const isLastAdmin = await server.usersService.isLastAdmin(Number(req.params.id));
-
-				// Admin updating himself
-				if (Number(req.params.id) === USER_ID && isRoleDowngrading && isLastAdmin) {
-					reply.code(409);
-					return {
-						status: 'error',
-						message: `Sorry. You cannot update your role. You are the only system administrator.`
-					};
-				}
-			}
-
-			const user = await server.usersService.getUserById(Number(req.params.id));
-
-			if (!user) {
-				reply.code(404);
-				return { status: 'error', message: `No such user` };
-			}
-
-			const username = await server.usersService.updateUser(Number(req.params.id), req.body);
-
-			reply.code(200);
-			return { status: 'success', message: `User '${username}' was updated` };
-		} catch (err) {
-			reply.code(500);
-			return { status: 'error', message: `Internal Server Error! ${err.message}` };
-		}
-	}
 
 	server.route({
 		method: 'DELETE',
@@ -195,41 +49,166 @@ async function users(server, options) {
 		schema: schema.deleteUser,
 		handler: onDeleteUser
 	});
-	async function onDeleteUser(req, reply) {
+
+	async function onCreateUser(req, reply) {
 		try {
 			const isAdmin = await server.usersService.isAdmin(USER_ID);
 
 			if (!isAdmin) {
-				reply.code(403);
-				return { status: 'error', message: `Sorry. You have no permissions to delete user` };
+				return http.handleError(reply, 403, `Sorry. You have no permissions to add new user`);
 			}
 
-			const user = await server.usersService.getUserById(Number(req.params.id));
+			const isUserExist = await server.usersService.getUserByUsername(req.body.username);
+
+			if (isUserExist) {
+				return http.handleError(reply, 409, `Sorry. User '${req.body.username}' already exists`);
+			}
+
+			const isRoleExist = await server.rolesService.getRoleById(req.body.roleId);
+
+			if (!isRoleExist) {
+				return http.handleError(reply, 409, `No such role`);
+			}
+
+			const username = await server.usersService.createUser(req.body);
+
+			return http.handleSuccess(reply, 201, `User '${username}' was created`);
+		} catch (err) {
+			return http.handleError(reply, 500, `Internal Server Error! ${err.message}`);
+		}
+	}
+
+	async function onGetUser(req, reply) {
+		try {
+			const isAdmin = await server.usersService.isAdmin(USER_ID);
+			const userId = Number(req.params.id);
+			const isOwner = USER_ID === userId;
+
+			if (!isAdmin && !isOwner) {
+				return http.handleError(reply, 403, `Sorry. You have no permissions to view this user`);
+			}
+
+			const user = await server.usersService.getUserById(userId);
 
 			if (!user) {
-				reply.code(404);
-				return { status: 'error', message: `No such user` };
+				return http.handleError(reply, 404, `No such user`);
 			}
 
-			const isLastAdmin = await server.usersService.isLastAdmin(Number(req.params.id));
+			return http.handleSuccess(reply, 200, `User found`, user);
+		} catch (err) {
+			return http.handleError(reply, 500, `Internal Server Error! ${err.message}`);
+		}
+	}
+
+	async function onGetUsers(req, reply) {
+		try {
+			const isAdmin = await server.usersService.isAdmin(USER_ID);
+
+			if (!isAdmin) {
+				return http.handleError(reply, 403, `Sorry. You have no permissions to view users`);
+			}
+
+			const data = await server.usersService.getUsers(req.query);
+
+			return http.handleSuccess(reply, 200, `Users found`, data);
+		} catch (err) {
+			return http.handleError(reply, 500, `Internal Server Error! ${err.message}`);
+		}
+	}
+
+	async function onUpdateUser(req, reply) {
+		try {
+			const isAdmin = await server.usersService.isAdmin(USER_ID);
+			const userId = Number(req.params.id);
+			const isOwner = USER_ID === userId;
+
+			if (!isAdmin && !isOwner) {
+				return http.handleError(reply, 403, `Sorry. You have no permissions to change this user`);
+			}
+
+			const user = await server.usersService.getUserById(userId);
+
+			if (!user) {
+				return http.handleError(reply, 404, `No such user`);
+			}
+
+			if ('roleId' in req.body) {
+				return await handleUserUpdateWithRole(reply, userId, req.body, { isOwner, isAdmin });
+			}
+
+			return await handleUserUpdateWithoutRole(reply, userId, req.body);
+		} catch (err) {
+			return http.handleError(reply, 500, `Internal Server Error! ${err.message}`);
+		}
+	}
+
+	async function onDeleteUser(req, reply) {
+		try {
+			const isAdmin = await server.usersService.isAdmin(USER_ID);
+			const userId = Number(req.params.id);
+			const isOwner = USER_ID === userId;
+
+			if (!isAdmin) {
+				return http.handleError(reply, 403, `Sorry. You have no permissions to delete user`);
+			}
+
+			const user = await server.usersService.getUserById(userId);
+
+			if (!user) {
+				return http.handleError(reply, 404, `No such user`);
+			}
+
+			const isLastAdmin = await server.usersService.isLastAdmin(userId);
 
 			// Admin deleting himself
-			if (Number(req.params.id) === USER_ID && isLastAdmin) {
-				reply.code(409);
-				return {
-					status: 'error',
-					message: `Sorry. You cannot delete your profile. You are the only system administrator.`
-				};
+			if (isOwner && isLastAdmin) {
+				return http.handleError(
+					reply,
+					409,
+					`Sorry. You cannot delete your profile. You are the only system administrator.`
+				);
 			}
 
-			const username = await server.usersService.deleteUser(Number(req.params.id));
+			const username = await server.usersService.deleteUser(userId);
 
-			reply.code(200);
-			return { status: 'success', message: `User '${username}' was deleted` };
+			return http.handleSuccess(reply, 200, `User '${username}' was deleted`);
 		} catch (err) {
-			reply.code(500);
-			return { status: 'error', message: `Internal Server Error! ${err.message}` };
+			return http.handleError(reply, 500, `Internal Server Error! ${err.message}`);
 		}
+	}
+
+	async function handleUserUpdateWithRole(reply, userId, data, permissions) {
+		const { isOwner, isAdmin } = permissions;
+
+		if (!isAdmin) {
+			return http.handleError(reply, 403, `Sorry. You have no permissions to change role`);
+		}
+		const targetRole = await server.rolesService.getRoleById(data.roleId);
+
+		if (!targetRole) {
+			return http.handleError(reply, 404, `No such role`);
+		}
+
+		const isRoleDowngrading = targetRole.name !== 'administrator';
+		const isLastAdmin = await server.usersService.isLastAdmin(userId);
+
+		if (isOwner && isRoleDowngrading && isLastAdmin) {
+			return http.handleError(
+				reply,
+				409,
+				`Sorry. You cannot update your role. You are the only system administrator.`
+			);
+		}
+
+		const username = await server.usersService.updateUser(userId, data);
+
+		return http.handleSuccess(reply, 200, `User '${username}' was updated`);
+	}
+
+	async function handleUserUpdateWithoutRole(reply, userId, data) {
+		const username = await server.usersService.updateUser(userId, data);
+
+		return http.handleSuccess(reply, 200, `User '${username}' was updated`);
 	}
 }
 

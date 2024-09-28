@@ -2,9 +2,10 @@ import fp from 'fastify-plugin';
 
 import * as schema from './roles-schema.js';
 import rolesService from '../../services/roles/roles-service.js';
+import { http } from '../../lib/utils/index.js';
 
 // TODO: delete after info about user id from request
-const USER_ID = 16;
+const USER_ID = 20;
 
 async function roles(server, options) {
 	await server.register(rolesService);
@@ -21,17 +22,14 @@ async function roles(server, options) {
 			const isAdmin = await server.usersService.isAdmin(USER_ID);
 
 			if (!isAdmin) {
-				reply.code(403);
-				return { status: 'error', message: `Sorry. You have no permissions to view roles` };
+				return http.handleError(reply, 403, `Sorry. You have no permissions to view roles`);
 			}
 
 			const roles = await server.rolesService.getRoles();
 
-			reply.code(200);
-			return { roles };
+			return http.handleSuccess(reply, 200, `Roles found`, { roles });
 		} catch (err) {
-			reply.code(500);
-			return { status: 'error', message: `Internal Server Error! ${err.message}` };
+			return http.handleError(reply, 500, `Internal Server Error! ${err.message}`);
 		}
 	}
 }

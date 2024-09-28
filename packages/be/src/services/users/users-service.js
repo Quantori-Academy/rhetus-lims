@@ -1,7 +1,8 @@
-import { eq, inArray, and } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import fp from 'fastify-plugin';
 import bcrypt from 'bcrypt';
 import { schema } from '../../lib/db/schema/index.js';
+import { db } from '../../lib/utils/index.js';
 
 const BCRYPT_SALT = 10;
 
@@ -10,16 +11,35 @@ const formatMapping = {
 	lastName: string => `${string.charAt(0).toUpperCase()}${string.slice(1).toLowerCase()}`,
 	password: string => bcrypt.hashSync(string, BCRYPT_SALT),
 	email: string => string.toLowerCase(),
-	username: string => string.toLowerCase()
+	username: string => string.toLowerCase(),
+	name: string => string.toLowerCase() // for role name
 };
 
-const optionsEnum = {
-	role: 'role',
-	lastlogin: 'lastLogin',
-	firstname: 'firstName',
-	lastname: 'lastName',
-	username: 'username',
-	email: 'email'
+const optionsDictionary = {
+	role: {
+		property: 'name',
+		schema: 'roles'
+	},
+	lastlogin: {
+		property: 'lastLogin',
+		schema: 'users'
+	},
+	firstname: {
+		property: 'firstName',
+		schema: 'users'
+	},
+	lastname: {
+		property: 'lastName',
+		schema: 'users'
+	},
+	username: {
+		property: 'username',
+		schema: 'users'
+	},
+	email: {
+		property: 'email',
+		schema: 'users'
+	}
 };
 
 async function usersService(server) {
@@ -55,7 +75,18 @@ async function usersService(server) {
 
 		getUserById: async id => {
 			const result = await server.db
-				.select()
+				.select({
+					id: schema.users.id,
+					username: schema.users.username,
+					firstName: schema.users.firstName,
+					lastName: schema.users.lastName,
+					email: schema.users.email,
+					role: {
+						id: schema.roles.id,
+						name: schema.roles.name
+					},
+					createdAt: schema.users.createdAt
+				})
 				.from(schema.users)
 				.innerJoin(schema.roles, eq(schema.users.roleId, schema.roles.id))
 				.where(eq(schema.users.id, id));
@@ -87,41 +118,13 @@ async function usersService(server) {
 				.innerJoin(schema.roles, eq(schema.users.roleId, schema.roles.id));
 
 			if (options) {
-				const parsedOptions = JSON.parse(options);
-
-				const filterSubQueries = Object.entries(parsedOptions).map(([key, value]) => {
-					const optionProperty = optionsEnum[key.toLowerCase()];
-
-					if (!optionProperty) {
-						return;
-					}
-
-					if (optionProperty === 'lastLogin') {
-						return eq(schema.users.lastLogin, new Date(value));
-					}
-
-					if (optionProperty === 'role') {
-						return !Array.isArray(value)
-							? eq(schema.roles.name, value.toLowerCase())
-							: inArray(
-									schema.roles.name,
-									value.map(roleName => roleName.toLowerCase())
-								);
-					}
-
-					return eq(schema.users[optionProperty], formatMapping[optionProperty](value));
-				});
+				const filterSubQueries = db.getFormattedFilters(options, formatMapping, optionsDictionary);
 
 				query.where(and(...filterSubQueries));
 			}
 
 			const count = await query;
-
-			if (limit && page) {
-				query.limit(limit).offset(offset);
-			}
-
-			const users = await query;
+			const users = await query.limit(limit).offset(offset);
 
 			return {
 				users,
@@ -157,7 +160,7 @@ async function usersService(server) {
 		isAdmin: async id => {
 			const result = await server.usersService.getUserById(id);
 
-			return result.roles.name === 'administrator';
+			return result.role.name === 'administrator';
 		},
 
 		isLastAdmin: async id => {
