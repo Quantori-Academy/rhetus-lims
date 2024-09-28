@@ -1,6 +1,6 @@
 <script setup>
 import 'primeicons/primeicons.css';
-import { ElTable, ElTableColumn, ElMenu, ElIcon, ElRow, ElMenuItem, ElButton} from 'element-plus';
+import { ElTable, ElTableColumn, ElMenu, ElIcon, ElRow, ElMenuItem, ElButton } from 'element-plus';
 import { onMounted, ref } from 'vue';
 import { $api } from '../lib/api';
 
@@ -15,34 +15,31 @@ const menu = ref(true);
 
 const handleClose = () => {
 	menu.value = false;
-}
+};
 
 const handleOpen = () => {
 	menu.value = true;
-}
+};
 </script>
 
 <template>
-	<div :class="['sidebar', { closed: !menu, open: menu }]" >
-		<el-menu v-if="menu"
-			active-text-color="#ffd04b"
-			class="el-menu-vertical"		
-		>
+	<div :class="['sidebar', { closed: !menu, open: menu }]">
+		<el-menu v-if="menu" active-text-color="#ffd04b" class="el-menu-vertical">
 			<el-row class="show-row">
-				<img class="logo" src="../lib/assets/images/logo.svg"/>
-				<el-button @click="handleClose" circle class="mobile">
+				<img class="logo" src="../lib/assets/images/logo.svg" />
+				<el-button circle class="mobile" @click="handleClose" >
 					<i class="pi pi-angle-left"></i>
 				</el-button>
 			</el-row>
-			
-			<el-menu-item >
+
+			<el-menu-item>
 				<router-link to="/profile">
 					<el-icon><i class="pi pi-user"></i></el-icon>
 					<span>Profile</span>
 				</router-link>
 			</el-menu-item>
 			<el-menu-item>
-				<router-link to="/user-list">
+				<router-link to="/users/list">
 					<el-icon><i class="pi pi-users"></i></el-icon>
 					<span>Users List</span>
 				</router-link>
@@ -53,8 +50,8 @@ const handleOpen = () => {
 					<span>User Detail Page</span>
 				</router-link>
 			</el-menu-item>
-			<el-menu-item >
-				<router-link to="/add-new-user">
+			<el-menu-item>
+				<router-link to="/users/new">
 					<el-icon><i class="pi pi-user-plus"></i></el-icon>
 					<span>Add New User</span>
 				</router-link>
@@ -64,12 +61,12 @@ const handleOpen = () => {
 
 	<div v-if="!menu" class="header">
 		<el-row class="show-row">
-			<el-button @click="handleOpen" circle>
+			<el-button circle @click="handleOpen" >
 				<i class="pi pi-angle-right"></i>
 			</el-button>
 		</el-row>
 	</div>
-    	
+
 	<div class="wrapper">
 		<h1>This is Dashboard</h1>
 		<el-table :data="data" stripe>
@@ -82,11 +79,11 @@ const handleOpen = () => {
 
 <style scoped>
 .sidebar {
-	transition: width 0.3s ease;
+	position: fixed;
 	width: 250px;
 	height: 100%;
-	position: fixed;
 	overflow: hidden;
+	transition: width 0.3s ease;
 
 	.el-menu-vertical {
 		padding-top: 1rem;
@@ -95,8 +92,8 @@ const handleOpen = () => {
 
 		span {
 			color: #080808;
-			font-size: 1rem;
 			font-weight: 500;
+			font-size: 1rem;
 		}
 
 		.el-menu-item {
@@ -108,21 +105,21 @@ const handleOpen = () => {
 			}
 
 			a {
-				padding: 0 20px;
-				width: 100%;
 				display: flex;
 				align-items: center;
-				text-decoration: none;
+				padding: 0 20px;
+				width: 100%;
 				color: #080808;
+				text-decoration: none;
 			}
 		}
 	}
 
 	.show-row {
-		padding: 0 20px 20px;
 		justify-content: space-between;
+		padding: 0 20px 20px;
 		color: #080808;
-		font-size: 1.5rem
+		font-size: 1.5rem;
 	}
 
 	.logo {
@@ -140,11 +137,11 @@ const handleOpen = () => {
 }
 
 .wrapper {
-	margin-left: 250px;
-	transition: margin-left 0.3s ease;
 	display: grid;
 	place-content: center;
 	gap: 24px;
+	margin-left: 250px;
+	transition: margin-left 0.3s ease;
 }
 
 .header {
@@ -154,9 +151,9 @@ const handleOpen = () => {
 
 @media (max-width: 768px) {
 	.sidebar {
+		z-index: 2;
 		width: 100%;
 		max-width: 250px;
-		z-index: 2;
 		transform: translateX(-250px);
 		transition: transform 0.3s ease;
 
@@ -170,8 +167,8 @@ const handleOpen = () => {
 	}
 
 	.wrapper {
-		width: 100%;
 		margin-left: 0px;
+		width: 100%;
 	}
 	.mobile {
 		display: inline-block;
