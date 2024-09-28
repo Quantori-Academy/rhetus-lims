@@ -1,6 +1,5 @@
 import { http, HttpResponse } from 'msw';
 import { api } from './api-url.js';
-
 const users = [
 	{
 		id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d',
@@ -30,6 +29,7 @@ const users = [
 		creationDate: '2022-06-15'
 	}
 ];
+
 export const usersHandlers = [
 	http.get(api('/users'), () => {
 		return HttpResponse.json([
