@@ -1,12 +1,12 @@
 <script setup>
 import { ElForm, ElInput, ElButton, ElFormItem, ElSelect, ElOption } from 'element-plus';
 import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg';
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, useTemplateRef } from 'vue';
 import { ref } from 'vue';
 import { $api } from '../lib/api/index.js';
 
 const editingForm = ref(false);
-const formRef = ref(null);
+const formEl = useTemplateRef('form-ref');
 const user = ref(null);
 const originalUser = ref(null);
 const loading = ref(true);
@@ -57,14 +57,16 @@ const cancelEdit = () => {
 	editingForm.value = false;
 	user.value = { ...originalUser.value };
 };
-
+async function validate() {
+	return formEl.value.validate();
+}
 const handleSubmit = async () => {
 	if (!formHasChanges.value) {
 		toggleEdit();
 		return;
 	}
 	try {
-		const valid = await formRef.value?.validate();
+		const valid = await validate();
 		if (valid === true) {
 			const updatedUser = await $api.users.updateUser(user.value.id, user.value);
 			user.value = updatedUser;
@@ -94,37 +96,32 @@ const changePassword = async () => {
 		<h1>User Details</h1>
 		<el-form
 			v-if="user && !loading"
-			ref="formRef"
+			ref="form-ref"
+			label-position="top"
 			:model="user"
 			:rules="rules"
 			@submit="handleSubmit"
 		>
-			<el-form-item prop="username"
-				>Username
+			<el-form-item label="Username" prop="username">
 				<el-input v-model="user.username" :disabled="true" />
 			</el-form-item>
-			<el-form-item prop="firstName"
-				>First name
+			<el-form-item label="First name" prop="firstName">
 				<el-input v-model="user.firstName" :disabled="!editingForm" />
 			</el-form-item>
-			<el-form-item prop="lastName"
-				>Last name
+			<el-form-item label="Last name" prop="lastName">
 				<el-input v-model="user.lastName" :disabled="!editingForm" />
 			</el-form-item>
-			<el-form-item prop="email"
-				>Email
+			<el-form-item label="Email" prop="email">
 				<el-input v-model="user.email" :disabled="!editingForm" />
 			</el-form-item>
-			<el-form-item
-				>Role
+			<el-form-item label="Role">
 				<el-select v-model="user.role" :disabled="!editingForm" :placeholder="user.role">
 					<el-option label="Admin" value="admin" />
 					<el-option label="Procurement officer" value="procurement_officer" />
 					<el-option label="Researcher" value="researcher" />
 				</el-select>
 			</el-form-item>
-			<el-form-item class="last-input" prop="creationDate"
-				>Creation date
+			<el-form-item class="last-input" label="Creation date" prop="creationDate">
 				<el-input v-model="user.creationDate" :disabled="true" />
 			</el-form-item>
 			<el-button v-if="editingForm" type="primary" @click="handleSubmit">{{ '		Save' }}</el-button>
