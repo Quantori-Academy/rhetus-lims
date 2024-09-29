@@ -15,4 +15,12 @@ export const $notifyUserAboutError = (error) => {
         message: error,
         type: 'error'
       });
+};
+
+export const $notifyUserAboutSuccess = (success) => {
+  ElNotification({
+      title: 'Success', 
+      message: success,
+      type: 'success'
+    });
 }
