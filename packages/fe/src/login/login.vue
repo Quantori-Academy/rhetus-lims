@@ -15,25 +15,19 @@ function createDefaultFormValues() {
 const users = ref([]);
 const form = ref(createDefaultFormValues());
 
-async function setUsers() {
-
+async function login(form) {
 	try {
-		users.value = await await $api.users.fetchUsers();
-		console.log(users.value);
+		const token = await await $api.loginUser.getBearerToken(form.username, form.password);
+		if (token) {
+			const userData = await await $api.loginUser.fetchUser(token, form.username);
+			if (userData) {
+				console.log("User Data:", userData);
+			}
+		}
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
-
-}
-
-async function login(form) {
-	const token = await await $api.loginUser.getBearerToken(form.username, form.password);
-	if (token) {
-		const userData = await await $api.loginUser.fetchUser(token, form.username);
-		if (userData) {
-			console.log("User Data:", userData);
-		}
-	}
+	
 }
 function onSubmit() {
 	console.log('submit');
