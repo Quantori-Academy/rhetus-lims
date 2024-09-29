@@ -15,4 +15,12 @@ export const $notifyUserAboutError = (error) => {
         message: error,
         type: 'error'
       });
-}
+};
+
+export const $notifyInvalidUsernameOrPassword = (error) => {
+    ElNotification({
+        title: 'Error',
+        message: 'Incorrect Username or Password',
+        type: 'error'
+    });
+};

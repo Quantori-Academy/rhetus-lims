@@ -18,5 +18,15 @@ export const routes = [
 		path: '/users/new',
 		name: 'new-user',
 		component: () => import('../../users/new/add-new-user.vue')
+	},
+	{
+		path: '/login',
+		name: 'login',
+		component: () => import('../../login/login.vue')
+	},
+	{
+		path: '/reset-password',
+		name: 'reset-password',
+		component: () => import('../../reset-password/reset-password.vue')
 	}
 ];
