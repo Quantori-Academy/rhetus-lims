@@ -160,7 +160,7 @@ async function usersService(server) {
 		isAdmin: async id => {
 			const result = await server.usersService.getUserById(id);
 
-			return result.role.name === 'administrator';
+			return result?.role?.name === 'administrator';
 		},
 
 		isLastAdmin: async id => {
