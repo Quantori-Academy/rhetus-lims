@@ -135,7 +135,7 @@ async function usersService(server) {
 		updateUser: async (id, data) => {
 			const dataForUpdate = Object.fromEntries(
 				Object.entries(data).map(([key, value]) =>
-					key === 'roleId' ? [key, value] : [key, formatMapping[key](value)]
+					key === 'roleId' || key === 'lastLogin' ? [key, value] : [key, formatMapping[key](value)]
 				)
 			);
 
