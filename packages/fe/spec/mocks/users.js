@@ -43,6 +43,19 @@ let user = {
 const allUsers = new Map()
 allUsers.set(user.id, user)
 
+let user = {
+	id: 1,
+	username: 'test1',
+	firstName: 'john',
+	lastName: 'white',
+	email: 'john@white.com',
+	role: { id: 0, name: 'Admin' },
+	lastLogin: '2024-09-26T10:15:06.720Z'
+}
+
+const allUsers = new Map()
+allUsers.set(user.id, user)
+
 export const usersHandlers = [
 	http.get(api('/users'), () => {
 		return HttpResponse.json(Array.from(allUsers.values()));
