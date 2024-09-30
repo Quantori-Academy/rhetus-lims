@@ -16,5 +16,11 @@ export default http => ({
 			method: 'PUT',
 			body: JSON.stringify(user)
 		});
-	}
+	},
+	async changePassword(id, confirm) {
+    return await http(`/users/${id}/change-password`, {
+        method: 'POST',
+        body: JSON.stringify({ confirm })
+    });
+}
 });

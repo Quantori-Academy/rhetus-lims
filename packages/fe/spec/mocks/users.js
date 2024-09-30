@@ -72,5 +72,25 @@ export const usersHandlers = [
 		} else {
 			return HttpResponse.json({ message: 'User not found' }, { status: 404 });
 		}
-	})
+	}),
+	http.post(api('/users/:id/change-password'), async ({ request, params }) => {
+    const { id } = params;
+    const { confirm } = await request.json();
+    const user = users.find(user => user.id === id);
+    if (user) {
+        if (confirm) {
+            return HttpResponse.json({
+                status: 'success',
+                message: 'Password change confirmed successfully'
+            });
+        } else {
+            return HttpResponse.json({
+                status: 'info',
+                message: 'Password change canceled'
+            });
+        }
+    } else {
+        return HttpResponse.json({ message: 'User not found' }, { status: 404 });
+    }
+})
 ];
