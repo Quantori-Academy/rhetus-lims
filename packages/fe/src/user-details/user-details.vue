@@ -1,7 +1,7 @@
 <script setup>
 import { ElForm, ElInput, ElButton, ElFormItem, ElSelect, ElOption } from 'element-plus';
-import { $notifyUserAboutError, 	$notify } from '../lib/utils/feedback/notify-msg';
-import {$confirm} from "../lib/utils/feedback/confirm-msg.js/"
+import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg';
+import { $confirm } from '../lib/utils/feedback/confirm-msg.js/';
 import { computed, onMounted, useTemplateRef } from 'vue';
 import { ref } from 'vue';
 import { $api } from '../lib/api/index.js';
@@ -79,27 +79,29 @@ const handleSubmit = async () => {
 	}
 };
 const changePassword = async () => {
-    try {
-			const confirmed = await $confirm('Are you sure you want to change your password?', 'Confirm Password Change', {
-            confirmButtonText: 'Yes',
-            cancelButtonText: 'No',
-            type: 'warning'
-        });
-        if (confirmed) {
-            const response = await $api.users.changePassword(user.value.id, true);
-            console.log(response);
-						$notify({
-			title: 'Success',
-			message: 'Password change request has been sent',
-			type: 'success'
-		});
-        }
-    } catch (error) {
-        $notifyUserAboutError(error.message || 'Error requesting password change');
-    }
+	try {
+		const confirmed = await $confirm(
+			'Are you sure you want to change your password?',
+			'Confirm Password Change',
+			{
+				confirmButtonText: 'Yes',
+				cancelButtonText: 'No',
+				type: 'warning'
+			}
+		);
+		if (confirmed) {
+			const response = await $api.users.changePassword(user.value.id, true);
+			console.log(response);
+			$notify({
+				title: 'Success',
+				message: 'Password change request has been sent',
+				type: 'success'
+			});
+		}
+	} catch (error) {
+		$notifyUserAboutError(error.message || 'Error requesting password change');
+	}
 };
-
-
 </script>
 
 <template>

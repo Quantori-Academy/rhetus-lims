@@ -1,12 +1,7 @@
 <template>
 	<div class="main-wrapper">
 		<div class="table-logo">
-			<img
-				width="42"
-				height="42"
-				src="../../../lib//assets/images/logo.svg"
-				alt=""
-			/>
+			<img width="42" height="42" src="../../../lib//assets/images/logo.svg" alt="" />
 		</div>
 		<nav class="main-navigation">
 			<router-link to="/">Table</router-link>
