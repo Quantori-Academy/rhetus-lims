@@ -6,6 +6,9 @@
 		<nav class="main-navigation">
 			<router-link to="/">Table</router-link>
 			<router-link to="/form">Form</router-link>
+			<router-link to="/users/list">Users</router-link>
+			<router-link to="/users/:id">User Details</router-link>
+			<router-link to="/users/list">Users</router-link>
 		</nav>
 		<router-view></router-view>
 	</div>
@@ -18,6 +21,7 @@
 	gap: 4px;
 	height: 100vh;
 }
+
 .main-navigation {
 	display: flex;
 	justify-content: center;
@@ -29,6 +33,7 @@
 		font-size: 16px;
 	}
 }
+
 .table-logo {
 	display: flex;
 	justify-content: center;
