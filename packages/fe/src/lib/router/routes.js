@@ -18,5 +18,11 @@ export const routes = [
 		path: '/users/new',
 		name: 'new-user',
 		component: () => import('../../users/new/add-new-user.vue')
+	},
+	{
+		path: '/users/:id',
+		name: 'user-details',
+		component: () => import('../../user-details/user-details.vue'),
+		props: true
 	}
 ];
