@@ -5,7 +5,7 @@ import usersService from '../../services/users/users-service.js';
 import { http } from '../../lib/utils/index.js';
 
 // TODO: delete after info about use id from request
-const USER_ID = 20;
+const USER_ID = 1;
 
 async function users(server, options) {
 	await server.register(usersService);

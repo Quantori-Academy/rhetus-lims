@@ -5,7 +5,7 @@ import rolesService from '../../services/roles/roles-service.js';
 import { http } from '../../lib/utils/index.js';
 
 // TODO: delete after info about user id from request
-const USER_ID = 20;
+const USER_ID = 1;
 
 async function roles(server, options) {
 	await server.register(rolesService);
