@@ -38,6 +38,7 @@ function deleteUser(id){
 					type: 'success',
 				});
 			}
+			setUsers()
         } catch(error) {
             $notifyUserAboutError(error);
         }
@@ -51,7 +52,6 @@ function deleteUser(id){
 };
 async function setUsers() {
 	isLoading.value = true;
-
 	try {
 		users.value = await $api.users.fetchUsers();
 		console.log(users.value);
