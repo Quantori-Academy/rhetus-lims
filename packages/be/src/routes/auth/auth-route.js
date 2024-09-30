@@ -27,6 +27,8 @@ async function auth(server, options) {
 				return { status: 'error', message: 'Invalid credentials.' };
 			}
 
+			await server.usersService.updateUser(user.id, { lastLogin: new Date() });
+
 			req.session.user = { id: user.id };
 
 			reply.code(200);
