@@ -9,14 +9,17 @@ async function sessionPlugin(fastify) {
 	await fastify.register(fastifyCookie);
 	await fastify.register(fastifySession, {
 		secret: config.sessionSecret,
-		cookie: { secure: config.prod },
+		cookie: {
+			secure: config.prod,
+			maxAge: 24 * 60 * 60 * 1000
+		},
 		saveUninitialized: false
 	});
 
 	fastify.decorate('authenticate', async (request, reply) => {
 		if (!request.session.user) {
 			reply.code(401);
-			return { error: 'Unauthorized' };
+			return { status: 'error', message: 'Unauthorized' };
 		}
 	});
 }
