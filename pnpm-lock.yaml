@@ -141,7 +141,7 @@ importers:
         specifier: ^0.8.0
         version: 0.8.0(rollup@4.21.0)
       vite:
-        specifier: ^5.4.8
+        specifier: ^5.3.1
         version: 5.4.8(@types/node@22.4.1)
       vite-plugin-svg-icons:
         specifier: ^2.0.1
@@ -8147,7 +8147,7 @@ snapshots:
   vite@5.4.8(@types/node@22.4.1):
     dependencies:
       esbuild: 0.21.5
-      postcss: 8.4.45
+      postcss: 8.4.47
       rollup: 4.21.0
     optionalDependencies:
       '@types/node': 22.4.1
