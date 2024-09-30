@@ -50,7 +50,6 @@ node_modules
 /old/
 dist-ssr
 *.local
-.prettierrc
 
 # actions
 !.github/actions/auto-mention-action/dist
