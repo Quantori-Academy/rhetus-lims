@@ -1,6 +1,6 @@
 {
-  "id": "0a73c91b-c5ad-4358-8ca0-d596c5742daf",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "563cbab4-1db9-40a4-8797-0f0fc43a66f5",
+  "prevId": "0a73c91b-c5ad-4358-8ca0-d596c5742daf",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -91,25 +91,25 @@
         "users_role_id_roles_id_fk": {
           "name": "users_role_id_roles_id_fk",
           "tableFrom": "users",
-          "tableTo": "roles",
           "columnsFrom": [
             "role_id"
           ],
+          "tableTo": "roles",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "users_username_unique": {
           "name": "users_username_unique",
-          "nullsNotDistinct": false,
           "columns": [
             "username"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       }
     }
