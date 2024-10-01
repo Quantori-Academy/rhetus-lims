@@ -61,18 +61,24 @@ const cancelEdit = () => {
 async function validate() {
 	return formEl.value.validate();
 }
+
 const confirmRoleChange = async () => {
 	if (user.value.role !== originalUser.value.role) {
-		const confirmed = await $confirm(
-			`Are you sure you want to change the role to ${user.value.role}?`,
-			'Confirm Role Change',
-			{
-				confirmButtonText: 'Yes, Change Role',
-				cancelButtonText: 'Cancel',
-				type: 'warning'
-			}
-		);
-		return confirmed;
+		try {
+			const confirmed = await $confirm(
+				`Are you sure you want to change the role to ${user.value.role}?`,
+				'Confirm Role Change',
+				{
+					confirmButtonText: 'Yes, Change Role',
+					cancelButtonText: 'Cancel',
+					type: 'warning'
+				}
+			);
+			return confirmed;
+		} catch (error) {
+			$notifyUserAboutError(error.message || 'Role update canceled');
+			return false;
+		}
 	}
 	return true;
 };
