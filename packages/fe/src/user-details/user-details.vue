@@ -5,6 +5,7 @@ import { $confirm } from '../lib/utils/feedback/confirm-msg.js/';
 import { computed, onMounted, useTemplateRef } from 'vue';
 import { ref } from 'vue';
 import { $api } from '../lib/api/index.js';
+import { router } from '../lib/router/router';
 
 const editingForm = ref(false);
 const formEl = useTemplateRef('form-ref');
@@ -102,6 +103,34 @@ const changePassword = async () => {
 		$notifyUserAboutError(error.message || 'Error requesting password change');
 	}
 };
+
+const deleteUser = () => {
+    $confirm('Do you want to delete this user?', 'Warning', {
+		confirmButtonText: 'OK',
+		cancelButtonText: 'Cancel',
+		type: 'warning'
+	}).then(async () => {
+        try {
+			const response = await $api.users.deleteUser(props.id);
+			if(response) {
+				$notify({
+					title: 'Success',
+					message: response.message,
+					type: 'success',
+				});
+			}
+			router.push({ name: 'users-list' });
+        } catch(error) {
+            $notifyUserAboutError(error);
+        }
+	}).catch(() => {
+        $notify({
+            title: 'Canceled',
+            message: 'User deletion canceled',
+            type: 'info'
+        });
+	}) 
+};
 </script>
 
 <template>
@@ -143,6 +172,7 @@ const changePassword = async () => {
 			<el-button v-if="!editingForm" type="warning" @click="changePassword"
 				>Change password</el-button
 			>
+			<el-button type="danger" @click="deleteUser">{{ 'Delete user' }}</el-button>
 		</el-form>
 		<div v-else>Loading user data...</div>
 	</div>
