@@ -30,33 +30,23 @@ const users = [
 	}
 ];
 
-let user = {
-	id: 'c7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3d3b333',
-	username: 'test1',
-	firstName: 'john',
-	lastName: 'white',
-	email: 'john@white.com',
-	role: { id: 0, name: 'Admin' },
-	lastLogin: '2024-09-26T10:15:06.720Z'
-}
-
-const allUsers = new Map()
-allUsers.set(user.id, user)
-allUsers.set(users[0].id, users[0])
-allUsers.set(users[1].id, users[1])
-allUsers.set(users[2].id, users[2])
+// let user = {
+// 	id: 'c7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3d3b333',
+// 	username: 'test1',
+// 	firstName: 'john',
+// 	lastName: 'white',
+// 	email: 'john@white.com',
+// 	role: { id: 0, name: 'Admin' },
+// 	lastLogin: '2024-09-26T10:15:06.720Z'
+// }
 
 export const usersHandlers = [
 	http.get(api('/users'), () => {
-		return HttpResponse.json(Array.from(allUsers.values()));
+		return HttpResponse.json(users);
 	}),
 	http.post(api('/users/new'), async ({ request }) => {
 		const user = await request.json();
-		const userWithId = {
-			...user,
-			id: (Date.now() + allUsers.size).toString()
-		}
-		allUsers.set(userWithId.id, userWithId)
+		users.push(user)
 		return HttpResponse.json({
 			status: 'success',
 			message: `user ${user.username} was created`
@@ -105,17 +95,17 @@ export const usersHandlers = [
 	}),
 	http.delete(api('/users/:id'), async ({ params }) => {
 		const { id } = params;
-		const deletedUser = allUsers.get(id)
-		if(!deletedUser){
+		const userIndex = users.findIndex(user => user.id === id)
+		if(!userIndex){
 			return HttpResponse.json({
 				status: 'error',
 				message: `User not found`
 			}, {status: 404})
 		}
-		allUsers.delete(id)
+		users.splice(userIndex, 1)
 		return HttpResponse.json({
 			status: 'success',
-			message: `User ${deletedUser.username} was deleted`
+			message: `User was deleted`
 		})
 })
 ];

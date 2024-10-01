@@ -29,7 +29,7 @@ function deleteUser(id){
 		cancelButtonText: 'Cancel',
 		type: 'warning'
 	}).then(async () => {
-        try {
+		try {
 			const response = await $api.users.deleteUser(id);
 			if(response) {
 				$notify({
