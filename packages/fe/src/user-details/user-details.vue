@@ -104,32 +104,32 @@ const changePassword = async () => {
 	}
 };
 
-const deleteUser = () => {
-    $confirm('Do you want to delete this user?', 'Warning', {
-		confirmButtonText: 'OK',
-		cancelButtonText: 'Cancel',
-		type: 'warning'
-	}).then(async () => {
-        try {
+const deleteUser = async () => {
+	try {
+		await $confirm('Do you want to delete this user?', 'Warning', {
+			confirmButtonText: 'OK',
+			cancelButtonText: 'Cancel',
+			type: 'warning'
+		})
+		try {
 			const response = await $api.users.deleteUser(props.id);
-			if(response) {
-				$notify({
-					title: 'Success',
-					message: response.message,
-					type: 'success',
-				});
-			}
+			$notify({
+				title: 'Success',
+				message: response.message,
+				type: 'success',
+			});
 			router.push({ name: 'users-list' });
-        } catch(error) {
-            $notifyUserAboutError(error);
-        }
-	}).catch(() => {
-        $notify({
-            title: 'Canceled',
-            message: 'User deletion canceled',
-            type: 'info'
-        });
-	}) 
+		} catch(error) {
+			$notifyUserAboutError(error);
+		}
+	} catch(error) {
+		console.log(error)
+		$notify({
+			title: 'Canceled',
+			message: 'User deletion canceled',
+			type: 'info'
+		});
+	}
 };
 </script>
 

@@ -23,33 +23,34 @@ function editUser(id) {
 	router.push({ name: 'edit-user', params: { id } });
 }
 
-function deleteUser(id){
-    $confirm('Do you want to delete this user?', 'Warning', {
-		confirmButtonText: 'OK',
-		cancelButtonText: 'Cancel',
-		type: 'warning'
-	}).then(async () => {
+const deleteUser = async (id) => {
+	try {
+		await $confirm('Do you want to delete this user?', 'Warning', {
+			confirmButtonText: 'OK',
+			cancelButtonText: 'Cancel',
+			type: 'warning'
+		})
 		try {
 			const response = await $api.users.deleteUser(id);
-			if(response) {
-				$notify({
-					title: 'Success',
-					message: response.message,
-					type: 'success',
-				});
-			}
-			setUsers()
-        } catch(error) {
-            $notifyUserAboutError(error);
-        }
-	}).catch(() => {
-        $notify({
-            title: 'Canceled',
-            message: 'User deletion canceled',
-            type: 'info'
-        });
-	}) 
+			$notify({
+				title: 'Success',
+				message: response.message,
+				type: 'success',
+			});
+			await setUsers()
+		} catch(error) {
+			$notifyUserAboutError(error);
+		}
+	} catch(error) {
+		console.log(error)
+		$notify({
+			title: 'Canceled',
+			message: 'User deletion canceled',
+			type: 'info'
+		});
+	}
 };
+
 async function setUsers() {
 	isLoading.value = true;
 	try {
