@@ -74,7 +74,7 @@ const confirmRoleChange = async () => {
 		);
 		return confirmed;
 	}
-	return;
+	return true;
 };
 const handleSubmit = async () => {
 	if (!formHasChanges.value) {
@@ -89,6 +89,11 @@ const handleSubmit = async () => {
 		const updatedUser = await $api.users.updateUser(user.value.id, user.value);
 		user.value = updatedUser;
 		originalUser.value = { ...updatedUser };
+		$notify({
+			title: 'Success',
+			message: 'Profile has been updated',
+			type: 'success'
+		});
 		toggleEdit();
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating user');
