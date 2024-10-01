@@ -31,7 +31,7 @@ const users = [
 ];
 
 let user = {
-	id: 1,
+	id: 'c7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3d3b333',
 	username: 'test1',
 	firstName: 'john',
 	lastName: 'white',
@@ -42,6 +42,9 @@ let user = {
 
 const allUsers = new Map()
 allUsers.set(user.id, user)
+allUsers.set(users[0].id, users[0])
+allUsers.set(users[1].id, users[1])
+allUsers.set(users[2].id, users[2])
 
 export const usersHandlers = [
 	http.get(api('/users'), () => {
@@ -51,7 +54,7 @@ export const usersHandlers = [
 		const user = await request.json();
 		const userWithId = {
 			...user,
-			id: allUsers.size+1
+			id: (Date.now() + allUsers.size).toString()
 		}
 		allUsers.set(userWithId.id, userWithId)
 		return HttpResponse.json({
@@ -102,17 +105,17 @@ export const usersHandlers = [
 	}),
 	http.delete(api('/users/:id'), async ({ params }) => {
 		const { id } = params;
-		const deletedUser = allUsers.get(Number(id))
+		const deletedUser = allUsers.get(id)
 		if(!deletedUser){
 			return HttpResponse.json({
 				status: 'error',
 				message: `User not found`
 			}, {status: 404})
 		}
-		allUsers.delete(Number(id))
+		allUsers.delete(id)
 		return HttpResponse.json({
 			status: 'success',
-			message: `User ${id} was deleted`
+			message: `User ${deletedUser.username} was deleted`
 		})
 })
 ];
