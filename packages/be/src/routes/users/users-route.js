@@ -4,16 +4,13 @@ import * as schema from './users-schema.js';
 import usersService from '../../services/users/users-service.js';
 import { http } from '../../lib/utils/index.js';
 
-// TODO: delete after info about use id from request
-const USER_ID = 1;
-
 async function users(server, options) {
 	await server.register(usersService);
 
 	server.route({
 		method: 'POST',
 		path: options.prefix + 'users',
-		// onRequest: [server.auth],
+		preValidation: [server.authenticate],
 		schema: schema.createUser,
 		handler: onCreateUser
 	});
@@ -21,7 +18,7 @@ async function users(server, options) {
 	server.route({
 		method: 'GET',
 		path: options.prefix + 'users/:id',
-		// onRequest: [server.auth],
+		preValidation: [server.authenticate],
 		schema: schema.getUser,
 		handler: onGetUser
 	});
@@ -29,7 +26,7 @@ async function users(server, options) {
 	server.route({
 		method: 'GET',
 		path: options.prefix + 'users',
-		// onRequest: [server.auth],
+		preValidation: [server.authenticate],
 		schema: schema.getUsers,
 		handler: onGetUsers
 	});
@@ -37,7 +34,7 @@ async function users(server, options) {
 	server.route({
 		method: 'PATCH',
 		path: options.prefix + 'users/:id',
-		// onRequest: [server.auth],
+		preValidation: [server.authenticate],
 		schema: schema.updateUser,
 		handler: onUpdateUser
 	});
@@ -45,14 +42,15 @@ async function users(server, options) {
 	server.route({
 		method: 'DELETE',
 		path: options.prefix + 'users/:id',
-		// onRequest: [server.auth],
+		preValidation: [server.authenticate],
 		schema: schema.deleteUser,
 		handler: onDeleteUser
 	});
 
 	async function onCreateUser(req, reply) {
 		try {
-			const isAdmin = await server.usersService.isAdmin(USER_ID);
+			const authenticatedUserId = req.session.user.id;
+			const isAdmin = await server.usersService.isAdmin(authenticatedUserId);
 
 			if (!isAdmin) {
 				return http.handleError(reply, 403, `Sorry. You have no permissions to add new user`);
@@ -80,9 +78,10 @@ async function users(server, options) {
 
 	async function onGetUser(req, reply) {
 		try {
-			const isAdmin = await server.usersService.isAdmin(USER_ID);
+			const authenticatedUserId = req.session.user.id;
+			const isAdmin = await server.usersService.isAdmin(authenticatedUserId);
 			const userId = Number(req.params.id);
-			const isOwner = USER_ID === userId;
+			const isOwner = authenticatedUserId === userId;
 
 			if (!isAdmin && !isOwner) {
 				return http.handleError(reply, 403, `Sorry. You have no permissions to view this user`);
@@ -102,7 +101,8 @@ async function users(server, options) {
 
 	async function onGetUsers(req, reply) {
 		try {
-			const isAdmin = await server.usersService.isAdmin(USER_ID);
+			const authenticatedUserId = req.session.user.id;
+			const isAdmin = await server.usersService.isAdmin(authenticatedUserId);
 
 			if (!isAdmin) {
 				return http.handleError(reply, 403, `Sorry. You have no permissions to view users`);
@@ -118,9 +118,10 @@ async function users(server, options) {
 
 	async function onUpdateUser(req, reply) {
 		try {
-			const isAdmin = await server.usersService.isAdmin(USER_ID);
+			const authenticatedUserId = req.session.user.id;
+			const isAdmin = await server.usersService.isAdmin(authenticatedUserId);
 			const userId = Number(req.params.id);
-			const isOwner = USER_ID === userId;
+			const isOwner = authenticatedUserId === userId;
 
 			if (!isAdmin && !isOwner) {
 				return http.handleError(reply, 403, `Sorry. You have no permissions to change this user`);
@@ -144,9 +145,10 @@ async function users(server, options) {
 
 	async function onDeleteUser(req, reply) {
 		try {
-			const isAdmin = await server.usersService.isAdmin(USER_ID);
+			const authenticatedUserId = req.session.user.id;
+			const isAdmin = await server.usersService.isAdmin(authenticatedUserId);
 			const userId = Number(req.params.id);
-			const isOwner = USER_ID === userId;
+			const isOwner = authenticatedUserId === userId;
 
 			if (!isAdmin) {
 				return http.handleError(reply, 403, `Sorry. You have no permissions to delete user`);

@@ -4,22 +4,20 @@ import * as schema from './roles-schema.js';
 import rolesService from '../../services/roles/roles-service.js';
 import { http } from '../../lib/utils/index.js';
 
-// TODO: delete after info about user id from request
-const USER_ID = 1;
-
 async function roles(server, options) {
 	await server.register(rolesService);
 
 	server.route({
 		method: 'GET',
 		path: options.prefix + 'roles',
-		// onRequest: [server.auth],
+		preValidation: [server.authenticate],
 		schema: schema.getRoles,
 		handler: onGetRoles
 	});
 	async function onGetRoles(req, reply) {
 		try {
-			const isAdmin = await server.usersService.isAdmin(USER_ID);
+			const authenticatedUserId = req.session.user.id;
+			const isAdmin = await server.usersService.isAdmin(authenticatedUserId);
 
 			if (!isAdmin) {
 				return http.handleError(reply, 403, `Sorry. You have no permissions to view roles`);
