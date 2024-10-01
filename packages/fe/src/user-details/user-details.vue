@@ -61,19 +61,35 @@ const cancelEdit = () => {
 async function validate() {
 	return formEl.value.validate();
 }
+const confirmRoleChange = async () => {
+	if (user.value.role !== originalUser.value.role) {
+		const confirmed = await $confirm(
+			`Are you sure you want to change the role to ${user.value.role}?`,
+			'Confirm Role Change',
+			{
+				confirmButtonText: 'Yes, Change Role',
+				cancelButtonText: 'Cancel',
+				type: 'warning'
+			}
+		);
+		return confirmed;
+	}
+	return;
+};
 const handleSubmit = async () => {
 	if (!formHasChanges.value) {
 		toggleEdit();
 		return;
 	}
+	const valid = await validate();
+	if (!valid) return;
+	const roleConfirmed = await confirmRoleChange();
+	if (!roleConfirmed) return;
 	try {
-		const valid = await validate();
-		if (valid === true) {
-			const updatedUser = await $api.users.updateUser(user.value.id, user.value);
-			user.value = updatedUser;
-			originalUser.value = { ...updatedUser };
-			toggleEdit();
-		}
+		const updatedUser = await $api.users.updateUser(user.value.id, user.value);
+		user.value = updatedUser;
+		originalUser.value = { ...updatedUser };
+		toggleEdit();
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating user');
 	}
