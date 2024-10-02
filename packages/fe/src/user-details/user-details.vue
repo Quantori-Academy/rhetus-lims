@@ -89,8 +89,6 @@ const handleSubmit = async () => {
 	}
 	const valid = await validate();
 	if (!valid) return;
-	const roleConfirmed = await confirmRoleChange();
-	if (!roleConfirmed) return;
 	try {
 		const updatedUser = await $api.users.updateUser(user.value.id, user.value);
 		user.value = updatedUser;
@@ -155,7 +153,12 @@ const changePassword = async () => {
 				<el-input v-model="user.email" :disabled="!editingForm" />
 			</el-form-item>
 			<el-form-item label="Role">
-				<el-select v-model="user.role" :disabled="!editingForm" :placeholder="user.role">
+				<el-select
+					v-model="user.role"
+					:disabled="!editingForm"
+					:placeholder="user.role"
+					@change="confirmRoleChange"
+				>
 					<el-option label="Admin" value="admin" />
 					<el-option label="Procurement officer" value="procurement_officer" />
 					<el-option label="Researcher" value="researcher" />
