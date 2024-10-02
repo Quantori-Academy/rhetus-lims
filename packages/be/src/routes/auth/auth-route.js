@@ -28,8 +28,9 @@ async function auth(server, options) {
 			}
 
 			await server.usersService.updateUser(user.id, { lastLogin: new Date() });
+			const role = await server.rolesService.getRoleById(user.roleId);
 
-			req.session.user = { id: user.id };
+			req.session.user = { id: user.id, role: role.name };
 
 			reply.code(200);
 			return { status: 'success', message: 'Successfully logged in.' };

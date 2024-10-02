@@ -118,7 +118,11 @@ async function usersService(server) {
 				.innerJoin(schema.roles, eq(schema.users.roleId, schema.roles.id));
 
 			if (options) {
-				const filterSubQueries = db.getFormattedFilters(options, formatMapping, optionsDictionary);
+				const filterSubQueries = db.generateFilterSubquery(
+					options,
+					formatMapping,
+					optionsDictionary
+				);
 
 				query.where(and(...filterSubQueries));
 			}
@@ -135,7 +139,9 @@ async function usersService(server) {
 		updateUser: async (id, data) => {
 			const dataForUpdate = Object.fromEntries(
 				Object.entries(data).map(([key, value]) =>
-					key === 'roleId' || key === 'lastLogin' ? [key, value] : [key, formatMapping[key](value)]
+					!Object.keys(formatMapping).includes(key)
+						? [key, value]
+						: [key, formatMapping[key](value)]
 				)
 			);
 
@@ -173,6 +179,46 @@ async function usersService(server) {
 				.where(eq(schema.roles.name, 'administrator'));
 
 			return result.length === 1 && result[0].id === id;
+		},
+
+		handleUserUpdateWithRole: async (userId, data, permissions) => {
+			const { isOwner, isAdmin } = permissions;
+
+			if (!isAdmin) {
+				return {
+					code: 403,
+					status: 'error',
+					message: 'Sorry. You have no permissions to change role'
+				};
+			}
+			const targetRole = await server.rolesService.getRoleById(data.roleId);
+
+			if (!targetRole) {
+				return {
+					code: 404,
+					status: 'error',
+					message: 'No such role'
+				};
+			}
+
+			const isRoleDowngrading = targetRole.name !== 'administrator';
+			const isLastAdmin = await server.usersService.isLastAdmin(userId);
+
+			if (isOwner && isRoleDowngrading && isLastAdmin) {
+				return {
+					code: 409,
+					status: 'error',
+					message: 'Sorry. You cannot update your role. You are the only system administrator.'
+				};
+			}
+
+			const username = await server.usersService.updateUser(userId, data);
+
+			return {
+				code: 200,
+				status: 'success',
+				message: `User '${username}' was updated`
+			};
 		}
 	});
 }
