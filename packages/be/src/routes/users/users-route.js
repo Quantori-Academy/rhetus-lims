@@ -153,7 +153,6 @@ async function users(server, options) {
 			const user = await server.usersService.getUserById(userId);
 
 			if (!user) {
-				// check without return
 				return reply.code(404).send({ status: 'error', message: `No such user` });
 			}
 
@@ -174,12 +173,6 @@ async function users(server, options) {
 			return reply.code(500).send(err);
 		}
 	}
-
-	// async function handleUserUpdateWithoutRole(reply, userId, data) {
-	// 	const username = await server.usersService.updateUser(userId, data);
-
-	// 	return reply.code(200).send({ status: 'success', message: `User '${username}' was updated` });
-	// }
 }
 
 export default fp(users);
