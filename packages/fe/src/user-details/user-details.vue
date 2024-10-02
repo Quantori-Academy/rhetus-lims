@@ -62,19 +62,44 @@ const cancelEdit = () => {
 async function validate() {
 	return formEl.value.validate();
 }
+
+const confirmRoleChange = async () => {
+	if (user.value.role !== originalUser.value.role) {
+		try {
+			const confirmed = await $confirm(
+				`Are you sure you want to change the role to ${user.value.role}?`,
+				'Confirm Role Change',
+				{
+					confirmButtonText: 'Yes, Change Role',
+					cancelButtonText: 'Cancel',
+					type: 'warning'
+				}
+			);
+			return confirmed;
+		} catch (error) {
+			$notifyUserAboutError(error.message || 'Role update canceled');
+			return false;
+		}
+	}
+	return true;
+};
 const handleSubmit = async () => {
 	if (!formHasChanges.value) {
 		toggleEdit();
 		return;
 	}
+	const valid = await validate();
+	if (!valid) return;
 	try {
-		const valid = await validate();
-		if (valid === true) {
-			const updatedUser = await $api.users.updateUser(user.value.id, user.value);
-			user.value = updatedUser;
-			originalUser.value = { ...updatedUser };
-			toggleEdit();
-		}
+		const updatedUser = await $api.users.updateUser(user.value.id, user.value);
+		user.value = updatedUser;
+		originalUser.value = { ...updatedUser };
+		$notify({
+			title: 'Success',
+			message: 'Profile has been updated',
+			type: 'success'
+		});
+		toggleEdit();
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating user');
 	}
@@ -157,7 +182,12 @@ const deleteUser = async () => {
 				<el-input v-model="user.email" :disabled="!editingForm" />
 			</el-form-item>
 			<el-form-item label="Role">
-				<el-select v-model="user.role" :disabled="!editingForm" :placeholder="user.role">
+				<el-select
+					v-model="user.role"
+					:disabled="!editingForm"
+					:placeholder="user.role"
+					@change="confirmRoleChange"
+				>
 					<el-option label="Admin" value="admin" />
 					<el-option label="Procurement officer" value="procurement_officer" />
 					<el-option label="Researcher" value="researcher" />
