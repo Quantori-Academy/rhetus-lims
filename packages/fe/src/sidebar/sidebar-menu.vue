@@ -25,30 +25,16 @@ const handleSidebarOpen = () => {
 			</el-row>
 
 			<el-row class="link">
-				<router-link  to="/profile">
+				<router-link to="/profile">
 					<rh-icon name="user"></rh-icon>
 					<span>Profile</span>
 				</router-link>
 			</el-row>
 
 			<el-row class="link">
-				<router-link  to="/users/list">
+				<router-link to="/users/list">
 					<rh-icon name="users"></rh-icon>
 					<span>Users List</span>
-				</router-link>
-			</el-row>
-
-			<el-row class="link">
-				<router-link  to="/user-details">
-					<rh-icon name="user-edit"></rh-icon>
-					<span>User Detail Page</span>
-				</router-link>
-			</el-row>
-
-			<el-row class="link">
-				<router-link  to="/users/new">
-					<rh-icon name="user-plus"></rh-icon>
-					<span>Add New User</span>
 				</router-link>
 			</el-row>
 		</nav>
