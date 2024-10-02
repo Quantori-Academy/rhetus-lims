@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { $api } from '../lib/api';
+import { ElTable, ElTableColumn } from 'element-plus';
 
 const data = ref([]);
 
