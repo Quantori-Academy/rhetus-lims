@@ -30,23 +30,23 @@ const users = [
 	}
 ];
 
+let userList = [{
+	id: 'c7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3d3b333',
+	username: 'test1',
+	firstName: 'john',
+	lastName: 'white',
+	email: 'john@white.com',
+	role: { id: 0, name: 'Admin' },
+	lastLogin: '2024-09-26T10:15:06.720Z'
+}]
+
 export const usersHandlers = [
 	http.get(api('/users'), () => {
-		return HttpResponse.json([
-			{
-				id: 1,
-				username: 'test1',
-				firstName: 'john',
-				lastName: 'white',
-				email: 'john@white.com',
-				role: { id: 0, name: 'Admin' },
-				lastLogin: '2024-09-26T10:15:06.720Z'
-			}
-		]);
+		return HttpResponse.json(userList);
 	}),
 	http.post(api('/users/new'), async ({ request }) => {
 		const user = await request.json();
-
+		userList.push(user)
 		return HttpResponse.json({
 			status: 'success',
 			message: `user ${user.username} was created`
@@ -92,5 +92,20 @@ export const usersHandlers = [
     } else {
         return HttpResponse.json({ message: 'User not found' }, { status: 404 });
     }
+	}),
+	http.delete(api('/users/:id'), async ({ params }) => {
+		const { id } = params;
+		const userIndex = userList.findIndex(user => user.id === id)
+		if(userIndex === -1){
+			return HttpResponse.json({
+				status: 'error',
+				message: `User not found`
+			}, {status: 404})
+		}
+		userList.splice(userIndex, 1)
+		return HttpResponse.json({
+			status: 'success',
+			message: `User was deleted`
+		})
 })
 ];

@@ -22,5 +22,10 @@ export default http => ({
         method: 'POST',
         body: JSON.stringify({ confirm })
     });
+	},
+	async deleteUser(id) {
+		return await http(`/users/${id}`, {
+			method: 'DELETE'
+		})
 }
 });
