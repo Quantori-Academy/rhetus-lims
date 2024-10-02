@@ -28,5 +28,11 @@ export const routes = [
 		path: '/reset-password',
 		name: 'reset-password',
 		component: () => import('../../reset-password/reset-password.vue')
+	},
+	{
+		path: '/users/:id',
+		name: 'user-details',
+		component: () => import('../../user-details/user-details.vue'),
+		props: true
 	}
 ];

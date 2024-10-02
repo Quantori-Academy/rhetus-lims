@@ -7,6 +7,8 @@
 			<router-link to="/">Table</router-link>
 			<router-link to="/form">Form</router-link>
 			<router-link to="/users/list">Users</router-link>
+			<router-link to="/users/:id">User Details</router-link>
+			<router-link to="/users/list">Users</router-link>
 			<router-link to="/login">Login</router-link>
 		</nav>
 		<router-view></router-view>
