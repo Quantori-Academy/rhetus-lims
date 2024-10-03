@@ -17,6 +17,7 @@ const User = S.object()
 	.prop('roleId', S.number().required().minimum(1));
 
 const createUser = {
+	security: [{ Session: [] }],
 	body: User.without(['id', 'lastLogin', 'createdAt']),
 	response: {
 		201: statusMessage,
@@ -27,6 +28,7 @@ const createUser = {
 };
 
 const getUsers = {
+	security: [{ Session: [] }],
 	query: S.object().prop('page', S.string()).prop('limit', S.string()).prop('options', S.string()),
 	response: {
 		200: S.object()
@@ -43,6 +45,7 @@ const getUsers = {
 };
 
 const getUser = {
+	security: [{ Session: [] }],
 	params: S.object().prop('id', S.string()),
 	response: {
 		200: User.without(['password', 'lastLogin', 'roleId']).prop('role', Role).required(),
@@ -61,6 +64,7 @@ const updateUserSchema = S.object()
 	.prop('roleId', S.number().minimum(1));
 
 const updateUser = {
+	security: [{ Session: [] }],
 	params: S.object().prop('id', S.string()),
 	body: updateUserSchema,
 	response: {
@@ -73,6 +77,7 @@ const updateUser = {
 };
 
 const deleteUser = {
+	security: [{ Session: [] }],
 	params: S.object().prop('id', S.string()),
 	response: {
 		200: statusMessage,

@@ -15,6 +15,7 @@ const Role = S.object()
 	.prop('name', S.string().enum(Object.values(roles)));
 
 const getRoles = {
+	security: [{ Session: [] }],
 	response: {
 		200: S.object().prop('roles', S.array().items(Role)),
 		403: statusMessage,

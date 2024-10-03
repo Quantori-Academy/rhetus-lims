@@ -2,7 +2,7 @@ import { eq, and } from 'drizzle-orm';
 import fp from 'fastify-plugin';
 import bcrypt from 'bcrypt';
 import { schema } from '../../lib/db/schema/index.js';
-import { db } from '../../lib/utils/index.js';
+import { generateFilterSubquery } from '../../lib/utils/db/filters-formatter.js';
 
 const BCRYPT_SALT = 10;
 
@@ -118,11 +118,7 @@ async function usersService(server) {
 				.innerJoin(schema.roles, eq(schema.users.roleId, schema.roles.id));
 
 			if (options) {
-				const filterSubQueries = db.generateFilterSubquery(
-					options,
-					formatMapping,
-					optionsDictionary
-				);
+				const filterSubQueries = generateFilterSubquery(options, formatMapping, optionsDictionary);
 
 				query.where(and(...filterSubQueries));
 			}

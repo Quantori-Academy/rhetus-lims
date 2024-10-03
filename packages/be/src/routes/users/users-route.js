@@ -3,18 +3,14 @@ import fp from 'fastify-plugin';
 import * as schema from './users-schema.js';
 import usersService from '../../services/users/users-service.js';
 
-// TODO: delete after info about use id from request
-const USER_ID = 1;
-
 async function users(server, options) {
 	await server.register(usersService);
 
 	server.route({
 		method: 'POST',
 		path: options.prefix + 'users',
-		preValidation: [server.checkRole],
+		preValidation: [server.authenticate, server.administrator],
 		schema: schema.createUser,
-		config: { allowedRoles: ['administrator'] },
 		handler: onCreateUser
 	});
 
@@ -45,16 +41,17 @@ async function users(server, options) {
 	server.route({
 		method: 'GET',
 		path: options.prefix + 'users/:id',
-		// onRequest: [server.auth],
+		preValidation: [server.authenticate],
 		schema: schema.getUser,
 		handler: onGetUser
 	});
 
 	async function onGetUser(req, reply) {
 		try {
-			const isAdmin = await server.usersService.isAdmin(USER_ID);
+			const authenticatedUserId = req.session.user.id;
+			const isAdmin = await server.usersService.isAdmin(authenticatedUserId);
 			const userId = Number(req.params.id);
-			const isOwner = USER_ID === userId;
+			const isOwner = authenticatedUserId === userId;
 
 			if (!isAdmin && !isOwner) {
 				reply
@@ -77,7 +74,7 @@ async function users(server, options) {
 	server.route({
 		method: 'GET',
 		path: options.prefix + 'users',
-		preValidation: [server.checkRole],
+		preValidation: [server.authenticate, server.administrator],
 		schema: schema.getUsers,
 		config: { allowedRoles: ['administrator'] },
 		handler: onGetUsers
@@ -96,16 +93,17 @@ async function users(server, options) {
 	server.route({
 		method: 'PATCH',
 		path: options.prefix + 'users/:id',
-		// onRequest: [server.auth],
+		preValidation: [server.authenticate],
 		schema: schema.updateUser,
 		handler: onUpdateUser
 	});
 
 	async function onUpdateUser(req, reply) {
 		try {
-			const isAdmin = await server.usersService.isAdmin(USER_ID);
+			const authenticatedUserId = req.session.user.id;
+			const isAdmin = await server.usersService.isAdmin(authenticatedUserId);
 			const userId = Number(req.params.id);
-			const isOwner = USER_ID === userId;
+			const isOwner = authenticatedUserId === userId;
 
 			if (!isAdmin && !isOwner) {
 				reply
@@ -139,16 +137,16 @@ async function users(server, options) {
 	server.route({
 		method: 'DELETE',
 		path: options.prefix + 'users/:id',
-		// onRequest: [server.auth],
+		preValidation: [server.authenticate, server.administrator],
 		schema: schema.deleteUser,
-		config: { allowedRoles: ['administrator'] },
 		handler: onDeleteUser
 	});
 
 	async function onDeleteUser(req, reply) {
 		try {
+			const authenticatedUserId = req.session.user.id;
 			const userId = Number(req.params.id);
-			const isOwner = USER_ID === userId;
+			const isOwner = authenticatedUserId === userId;
 
 			const user = await server.usersService.getUserById(userId);
 

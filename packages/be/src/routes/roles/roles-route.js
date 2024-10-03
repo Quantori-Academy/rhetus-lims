@@ -9,11 +9,11 @@ async function roles(server, options) {
 	server.route({
 		method: 'GET',
 		path: options.prefix + 'roles',
-		preValidation: [server.checkRole],
+		preValidation: [server.authenticate, server.administrator],
 		schema: schema.getRoles,
-		config: { allowedRoles: ['administrator'] },
 		handler: onGetRoles
 	});
+
 	async function onGetRoles(req, reply) {
 		try {
 			const roles = await server.rolesService.getRoles();
