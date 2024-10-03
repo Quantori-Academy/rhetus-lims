@@ -1,7 +1,7 @@
 import { eq, inArray } from 'drizzle-orm';
 import { schema } from '../../db/schema/index.js';
 
-function getFormattedFilters(data, formatMapping, optionsDictionary) {
+function generateFilterSubquery(data, formatMapping, optionsDictionary) {
 	const parsedData = JSON.parse(data);
 	return Object.entries(parsedData).map(([key, value]) => {
 		const optionProperty = optionsDictionary[key.toLowerCase()].property;
@@ -26,4 +26,4 @@ function getFormattedFilters(data, formatMapping, optionsDictionary) {
 	});
 }
 
-export { getFormattedFilters };
+export { generateFilterSubquery };

@@ -27,7 +27,7 @@ async function swaggerGenerator(fastify) {
 				Session: {
 					type: 'apiKey',
 					name: 'Cookie',
-					in: 'header',
+					in: 'header'
 				},
 				Bearer: {
 					type: 'apiKey',

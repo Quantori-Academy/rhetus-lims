@@ -1,13 +1,7 @@
-import { handleSuccess, handleError } from './http/reply-handlers.js';
-import { getFormattedFilters } from './db/filters-formatter.js';
-
-const http = {
-	handleError,
-	handleSuccess
-};
+import { generateFilterSubquery } from './db/filters-formatter.js';
 
 const db = {
-	getFormattedFilters
+	generateFilterSubquery
 };
 
-export { http, db };
+export { db };
