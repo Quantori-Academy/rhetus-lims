@@ -2,7 +2,7 @@ import { eq, and } from 'drizzle-orm';
 import fp from 'fastify-plugin';
 import bcrypt from 'bcrypt';
 import { schema } from '../../lib/db/schema/index.js';
-import { generateFilterSubquery } from '../../lib/utils/db/filters-formatter.js';
+import { generateFilterSubquery } from '../../lib/utils/db/filter-subquery-generator.js';
 
 const BCRYPT_SALT = 10;
 
