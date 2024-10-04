@@ -104,6 +104,7 @@ At first, quick decision-making and realizing that things change with less consu
 - [Processes](./docs/processes.md)
 - [Initial Setup of .env](./docs/setup-env.md)
 - [Prettier settings](./docs/prettier.md)
+- [MSW settings and explanation](./docs/prettier.md)
 
 Guides will help you understand some aspects of the work.
 
