@@ -6,8 +6,8 @@
 		"dev": "vite",
 		"dev:msw": "vite --mode msw",
 		"build": "vite build",
-		"check:eslint": "prettier --check .",
-		"check:prettier": "eslint .",
+		"check:prettier": "prettier --check --ignore-path ./.prettierignore . ",
+		"check:eslint": "eslint .",
 		"lint": "npm run check:eslint && npm run check:prettier"
 	},
 	"dependencies": {
