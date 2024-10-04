@@ -1,4 +1,4 @@
-import { eq, and } from 'drizzle-orm';
+import { eq, and, exists } from 'drizzle-orm';
 import fp from 'fastify-plugin';
 import bcrypt from 'bcrypt';
 import { schema } from '../../lib/db/schema/index.js';
@@ -85,7 +85,18 @@ async function usersService(server) {
 						id: schema.roles.id,
 						name: schema.roles.name
 					},
-					createdAt: schema.users.createdAt
+					createdAt: schema.users.createdAt,
+					hasPasswordResetRequests: exists(
+						server.db
+							.select({ id: schema.passwordResetRequests.id })
+							.from(schema.passwordResetRequests)
+							.where(
+								and(
+									eq(schema.passwordResetRequests.fromUserId, schema.users.id),
+									eq(schema.passwordResetRequests.completed, false)
+								)
+							)
+					).as('hasPasswordResetRequests')
 				})
 				.from(schema.users)
 				.innerJoin(schema.roles, eq(schema.users.roleId, schema.roles.id))
@@ -112,6 +123,17 @@ async function usersService(server) {
 						id: schema.roles.id,
 						name: schema.roles.name
 					},
+					hasPasswordResetRequests: exists(
+						server.db
+							.select({ id: schema.passwordResetRequests.id })
+							.from(schema.passwordResetRequests)
+							.where(
+								and(
+									eq(schema.passwordResetRequests.fromUserId, schema.users.id),
+									eq(schema.passwordResetRequests.completed, false)
+								)
+							)
+					).as('hasPasswordResetRequests'),
 					lastLogin: schema.users.lastLogin
 				})
 				.from(schema.users)
