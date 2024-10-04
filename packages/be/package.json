@@ -9,7 +9,9 @@
 	"scripts": {
 		"dev": "node --watch --env-file .env src/server.js",
 		"start": "node --env-file .env src/server.js",
-		"lint": "eslint"
+		"check:prettier": "prettier --check --ignore-path ./.prettierignore . ",
+		"check:eslint": "eslint .",
+		"lint": "npm run check:eslint && npm run check:prettier"
 	},
 	"dependencies": {
 		"@fastify/autoload": "^5.10.0",

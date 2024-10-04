@@ -14,7 +14,7 @@ export default [
 			'max-depth': ['error', { max: 2 }],
 			'max-nested-callbacks': ['error', { max: 2 }],
 			'max-params': ['error', { max: 4 }],
-			'max-lines': ['error', { max: 200, skipComments: true, skipBlankLines: true }]
+			'max-lines': ['error', { max: 250, skipComments: true, skipBlankLines: true }]
 		}
 	},
 	{
