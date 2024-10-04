@@ -3,7 +3,7 @@ import SidebarMenu from '../../../sidebar/sidebar-menu.vue';
 </script>
 
 <template>
-	<sidebar-menu/>
+	<sidebar-menu />
 	<div class="main-wrapper">
 		<div class="table-logo">
 			<img width="42" height="42" src="../../../lib//assets/images/logo.svg" alt="" />

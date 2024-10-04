@@ -62,7 +62,7 @@ const handleSidebarOpen = () => {
 		height: 100%;
 		background-color: #f2f3f8;
 
-		.link{
+		.link {
 			padding: 0;
 			height: 50px;
 

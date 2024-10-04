@@ -135,20 +135,20 @@ const deleteUser = async () => {
 			confirmButtonText: 'OK',
 			cancelButtonText: 'Cancel',
 			type: 'warning'
-		})
+		});
 		try {
 			const response = await $api.users.deleteUser(props.id);
 			$notify({
 				title: 'Success',
 				message: response.message,
-				type: 'success',
+				type: 'success'
 			});
 			router.push({ name: 'users-list' });
-		} catch(error) {
+		} catch (error) {
 			$notifyUserAboutError(error);
 		}
-	} catch(error) {
-		console.log(error)
+	} catch (error) {
+		console.log(error);
 		$notify({
 			title: 'Canceled',
 			message: 'User deletion canceled',
