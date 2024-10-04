@@ -8,6 +8,7 @@ export function getConfig() {
 			.prop('MODE', S.enum(['development', 'production']).required())
 			.prop('API_HOST', S.string().required())
 			.prop('API_PORT', S.string().required())
+			.prop('SESSION_SECRET', S.string().required())
 			.prop('PG_DATABASE_URL', S.string().required())
 			.prop(
 				'LOG_LEVEL',
@@ -33,6 +34,7 @@ export function getConfig() {
 				level: env.LOG_LEVEL
 			}
 		},
+		sessionSecret: env.SESSION_SECRET,
 		mode: env.MODE,
 		prod: env.MODE === 'production',
 		dev: env.MODE === 'development'
