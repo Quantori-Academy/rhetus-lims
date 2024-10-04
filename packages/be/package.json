@@ -9,10 +9,12 @@
 	"scripts": {
 		"dev": "node --watch --env-file .env src/server.js",
 		"start": "node --env-file .env src/server.js",
-		"lint": "eslint",
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "node src/lib/db/migrate.js",
 		"db:update": "npm run db:generate && npm run db:migrate"
+		"check:prettier": "prettier --check --ignore-path ./.prettierignore . ",
+		"check:eslint": "eslint .",
+		"lint": "npm run check:eslint && npm run check:prettier"
 	},
 	"dependencies": {
 		"@fastify/autoload": "^5.10.0",

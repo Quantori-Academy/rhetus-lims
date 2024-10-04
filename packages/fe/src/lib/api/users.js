@@ -18,9 +18,14 @@ export default http => ({
 		});
 	},
 	async changePassword(id, confirm) {
-    return await http(`/users/${id}/change-password`, {
-        method: 'POST',
-        body: JSON.stringify({ confirm })
-    });
-}
+		return await http(`/users/${id}/change-password`, {
+			method: 'POST',
+			body: JSON.stringify({ confirm })
+		});
+	},
+	async deleteUser(id) {
+		return await http(`/users/${id}`, {
+			method: 'DELETE'
+		});
+	}
 });

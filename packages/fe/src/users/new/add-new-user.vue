@@ -30,7 +30,7 @@ async function addUser() {
 
 	try {
 		const response = await $api.users.addUser(form.value);
-		$notify({ title: response.message, type: 'success' });
+		$notify({ message: response.message, type: 'success' });
 		router.push({ name: 'users-list' });
 	} catch (error) {
 		$notifyUserAboutError(error);

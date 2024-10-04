@@ -3,11 +3,11 @@
 _See the [full doc](../README.md) first._
 
 - [Rhetus BE](#rhetus-be)
-	- [Project Structure](#project-structure)
-	- [Style Guide](#style-guide)
-		- [Naming](#naming)
-	- [Tools](#tools)
-	- [Scripts](#scripts)
+  - [Project Structure](#project-structure)
+  - [Style Guide](#style-guide)
+    - [Naming](#naming)
+  - [Tools](#tools)
+  - [Scripts](#scripts)
 
 ## Project Structure
 

@@ -14,7 +14,7 @@
 		"lint": "pnpm run '/^lint:.*/'",
 		"dev:fe": "pnpm --filter rhetus-fe dev",
 		"dev:be": "pnpm --filter rhetus-be dev",
-		"lint:fe": "pnpm --filter rhetus-be lint",
+		"lint:fe": "pnpm --filter rhetus-fe lint",
 		"lint:be": "pnpm --filter rhetus-be lint",
 		"build:fe": "pnpm --filter rhetus-fe build",
 		"build:be": "pnpm --filter rhetus-be build"

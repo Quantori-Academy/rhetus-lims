@@ -5,6 +5,7 @@ import { $confirm } from '../lib/utils/feedback/confirm-msg.js/';
 import { computed, onMounted, useTemplateRef } from 'vue';
 import { ref } from 'vue';
 import { $api } from '../lib/api/index.js';
+import { router } from '../lib/router/router';
 
 const editingForm = ref(false);
 const formEl = useTemplateRef('form-ref');
@@ -61,19 +62,44 @@ const cancelEdit = () => {
 async function validate() {
 	return formEl.value.validate();
 }
+
+const confirmRoleChange = async () => {
+	if (user.value.role !== originalUser.value.role) {
+		try {
+			const confirmed = await $confirm(
+				`Are you sure you want to change the role to ${user.value.role}?`,
+				'Confirm Role Change',
+				{
+					confirmButtonText: 'Yes, Change Role',
+					cancelButtonText: 'Cancel',
+					type: 'warning'
+				}
+			);
+			return confirmed;
+		} catch (error) {
+			$notifyUserAboutError(error.message || 'Role update canceled');
+			return false;
+		}
+	}
+	return true;
+};
 const handleSubmit = async () => {
 	if (!formHasChanges.value) {
 		toggleEdit();
 		return;
 	}
+	const valid = await validate();
+	if (!valid) return;
 	try {
-		const valid = await validate();
-		if (valid === true) {
-			const updatedUser = await $api.users.updateUser(user.value.id, user.value);
-			user.value = updatedUser;
-			originalUser.value = { ...updatedUser };
-			toggleEdit();
-		}
+		const updatedUser = await $api.users.updateUser(user.value.id, user.value);
+		user.value = updatedUser;
+		originalUser.value = { ...updatedUser };
+		$notify({
+			title: 'Success',
+			message: 'Profile has been updated',
+			type: 'success'
+		});
+		toggleEdit();
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating user');
 	}
@@ -102,6 +128,34 @@ const changePassword = async () => {
 		$notifyUserAboutError(error.message || 'Error requesting password change');
 	}
 };
+
+const deleteUser = async () => {
+	try {
+		await $confirm('Do you want to delete this user?', 'Warning', {
+			confirmButtonText: 'OK',
+			cancelButtonText: 'Cancel',
+			type: 'warning'
+		});
+		try {
+			const response = await $api.users.deleteUser(props.id);
+			$notify({
+				title: 'Success',
+				message: response.message,
+				type: 'success'
+			});
+			router.push({ name: 'users-list' });
+		} catch (error) {
+			$notifyUserAboutError(error);
+		}
+	} catch (error) {
+		console.log(error);
+		$notify({
+			title: 'Canceled',
+			message: 'User deletion canceled',
+			type: 'info'
+		});
+	}
+};
 </script>
 
 <template>
@@ -128,7 +182,12 @@ const changePassword = async () => {
 				<el-input v-model="user.email" :disabled="!editingForm" />
 			</el-form-item>
 			<el-form-item label="Role">
-				<el-select v-model="user.role" :disabled="!editingForm" :placeholder="user.role">
+				<el-select
+					v-model="user.role"
+					:disabled="!editingForm"
+					:placeholder="user.role"
+					@change="confirmRoleChange"
+				>
 					<el-option label="Admin" value="admin" />
 					<el-option label="Procurement officer" value="procurement_officer" />
 					<el-option label="Researcher" value="researcher" />
@@ -143,6 +202,7 @@ const changePassword = async () => {
 			<el-button v-if="!editingForm" type="warning" @click="changePassword"
 				>Change password</el-button
 			>
+			<el-button type="danger" @click="deleteUser">{{ 'Delete user' }}</el-button>
 		</el-form>
 		<div v-else>Loading user data...</div>
 	</div>

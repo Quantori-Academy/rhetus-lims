@@ -3,7 +3,8 @@ import { ref, onMounted } from 'vue';
 import { ElTable, ElTableColumn, ElButton } from 'element-plus';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { $api } from '../../lib/api/index.js';
-import { $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
+import { $confirm } from '../../lib/utils/feedback/confirm-msg';
+import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { formatDate } from '../../lib/utils/datetime/date-format.js';
 import { router } from '../../lib/router/router.js';
 
@@ -22,11 +23,38 @@ function editUser(id) {
 	router.push({ name: 'edit-user', params: { id } });
 }
 
+const deleteUser = async id => {
+	try {
+		await $confirm('Do you want to delete this user?', 'Warning', {
+			confirmButtonText: 'OK',
+			cancelButtonText: 'Cancel',
+			type: 'warning'
+		});
+		try {
+			const response = await $api.users.deleteUser(id);
+			$notify({
+				title: 'Success',
+				message: response.message,
+				type: 'success'
+			});
+			await setUsers();
+		} catch (error) {
+			$notifyUserAboutError(error);
+		}
+	} catch (error) {
+		console.log(error);
+		$notify({
+			title: 'Canceled',
+			message: 'User deletion canceled',
+			type: 'info'
+		});
+	}
+};
+
 async function setUsers() {
 	isLoading.value = true;
-
 	try {
-		users.value = await await $api.users.fetchUsers();
+		users.value = await $api.users.fetchUsers();
 		console.log(users.value);
 	} catch (error) {
 		$notifyUserAboutError(error);
@@ -67,8 +95,8 @@ onMounted(() => {
 				</template>
 			</el-table-column>
 			<el-table-column width="80">
-				<template #default>
-					<el-button type="danger">
+				<template #default="{ row }">
+					<el-button type="danger" @click="() => deleteUser(row.id)">
 						<rh-icon color="white" name="trash" />
 					</el-button>
 				</template>
