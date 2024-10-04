@@ -76,7 +76,6 @@ async function users(server, options) {
 		path: options.prefix + 'users',
 		preValidation: [server.authenticate, server.administrator],
 		schema: schema.getUsers,
-		config: { allowedRoles: ['administrator'] },
 		handler: onGetUsers
 	});
 
