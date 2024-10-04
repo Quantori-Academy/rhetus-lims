@@ -1,7 +1,7 @@
 import fp from 'fastify-plugin';
 
 import * as schema from './password-reset-requests-schema.js';
-import passwordResetRequestsService from '../../services/passoword-reset-requests/password-reset-requests-service.js';
+import passwordResetRequestsService from '../../services/password-reset-requests/password-reset-requests-service.js';
 
 async function passwordResetRequests(server, options) {
 	await server.register(passwordResetRequestsService);
