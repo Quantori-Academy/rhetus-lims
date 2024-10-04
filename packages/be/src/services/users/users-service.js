@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { eq, and, exists } from 'drizzle-orm';
 import fp from 'fastify-plugin';
 import bcrypt from 'bcrypt';

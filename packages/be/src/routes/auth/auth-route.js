@@ -31,6 +31,7 @@ async function auth(server, options) {
 			} else {
 				const isPasswordValid = await bcrypt.compare(password, user.password);
 
+				// eslint-disable-next-line max-depth
 				if (!isPasswordValid) {
 					reply.code(401);
 					return { status: 'error', message: 'Invalid credentials.' };
