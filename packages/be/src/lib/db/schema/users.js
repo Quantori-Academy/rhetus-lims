@@ -1,4 +1,4 @@
-import { integer, pgTable, serial, timestamp, varchar, text } from 'drizzle-orm/pg-core';
+import { integer, pgTable, serial, timestamp, varchar, text, boolean } from 'drizzle-orm/pg-core';
 import { roles } from './roles.js';
 
 export const users = pgTable('users', {
@@ -10,5 +10,6 @@ export const users = pgTable('users', {
 	email: varchar('email', { length: 256 }).notNull(),
 	roleId: integer('role_id').references(() => roles.id),
 	lastLogin: timestamp('last_login'),
-	createdAt: timestamp('created_at').notNull()
+	createdAt: timestamp('created_at').notNull(),
+	shouldResetPassword: boolean('should_reset_password').default(false)
 });

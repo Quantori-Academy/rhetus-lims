@@ -22,6 +22,13 @@
       "when": 1727680739502,
       "tag": "0002_freezing_black_widow",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1728003626569,
+      "tag": "0003_silent_the_twelve",
+      "breakpoints": true
     }
   ]
 }
