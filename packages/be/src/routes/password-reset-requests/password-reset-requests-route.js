@@ -25,9 +25,8 @@ async function passwordResetRequests(server, options) {
 
 			await server.passwordResetRequestsService.createRequest(user.id);
 
-			return reply
-				.code(201)
-				.send({ status: 'success', message: `Password reset request sent for '${username}'.` });
+			reply.code(201);
+			return { status: 'success', message: `Password reset request sent for '${username}'.` };
 		} catch (err) {
 			server.log.error(err);
 			reply.code(500);
@@ -57,10 +56,11 @@ async function passwordResetRequests(server, options) {
 
 			await server.usersService.updateUser(user.id, { shouldResetPassword: true });
 
-			return reply.code(201).send({
+			reply.code(200);
+			return {
 				status: 'success',
 				message: `Password reset request confirmed for '${username}'.`
-			});
+			};
 		} catch (err) {
 			server.log.error(err);
 			reply.code(500);
