@@ -38,7 +38,7 @@ async function passwordResetRequests(server, options) {
 	server.route({
 		method: 'PATCH',
 		path: options.prefix + 'confirm-password-reset',
-		// preValidation: [server.authenticate, server.administrator],
+		preValidation: [server.authenticate, server.administrator],
 		schema: schema.confirmRequest,
 		handler: onConfirmRequest
 	});
@@ -55,12 +55,12 @@ async function passwordResetRequests(server, options) {
 
 			await server.passwordResetRequestsService.updateRequestByUserId(user.id, { completed: true });
 
-			return reply
-				.code(201)
-				.send({
-					status: 'success',
-					message: `Password reset request confirmed for '${username}'.`
-				});
+			await server.usersService.updateUser(user.id, { shouldResetPassword: true });
+
+			return reply.code(201).send({
+				status: 'success',
+				message: `Password reset request confirmed for '${username}'.`
+			});
 		} catch (err) {
 			server.log.error(err);
 			reply.code(500);

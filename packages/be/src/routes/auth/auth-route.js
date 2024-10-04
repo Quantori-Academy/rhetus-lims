@@ -20,60 +20,29 @@ async function auth(server, options) {
 				return { status: 'success', message: 'User not found.' };
 			}
 
-			const isPasswordValid = await bcrypt.compare(password, user.password);
+			let message = 'Successfully logged in.';
 
-			if (!isPasswordValid) {
-				reply.code(401);
-				return { status: 'error', message: 'Invalid credentials.' };
+			if (user.shouldResetPassword) {
+				await server.usersService.updateUser(user.id, {
+					password,
+					shouldResetPassword: false
+				});
+				message = 'Your password has been reset.';
+			} else {
+				const isPasswordValid = await bcrypt.compare(password, user.password);
+
+				if (!isPasswordValid) {
+					reply.code(401);
+					return { status: 'error', message: 'Invalid credentials.' };
+				}
 			}
 
 			await server.usersService.updateUser(user.id, { lastLogin: new Date() });
 
 			req.session.user = { id: user.id };
 
-			const message = user.shouldResetPassword
-				? 'Your password was reset by an admin, please, change it.'
-				: 'Successfully logged in.';
-
 			reply.code(200);
 			return { status: 'success', message };
-		} catch (err) {
-			server.log.error(err);
-			reply.code(500);
-			return { status: 'error', message: 'Oops! Something went wrong. Try again later.' };
-		}
-	}
-
-	server.route({
-		method: 'POST',
-		path: options.prefix + 'reset-password',
-		schema: schema.passwordReset,
-		handler: onPasswordReset
-	});
-	async function onPasswordReset(req, reply) {
-		try {
-			const loggedInUser = req.session.user.id;
-
-			const { username, password } = req.body;
-			const isAdmin = await server.usersService.isAdmin(loggedInUser);
-
-			if (isAdmin) {
-				const user = await server.usersService.getUserByUsername(username);
-
-				const isOwner = user.id === loggedInUser;
-				await server.usersService.updateUser(user.id, { password, shouldResetPassword: !isOwner });
-
-				reply.code(200);
-				return { status: 'success', message: `Successfully reset ${username}'s password.` };
-			}
-			
-			await server.usersService.updateUser(loggedInUser, {
-				password,
-				shouldResetPassword: false
-			});
-
-			reply.code(200);
-			return { status: 'success', message: `Successfully reset password.` };
 		} catch (err) {
 			server.log.error(err);
 			reply.code(500);

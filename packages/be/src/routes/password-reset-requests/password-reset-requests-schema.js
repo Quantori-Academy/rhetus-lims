@@ -14,7 +14,7 @@ const createRequest = {
 };
 
 const confirmRequest = {
-	// security: [{ Session: [] }],
+	security: [{ Session: [] }],
 	body: S.object().prop('username', S.string().required()),
 	response: {
 		200: statusMessage,
