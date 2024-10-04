@@ -39,5 +39,16 @@ export const routes = [
 		path: '/samples/new',
 		name: 'new-sample',
 		component: () => import('../../samples/new/add-new-sample.vue')
-	}
+	},
+	{
+		path: '/storages/list',
+		name: 'storages-list',
+		component: () => import('../../storage-management/list/storage-management-list.vue')
+	},
+	{
+		path: '/storages/:id',
+		name: 'edit-storage',
+		component: () => import('../../storage-management/edit/storage-management-edit.vue'),
+		props: true
+	},
 ];
