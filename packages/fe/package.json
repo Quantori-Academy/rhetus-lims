@@ -6,7 +6,9 @@
 		"dev": "vite",
 		"dev:msw": "vite --mode msw",
 		"build": "vite build",
-		"lint": "eslint ."
+		"check:eslint": "prettier --check .",
+		"check:prettier": "eslint .",
+		"lint": "npm run check:eslint && npm run check:prettier"
 	},
 	"dependencies": {
 		"date-fns": "^3.6.0",
