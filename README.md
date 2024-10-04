@@ -102,6 +102,7 @@ At first, quick decision-making and realizing that things change with less consu
 
 - [Team Onboarding](./docs/onboarding.md)
 - [Processes](./docs/processes.md)
+- [Prettier settings](./docs/prettier.md)
 
 Guides will help you understand some aspects of the work.
 
