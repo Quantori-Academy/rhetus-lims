@@ -11,7 +11,7 @@
 		"start": "node --env-file .env src/server.js",
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "node src/lib/db/migrate.js",
-		"db:update": "npm run db:generate && npm run db:migrate"
+		"db:update": "npm run db:generate && npm run db:migrate",
 		"check:prettier": "prettier --check --ignore-path ./.prettierignore . ",
 		"check:eslint": "eslint .",
 		"lint": "npm run check:eslint && npm run check:prettier"
