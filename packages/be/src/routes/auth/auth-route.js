@@ -21,25 +21,25 @@ async function auth(server, options) {
 				return { status: 'success', message: 'User not found.' };
 			}
 
-			let message = 'Successfully logged in.';
+			const isPasswordValid = await bcrypt.compare(password, user.password);
 
-			if (user.shouldResetPassword) {
-				await server.usersService.updateUser(user.id, {
-					password,
-					passwordResetStatus: Status.NONE
-				});
-				message = 'Your password has been reset.';
-			} else {
-				const isPasswordValid = await bcrypt.compare(password, user.password);
-
-				// eslint-disable-next-line max-depth
-				if (!isPasswordValid) {
-					reply.code(401);
-					return { status: 'error', message: 'Invalid credentials.' };
-				}
+			// require a valid password only when the user doesn't have a confirmed reset request
+			if (user.passwordResetStatus !== Status.CONFIRMED && !isPasswordValid) {
+				reply.code(401);
+				return { status: 'error', message: 'Invalid credentials.' };
 			}
 
-			await server.usersService.updateUser(user.id, { lastLogin: new Date() });
+			let message = 'Successfully logged in.';
+			const dataToUpdate = {};
+
+			if (user.passwordResetStatus === Status.CONFIRMED) {
+				dataToUpdate.password = password;
+				dataToUpdate.passwordResetStatus = Status.NONE;
+
+				message = 'Your password has been reset.';
+			}
+
+			await server.usersService.updateUser(user.id, { ...dataToUpdate, lastLogin: new Date() });
 
 			req.session.user = { id: user.id };
 
