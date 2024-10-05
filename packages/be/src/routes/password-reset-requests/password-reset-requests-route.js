@@ -3,7 +3,7 @@ import fp from 'fastify-plugin';
 import * as schema from './password-reset-requests-schema.js';
 import { Status } from '../../lib/db/schema/users.js';
 
-async function passwordResetRequests(server, options) {	
+async function passwordResetRequests(server, options) {
 	server.route({
 		method: 'POST',
 		path: options.prefix + 'request-password-reset',
@@ -52,7 +52,10 @@ async function passwordResetRequests(server, options) {
 
 			if (user.passwordResetStatus !== Status.ACTIVE) {
 				reply.code(400);
-				return { status: 'error', message: `User '${req.body.username}' does not have an active request.` };
+				return {
+					status: 'error',
+					message: `User '${req.body.username}' does not have an active request.`
+				};
 			}
 
 			await server.usersService.updateUser(user.id, { passwordResetStatus: Status.CONFIRMED });
