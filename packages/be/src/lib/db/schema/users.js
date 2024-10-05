@@ -1,5 +1,13 @@
-import { integer, pgTable, serial, timestamp, varchar, text, boolean } from 'drizzle-orm/pg-core';
+import { integer, pgTable, serial, timestamp, varchar, text, pgEnum } from 'drizzle-orm/pg-core';
 import { roles } from './roles.js';
+
+export const Status = {
+	NONE: 'none',
+	ACTIVE: 'active',
+	CONFIRMED: 'confirmed'
+};
+
+export const passwordResetStatusEnum = pgEnum('password_request_status', Object.values(Status));
 
 export const users = pgTable('users', {
 	id: serial('id').primaryKey().notNull(),
@@ -11,5 +19,5 @@ export const users = pgTable('users', {
 	roleId: integer('role_id').references(() => roles.id),
 	lastLogin: timestamp('last_login'),
 	createdAt: timestamp('created_at').notNull(),
-	shouldResetPassword: boolean('should_reset_password').default(false)
+	passwordResetStatus: passwordResetStatusEnum('password_reset_status').default('none')
 });

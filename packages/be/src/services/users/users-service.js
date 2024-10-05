@@ -1,9 +1,9 @@
-/* eslint-disable max-lines */
-import { eq, and, exists } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import fp from 'fastify-plugin';
 import bcrypt from 'bcrypt';
 import { schema } from '../../lib/db/schema/index.js';
 import { generateFilterSubquery } from '../../lib/utils/db/filter-subquery-generator.js';
+import { Status } from '../../lib/db/schema/users.js';
 
 const BCRYPT_SALT = 10;
 
@@ -87,17 +87,7 @@ async function usersService(server) {
 						name: schema.roles.name
 					},
 					createdAt: schema.users.createdAt,
-					hasPasswordResetRequests: exists(
-						server.db
-							.select({ id: schema.passwordResetRequests.id })
-							.from(schema.passwordResetRequests)
-							.where(
-								and(
-									eq(schema.passwordResetRequests.fromUserId, schema.users.id),
-									eq(schema.passwordResetRequests.completed, false)
-								)
-							)
-					).as('hasPasswordResetRequests')
+					hasPasswordResetRequests: eq(schema.users.passwordResetStatus, Status.ACTIVE)
 				})
 				.from(schema.users)
 				.innerJoin(schema.roles, eq(schema.users.roleId, schema.roles.id))
@@ -124,17 +114,7 @@ async function usersService(server) {
 						id: schema.roles.id,
 						name: schema.roles.name
 					},
-					hasPasswordResetRequests: exists(
-						server.db
-							.select({ id: schema.passwordResetRequests.id })
-							.from(schema.passwordResetRequests)
-							.where(
-								and(
-									eq(schema.passwordResetRequests.fromUserId, schema.users.id),
-									eq(schema.passwordResetRequests.completed, false)
-								)
-							)
-					).as('hasPasswordResetRequests'),
+					hasPasswordResetRequests: eq(schema.users.passwordResetStatus, Status.ACTIVE),
 					lastLogin: schema.users.lastLogin
 				})
 				.from(schema.users)

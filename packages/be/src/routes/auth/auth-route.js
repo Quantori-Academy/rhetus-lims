@@ -1,6 +1,7 @@
 import fp from 'fastify-plugin';
 import bcrypt from 'bcrypt';
 import * as schema from './auth-schema.js';
+import { Status } from '../../lib/db/schema/users.js';
 
 async function auth(server, options) {
 	server.route({
@@ -25,7 +26,7 @@ async function auth(server, options) {
 			if (user.shouldResetPassword) {
 				await server.usersService.updateUser(user.id, {
 					password,
-					shouldResetPassword: false
+					passwordResetStatus: Status.NONE
 				});
 				message = 'Your password has been reset.';
 			} else {
