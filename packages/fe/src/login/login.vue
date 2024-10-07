@@ -1,8 +1,9 @@
 <script setup>
-import { ElForm, ElInput, ElLink, ElButton, ElFormItem, } from 'element-plus';
+import { ElForm, ElInput, ElButton, ElFormItem, } from 'element-plus';
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { $api } from '../lib/api/index.js';
-import { $notifyUserAboutError } from '../../src/lib/utils/feedback/notify-msg.js';
+import { $notify } from '../../src/lib/utils/feedback/notify-msg.js';
 
 function createDefaultFormValues() {
 	return {
@@ -12,28 +13,31 @@ function createDefaultFormValues() {
 	};
 }
 
-const users = ref([]);
 const form = ref(createDefaultFormValues());
+const router = useRouter();
 
 async function login(form) {
 	try {
-		const token = await await $api.loginUser.getBearerToken(form.username, form.password);
+		const token = await $api.auth.login(form.value);
 		if (token) {
-			const userData = await await $api.loginUser.fetchUser(token, form.username);
+			localStorage.setItem('token', token);
+			const userData = await $api.auth.fetchUser(token, form.value);
 			if (userData) {
-				console.log("User Data:", userData);
+				router.push({ name:'dashboard' });
 			}
 		}
 	} catch (error) {
-		$notifyUserAboutError(error);
+		$notify({
+			title: 'Error',
+			message: 'Incorrect Username or Password',
+			type: 'Error'
+		});
 	}
 	
 }
 function onSubmit() {
 	console.log('submit');
-	form.value = createDefaultFormValues();
 	login(form.value);
-	
 }
 </script>
 
@@ -44,16 +48,10 @@ function onSubmit() {
 				<el-input v-model="form.username" />
 			</el-form-item>
 			<el-form-item label="Password">
-				<el-input
-                    v-model="form.password"
-                    type="password"
-                    
-                />        
+				<el-input v-model="form.password" type="password" />        
 			</el-form-item>
 		    <el-form-item>
-				<el-link href="http://localhost:5173/reset-password" target="_blank" type="primary">
-					Reset password
-				</el-link>
+				<router-link to="/reset-password">Reset Password</router-link>
 			</el-form-item>	
 			<el-form-item>
 				<el-button type="primary" @click="onSubmit">

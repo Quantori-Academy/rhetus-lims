@@ -1,5 +1,5 @@
 export default http => ({
-	async getBearerToken(username, password) {
+	async login(username, password) {
 		const url = 'https://endpoint';
     	const payload = {
         	username: username,
