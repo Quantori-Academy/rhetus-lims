@@ -1,14 +1,18 @@
 <script setup>
-import { ref, onMounted } from "vue"
+import { ref, onMounted, computed, useTemplateRef } from "vue"
 import { ElForm, ElInput, ElButton, ElFormItem } from 'element-plus';
 
 import { $api } from "../../lib/api";
-import { $confirm } from '../../lib/utils/feedback/confirm-msg';
+//import { $confirm } from '../../lib/utils/feedback/confirm-msg';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { router } from "../../lib/router/router";
 
+import { rules, validate } from '../helpers';
+
 const storage = ref(null);
 const isLoading = ref(false);
+const initialStorage = ref(null);
+const formEl = useTemplateRef('form-ref');
 
 const props = defineProps({
     id: {
@@ -17,15 +21,13 @@ const props = defineProps({
     }
 })
 
-const validator = ref({
-    room: [{ required: true, message: "Room can't be empty" }],
-    name: [{ required: true, message: "Name can't be empty" }]
-})
-async function setStorage(id) {
+
+const setStorage = async (id) => {
     isLoading.value = true;
 	try {
-		storage.value = await $api.storages.fetchStorage(id);
-		console.log(storage.value);
+		const storageData = await $api.storages.fetchStorage(id);
+        storage.value = storageData;
+		initialStorage.value = { ...storageData };
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
@@ -33,13 +35,30 @@ async function setStorage(id) {
 	isLoading.value = false;
 }
 
-function cancelEdit() {
-    console.log("cancel edit")
+const cancelEdit = () => {
+    router.push({ name: 'storages-list' });
 }
 
-async function handleSubmit() {
+const isFormChanged = computed(() => {
+    return storage.value.room !== initialStorage.value.room || storage.value.name !== initialStorage.value.name;
+});
+
+
+const handleSubmit = async () => {
     try {
+        if(!isFormChanged.value) {
+            $notify({
+                title: 'Notification',
+                message: 'There is nothing to update',
+                type: 'info'
+            });
+            return;
+        };
+
+        if(!(await validate(formEl))) return;
+
         const updatedStorage = await $api.storages.updateStorage(storage.value.id, storage.value);
+        console.log(updatedStorage)
         $notify({
 			title: 'Success',
 			message: 'Storage has been updated',
@@ -64,7 +83,7 @@ onMounted(() => {
             ref="form-ref"
             label-position="top"
             :model="storage"
-            :rules="validator"
+            :rules="rules"
             @submit="handleSubmit"
         >
             <el-form-item label="Room" prop="room">
