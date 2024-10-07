@@ -22,6 +22,27 @@
       "when": 1727680739502,
       "tag": "0002_freezing_black_widow",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1728003626569,
+      "tag": "0003_silent_the_twelve",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1728005711018,
+      "tag": "0004_orange_unicorn",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1728132399861,
+      "tag": "0005_needy_wendigo",
+      "breakpoints": true
     }
   ]
 }

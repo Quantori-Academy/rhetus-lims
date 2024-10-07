@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "should_reset_password" boolean DEFAULT false;

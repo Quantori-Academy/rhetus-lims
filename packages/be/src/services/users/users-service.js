@@ -3,6 +3,7 @@ import fp from 'fastify-plugin';
 import bcrypt from 'bcrypt';
 import { schema } from '../../lib/db/schema/index.js';
 import { generateFilterSubquery } from '../../lib/utils/db/filter-subquery-generator.js';
+import { Status } from '../../lib/db/schema/users.js';
 
 const BCRYPT_SALT = 10;
 
@@ -85,7 +86,8 @@ async function usersService(server) {
 						id: schema.roles.id,
 						name: schema.roles.name
 					},
-					createdAt: schema.users.createdAt
+					createdAt: schema.users.createdAt,
+					hasPasswordResetRequests: eq(schema.users.passwordResetStatus, Status.ACTIVE)
 				})
 				.from(schema.users)
 				.innerJoin(schema.roles, eq(schema.users.roleId, schema.roles.id))
@@ -112,6 +114,7 @@ async function usersService(server) {
 						id: schema.roles.id,
 						name: schema.roles.name
 					},
+					hasPasswordResetRequests: eq(schema.users.passwordResetStatus, Status.ACTIVE),
 					lastLogin: schema.users.lastLogin
 				})
 				.from(schema.users)

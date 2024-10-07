@@ -35,7 +35,10 @@ const getUsers = {
 			.prop(
 				'users',
 				S.array().items(
-					User.without(['password', 'createdAt', 'roleId']).prop('role', Role).required()
+					User.without(['password', 'createdAt', 'roleId'])
+						.prop('role', Role)
+						.required()
+						.prop('hasPasswordResetRequests', S.boolean().required())
 				)
 			)
 			.prop('count', S.number()),
@@ -48,7 +51,10 @@ const getUser = {
 	security: [{ Session: [] }],
 	params: S.object().prop('id', S.string()),
 	response: {
-		200: User.without(['password', 'lastLogin', 'roleId']).prop('role', Role).required(),
+		200: User.without(['password', 'lastLogin', 'roleId'])
+			.prop('role', Role)
+			.required()
+			.prop('hasPasswordResetRequests', S.boolean().required()),
 		403: statusMessage,
 		404: statusMessage,
 		500: statusMessage

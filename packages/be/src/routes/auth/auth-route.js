@@ -1,6 +1,7 @@
 import fp from 'fastify-plugin';
 import bcrypt from 'bcrypt';
 import * as schema from './auth-schema.js';
+import { Status } from '../../lib/db/schema/users.js';
 
 async function auth(server, options) {
 	server.route({
@@ -22,17 +23,28 @@ async function auth(server, options) {
 
 			const isPasswordValid = await bcrypt.compare(password, user.password);
 
-			if (!isPasswordValid) {
+			// require a valid password only when the user doesn't have a confirmed reset request
+			if (user.passwordResetStatus !== Status.CONFIRMED && !isPasswordValid) {
 				reply.code(401);
 				return { status: 'error', message: 'Invalid credentials.' };
 			}
 
-			await server.usersService.updateUser(user.id, { lastLogin: new Date() });
+			let message = 'Successfully logged in.';
+			const dataToUpdate = {};
+
+			if (user.passwordResetStatus === Status.CONFIRMED) {
+				dataToUpdate.password = password;
+				dataToUpdate.passwordResetStatus = Status.NONE;
+
+				message = 'Your password has been reset.';
+			}
+
+			await server.usersService.updateUser(user.id, { ...dataToUpdate, lastLogin: new Date() });
 
 			req.session.user = { id: user.id };
 
 			reply.code(200);
-			return { status: 'success', message: 'Successfully logged in.' };
+			return { status: 'success', message };
 		} catch (err) {
 			server.log.error(err);
 			reply.code(500);
