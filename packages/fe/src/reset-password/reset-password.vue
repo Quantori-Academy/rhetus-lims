@@ -2,7 +2,7 @@
 import { ElForm, ElInput, ElLink, ElButton, ElFormItem, } from 'element-plus';
 import { ref } from 'vue';
 import { $api } from '../lib/api/index.js';
-import { $notifyUserAboutError, $notifyUserAboutSuccess } from '../../src/lib/utils/feedback/notify-msg.js';
+import { $notifyUserAboutError, $notify } from '../../src/lib/utils/feedback/notify-msg.js';
 
 function createDefaultFormValues() {
 	return {
@@ -15,10 +15,12 @@ const form = ref(createDefaultFormValues());
 
 async function resetPassword(form) {
 	try {
-		const user = await await $api.resetPassword.resetUserPassword(form.username);
-		if(user.ok) {
-			$notifyUserAboutSuccess;
-		}
+		const user = await $api.auth.resetUserPassword(form.username);
+		$notify({
+			title: 'Success',
+			message: 'Password reset successfully',
+			type: 'success'
+		});
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
@@ -27,9 +29,7 @@ async function resetPassword(form) {
 
 function onSubmit() {
 	console.log('submit');
-	form.value = createDefaultFormValues();
-	resetPassword(form.value);
-	
+	resetPassword(form.value = createDefaultFormValues());
 }
 </script>
 
