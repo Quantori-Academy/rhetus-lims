@@ -1,6 +1,6 @@
 import fp from 'fastify-plugin';
-import fastifySession from 'fastify-session';
-import fastifyCookie from 'fastify-cookie';
+import fastifySession from '@fastify/session';
+import fastifyCookie from '@fastify/cookie';
 import { getConfig } from '../config/config.js';
 
 const config = getConfig();
