@@ -8,4 +8,4 @@ const $router = createRouter({
 	routes
 });
 
-export { Srouter };
+export { $router };
