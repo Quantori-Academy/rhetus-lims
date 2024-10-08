@@ -29,7 +29,7 @@ async function resetPassword(form) {
 
 function onSubmit() {
 	console.log('submit');
-	resetPassword(form.value = createDefaultFormValues());
+	resetPassword(form.value);
 }
 </script>
 
