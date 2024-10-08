@@ -26,14 +26,13 @@ async function resetPassword(form) {
 }
 
 function onSubmit() {
-	console.log('submit');
 	resetPassword(form.value);
 }
 </script>
 
 <template>
 	<div class="wrapper">
-		<el-form :model="form" label-width="auto">
+		<el-form :model="form" label-width="auto" label-position="top">
 			<el-form-item label="Username">
 				<el-input v-model="form.username" />
 			</el-form-item>
@@ -49,13 +48,5 @@ function onSubmit() {
 	display: grid;
 	place-content: center;
 	gap: 24px;
-}
-
-.icon {
-	color: white;
-}
-
-.icon-container {
-	margin-right: 4px;
 }
 </style>
