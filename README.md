@@ -102,6 +102,9 @@ At first, quick decision-making and realizing that things change with less consu
 
 - [Team Onboarding](./docs/onboarding.md)
 - [Processes](./docs/processes.md)
+- [Initial Setup of .env](./docs/setup-env.md)
+- [Prettier settings](./docs/prettier.md)
+- [MSW settings and explanation](./docs/prettier.md)
 
 Guides will help you understand some aspects of the work.
 
@@ -170,7 +173,7 @@ Don't forget about "First unblock others" in [collaboration](#collaboration) sec
 **Reviewers:**
 
 - Responsible for reviewing the specifics of the proposed solution in an PR, ensuring it meets the acceptance criteria.
-- Recommend splitting large or complex MRs into smaller parts to simplify the review process.
+- Recommend splitting large or complex PRs into smaller parts to simplify the review process.
 
 **Maintainers:**
 
@@ -180,8 +183,8 @@ Don't forget about "First unblock others" in [collaboration](#collaboration) sec
 **Comparison:**
 
 - **Scope of Responsibility**: Maintainers are responsible for the overall quality and architecture of the codebase, while reviewers focus on the specifics of technical solutions and details within an PR.
-- **Role in the Process**: Maintainers can approve and merge PRs with broad competence across the project, while reviewers can only review and approve MRs.
-- **Managing MRs**: Maintainers oversee the entire process up to merging, while reviewers focus more on initial analysis and providing recommendations for improvements.
+- **Role in the Process**: Maintainers can approve and merge PRs with broad competence across the project, while reviewers can only review and approve PRs.
+- **Managing PRs**: Maintainers oversee the entire process up to merging, while reviewers focus more on initial analysis and providing recommendations for improvements.
 
 This is a subset of the rules taken from: [Code Review Guidelines](https://docs.gitlab.com/ee/development/code_review.html#:~:text=Maintainers%20are%20responsible%20for%20the,DRYness%2C%20consistency%2C%20and%20readability.)
 

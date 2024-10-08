@@ -23,26 +23,26 @@ function editUser(id) {
 	router.push({ name: 'edit-user', params: { id } });
 }
 
-const deleteUser = async (id) => {
+const deleteUser = async id => {
 	try {
 		await $confirm('Do you want to delete this user?', 'Warning', {
 			confirmButtonText: 'OK',
 			cancelButtonText: 'Cancel',
 			type: 'warning'
-		})
+		});
 		try {
 			const response = await $api.users.deleteUser(id);
 			$notify({
 				title: 'Success',
 				message: response.message,
-				type: 'success',
+				type: 'success'
 			});
-			await setUsers()
-		} catch(error) {
+			await setUsers();
+		} catch (error) {
 			$notifyUserAboutError(error);
 		}
-	} catch(error) {
-		console.log(error)
+	} catch (error) {
+		console.log(error);
 		$notify({
 			title: 'Canceled',
 			message: 'User deletion canceled',

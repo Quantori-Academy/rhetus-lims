@@ -4,9 +4,11 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
-		"dev:msw": "VITE_MSW_BROWSER=true vite",
+		"dev:msw": "vite --mode msw",
 		"build": "vite build",
-		"lint": "eslint ."
+		"check:prettier": "prettier --check --ignore-path ./.prettierignore . ",
+		"check:eslint": "eslint .",
+		"lint": "npm run check:eslint && npm run check:prettier"
 	},
 	"dependencies": {
 		"date-fns": "^3.6.0",

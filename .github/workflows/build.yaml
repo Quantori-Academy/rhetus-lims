@@ -50,13 +50,17 @@ jobs:
         with:
           config_file: ./lims/.github/workflows/client.ovpn
 
-      - name: Create .env file with all secrets
+      - name: Set environment variables
         run: |
-          echo "MODE=production" > ./lims/packages/be/.env
-          echo "API_HOST=0.0.0.0" >> ./lims/packages/be/.env
-          echo "API_PORT=3000" >> ./lims/packages/be/.env
-          echo "LOG_LEVEL=info" >> ./lims/packages/be/.env
-          echo "PG_DATABASE_URL=${{ secrets.DATABASE_URL }}" >> ./lims/packages/be/.env
+          cat <<EOF > ./lims/packages/be/.env
+          MODE=production
+          API_HOST=0.0.0.0
+          API_PORT=3000
+          LOG_LEVEL=info
+          SESSION_SECRET="${{ secrets.SESSION_SECRET }}"
+          PG_DATABASE_URL="${{ secrets.DATABASE_URL }}"
+          EOF
+        shell: bash
 
       - name: Copy code to VM
         env:

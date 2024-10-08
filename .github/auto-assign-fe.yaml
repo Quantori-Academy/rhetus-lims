@@ -7,13 +7,12 @@ useReviewGroups: true
 
 reviewGroups:
   reviewer:
-    - Anna1-991
     - catherineisonline
     - KaaRinnna
     - AkerkeMilano
     - the-boy-al
+    - 1ilit
   maintainer:
     - dsavitskiiquantori
-    - StanAtWork
     - andreypoletaev2
     - PavelYakupov-FOG
