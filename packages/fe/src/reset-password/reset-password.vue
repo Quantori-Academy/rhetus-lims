@@ -1,17 +1,16 @@
 <script setup>
-import { ElForm, ElInput, ElButton, ElFormItem, } from 'element-plus';
+import { ElForm, ElInput, ElButton, ElFormItem } from 'element-plus';
 import { ref } from 'vue';
 import { $api } from '../lib/api/index.js';
 import { $notifyUserAboutError, $notify } from '../../src/lib/utils/feedback/notify-msg.js';
 
 function createDefaultFormValues() {
 	return {
-		username: '',
+		username: ''
 	};
 }
 
 const form = ref(createDefaultFormValues());
-
 
 async function resetPassword(form) {
 	try {
@@ -24,7 +23,6 @@ async function resetPassword(form) {
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
-	
 }
 
 function onSubmit() {
@@ -40,9 +38,7 @@ function onSubmit() {
 				<el-input v-model="form.username" />
 			</el-form-item>
 			<el-form-item>
-				<el-button type="primary" @click="onSubmit">
-					Reset Password
-				</el-button>
+				<el-button type="primary" @click="onSubmit"> Reset Password </el-button>
 			</el-form-item>
 		</el-form>
 	</div>
