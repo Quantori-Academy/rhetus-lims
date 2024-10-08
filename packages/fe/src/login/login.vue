@@ -1,9 +1,9 @@
 <script setup>
 import { ElForm, ElInput, ElButton, ElFormItem, } from 'element-plus';
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { router } from '../../lib/router/router.js';
 import { $api } from '../lib/api/index.js';
-import { $notify } from '../../src/lib/utils/feedback/notify-msg.js';
+import { $notify, $notifyUserAboutError } from '../../src/lib/utils/feedback/notify-msg.js';
 
 function createDefaultFormValues() {
 	return {
@@ -14,31 +14,25 @@ function createDefaultFormValues() {
 }
 
 const form = ref(createDefaultFormValues());
-const router = useRouter();
 
 async function login(form) {
 	try {
-		const token = await $api.auth.login(form.value);
-		if (token) {
-			localStorage.setItem('token', token);
-			const userData = await $api.auth.fetchUser(token, form.value);
-			if (userData) {
-				router.push({ name:'dashboard' });
-			}
-		}
-	} catch (error) {
+		const response = await $api.auth.login(form.value);
 		$notify({
-			title: 'Error',
-			message: 'Incorrect Username or Password',
-			type: 'Error'
+			title: 'Success',
+			message: response.message,
+			type: 'success'
 		});
+		router.push({ name: 'dashboard' });
+	} catch (error) {
+		$notifyUserAboutError(error);
 	}
 	
 }
 function onSubmit() {
-	console.log('submit');
 	login(form.value);
 }
+
 </script>
 
 <template>
