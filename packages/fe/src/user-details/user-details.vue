@@ -5,7 +5,7 @@ import { $confirm } from '../lib/utils/feedback/confirm-msg.js/';
 import { computed, onMounted, useTemplateRef } from 'vue';
 import { ref } from 'vue';
 import { $api } from '../lib/api/index.js';
-import { router } from '../lib/router/router';
+import { $router } from '../lib/router/router';
 
 const editingForm = ref(false);
 const formEl = useTemplateRef('form-ref');
@@ -143,7 +143,7 @@ const deleteUser = async () => {
 				message: response.message,
 				type: 'success'
 			});
-			router.push({ name: 'users-list' });
+			$router.push({ name: 'users-list' });
 		} catch (error) {
 			$notifyUserAboutError(error);
 		}
