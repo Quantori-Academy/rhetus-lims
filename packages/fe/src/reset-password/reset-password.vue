@@ -1,5 +1,5 @@
 <script setup>
-import { ElForm, ElInput, ElLink, ElButton, ElFormItem, } from 'element-plus';
+import { ElForm, ElInput, ElButton, ElFormItem, } from 'element-plus';
 import { ref } from 'vue';
 import { $api } from '../lib/api/index.js';
 import { $notifyUserAboutError, $notify } from '../../src/lib/utils/feedback/notify-msg.js';
@@ -15,10 +15,10 @@ const form = ref(createDefaultFormValues());
 
 async function resetPassword(form) {
 	try {
-		const user = await $api.auth.resetUserPassword(form.username);
+		const response = await $api.auth.resetUserPassword(form.username);
 		$notify({
 			title: 'Success',
-			message: 'Password reset successfully',
+			message: response.message,
 			type: 'success'
 		});
 	} catch (error) {
