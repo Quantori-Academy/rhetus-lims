@@ -2,7 +2,7 @@
 import { ref, useTemplateRef } from 'vue';
 import { ElForm, ElFormItem, ElInput, ElButton, ElSelect, ElOption } from 'element-plus';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
-import { router } from '../../lib/router/router.js';
+import { $router } from '../../lib/router/router.js';
 import { $api } from '../../lib/api/index.js';
 
 const isSaving = ref(false);
@@ -31,7 +31,7 @@ async function addUser() {
 	try {
 		const response = await $api.users.addUser(form.value);
 		$notify({ message: response.message, type: 'success' });
-		router.push({ name: 'users-list' });
+		$router.push({ name: 'users-list' });
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
@@ -57,7 +57,7 @@ async function validate() {
 
 const cancelHandler = () => {
 	resetForm();
-	router.push({ name: 'users-list' });
+	$router.push({ name: 'users-list' });
 };
 </script>
 
