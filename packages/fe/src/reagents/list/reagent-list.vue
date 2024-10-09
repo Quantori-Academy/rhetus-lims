@@ -106,7 +106,6 @@ onMounted(() => {
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
-	justify-content: center;
 	gap: 2px;
 }
 :deep(.el-table__row):hover {
