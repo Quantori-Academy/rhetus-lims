@@ -16,7 +16,7 @@ export default http => ({
 	},
 	async updateUser(id, user) {
 		return await http(`/users/${id}`, {
-			method: 'PUT',
+			method: 'PATCH',
 			body: JSON.stringify(user)
 		});
 	},
