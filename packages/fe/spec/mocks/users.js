@@ -39,9 +39,9 @@ let userInfo = {
 			lastName: 'white',
 			email: 'john@white.com',
 			role: {
-				"id": 1,
-				"name": "administrator"
-			  },
+				id: 1,
+				name: 'administrator'
+			},
 			lastLogin: '2024-09-26T10:15:06.720Z'
 		}
 	],
@@ -51,19 +51,19 @@ let userInfo = {
 let roleInfo = {
 	roles: [
 		{
-			"id": 1,
-			"name": "administrator"
+			id: 1,
+			name: 'administrator'
 		},
 		{
-			"id": 2,
-			"name": "procurement officer"
+			id: 2,
+			name: 'procurement officer'
 		},
 		{
-			"id": 3,
-			"name": "researcher"
-		},
+			id: 3,
+			name: 'researcher'
+		}
 	]
-}
+};
 
 export const usersHandlers = [
 	http.get(api('/roles'), () => {
@@ -77,7 +77,7 @@ export const usersHandlers = [
 		const updatedUser = {
 			...user,
 			role: roleInfo.roles.find(role => role.id === user.roleId)
-		}
+		};
 		userInfo.users.push(updatedUser);
 		return HttpResponse.json({
 			status: 'success',

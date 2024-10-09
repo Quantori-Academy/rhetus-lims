@@ -95,7 +95,12 @@ const cancelHandler = () => {
 		</el-form-item>
 		<el-form-item label="Role" prop="role">
 			<el-select v-model="form.roleId" placeholder="Select role">
-				<el-option v-for="role of roles" :key="role.id" :label="role.name" :value="role.id"></el-option>
+				<el-option
+					v-for="role of roles"
+					:key="role.id"
+					:label="role.name"
+					:value="role.id"
+				></el-option>
 			</el-select>
 		</el-form-item>
 		<el-button @click="cancelHandler">Cancel Creation </el-button>

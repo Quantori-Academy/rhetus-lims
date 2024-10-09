@@ -1,6 +1,6 @@
 export default http => ({
 	async getRoles() {
-		return await http('/roles')
+		return await http('/roles');
 	},
 	async fetchUsers() {
 		return await http(`/users`);
