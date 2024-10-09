@@ -1,7 +1,7 @@
 import cities from './cities.js';
 import { http } from './http';
 import users from './users.js';
-import auth from './reset-password.js';
+import auth from './auth.js';
 
 export const $api = {
 	cities: cities(http),
