@@ -25,7 +25,7 @@ const handleSidebarOpen = () => {
 			</el-row>
 
 			<el-row class="link">
-				<router-link to="/users/:id">
+				<router-link to="/profile">
 					<rh-icon name="user"></rh-icon>
 					<span>Profile</span>
 				</router-link>

@@ -30,5 +30,8 @@ export default http => ({
 		return await http(`/users/${id}`, {
 			method: 'DELETE'
 		});
+	},
+	async fetchCurrentUserInfo() {
+		return await http('/me');
 	}
 });

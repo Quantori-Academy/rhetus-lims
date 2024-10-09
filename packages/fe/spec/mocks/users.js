@@ -157,5 +157,9 @@ export const usersHandlers = [
 			status: 'success',
 			message: `User was deleted`
 		});
+	}),
+	http.get(api('/me'), () => {
+		const user = users[0];
+		return HttpResponse.json(user); //temporary ----------------
 	})
 ];

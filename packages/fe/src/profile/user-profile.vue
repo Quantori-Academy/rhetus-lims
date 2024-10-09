@@ -3,45 +3,44 @@ import { onMounted, ref, useTemplateRef } from 'vue';
 import { $api } from '../lib/api';
 import { ElForm, ElFormItem, ElInput, ElButton } from 'element-plus';
 import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg';
-import { router } from '../lib/router/router';
+import { $confirm } from '../lib/utils/feedback/confirm-msg';
 
 const editable = ref(false);
 const profile = ref(null);
-const initialData = ref(null);
+const initialData = ref(createInitialDataValues());
 const form = useTemplateRef('form');
 
-const props = defineProps({
-	id: {
-		type: String,
-		default: null
-	}
-});
-const setProfile = async id => {
+function createInitialDataValues() {
+	return {
+		username: '',
+		firstName: '',
+		lastName: '',
+		email: '',
+		role: ''
+	};
+}
+const setProfile = async () => {
 	try {
-		const data = (profile.value = await $api.users.fetchUser(id));
+		const data = (profile.value = await $api.users.fetchCurrentUserInfo());
 		initialData.value = { ...data };
 	} catch (err) {
 		$notifyUserAboutError(err);
 	}
 };
-const ifCancel = () => {
+const cancelEdit = () => {
 	profile.value = { ...initialData.value };
-	editable.value = !editable.value;
+	editable.value = false;
 };
 const ifEdit = () => {
 	editable.value = !editable.value;
 };
 const requiredRule = { required: true, message: 'Length should be at least 1', trigger: 'blur' };
-const validation = ref({
+const rules = ref({
 	firstName: [requiredRule],
 	lastName: [requiredRule],
 	email: [
-		{
-			required: true,
-			type: 'email',
-			message: 'Please input correct email address',
-			trigger: 'blur'
-		}
+		requiredRule,
+		{ type: 'email', message: 'Please input correct email address', trigger: 'blur' }
 	]
 });
 async function validate() {
@@ -49,7 +48,7 @@ async function validate() {
 }
 const onProfileEdit = () => {
 	if (editable.value) {
-		ifCancel();
+		cancelEdit();
 	} else {
 		ifEdit();
 	}
@@ -57,7 +56,7 @@ const onProfileEdit = () => {
 const editHandler = async () => {
 	if (!(await validate())) return;
 	try {
-		await $api.users.updateUser(props.id, profile.value);
+		await $api.users.updateUser(profile.value.id, profile.value);
 		editable.value = false;
 		$notify({
 			title: 'Success',
@@ -69,10 +68,22 @@ const editHandler = async () => {
 	}
 };
 const passwordResetHandler = () => {
-	router.push({ name: 'reset-password' });
+	async function confirmed() {
+		try {
+			await $confirm('Are you sure you want to change password?', 'Please, confirm your action', {
+				confirmButtonText: 'Yes',
+				cancelButtonText: 'No',
+				type: 'warning'
+			});
+			console.log('password can be changed');
+		} catch (err) {
+			$notifyUserAboutError(err);
+		}
+	}
+	confirmed();
 };
 onMounted(() => {
-	setProfile(props.id);
+	setProfile();
 });
 </script>
 
@@ -85,7 +96,7 @@ onMounted(() => {
 			class="el-form"
 			:model="profile"
 			label-position="top"
-			:rules="validation"
+			:rules="rules"
 			@submit="editHandler"
 		>
 			<el-form-item label="Username" prop="username">
@@ -103,12 +114,15 @@ onMounted(() => {
 			<el-form-item label="Role" prop="role">
 				<el-input v-model="profile.role" :readonly="true" :disabled="editable" />
 			</el-form-item>
+			<!-- <el-form-item label="Password" prop="password">
+				<el-input type="password" :readonly="true" :disabled="editable" />
+			</el-form-item> -->
 			<el-form-item>
 				<el-button :type="editable ? 'default' : 'primary'" @click="onProfileEdit">{{
 					editable ? 'Cancel' : 'Edit'
 				}}</el-button>
 				<el-button v-if="editable" type="primary" @click="editHandler">Save</el-button>
-				<el-button type="warning" @click="passwordResetHandler">Reset password</el-button>
+				<el-button type="warning" @click="passwordResetHandler">Change password</el-button>
 			</el-form-item>
 		</el-form>
 	</div>
