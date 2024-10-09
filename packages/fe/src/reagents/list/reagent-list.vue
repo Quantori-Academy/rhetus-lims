@@ -60,23 +60,19 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="reagent-list">
+	<div class="reagent-table">
 		<el-button type="primary">Add New Reagent</el-button>
 		<el-button type="primary">Add New Sample</el-button>
 		<el-table v-loading="isLoading" :data="reagents" @row-click="viewReagent">
-			<el-table-column prop="name" label="Name" sortable width="140" />
-			<el-table-column prop="category" label="Category" sortable width="140" />
-			<el-table-column prop="structure" label="Structure" width="140" />
-			<el-table-column prop="description" label="Description" width="140" />
-			<el-table-column prop="quantityLeft" label="Quantity Left" width="140" />
-			<el-table-column prop="storageLocation" label="Storage Location" width="140" />
-			<el-table-column width="80">
+			<el-table-column prop="name" label="Name" sortable />
+			<el-table-column prop="category" label="Category" sortable />
+			<el-table-column prop="structure" label="Structure" />
+			<el-table-column prop="description" label="Description" />
+			<el-table-column prop="quantityLeft" label="Quantity Left" />
+			<el-table-column prop="storageLocation" label="Storage Location" />
+			<el-table-column>
 				<template #default="{ row }">
 					<el-button @click="() => editReagent(row.id)"><rh-icon name="pencil" /></el-button>
-				</template>
-			</el-table-column>
-			<el-table-column width="80">
-				<template #default="{ row }">
 					<el-button type="danger" @click="() => deleteReagent(row.id)">
 						<rh-icon color="white" name="trash" />
 					</el-button>
@@ -87,6 +83,25 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.reagent-table {
+	padding-left: 15rem;
+	width: 90vw;
+}
+.reagent__action-buttons {
+	display: flex;
+	flex-direction: row;
+}
+:deep(.el-table__column) {
+	width: max-content;
+}
+
+:deep(.el-table__cell) .cell:last-child {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 2px;
+}
 :deep(.el-table__row):hover {
 	cursor: pointer;
 }
