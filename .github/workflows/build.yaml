@@ -59,6 +59,7 @@ jobs:
           LOG_LEVEL=info
           SESSION_SECRET="${{ secrets.SESSION_SECRET }}"
           PG_DATABASE_URL="${{ secrets.DATABASE_URL }}"
+          CLIENT_URL="${{ secrets.CLIENT_URL }}"
           EOF
         shell: bash
 

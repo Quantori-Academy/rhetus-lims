@@ -170,6 +170,30 @@ async function users(server, options) {
 			return reply.code(500).send(err);
 		}
 	}
+
+	server.route({
+		method: 'GET',
+		path: options.prefix + 'me',
+		preValidation: [server.authenticate],
+		schema: schema.getUser,
+		handler: onGetMe
+	});
+
+	async function onGetMe(req, reply) {
+		try {
+			const authenticatedUserId = req.session.user.id;
+
+			const user = await server.usersService.getUserById(authenticatedUserId);
+
+			if (!user) {
+				return reply.code(404).send({ status: 'error', message: `No such user` });
+			}
+
+			return reply.code(200).send(user);
+		} catch (err) {
+			return reply.code(500).send(err);
+		}
+	}
 }
 
 export default fp(users);

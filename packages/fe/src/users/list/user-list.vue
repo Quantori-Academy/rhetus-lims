@@ -6,21 +6,21 @@ import { $api } from '../../lib/api/index.js';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { formatDate } from '../../lib/utils/datetime/date-format.js';
-import { router } from '../../lib/router/router.js';
+import { $router } from '../../lib/router/router.js';
 
 const users = ref([]);
 const isLoading = ref(false);
 
 function addNewUser() {
-	router.push({ name: 'new-user' });
+	$router.push({ name: 'new-user' });
 }
 
 function viewUserDetails(id) {
-	router.push({ name: 'user-details', params: { id } });
+	$router.push({ name: 'user-details', params: { id } });
 }
 
 function editUser(id) {
-	router.push({ name: 'edit-user', params: { id } });
+	$router.push({ name: 'edit-user', params: { id } });
 }
 
 const deleteUser = async id => {
