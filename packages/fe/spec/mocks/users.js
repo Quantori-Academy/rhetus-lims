@@ -30,25 +30,55 @@ const users = [
 	}
 ];
 
-let userList = [
-	{
-		id: 'c7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3d3b333',
-		username: 'test1',
-		firstName: 'john',
-		lastName: 'white',
-		email: 'john@white.com',
-		role: { id: 0, name: 'Admin' },
-		lastLogin: '2024-09-26T10:15:06.720Z'
-	}
-];
+let userInfo = {
+	users: [
+		{
+			id: 'c7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3d3b333',
+			username: 'test1',
+			firstName: 'john',
+			lastName: 'white',
+			email: 'john@white.com',
+			role: {
+				"id": 1,
+				"name": "administrator"
+			  },
+			lastLogin: '2024-09-26T10:15:06.720Z'
+		}
+	],
+	counts: 1
+};
+
+let roleInfo = {
+	roles: [
+		{
+			"id": 1,
+			"name": "administrator"
+		},
+		{
+			"id": 2,
+			"name": "procurement officer"
+		},
+		{
+			"id": 3,
+			"name": "researcher"
+		},
+	]
+}
 
 export const usersHandlers = [
-	http.get(api('/users'), () => {
-		return HttpResponse.json(userList);
+	http.get(api('/roles'), () => {
+		return HttpResponse.json(roleInfo);
 	}),
-	http.post(api('/users/new'), async ({ request }) => {
+	http.get(api('/users'), () => {
+		return HttpResponse.json(userInfo);
+	}),
+	http.post(api('/users'), async ({ request }) => {
 		const user = await request.json();
-		userList.push(user);
+		const updatedUser = {
+			...user,
+			role: roleInfo.roles.find(role => role.id === user.roleId)
+		}
+		userInfo.users.push(updatedUser);
 		return HttpResponse.json({
 			status: 'success',
 			message: `user ${user.username} was created`
@@ -97,7 +127,7 @@ export const usersHandlers = [
 	}),
 	http.delete(api('/users/:id'), async ({ params }) => {
 		const { id } = params;
-		const userIndex = userList.findIndex(user => user.id === id);
+		const userIndex = userInfo.users.findIndex(user => user.id === id);
 		if (userIndex === -1) {
 			return HttpResponse.json(
 				{
@@ -107,7 +137,7 @@ export const usersHandlers = [
 				{ status: 404 }
 			);
 		}
-		userList.splice(userIndex, 1);
+		userInfo.users.splice(userIndex, 1);
 		return HttpResponse.json({
 			status: 'success',
 			message: `User was deleted`
