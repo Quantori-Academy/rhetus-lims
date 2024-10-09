@@ -10,6 +10,13 @@ import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-
 const reagents = ref(null);
 const isLoading = ref(false);
 
+function addNewReagent() {
+	$router.push({ name: 'new-reagent' });
+}
+function addNewSample() {
+	$router.push({ name: 'new-sample' });
+}
+
 function editReagent(id) {
 	$router.push({ name: 'reagent-details', params: { id: id }, query: { isEdit: true } });
 }
@@ -61,8 +68,8 @@ onMounted(() => {
 
 <template>
 	<div class="reagent-table">
-		<el-button type="primary">Add New Reagent</el-button>
-		<el-button type="primary">Add New Sample</el-button>
+		<el-button type="primary" @click="addNewReagent">Add New Reagent</el-button>
+		<el-button type="primary" @click="addNewSample">Add New Sample</el-button>
 		<el-table v-loading="isLoading" :data="reagents" @row-click="viewReagent">
 			<el-table-column prop="name" label="Name" sortable />
 			<el-table-column prop="category" label="Category" sortable />
