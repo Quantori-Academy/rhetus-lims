@@ -7,12 +7,13 @@ import { ref } from 'vue';
 import { $api } from '../lib/api/index.js';
 import { $router } from '../lib/router/router';
 import { $isFormValid } from '../lib/utils/form-validation/is-form-valid.js';
-
+import { formatDate } from '../lib/utils/datetime/date-format';
 const editingForm = ref(false);
 const formEl = useTemplateRef('form-ref');
 const user = ref(null);
 const originalUser = ref(null);
 const loading = ref(true);
+const roles = ref([]);
 const props = defineProps({
 	id: {
 		type: String,
@@ -28,14 +29,31 @@ const rules = ref({
 	]
 });
 
+async function setRoles() {
+	try {
+		const data = await $api.users.getRoles();
+		roles.value = data.roles;
+	} catch (error) {
+		$notifyUserAboutError(error);
+	}
+}
+
 onMounted(() => {
 	setUser(props.id);
+	setRoles();
 });
 const setUser = async id => {
 	try {
 		const data = await $api.users.fetchUser(id);
-		user.value = data;
-		originalUser.value = { ...data };
+		const { role, ...userData } = data;
+		user.value = {
+			...userData,
+			roleId: role.id
+		};
+		originalUser.value = {
+			...userData,
+			roleId: role.id
+		};
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating user');
 	} finally {
@@ -48,10 +66,13 @@ const formHasChanges = computed(() => {
 		user.value.firstName !== originalUser.value.firstName ||
 		user.value.lastName !== originalUser.value.lastName ||
 		user.value.email !== originalUser.value.email ||
-		user.value.role !== originalUser.value.role
+		user.value.roleId !== originalUser.value.roleId
 	);
 });
 
+const roleName = computed(() => {
+	return roles.value.find(role => role.id === user.value.roleId).name;
+});
 const toggleEdit = () => {
 	editingForm.value = !editingForm.value;
 };
@@ -65,10 +86,10 @@ async function validate() {
 }
 
 const confirmRoleChange = async () => {
-	if (user.value.role !== originalUser.value.role) {
+	if (user.value.roleId !== originalUser.value.roleId) {
 		try {
 			const confirmed = await $confirm(
-				`Are you sure you want to change the role to ${user.value.role}?`,
+				`Are you sure you want to change the role to ${roleName.value}?`,
 				'Confirm Role Change',
 				{
 					confirmButtonText: 'Yes, Change Role',
@@ -93,11 +114,10 @@ const handleSubmit = async () => {
 	if (!valid) return;
 	try {
 		const updatedUser = await $api.users.updateUser(user.value.id, user.value);
-		user.value = updatedUser;
-		originalUser.value = { ...updatedUser };
+		await setUser(props.id);
 		$notify({
 			title: 'Success',
-			message: 'Profile has been updated',
+			message: updatedUser.message,
 			type: 'success'
 		});
 		toggleEdit();
@@ -182,20 +202,23 @@ const deleteUser = async () => {
 			<el-form-item label="Email" prop="email">
 				<el-input v-model="user.email" :disabled="!editingForm" />
 			</el-form-item>
-			<el-form-item label="Role">
+			<el-form-item label="Role" prop="role">
 				<el-select
-					v-model="user.role"
+					v-model="user.roleId"
 					:disabled="!editingForm"
-					:placeholder="user.role"
+					:placeholder="roles.value && roleName.value"
 					@change="confirmRoleChange"
 				>
-					<el-option label="Admin" value="admin" />
-					<el-option label="Procurement officer" value="procurement_officer" />
-					<el-option label="Researcher" value="researcher" />
+					<el-option
+						v-for="role of roles"
+						:key="role.id"
+						:label="role.name"
+						:value="role.id"
+					></el-option>
 				</el-select>
 			</el-form-item>
 			<el-form-item class="last-input" label="Creation date" prop="creationDate">
-				<el-input v-model="user.creationDate" :disabled="true" />
+				<el-input :value="formatDate(user.createdAt)" :disabled="true" />
 			</el-form-item>
 			<el-button v-if="editingForm" type="primary" @click="handleSubmit">{{ '		Save' }}</el-button>
 			<el-button v-else type="primary" @click="toggleEdit">{{ 'Edit profile' }}</el-button>
