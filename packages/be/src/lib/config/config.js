@@ -9,6 +9,7 @@ export function getConfig() {
 			.prop('API_HOST', S.string().required())
 			.prop('API_PORT', S.string().required())
 			.prop('SESSION_SECRET', S.string().required())
+			.prop('CLIENT_URL', S.string().required())
 			.prop('PG_DATABASE_URL', S.string().required())
 			.prop(
 				'LOG_LEVEL',
@@ -33,6 +34,9 @@ export function getConfig() {
 			logger: {
 				level: env.LOG_LEVEL
 			}
+		},
+		client: {
+			url: env.CLIENT_URL
 		},
 		sessionSecret: env.SESSION_SECRET,
 		mode: env.MODE,
