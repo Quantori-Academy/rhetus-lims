@@ -54,8 +54,8 @@ const deleteUser = async id => {
 async function setUsers() {
 	isLoading.value = true;
 	try {
-		users.value = await $api.users.fetchUsers();
-		console.log(users.value);
+		const data = await $api.users.fetchUsers();
+		users.value = data.users;
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
