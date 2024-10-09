@@ -1,11 +1,12 @@
 <script setup>
-import { ref, useTemplateRef } from 'vue';
+import { ref, useTemplateRef, onMounted } from 'vue';
 import { ElForm, ElFormItem, ElInput, ElButton, ElSelect, ElOption } from 'element-plus';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $router } from '../../lib/router/router.js';
 import { $api } from '../../lib/api/index.js';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 
+const roles = ref([]);
 const isSaving = ref(false);
 const formEl = useTemplateRef('form-ref');
 const form = ref({
@@ -14,7 +15,7 @@ const form = ref({
 	lastName: '',
 	email: '',
 	password: '',
-	role: ''
+	roleId: ''
 });
 
 const requiredRule = { required: true, message: 'Required field', trigger: ['blur', 'change'] };
@@ -22,7 +23,7 @@ const rules = ref({
 	username: [requiredRule],
 	email: [{ required: true, type: 'email', message: 'Required field' }],
 	password: [requiredRule],
-	role: [requiredRule]
+	roleId: [requiredRule]
 });
 async function addUser() {
 	if (!(await validate())) return;
@@ -40,6 +41,19 @@ async function addUser() {
 	isSaving.value = false;
 }
 
+async function setRoles() {
+	try {
+		const data = await $api.users.getRoles();
+		roles.value = data.roles;
+	} catch (error) {
+		$notifyUserAboutError(error);
+	}
+}
+
+onMounted(() => {
+	setRoles();
+});
+
 const resetForm = () => {
 	form.value = {
 		username: '',
@@ -48,7 +62,7 @@ const resetForm = () => {
 		email: '',
 		password: '',
 		confirmPassword: '',
-		role: ''
+		roleId: ''
 	};
 };
 
@@ -80,10 +94,8 @@ const cancelHandler = () => {
 			<el-input v-model="form.password" placeholder="Enter password" type="password"></el-input>
 		</el-form-item>
 		<el-form-item label="Role" prop="role">
-			<el-select v-model="form.role" placeholder="Select role">
-				<el-option label="Admin" value="Admin"></el-option>
-				<el-option label="Procurement Officer" value="Procurement Officer"></el-option>
-				<el-option label="Researcher" value="Researcher"></el-option>
+			<el-select v-model="form.roleId" placeholder="Select role">
+				<el-option v-for="role of roles" :key="role.id" :label="role.name" :value="role.id"></el-option>
 			</el-select>
 		</el-form-item>
 		<el-button @click="cancelHandler">Cancel Creation </el-button>
