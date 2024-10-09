@@ -37,6 +37,13 @@ const handleSidebarOpen = () => {
 					<span>Users List</span>
 				</router-link>
 			</el-row>
+
+			<el-row class="link">
+				<router-link to="/storages/list">
+					<rh-icon name="storages"></rh-icon>
+					<span>Storage Location Management</span>
+				</router-link>
+			</el-row>
 		</nav>
 	</div>
 
