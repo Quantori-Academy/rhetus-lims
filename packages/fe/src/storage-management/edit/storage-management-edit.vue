@@ -1,11 +1,11 @@
 <script setup>
-import { ref, onMounted, computed, useTemplateRef } from "vue"
+import { ref, onMounted, computed, useTemplateRef } from 'vue';
 import { ElForm, ElInput, ElButton, ElFormItem } from 'element-plus';
 
-import { $api } from "../../lib/api";
+import { $api } from '../../lib/api';
 //import { $confirm } from '../../lib/utils/feedback/confirm-msg';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
-import { router } from "../../lib/router/router";
+import { $router } from '../../lib/router/router';
 
 import { rules, validate } from '../helpers';
 
@@ -15,60 +15,61 @@ const initialStorage = ref(null);
 const formEl = useTemplateRef('form-ref');
 
 const props = defineProps({
-    id: {
-        type: String,
-        default: null
-    }
-})
+	id: {
+		type: String,
+		default: null
+	}
+});
 
-
-const setStorage = async (id) => {
-    isLoading.value = true;
+const setStorage = async id => {
+	isLoading.value = true;
 	try {
 		const storageData = await $api.storages.fetchStorage(id);
-        storage.value = storageData;
+		storage.value = storageData;
 		initialStorage.value = { ...storageData };
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
 
 	isLoading.value = false;
-}
+};
 
 const cancelEdit = () => {
-    router.push({ name: 'storages-list' });
-}
+	$router.push({ name: 'storages-list' });
+};
 
 const isFormChanged = computed(() => {
-    return storage.value.room !== initialStorage.value.room || storage.value.name !== initialStorage.value.name;
+	return (
+		storage.value.room !== initialStorage.value.room ||
+		storage.value.name !== initialStorage.value.name
+	);
 });
 
-
 const handleSubmit = async () => {
-    try {
-        if(!isFormChanged.value) {
-            $notify({
-                title: 'Notification',
-                message: 'There is nothing to update',
-                type: 'info'
-            });
-            return;
-        };
+	try {
+		if (!isFormChanged.value) {
+			$notify({
+				title: 'Notification',
+				message: 'There is nothing to update',
+				type: 'info'
+			});
+			return;
+		}
 
-        if(!(await validate(formEl))) return;
+		if (!(await validate(formEl))) return;
 
-        const updatedStorage = await $api.storages.updateStorage(storage.value.id, storage.value);
-        console.log(updatedStorage)
-        $notify({
+		const updatedStorage = await $api.storages.updateStorage(storage.value.id, storage.value);
+		console.log(updatedStorage);
+		$notify({
 			title: 'Success',
 			message: 'Storage has been updated',
 			type: 'success'
 		});
-        router.push({ name: 'storages-list' });
-    } catch(error) {
-        $notifyUserAboutError(error.message || 'Error updating storage');
-    }
-}
+		$router.push({ name: 'storages-list' });
+	} catch (error) {
+		$notifyUserAboutError(error.message || 'Error updating storage');
+	}
+};
 
 onMounted(() => {
 	setStorage(props.id);
@@ -76,25 +77,24 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="wrapper">
-        <h1>Storage Location Edit</h1>
-        <el-form
-            v-if="storage && !loading"
-            ref="form-ref"
-            label-position="top"
-            :model="storage"
-            :rules="rules"
-            @submit="handleSubmit"
-        >
-            <el-form-item label="Room" prop="room">
-                <el-input v-model="storage.room"></el-input>
-            </el-form-item>
-            <el-form-item label="Name" prop="name">
-                <el-input v-model="storage.name"></el-input>
-            </el-form-item>
-            <el-button @click="cancelEdit">Cancel</el-button>
-		    <el-button type="primary" @click="handleSubmit">Save</el-button>
-        </el-form>
-    </div>
+	<div class="wrapper">
+		<h1>Storage Location Edit</h1>
+		<el-form
+			v-if="storage && !loading"
+			ref="form-ref"
+			label-position="top"
+			:model="storage"
+			:rules="rules"
+			@submit="handleSubmit"
+		>
+			<el-form-item label="Room" prop="room">
+				<el-input v-model="storage.room"></el-input>
+			</el-form-item>
+			<el-form-item label="Name" prop="name">
+				<el-input v-model="storage.name"></el-input>
+			</el-form-item>
+			<el-button @click="cancelEdit">Cancel</el-button>
+			<el-button type="primary" @click="handleSubmit">Save</el-button>
+		</el-form>
+	</div>
 </template>
-
