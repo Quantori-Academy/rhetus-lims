@@ -105,7 +105,7 @@ export const usersHandlers = [
 		}
 	}),
 
-	http.put(api('/users/:id'), async ({ request, params }) => {
+	http.patch(api('/users/:id'), async ({ request, params }) => {
 		const { id } = params;
 		const editedUser = await request.json();
 		const updatedUser = {
