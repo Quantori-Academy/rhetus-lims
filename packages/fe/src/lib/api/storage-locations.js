@@ -5,6 +5,12 @@ export default http => ({
 	async fetchStorage(id) {
 		return await http(`/storages/${id}`);
 	},
+	async addStorage(storage) {
+		return await http('/storages', {
+			method: 'POST',
+			body: storage
+		});
+	},
 	async updateStorage(id, storage) {
 		return await http(`/storages/${id}`, {
 			method: 'PUT',
