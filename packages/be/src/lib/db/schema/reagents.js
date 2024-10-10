@@ -6,12 +6,14 @@ import {
 	text,
 	uuid,
 	real,
-	boolean,
+	boolean
 } from 'drizzle-orm/pg-core';
-import { sql } from "drizzle-orm";
+import { sql } from 'drizzle-orm';
 
 export const reagents = pgTable('reagents', {
-	id: uuid('id').primaryKey().default(sql`uuid_generate_v4()`),
+	id: uuid('id')
+		.primaryKey()
+		.default(sql`uuid_generate_v4()`),
 	name: varchar('name', { length: 256 }).notNull(),
 	// TODO: add structure in next milestones
 	// structure: text('structure').notNull(),
