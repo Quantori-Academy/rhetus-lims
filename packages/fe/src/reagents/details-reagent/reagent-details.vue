@@ -69,13 +69,13 @@ const toggleEdit = () => {
 };
 
 const cancelEdit = () => {
-	formEl.value.resetFields();
 	$router.push({ name: 'reagent-details', params: { id: reagent.value.id } });
 	$notify({
 		title: 'Canceled',
 		message: 'Reagent deletion canceled',
 		type: 'info'
 	});
+	formEl.value.resetFields();
 };
 
 const handleSubmit = async () => {
@@ -83,24 +83,34 @@ const handleSubmit = async () => {
 	try {
 		const updatedReagent = await $api.reagents.updateReagent(reagent.value.id, reagent.value);
 		reagent.value = updatedReagent;
-		$notify({
-			title: 'Success',
-			message: 'Reagent has been updated',
-			type: 'success'
-		});
-		$router.push({ name: 'reagent-details', params: { id: reagent.value.id } });
+		if (reagent.value.quantityLeft === 0) {
+			await deleteReagent(true);
+		} else {
+			$notify({
+				title: 'Success',
+				message: 'Reagent has been updated',
+				type: 'success'
+			});
+			$router.push({ name: 'reagent-details', params: { id: reagent.value.id } });
+		}
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating reagent');
 	}
 };
 
-const deleteReagent = async () => {
+const deleteReagent = async (reachedZero = false) => {
 	try {
-		await $confirm('Do you want to delete this reagent?', 'Warning', {
-			confirmButtonText: 'OK',
-			cancelButtonText: 'Cancel',
-			type: 'warning'
-		});
+		await $confirm(
+			reachedZero === true
+				? 'Quantity reached 0. Do you want to delete this reagent?'
+				: 'Do you want to delete this reagent?',
+			'Warning',
+			{
+				confirmButtonText: 'OK',
+				cancelButtonText: 'Cancel',
+				type: 'warning'
+			}
+		);
 		const response = await $api.reagents.deleteReagent(props.id);
 		$notify({
 			title: 'Success',
@@ -167,7 +177,6 @@ const deleteReagent = async () => {
 					/>
 				</el-select>
 			</el-form-item>
-
 			<el-form-item label="Quantity left" prop="quantityLeft">
 				<el-input-number
 					v-model="reagent.quantityLeft"
@@ -212,17 +221,24 @@ const deleteReagent = async () => {
 	display: flex;
 	flex-direction: column;
 	gap: 5rem;
-	padding-bottom: 5rem;
-	width: 50vw;
+	padding: 3rem;
+	max-width: 70vw;
 	color: black;
 }
 .reagent-details :deep(.el-input__wrapper),
 .reagent-details :deep(.el-select__wrapper) {
 	background-color: transparent;
 }
+
 .quantity-unit-wrapper {
 	display: flex;
 	flex-direction: row;
 	gap: 10px;
+}
+@media screen and (max-width: 578px) {
+	.el-button {
+		margin: 0;
+		margin-top: 10px;
+	}
 }
 </style>
