@@ -2,8 +2,11 @@ import fp from 'fastify-plugin';
 import bcrypt from 'bcrypt';
 import * as schema from './auth-schema.js';
 import { Status } from '../../lib/db/schema/users.js';
+import authService from '../../services/auth/auth-service.js';
 
 async function auth(server, options) {
+	await server.register(authService);
+
 	server.route({
 		method: 'POST',
 		path: options.prefix + 'login',
@@ -42,6 +45,13 @@ async function auth(server, options) {
 			await server.usersService.updateUser(user.id, { ...dataToUpdate, lastLogin: new Date() });
 
 			req.session.user = { id: user.id };
+
+			const { sameSite, secure } = await server.authService.getCookieSettingsByOrigin(
+				req.headers.origin
+			);
+
+			req.session.cookie.sameSite = sameSite;
+			req.session.cookie.secure = secure;
 
 			reply.code(200);
 			return { status: 'success', message };
