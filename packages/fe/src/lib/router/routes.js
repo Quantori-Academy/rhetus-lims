@@ -55,5 +55,5 @@ export const routes = [
 		path: '/storages/new',
 		name: 'new-storage',
 		component: () => import('../../storage-management/add-new/storage-management-new.vue')
-	},
+	}
 ];
