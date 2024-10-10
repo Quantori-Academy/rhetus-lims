@@ -229,7 +229,6 @@ const deleteReagent = async (reachedZero = false) => {
 .reagent-details :deep(.el-select__wrapper) {
 	background-color: transparent;
 }
-
 .quantity-unit-wrapper {
 	display: flex;
 	flex-direction: row;
