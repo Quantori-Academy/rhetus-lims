@@ -1,13 +1,11 @@
-version: '3.8'
-
 services:
   frontend:
     build:
       context: .
       dockerfile: Dockerfile
-      target: fe
-    ports:
-      - '8080:80'
+      target: frontend-export
+    volumes:
+      - frontend-files:/usr/share/nginx/html
     networks:
       - app-network
 
@@ -15,11 +13,24 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: be
-    ports:
-      - '3000:3000'
+      target: backend
     networks:
       - app-network
+
+  nginx:
+    image: georgjung/nginx-brotli:latest
+    ports:
+      - '80:80'
+      - '443:443'
+    networks:
+      - app-network
+    volumes:
+      - frontend-files:/usr/share/nginx/html:ro
+      - ../certs:/etc/nginx/certs:ro
+      - .github/workflows/nginx.conf:/etc/nginx/nginx.conf:ro
+
+volumes:
+  frontend-files:
 
 networks:
   app-network:
