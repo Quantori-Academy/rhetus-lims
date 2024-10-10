@@ -1,9 +1,7 @@
 <script setup>
 import { ref, onMounted, computed, useTemplateRef } from 'vue';
 import { ElForm, ElInput, ElButton, ElFormItem } from 'element-plus';
-
 import { $api } from '../../lib/api';
-//import { $confirm } from '../../lib/utils/feedback/confirm-msg';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $router } from '../../lib/router/router';
 
@@ -30,7 +28,6 @@ const setStorage = async id => {
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
-
 	isLoading.value = false;
 };
 
@@ -41,7 +38,8 @@ const cancelEdit = () => {
 const isFormChanged = computed(() => {
 	return (
 		storage.value.room !== initialStorage.value.room ||
-		storage.value.name !== initialStorage.value.name
+		storage.value.name !== initialStorage.value.name ||
+		storage.value.description !== initialStorage.value.description
 	);
 });
 
@@ -58,11 +56,10 @@ const handleSubmit = async () => {
 
 		if (!(await validate(formEl))) return;
 
-		const updatedStorage = await $api.storages.updateStorage(storage.value.id, storage.value);
-		console.log(updatedStorage);
+		const response = await $api.storages.updateStorage(storage.value.id, storage.value);
 		$notify({
 			title: 'Success',
-			message: 'Storage has been updated',
+			message: response.message,
 			type: 'success'
 		});
 		$router.push({ name: 'storages-list' });
@@ -92,6 +89,9 @@ onMounted(() => {
 			</el-form-item>
 			<el-form-item label="Name" prop="name">
 				<el-input v-model="storage.name"></el-input>
+			</el-form-item>
+			<el-form-item label="Description" prop="description">
+				<el-input v-model="storage.description"></el-input>
 			</el-form-item>
 			<el-button @click="cancelEdit">Cancel</el-button>
 			<el-button type="primary" @click="handleSubmit">Save</el-button>

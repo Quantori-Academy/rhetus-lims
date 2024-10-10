@@ -1,5 +1,6 @@
 <script setup>
 import { ref, useTemplateRef } from 'vue';
+import { ElForm, ElFormItem, ElInput, ElButton } from 'element-plus';
 import { rules, validate } from '../helpers';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $router } from '../../lib/router/router.js';
@@ -8,13 +9,15 @@ import { $api } from '../../lib/api/index.js';
 const formEl = useTemplateRef('form-ref');
 const storage = ref({
 	room: '',
-	name: ''
+	name: '',
+	description: ''
 });
 
 const resetForm = () => {
 	storage.value = {
 		room: '',
-		name: ''
+		name: '',
+		description: ''
 	};
 };
 
@@ -43,6 +46,9 @@ const addStorage = async () => {
 			</el-form-item>
 			<el-form-item label="Name" prop="name">
 				<el-input v-model="storage.name"></el-input>
+			</el-form-item>
+			<el-form-item label="Description" prop="description">
+				<el-input v-model="storage.description"></el-input>
 			</el-form-item>
 			<el-button @click="cancelHandler">Cancel</el-button>
 			<el-button type="primary" @click="addStorage">Save</el-button>
