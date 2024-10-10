@@ -30,6 +30,14 @@ export const storageLocationHandlers = [
 		}
 		return HttpResponse.json(storage);
 	}),
+	http.post(api('/storages'), async ({ request }) => {
+		const storage = await request.json();
+		storageInfo.storages.push(storage);
+		return HttpResponse.json({
+			status: 'success',
+			message: `Storage location was created`
+		});
+	}),
 	http.put(api('/storages/:id'), async ({ request, params }) => {
 		const { id } = params;
 		const storage = storageInfo.storages.find(location => location.id === id);
@@ -39,6 +47,9 @@ export const storageLocationHandlers = [
 
 		const updatedStorage = await request.json();
 		Object.assign(storage, updatedStorage);
-		return HttpResponse.json(storage);
+		return HttpResponse.json(
+			{ status: 'success', message: `Storage location was updated` },
+			{ status: 200 }
+		);
 	})
 ];
