@@ -47,9 +47,9 @@ onMounted(() => {
 			>Add New Storage Location</el-button
 		>
 		<el-table v-loading="isLoading" :data="storages">
-			<el-table-column prop="room" label="Room" />
-			<el-table-column prop="name" label="Name" />
-			<el-table-column prop="description" label="Description" />
+			<el-table-column prop="room" label="Room" width="180" />
+			<el-table-column prop="name" label="Name" width="180" />
+			<el-table-column prop="description" label="Description" width="180" />
 			<el-table-column width="80">
 				<template #default="{ row }">
 					<el-tooltip class="box-item" effect="dark" content="View content" placement="top-end">
@@ -79,4 +79,8 @@ onMounted(() => {
 	</div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.add-button {
+	margin: 20px 0;
+}
+</style>
