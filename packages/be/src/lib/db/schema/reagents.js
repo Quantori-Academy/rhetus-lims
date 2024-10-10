@@ -23,7 +23,7 @@ export const reagents = pgTable('reagents', {
 	catalogLink: text('catalog_link').default(null),
 	unitPrice: real('unit_price').notNull(),
 	quantityUnit: varchar('quantity_unit', { length: 256 }).notNull(),
-	size: integer('size').notNull(),
+	quantity: integer('quantity').notNull(),
 	quantityLeft: real('quantity_left').notNull(),
 	expirationDate: timestamp('expiration_date').notNull(),
 	storageLocationId: integer('storage_location_id'),
