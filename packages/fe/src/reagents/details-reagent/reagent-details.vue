@@ -1,5 +1,5 @@
 <script setup>
-import { ElForm, ElInput, ElButton, ElFormItem, ElSelect, ElOption, ElImage } from 'element-plus';
+import { ElForm, ElInput, ElButton, ElFormItem, ElSelect, ElOption } from 'element-plus';
 import { $notifyUserAboutError, $notify } from '../../lib/utils/feedback/notify-msg';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg.js/';
 import { computed, onMounted, useTemplateRef } from 'vue';
@@ -37,7 +37,7 @@ onMounted(() => {
 });
 
 const rules = ref({
-	quantityLeft: [{ required: true, message: "Quantity can't be empty" }],
+	quantityLeft: [{ required: true, message: "Quantity left can't be empty" }],
 	storageLocation: [
 		{ required: true, message: "Storage location can't be empty", trigger: 'change' },
 		{
@@ -109,7 +109,6 @@ const deleteReagent = async () => {
 			type: 'warning'
 		});
 		const response = await $api.reagents.deleteReagent(props.id);
-		console.log(response.message);
 		$notify({
 			title: 'Success',
 			message: response.message,
@@ -152,13 +151,6 @@ const deleteReagent = async () => {
 			<el-form-item label="Description" prop="description">
 				<el-input v-model="reagent.description" :disabled="true" />
 			</el-form-item>
-			<el-form-item label="Structure">
-				<el-image
-					src="https://www.thoughtco.com/thmb/hg7HpLu7rYj7tTae5CmOq7uwbKA=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/flavonol-58b5f2373df78cdcd816fecf.png"
-					alt="Potassium Permanganate Structure"
-					fit="cover"
-				/>
-			</el-form-item>
 			<el-form-item label="CAS number" prop="casNumber">
 				<el-input v-model="reagent.casNumber" :disabled="true" />
 			</el-form-item>
@@ -174,11 +166,14 @@ const deleteReagent = async () => {
 			<el-form-item label="Storage location" prop="storageLocation">
 				<el-input v-model="reagent.storageLocation.name" :disabled="!editingForm" />
 			</el-form-item>
-			<el-form-item label="Size (unit)" prop="unitSize">
-				<el-input v-model="reagent.unitSize" :disabled="true" />
-			</el-form-item>
-			<el-form-item label="Quantity" prop="quantityLeft">
+			<el-form-item label="Quantity left" prop="quantityLeft">
 				<el-input v-model="reagent.quantityLeft" :disabled="!editingForm" />
+			</el-form-item>
+			<el-form-item label="Quantity" prop="quantity">
+				<el-input v-model="reagent.quantity" :disabled="true" />
+			</el-form-item>
+			<el-form-item label="Unit" prop="quantityUnit">
+				<el-input v-model="reagent.quantityUnit" :disabled="true" />
 			</el-form-item>
 			<el-form-item label="Price per unit" prop="unitPrice">
 				<el-input v-model="reagent.unitPrice" :disabled="true" />
@@ -201,10 +196,16 @@ const deleteReagent = async () => {
 	flex-direction: column;
 	gap: 5rem;
 	padding-bottom: 5rem;
+	width: 50vw;
 	color: black;
 }
 .reagent-details :deep(.el-input__wrapper),
 .reagent-details :deep(.el-select__wrapper) {
 	background-color: transparent;
+}
+.quantity-unit-wrapper {
+	display: flex;
+	flex-direction: row;
+	gap: 10px;
 }
 </style>

@@ -39,7 +39,8 @@ const reagentDetails = [
 		producer: 'Chemical Co.',
 		catalogId: 'CH-001234',
 		catalogLink: 'http://chemicalco.com/catalog/sodium-chloride',
-		unitSize: '500 g bottle',
+		quantityUnit: 'g',
+		quantity: 500,
 		unitPrice: 12.5,
 		quantityLeft: 25.0,
 		storageLocation: {
@@ -77,7 +78,8 @@ const reagentDetails = [
 		producer: 'Pure Chemicals',
 		catalogId: 'PC-002567',
 		catalogLink: 'http://purechemicals.com/catalog/acetic-acid',
-		unitSize: '1 L bottle',
+		quantityUnit: 'g',
+		quantity: 1000,
 		unitPrice: 8.99,
 		quantityLeft: 15.0,
 		storageLocation: {
