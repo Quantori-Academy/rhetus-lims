@@ -1,7 +1,7 @@
 <script setup>
+import RhIcon from '../../lib/components/rh-icon.vue';
 import { ref, onMounted } from 'vue';
 import { ElTable, ElTableColumn, ElButton } from 'element-plus';
-import RhIcon from '../../lib/components/rh-icon.vue';
 import { $router } from '../../lib/router/router.js';
 import { $api } from '../../lib/api/index.js';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg';
@@ -57,8 +57,24 @@ async function setReagents() {
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
-
 	isLoading.value = false;
+}
+
+const sortState = ref({
+	name: 'desc',
+	category: 'desc'
+});
+
+async function setSortedReagents(event) {
+	const prop = event.currentTarget.getAttribute('data-column');
+	if (!prop) return;
+	sortState.value[prop] = sortState.value[prop] === 'asc' ? 'desc' : 'asc';
+	const order = sortState.value[prop];
+	const sort = JSON.stringify({
+		[prop]: order
+	});
+	const data = await $api.reagents.fetchSortedReagents(sort);
+	reagents.value = data;
 }
 
 onMounted(() => {
@@ -70,9 +86,28 @@ onMounted(() => {
 	<div class="reagent-table">
 		<el-button type="primary" @click="addNewReagent">Add New Reagent</el-button>
 		<el-button type="primary" @click="addNewSample">Add New Sample</el-button>
-		<el-table v-loading="isLoading" :data="reagents" @row-click="viewReagent">
-			<el-table-column prop="name" label="Name" sortable />
-			<el-table-column prop="category" label="Category" sortable />
+		<el-table
+			v-loading="isLoading"
+			:data="reagents"
+			@row-click="viewReagent"
+			@sort-change="setSortedReagents"
+		>
+			<el-table-column prop="name" label="Name">
+				<template #header>
+					<span>Name</span>
+					<el-button data-column="name" @click="setSortedReagents">
+						<rh-icon :name="sortState.name === 'asc' ? 'arrow-up' : 'arrow-down'" size="12" />
+					</el-button>
+				</template>
+			</el-table-column>
+			<el-table-column prop="category" label="Category">
+				<template #header>
+					<span>Category</span>
+					<el-button data-column="category" @click="setSortedReagents">
+						<rh-icon :name="sortState.category === 'asc' ? 'arrow-up' : 'arrow-down'" size="12" />
+					</el-button>
+				</template>
+			</el-table-column>
 			<el-table-column prop="structure" label="Structure" />
 			<el-table-column prop="description" label="Description" />
 			<el-table-column prop="quantityLeft" label="Quantity Left" />
@@ -98,16 +133,20 @@ onMounted(() => {
 	display: flex;
 	flex-direction: row;
 }
-:deep(.el-table__column) {
-	width: max-content;
-}
 
-:deep(.el-table__cell) .cell:last-child {
+::v-deep .el-table__header-wrapper .cell {
 	display: flex;
 	flex-direction: row;
-	flex-wrap: wrap;
-	gap: 2px;
+	align-items: center;
+	gap: 1px;
 }
+::v-deep .el-table__header-wrapper .cell .el-button {
+	margin-left: 0;
+	width: 1rem;
+	height: 1rem;
+	border: none;
+}
+
 :deep(.el-table__row):hover {
 	cursor: pointer;
 }

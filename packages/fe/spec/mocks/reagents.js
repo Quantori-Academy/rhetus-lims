@@ -29,10 +29,30 @@ const reagents = [
 		structure: 'O=[Mn](=O)(=O)=O[O-].[K+]'
 	}
 ];
-
 export const reagentsHandlers = [
 	http.get(api('/reagents'), () => {
 		return HttpResponse.json(reagents);
+	}),
+	http.get(api('/substances:sort'), ({ params }) => {
+		const sortingOption = params.sort;
+		const parsedSort = JSON.parse(decodeURIComponent(sortingOption.replace('&sort=', '')));
+		let sortedReagents = [...reagents];
+		const [sortField, sortOrder] = Object.entries(parsedSort)[0];
+
+		const compare = (a, b) => {
+			const aField = a[sortField];
+			const bField = b[sortField];
+			const orderModifier = sortOrder === 'asc' ? 1 : -1;
+			if (typeof aField === 'string' && typeof bField === 'string') {
+				return orderModifier * aField.localeCompare(bField);
+			}
+			if (typeof aField === 'number' && typeof bField === 'number') {
+				return orderModifier * (aField - bField);
+			}
+			return 0;
+		};
+		sortedReagents.sort(compare);
+		return HttpResponse.json(sortedReagents);
 	}),
 	http.delete(api('/reagents/:id'), async ({ params }) => {
 		const { id } = params;
