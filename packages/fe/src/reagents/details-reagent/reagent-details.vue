@@ -26,10 +26,7 @@ const props = defineProps({
 });
 
 const route = useRoute();
-
-const isEdit = computed(() => {
-	return props.isEdit || route.query.isEdit === 'true';
-});
+const isEdit = computed(() => props.isEdit || route.query.isEdit === 'true');
 
 onMounted(() => {
 	setReagent(props.id);
@@ -55,8 +52,7 @@ const rules = ref({
 
 const setReagent = async id => {
 	try {
-		const data = await $api.reagents.fetchReagent(id);
-		reagent.value = { ...data };
+		reagent.value = await $api.reagents.fetchReagent(id);
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating reagent');
 	} finally {
@@ -79,9 +75,7 @@ const cancelEdit = () => {
 	$router.push({ name: 'reagent-details', params: { id: props.id } });
 };
 
-async function validate() {
-	return formEl.value.validate();
-}
+const validate = async () => formEl.value.validate();
 
 const handleSubmit = async () => {
 	const valid = await validate();
