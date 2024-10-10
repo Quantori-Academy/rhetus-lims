@@ -2,7 +2,7 @@
 
 Rhetus LIMS is a repository for a efficient system that stores, manages, and analyzes laboratory data.
 
-Prototype link: [dev](https://vm3.quantori.academy:8080/)
+Prototype link: [dev](https://vm3.quantori.academy)
 
 ---
 
