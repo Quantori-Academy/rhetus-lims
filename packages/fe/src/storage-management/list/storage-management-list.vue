@@ -3,8 +3,7 @@ import { ref, onMounted } from 'vue';
 import { ElTable, ElTableColumn, ElButton, ElTooltip } from 'element-plus';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { $api } from '../../lib/api/index.js';
-import { $confirm } from '../../lib/utils/feedback/confirm-msg';
-import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
+import { $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $router } from '../../lib/router/router.js';
 
 const storages = ref([]);
@@ -27,8 +26,8 @@ function deleteStorageLocation(id) {
 async function setStorages() {
 	isLoading.value = true;
 	try {
-		storages.value = await $api.storages.fetchStorages();
-		console.log(storages.value);
+		const data = await $api.storages.fetchStorages();
+		storages.value = data.storages;
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
@@ -50,6 +49,7 @@ onMounted(() => {
 		<el-table v-loading="isLoading" :data="storages">
 			<el-table-column prop="room" label="Room" />
 			<el-table-column prop="name" label="Name" />
+			<el-table-column prop="description" label="Description" />
 			<el-table-column width="80">
 				<template #default="{ row }">
 					<el-tooltip class="box-item" effect="dark" content="View content" placement="top-end">
