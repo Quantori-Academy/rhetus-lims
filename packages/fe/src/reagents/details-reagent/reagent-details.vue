@@ -130,7 +130,7 @@ const deleteReagent = async () => {
 			:rules="rules"
 			@submit="handleSubmit"
 		>
-			<el-form-item label="Expiration date" prop="expirationDate">
+			<el-form-item label="ID" prop="id">
 				<span> {{ reagent.id }}</span>
 			</el-form-item>
 			<el-form-item label="Name" prop="name">
