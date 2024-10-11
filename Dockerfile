@@ -15,19 +15,15 @@ ENV NODE_ENV="production"
 
 RUN pnpm run build
 
-# Deploy Frontend
-FROM georgjung/nginx-brotli:latest AS fe
+# Export Frontend Artifacts
+FROM alpine AS frontend-export
 
-COPY .github/workflows/nginx.conf /etc/nginx/nginx.conf
-COPY --chown=node:node --from=build /usr/src/app/packages/fe/dist /usr/share/nginx/html
+RUN mkdir -p /usr/share/nginx/html
 
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
-
+COPY --from=build /usr/src/app/packages/fe/dist /usr/share/nginx/html
 
 # Deploy backend
-FROM node:22-alpine AS be
+FROM node:22-alpine AS backend
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"

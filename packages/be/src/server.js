@@ -2,8 +2,8 @@ import { build } from './app.js';
 import closeWithGrace from 'close-with-grace';
 import { getConfig } from './lib/config/config.js';
 
-const opts = { logger: { level: 'info' } };
 const config = getConfig();
+const opts = config.fastifyInit;
 
 // We want to use pino-pretty only if there is a human watching this,
 // otherwise we log as newline-delimited JSON.
