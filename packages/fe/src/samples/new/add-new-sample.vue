@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import {
 	ElInput,
 	ElForm,
@@ -10,6 +10,9 @@ import {
 	ElInputNumber
 } from 'element-plus';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
+import { $router } from '../../lib/router/router';
+import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg';
+import { $api } from '../../lib/api';
 
 const quantityUnits = [
 	'ml',
@@ -41,13 +44,7 @@ const quantityUnits = [
 	'bar'
 ];
 
-const reagents = [
-	{ value: 'aaaaa', label: 'Methane' },
-	{ value: 'aaaab', label: 'Ethane' },
-	{ value: 'aaaac', label: 'Propane' },
-	{ value: 'aaaad', label: 'Butan' },
-	{ value: 'aaaae', label: 'Heptane' }
-];
+const reagentsAndSamplesOptions = ref([]);
 
 const formEl = ref(null);
 const form = ref({
@@ -91,14 +88,40 @@ const rules = reactive({
 	shelf: [requiredRule]
 });
 
+const isSaving = ref(false);
+
 async function submit() {
-	const isValid = await $isFormValid(formEl);
-	if (!isValid) return;
+	if (!(await $isFormValid(formEl))) return;
+
+	isSaving.value = true;
+
+	try {
+		const response = await $api.samples.addSample(form.value);
+		$notify({ message: response.message, type: 'success' });
+		$router.push({ name: 'dashboard' });
+	} catch (error) {
+		$notifyUserAboutError(error);
+	}
+
+	isSaving.value = false;
 }
 
 function cancel() {
 	formEl.value.resetFields();
 }
+
+async function setReagentsAndSamples() {
+	try {
+		const res = await $api.samples.fetchSamples();
+		reagentsAndSamplesOptions.value = res.samples.map(x => ({ value: x.id, label: x.name }));
+	} catch (error) {
+		$notifyUserAboutError(error);
+	}
+}
+
+onMounted(() => {
+	setReagentsAndSamples();
+});
 </script>
 
 <template>
@@ -114,7 +137,7 @@ function cancel() {
 					filterable
 					multiple
 					placeholder="Select reagents/samples used in this sample"
-					:options="reagents"
+					:options="reagentsAndSamplesOptions"
 				/>
 			</el-form-item>
 			<div class="flex">
@@ -160,7 +183,7 @@ function cancel() {
 			</el-form-item>
 			<div class="btn-container">
 				<el-button @click="cancel">Cancel</el-button>
-				<el-button type="primary" @click="submit">Create</el-button>
+				<el-button :loading="isSaving" type="primary" @click="submit">Create</el-button>
 			</div>
 		</el-form>
 	</div>
