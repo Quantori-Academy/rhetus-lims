@@ -43,6 +43,27 @@
       "when": 1728132399861,
       "tag": "0005_needy_wendigo",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1728489373475,
+      "tag": "0006_remarkable_dreadnoughts",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1728489394264,
+      "tag": "0007_tough_exodus",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1728560415198,
+      "tag": "0008_lowly_jean_grey",
+      "breakpoints": true
     }
   ]
 }
