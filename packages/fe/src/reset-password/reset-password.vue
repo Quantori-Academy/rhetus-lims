@@ -14,6 +14,7 @@ const form = ref(createDefaultFormValues());
 
 async function resetPassword(form) {
 	try {
+		console.log(form);
 		const response = await $api.auth.resetUserPassword(form.username);
 		$notify({
 			title: 'Success',

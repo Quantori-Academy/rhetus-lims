@@ -22,7 +22,7 @@ export const routes = [
 	{
 		path: '/login',
 		name: 'login',
-		component: () => import('../../login/login.vue')
+		component: () => import('../../login/login-page.vue')
 	},
 	{
 		path: '/reset-password',

@@ -1,7 +1,7 @@
 <script setup>
 import { ElForm, ElInput, ElButton, ElFormItem } from 'element-plus';
 import { ref } from 'vue';
-import { $router } from '../../lib/router/router.js';
+import { $router } from '../lib/router/router.js';
 import { $api } from '../lib/api/index.js';
 import { $notify, $notifyUserAboutError } from '../lib/utils/feedback/notify-msg.js';
 
@@ -16,7 +16,7 @@ const form = ref(createDefaultFormValues());
 
 async function login(form) {
 	try {
-		const response = await $api.auth.login(form.value);
+		const response = await $api.auth.login(form);
 		$notify({
 			title: 'Success',
 			message: response.message,

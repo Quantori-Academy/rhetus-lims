@@ -2,7 +2,7 @@ export default http => ({
 	async login(payload) {
 		return await http('/login', {
 			method: 'POST',
-			body: JSON.stringify(payload)
+			body: payload
 		});
 	},
 	async resetUserPassword(username) {
