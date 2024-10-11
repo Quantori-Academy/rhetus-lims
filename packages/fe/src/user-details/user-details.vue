@@ -14,7 +14,7 @@ import { $confirm } from '../lib/utils/feedback/confirm-msg.js/';
 import { $api } from '../lib/api/index.js';
 import { $router } from '../lib/router/router';
 import { $isFormValid } from '../lib/utils/form-validation/is-form-valid.js';
-import { formRules } from './helpers';
+import { formRules } from './constants';
 
 const props = defineProps({
 	id: {
