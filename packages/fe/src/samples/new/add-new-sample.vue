@@ -9,40 +9,11 @@ import {
 	ElSelectV2,
 	ElInputNumber
 } from 'element-plus';
+import { quantityUnits } from '../../lib/constants/quantityUnits';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
 import { $router } from '../../lib/router/router';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg';
 import { $api } from '../../lib/api';
-
-const quantityUnits = [
-	'ml',
-	'L',
-	'mg',
-	'g',
-	'kg',
-	'µl',
-	'ul',
-	'nl',
-	'cm³',
-	'cc',
-	'm³',
-	'µg',
-	'ug',
-	'ng',
-	'mol',
-	'mmol',
-	'µmol',
-	'umol',
-	'nmol',
-	'M',
-	'mM',
-	'µM',
-	'uM',
-	'g/L',
-	'mg/mL',
-	'atm',
-	'bar'
-];
 
 const reagentsAndSamplesOptions = ref([]);
 
