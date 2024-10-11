@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 import {
 	ElInput,
 	ElForm,
@@ -9,6 +9,7 @@ import {
 	ElSelectV2,
 	ElInputNumber
 } from 'element-plus';
+import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
 
 const quantityUnits = [
 	'ml',
@@ -41,34 +42,20 @@ const quantityUnits = [
 ];
 
 const reagents = [
-	{
-		value: 'aaaaa',
-		label: 'Methane'
-	},
-	{
-		value: 'aaaab',
-		label: 'Ethane'
-	},
-	{
-		value: 'aaaac',
-		label: 'Propane'
-	},
-	{
-		value: 'aaaad',
-		label: 'Butan'
-	},
-	{
-		value: 'aaaae',
-		label: 'Heptane'
-	}
+	{ value: 'aaaaa', label: 'Methane' },
+	{ value: 'aaaab', label: 'Ethane' },
+	{ value: 'aaaac', label: 'Propane' },
+	{ value: 'aaaad', label: 'Butan' },
+	{ value: 'aaaae', label: 'Heptane' }
 ];
 
+const formEl = ref(null);
 const form = ref({
 	name: '',
 	reagentsAndSamples: [],
 	quantityUnit: '',
-	size: 0,
-	quantityLeft: 0,
+	size: 1,
+	quantityLeft: 1,
 	expirationDate: '',
 	room: '',
 	cabinet: '',
@@ -76,19 +63,52 @@ const form = ref({
 	description: ''
 });
 
-function submit() {
-	console.log(form.value);
+const requiredRule = {
+	required: true,
+	message: 'Please enter a value',
+	trigger: ['blur', 'change']
+};
+const rules = reactive({
+	name: [requiredRule],
+	reagentsAndSamples: [requiredRule],
+	quantityUnit: [requiredRule],
+	size: [
+		requiredRule,
+		{ type: 'number', min: 0, message: 'Size cannot be negative', trigger: ['blur', 'change'] }
+	],
+	quantityLeft: [
+		requiredRule,
+		{
+			type: 'number',
+			min: 0,
+			message: "You can't add a sample that has none left",
+			trigger: ['blur', 'change']
+		}
+	],
+	expirationDate: [requiredRule],
+	room: [requiredRule],
+	cabinet: [requiredRule],
+	shelf: [requiredRule]
+});
+
+async function submit() {
+	const isValid = await $isFormValid(formEl);
+	if (!isValid) return;
+}
+
+function cancel() {
+	formEl.value.resetFields();
 }
 </script>
 
 <template>
 	<div class="container">
 		<div class="title">New Sample</div>
-		<el-form :model="form" label-width="auto" label-position="top">
-			<el-form-item label="Name">
+		<el-form ref="formEl" :model="form" :rules="rules" label-width="auto" label-position="top">
+			<el-form-item label="Name" prop="name">
 				<el-input v-model="form.name" placeholder="Enter sample name" />
 			</el-form-item>
-			<el-form-item label="Reagents/Samples used">
+			<el-form-item label="Reagents/Samples used" prop="reagentsAndSamples">
 				<el-select-v2
 					v-model="form.reagentsAndSamples"
 					filterable
@@ -98,7 +118,7 @@ function submit() {
 				/>
 			</el-form-item>
 			<div class="flex">
-				<el-form-item label="Quantity unit">
+				<el-form-item label="Quantity unit" prop="quantityUnit">
 					<el-select-v2
 						v-model="form.quantityUnit"
 						filterable
@@ -106,14 +126,14 @@ function submit() {
 						:options="quantityUnits.map(x => ({ value: x, label: x }))"
 					/>
 				</el-form-item>
-				<el-form-item label="Size">
+				<el-form-item label="Size" prop="size">
 					<el-input-number v-model="form.size" placeholder="Enter amount">
 						<template #suffix>
 							<span>{{ form.quantityUnit }}</span>
 						</template>
 					</el-input-number>
 				</el-form-item>
-				<el-form-item label="Quantity left">
+				<el-form-item label="Quantity left" prop="quantityLeft">
 					<el-input-number v-model="form.quantityLeft" placeholder="Enter amount">
 						<template #suffix>
 							{{ form.quantityUnit }}
@@ -121,25 +141,25 @@ function submit() {
 					</el-input-number>
 				</el-form-item>
 			</div>
-			<el-form-item label="Expiration date">
+			<el-form-item label="Expiration date" prop="expirationDate">
 				<el-date-picker v-model="form.expirationDate" type="date" placeholder="Pick a date" />
 			</el-form-item>
 			<div class="flex">
-				<el-form-item label="Room">
+				<el-form-item label="Room" prop="room">
 					<el-input v-model="form.room" placeholder="Enter room" />
 				</el-form-item>
-				<el-form-item label="Cabinet">
+				<el-form-item label="Cabinet" prop="cabinet">
 					<el-input v-model="form.cabinet" placeholder="Enter cabinet" />
 				</el-form-item>
-				<el-form-item label="Shelf">
+				<el-form-item label="Shelf" prop="shelf">
 					<el-input v-model="form.shelf" placeholder="Enter shelf" />
 				</el-form-item>
 			</div>
-			<el-form-item label="Description">
+			<el-form-item label="Description" prop="description">
 				<el-input v-model="form.description" type="textarea" placeholder="Enter description" />
 			</el-form-item>
 			<div class="btn-container">
-				<el-button>Cancel</el-button>
+				<el-button @click="cancel">Cancel</el-button>
 				<el-button type="primary" @click="submit">Create</el-button>
 			</div>
 		</el-form>
