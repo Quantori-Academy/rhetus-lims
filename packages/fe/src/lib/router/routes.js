@@ -43,17 +43,17 @@ export const routes = [
 	{
 		path: '/storages/list',
 		name: 'storages-list',
-		component: () => import('../../storage-management/list/storage-management-list.vue')
+		component: () => import('../../storages/list/storage-list.vue')
 	},
 	{
 		path: '/storages/:id',
 		name: 'edit-storage',
-		component: () => import('../../storage-management/edit/storage-management-edit.vue'),
+		component: () => import('../../storages/edit/storage-edit.vue'),
 		props: true
 	},
 	{
 		path: '/storages/new',
 		name: 'new-storage',
-		component: () => import('../../storage-management/add-new/storage-management-new.vue')
+		component: () => import('../../storages/add-new/storage-new.vue')
 	}
 ];
