@@ -9,7 +9,7 @@ import {
 	ElSelectV2,
 	ElInputNumber
 } from 'element-plus';
-import { quantityUnits } from '../../lib/constants/quantityUnits';
+import { quantityUnits } from '../../lib/constants/quantity-units';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
 import { $router } from '../../lib/router/router';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg';
