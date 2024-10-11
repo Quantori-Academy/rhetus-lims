@@ -79,6 +79,7 @@ async function submit() {
 
 function cancel() {
 	formEl.value.resetFields();
+	$router.push({ name: 'dashboard' });
 }
 
 async function setReagentsAndSamples() {
