@@ -5,7 +5,7 @@ import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-
 import { $router } from '../../lib/router/router.js';
 import { $api } from '../../lib/api/index.js';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
-import { rules } from '../helpers';
+import { rules } from '../constants';
 
 const formEl = useTemplateRef('form-ref');
 const storage = ref({

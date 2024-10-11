@@ -41,7 +41,7 @@ const handleSidebarOpen = () => {
 			<el-row class="link">
 				<router-link to="/storages/list">
 					<rh-icon name="storages"></rh-icon>
-					<span>Storage Location Management</span>
+					<span>Storages</span>
 				</router-link>
 			</el-row>
 		</nav>

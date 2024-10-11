@@ -5,7 +5,7 @@ import { $api } from '../../lib/api';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $router } from '../../lib/router/router';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
-import { rules } from '../helpers';
+import { rules } from '../constants';
 
 const storage = ref(null);
 const isLoading = ref(false);
