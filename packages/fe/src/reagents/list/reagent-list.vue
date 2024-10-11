@@ -56,24 +56,21 @@ async function setReagents() {
 		reagents.value = await $api.reagents.fetchReagents();
 	} catch (error) {
 		$notifyUserAboutError(error);
+	} finally {
+		isLoading.value = false;
 	}
-	isLoading.value = false;
 }
 
-const sortState = ref({
-	name: 'desc',
-	category: 'desc'
-});
-
 async function setSortedReagents(event) {
-	const prop = event.currentTarget.getAttribute('data-column');
-	if (!prop) return;
-	sortState.value[prop] = sortState.value[prop] === 'asc' ? 'desc' : 'asc';
-	const order = sortState.value[prop];
-	const sort = JSON.stringify({
-		[prop]: order
-	});
-	const data = await $api.reagents.fetchSortedReagents(sort);
+	const prop = event.prop;
+	const order = event.order === 'ascending' ? 'desc' : 'asc';
+	if (!prop || !order) return;
+	const query = {
+		sort: {
+			[prop]: order
+		}
+	};
+	const data = await $api.reagents.fetchSortedReagents(query);
 	reagents.value = data;
 }
 
@@ -92,22 +89,8 @@ onMounted(() => {
 			@row-click="viewReagent"
 			@sort-change="setSortedReagents"
 		>
-			<el-table-column prop="name" label="Name">
-				<template #header>
-					<span>Name</span>
-					<el-button data-column="name" @click="setSortedReagents">
-						<rh-icon :name="sortState.name === 'asc' ? 'arrow-up' : 'arrow-down'" size="12" />
-					</el-button>
-				</template>
-			</el-table-column>
-			<el-table-column prop="category" label="Category">
-				<template #header>
-					<span>Category</span>
-					<el-button data-column="category" @click="setSortedReagents">
-						<rh-icon :name="sortState.category === 'asc' ? 'arrow-up' : 'arrow-down'" size="12" />
-					</el-button>
-				</template>
-			</el-table-column>
+			<el-table-column prop="name" label="Name" sortable />
+			<el-table-column prop="category" label="Category" sortable />
 			<el-table-column prop="structure" label="Structure" />
 			<el-table-column prop="description" label="Description" />
 			<el-table-column prop="quantityLeft" label="Quantity Left" />

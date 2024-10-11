@@ -44,6 +44,13 @@ const handleSidebarOpen = () => {
 					<span>Storages</span>
 				</router-link>
 			</el-row>
+
+			<el-row class="link">
+				<router-link to="/reagents/list">
+					<rh-icon name="asteriks"></rh-icon>
+					<span>Reagents List</span>
+				</router-link>
+			</el-row>
 		</nav>
 	</div>
 
