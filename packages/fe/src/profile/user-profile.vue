@@ -7,28 +7,19 @@ import { $confirm } from '../lib/utils/feedback/confirm-msg';
 
 const editable = ref(false);
 const profile = ref(null);
-const initialData = ref(createInitialDataValues());
 const form = useTemplateRef('form');
+const password = ref(false);
+const newPassword = ref('');
 
-function createInitialDataValues() {
-	return {
-		username: '',
-		firstName: '',
-		lastName: '',
-		email: '',
-		role: ''
-	};
-}
 const setProfile = async () => {
 	try {
-		const data = (profile.value = await $api.users.fetchCurrentUserInfo());
-		initialData.value = { ...data };
+		profile.value = await $api.users.fetchCurrentUserInfo();
 	} catch (err) {
 		$notifyUserAboutError(err);
 	}
 };
 const cancelEdit = () => {
-	profile.value = { ...initialData.value };
+	setProfile();
 	editable.value = false;
 };
 const ifEdit = () => {
@@ -56,6 +47,9 @@ const onProfileEdit = () => {
 const editHandler = async () => {
 	if (!(await validate())) return;
 	try {
+		if (newPassword.value) {
+			profile.value = { ...profile.value, password: newPassword };
+		}
 		await $api.users.updateUser(profile.value.id, profile.value);
 		editable.value = false;
 		$notify({
@@ -67,7 +61,7 @@ const editHandler = async () => {
 		$notifyUserAboutError(err);
 	}
 };
-const passwordResetHandler = () => {
+const passwordChangeHandler = () => {
 	async function confirmed() {
 		try {
 			await $confirm('Are you sure you want to change password?', 'Please, confirm your action', {
@@ -75,7 +69,7 @@ const passwordResetHandler = () => {
 				cancelButtonText: 'No',
 				type: 'warning'
 			});
-			console.log('password can be changed');
+			password.value = true;
 		} catch (err) {
 			$notifyUserAboutError(err);
 		}
@@ -114,15 +108,17 @@ onMounted(() => {
 			<el-form-item label="Role" prop="role">
 				<el-input v-model="profile.role" :readonly="true" :disabled="editable" />
 			</el-form-item>
-			<!-- <el-form-item label="Password" prop="password">
-				<el-input type="password" :readonly="true" :disabled="editable" />
-			</el-form-item> -->
+			<el-form-item v-if="password" label="Password" prop="password">
+				<el-input v-model="newPassword" type="password" :readonly="!editable" />
+			</el-form-item>
 			<el-form-item>
 				<el-button :type="editable ? 'default' : 'primary'" @click="onProfileEdit">{{
 					editable ? 'Cancel' : 'Edit'
 				}}</el-button>
 				<el-button v-if="editable" type="primary" @click="editHandler">Save</el-button>
-				<el-button type="warning" @click="passwordResetHandler">Change password</el-button>
+				<el-button v-if="editable" type="warning" @click="passwordChangeHandler"
+					>Change password</el-button
+				>
 			</el-form-item>
 		</el-form>
 	</div>

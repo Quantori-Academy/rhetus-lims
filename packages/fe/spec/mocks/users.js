@@ -160,6 +160,6 @@ export const usersHandlers = [
 	}),
 	http.get(api('/me'), () => {
 		const user = users[0];
-		return HttpResponse.json(user); //temporary ----------------
+		return HttpResponse.json(user);
 	})
 ];
