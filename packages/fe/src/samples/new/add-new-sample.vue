@@ -72,9 +72,9 @@ async function submit() {
 		$router.push({ name: 'dashboard' });
 	} catch (error) {
 		$notifyUserAboutError(error);
+	} finally {
+		isSaving.value = false;
 	}
-
-	isSaving.value = false;
 }
 
 function cancel() {
@@ -112,7 +112,7 @@ onMounted(() => {
 					:options="reagentsAndSamplesOptions"
 				/>
 			</el-form-item>
-			<div class="flex">
+			<div class="align-horizontal">
 				<el-form-item label="Quantity unit" prop="quantityUnit">
 					<el-select-v2
 						v-model="form.quantityUnit"
@@ -139,7 +139,7 @@ onMounted(() => {
 			<el-form-item label="Expiration date" prop="expirationDate">
 				<el-date-picker v-model="form.expirationDate" type="date" placeholder="Pick a date" />
 			</el-form-item>
-			<div class="flex">
+			<div class="align-horizontal">
 				<el-form-item label="Room" prop="room">
 					<el-input v-model="form.room" placeholder="Enter room" />
 				</el-form-item>
@@ -163,9 +163,9 @@ onMounted(() => {
 
 <style>
 .container {
-	width: 600px;
+	width: 42vw;
 }
-.flex {
+.align-horizontal {
 	display: flex;
 	gap: 18px;
 
@@ -190,5 +190,15 @@ onMounted(() => {
 .el-date-editor.el-input,
 .el-date-editor.el-input__wrapper {
 	width: 100% !important;
+}
+
+@media (max-width: 768px) {
+	.container {
+		padding-bottom: 24px;
+		width: 80vw;
+	}
+	.align-horizontal {
+		display: block;
+	}
 }
 </style>
