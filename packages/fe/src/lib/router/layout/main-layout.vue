@@ -17,7 +17,6 @@ import SidebarMenu from '../../../sidebar/sidebar-menu.vue';
 	display: grid;
 	place-content: center;
 	gap: 4px;
-	height: 100vh;
 }
 .table-logo {
 	display: flex;

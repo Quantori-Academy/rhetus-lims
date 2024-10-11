@@ -6,6 +6,7 @@ import { computed, onMounted, useTemplateRef } from 'vue';
 import { ref } from 'vue';
 import { $api } from '../lib/api/index.js';
 import { $router } from '../lib/router/router';
+import { $isFormValid } from '../lib/utils/form-validation/is-form-valid.js';
 
 const editingForm = ref(false);
 const formEl = useTemplateRef('form-ref');
@@ -60,7 +61,7 @@ const cancelEdit = () => {
 	user.value = { ...originalUser.value };
 };
 async function validate() {
-	return formEl.value.validate();
+	return $isFormValid(formEl);
 }
 
 const confirmRoleChange = async () => {

@@ -4,6 +4,7 @@ import { ElForm, ElFormItem, ElInput, ElButton, ElSelect, ElOption } from 'eleme
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $router } from '../../lib/router/router.js';
 import { $api } from '../../lib/api/index.js';
+import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 
 const isSaving = ref(false);
 const formEl = useTemplateRef('form-ref');
@@ -52,7 +53,7 @@ const resetForm = () => {
 };
 
 async function validate() {
-	return formEl.value.validate();
+	return $isFormValid(formEl);
 }
 
 const cancelHandler = () => {
