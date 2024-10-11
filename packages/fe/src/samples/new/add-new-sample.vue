@@ -137,7 +137,13 @@ onMounted(() => {
 				</el-form-item>
 			</div>
 			<el-form-item label="Expiration date" prop="expirationDate">
-				<el-date-picker v-model="form.expirationDate" type="date" placeholder="Pick a date" />
+				<el-date-picker
+					v-model="form.expirationDate"
+					type="date"
+					format="YYYY-MM-DD"
+					value-format="YYYY-MM-DD"
+					placeholder="Pick a date (YYYY-MM-DD)"
+				/>
 			</el-form-item>
 			<div class="align-horizontal">
 				<el-form-item label="Room" prop="room">
