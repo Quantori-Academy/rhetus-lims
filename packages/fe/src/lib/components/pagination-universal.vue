@@ -19,7 +19,7 @@ const props = defineProps({
 	},
 	pageSizes: {
 		type: Array,
-		default: () => [10, 20, 30, 40]
+		default: () => [5, 10, 20]
 	},
 	size: {
 		type: String,
@@ -58,13 +58,8 @@ watch(
 	}
 );
 
-const handleSizeChange = val => {
-	emit('update:limit', val);
-};
-
-const handleCurrentChange = val => {
-	emit('update:page', val);
-};
+const handleSizeChange = val => emit('update:limit', val);
+const handleCurrentChange = val => emit('update:page', val);
 </script>
 
 <template>

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 import { ElTable, ElTableColumn, ElButton } from 'element-plus';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { $api } from '../../lib/api/index.js';
@@ -7,10 +7,11 @@ import { $confirm } from '../../lib/utils/feedback/confirm-msg';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { formatDate } from '../../lib/utils/datetime/date-format.js';
 import { $router } from '../../lib/router/router.js';
-import PaginationTable from '../../lib/components/pagination-table.vue';
+import PaginationComponent from '../../lib/components/pagination-universal.vue';
+import { usePagination } from '../../lib/utils/use-pagination.js';
 
 const users = ref([]);
-const isLoading = ref(false);
+// const isLoading = ref(false);
 
 function addNewUser() {
 	$router.push({ name: 'new-user' });
@@ -52,70 +53,44 @@ const deleteUser = async id => {
 	}
 };
 
-// async function setUsers() {
-// 	isLoading.value = true;
-// 	try {
-// 		users.value = await $api.users.fetchUsers();
-// 		console.log(users.value);
-// 	} catch (error) {
-// 		$notifyUserAboutError(error);
-// 	}
-
-// 	isLoading.value = false;
-// }
-
-//  TEST
-const currentPage = ref(1);
-const currentLimit = ref(3);
-const totalItems = ref(0);
-
-const paginatedItems = ref([]);
-const setUsers = async (sortOptions = {}) => {
+async function setUsers() {
+	isLoading.value = true;
 	try {
-		const params = {
-			page: currentPage.value,
-			limit: currentLimit.value,
-			sort: JSON.stringify(sortOptions)
-		};
-
-		const queryString = new URLSearchParams(params).toString();
-		console.log(`/substances?${queryString}`);
-		const response = await $api.pagination.fetchPaginatedItems(`/substances?${queryString}`);
-		console.log(response);
-		users.value = response.items;
-		totalItems.value = response.total;
+		users.value = await $api.users.fetchUsers();
+		console.log(users.value);
 	} catch (error) {
-		console.error('Failed to fetch items:', error);
+		$notifyUserAboutError(error);
 	}
-};
-const updatePaginatedItems = () => {
-	const start = (currentPage.value - 1) * currentLimit.value;
-	paginatedItems.value = users.value.slice(start, start + currentLimit.value);
-};
 
-const updatePage = newPage => {
-	currentPage.value = newPage;
-	updatePaginatedItems();
-};
-
-const updateLimit = newLimit => {
-	currentLimit.value = newLimit;
-	currentPage.value = 1;
-	updatePaginatedItems();
-};
-
-watch([currentPage, currentLimit], setUsers);
-// END TEST
+	isLoading.value = false;
+}
 
 onMounted(() => {
 	setUsers();
+});
+
+const endpoint = '/paginatedusers';
+const {
+	currentPage,
+	currentLimit,
+	totalItemsLength,
+	paginatedItems,
+	isLoading,
+	updatePage,
+	updateLimit,
+	setEndpoint
+} = usePagination($api.users.fetchPaginatedUsers);
+
+onMounted(() => {
+	setEndpoint(endpoint);
 });
 </script>
 
 <template>
 	<div>
 		<el-button class="add-button" type="primary" @click="addNewUser">Add New User</el-button>
-		<el-table v-loading="isLoading" :data="users">
+
+		<el-table v-loading="isLoading" :data="paginatedItems">
 			<el-table-column prop="username" label="User name" />
 			<el-table-column prop="firstName" label="First Name" />
 			<el-table-column prop="lastName" label="Last Name" />
@@ -145,13 +120,11 @@ onMounted(() => {
 				</template>
 			</el-table-column>
 		</el-table>
-		<pagination-table
+		<pagination-component
 			:page="currentPage"
 			:limit="currentLimit"
-			:total-items="totalItems"
-			:page-sizes="[10, 20, 30, 40]"
-			:background="false"
-			:disabled="false"
+			:page-sizes="[5, 10, 20]"
+			:total-items="totalItemsLength"
 			@update:page="updatePage"
 			@update:limit="updateLimit"
 		/>
