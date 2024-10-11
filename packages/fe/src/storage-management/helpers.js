@@ -1,5 +1,4 @@
 import { ref } from 'vue';
-import { $notifyUserAboutError } from '../lib/utils/feedback/notify-msg.js';
 
 export const rules = ref({
 	room: [
@@ -12,12 +11,3 @@ export const rules = ref({
 	]
 });
 
-export const validate = async formEl => {
-	try {
-		const isValid = await formEl.value.validate();
-		return isValid;
-	} catch (error) {
-		$notifyUserAboutError(error.message || 'Error submitting form');
-		return false;
-	}
-};

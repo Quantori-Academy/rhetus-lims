@@ -1,10 +1,11 @@
 <script setup>
 import { ref, useTemplateRef } from 'vue';
 import { ElForm, ElFormItem, ElInput, ElButton } from 'element-plus';
-import { rules, validate } from '../helpers';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $router } from '../../lib/router/router.js';
 import { $api } from '../../lib/api/index.js';
+import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
+import { rules } from '../helpers';
 
 const formEl = useTemplateRef('form-ref');
 const storage = ref({
@@ -26,7 +27,11 @@ const cancelHandler = () => {
 	$router.push({ name: 'storages-list' });
 };
 const addStorage = async () => {
-	if (!(await validate(formEl))) return;
+	if (!(await $isFormValid(formEl))) {
+		$notifyUserAboutError('Error submitting form');
+		return;
+	}
+
 	try {
 		const response = await $api.storages.addStorage(storage.value);
 		$notify({ message: response.message, type: 'success' });

@@ -4,8 +4,8 @@ import { ElForm, ElInput, ElButton, ElFormItem } from 'element-plus';
 import { $api } from '../../lib/api';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $router } from '../../lib/router/router';
-
-import { rules, validate } from '../helpers';
+import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
+import { rules } from '../helpers';
 
 const storage = ref(null);
 const isLoading = ref(false);
@@ -54,7 +54,10 @@ const handleSubmit = async () => {
 			return;
 		}
 
-		if (!(await validate(formEl))) return;
+		if (!(await $isFormValid(formEl))) {
+			$notifyUserAboutError('Error submitting form');
+			return;
+		}
 
 		const response = await $api.storages.updateStorage(storage.value.id, storage.value);
 		$notify({
@@ -77,7 +80,7 @@ onMounted(() => {
 	<div class="wrapper">
 		<h1>Storage Location Edit</h1>
 		<el-form
-			v-if="storage && !loading"
+			v-if="storage && !isLoading"
 			ref="form-ref"
 			label-position="top"
 			:model="storage"
