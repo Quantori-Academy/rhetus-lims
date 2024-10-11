@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref, useTemplateRef } from 'vue';
 import {
 	ElInput,
 	ElForm,
@@ -17,7 +17,7 @@ import { $api } from '../../lib/api';
 
 const reagentsAndSamplesOptions = ref([]);
 
-const formEl = ref(null);
+const formEl = useTemplateRef('form-el');
 const form = ref({
 	name: '',
 	reagentsAndSamples: [],
@@ -99,7 +99,7 @@ onMounted(() => {
 <template>
 	<div class="container">
 		<div class="title">New Sample</div>
-		<el-form ref="formEl" :model="form" :rules="rules" label-width="auto" label-position="top">
+		<el-form ref="form-el" :model="form" :rules="rules" label-width="auto" label-position="top">
 			<el-form-item label="Name" prop="name">
 				<el-input v-model="form.name" placeholder="Enter sample name" />
 			</el-form-item>
