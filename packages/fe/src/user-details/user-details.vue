@@ -8,13 +8,13 @@ import {
 	ElOption,
 	ElDatePicker
 } from 'element-plus';
+import { computed, onMounted, useTemplateRef, ref } from 'vue';
 import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg';
 import { $confirm } from '../lib/utils/feedback/confirm-msg.js/';
-import { computed, onMounted, useTemplateRef } from 'vue';
-import { ref } from 'vue';
 import { $api } from '../lib/api/index.js';
 import { $router } from '../lib/router/router';
 import { $isFormValid } from '../lib/utils/form-validation/is-form-valid.js';
+import { formRules } from './helpers';
 
 const props = defineProps({
 	id: {
@@ -29,14 +29,7 @@ const user = ref(null);
 const originalUser = ref(null);
 const loading = ref(true);
 const roles = ref([]);
-const rules = ref({
-	firstName: [{ required: true, message: "First name can't be empty" }],
-	lastName: [{ required: true, message: "Last name can't be empty", trigger: 'change' }],
-	email: [
-		{ required: true, message: "Email can't be empty" },
-		{ type: 'email', message: 'Please input a valid email address', trigger: 'blur' }
-	]
-});
+const rules = ref(formRules);
 
 async function setRoles() {
 	try {
