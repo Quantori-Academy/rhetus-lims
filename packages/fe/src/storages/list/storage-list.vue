@@ -30,9 +30,9 @@ async function setStorages() {
 		storages.value = data.storages;
 	} catch (error) {
 		$notifyUserAboutError(error);
+	} finally {
+		isLoading.value = false;
 	}
-
-	isLoading.value = false;
 }
 
 onMounted(() => {

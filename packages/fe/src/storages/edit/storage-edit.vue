@@ -5,12 +5,7 @@ import { $api } from '../../lib/api';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $router } from '../../lib/router/router';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
-import { rules } from '../constants';
-
-const storage = ref(null);
-const isLoading = ref(false);
-const initialStorage = ref(null);
-const formEl = useTemplateRef('form-ref');
+import { formRules } from '../constants';
 
 const props = defineProps({
 	id: {
@@ -18,6 +13,11 @@ const props = defineProps({
 		default: null
 	}
 });
+const storage = ref(null);
+const isLoading = ref(false);
+const initialStorage = ref(null);
+const formEl = useTemplateRef('form-ref');
+const rules = ref(formRules);
 
 const setStorage = async id => {
 	isLoading.value = true;
@@ -77,10 +77,10 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="wrapper">
+	<div v-loading="isLoading" class="wrapper">
 		<h1>Storage Location Edit</h1>
 		<el-form
-			v-if="storage && !isLoading"
+			v-if="storage"
 			ref="form-ref"
 			label-position="top"
 			:model="storage"
@@ -88,13 +88,13 @@ onMounted(() => {
 			@submit="handleSubmit"
 		>
 			<el-form-item label="Room" prop="room">
-				<el-input v-model="storage.room"></el-input>
+				<el-input v-model="storage.room" />
 			</el-form-item>
 			<el-form-item label="Name" prop="name">
-				<el-input v-model="storage.name"></el-input>
+				<el-input v-model="storage.name" />
 			</el-form-item>
 			<el-form-item label="Description" prop="description">
-				<el-input v-model="storage.description"></el-input>
+				<el-input v-model="storage.description" />
 			</el-form-item>
 			<el-button @click="cancelEdit">Cancel</el-button>
 			<el-button type="primary" @click="handleSubmit">Save</el-button>
