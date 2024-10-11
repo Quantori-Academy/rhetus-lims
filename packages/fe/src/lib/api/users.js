@@ -1,9 +1,12 @@
 export default http => ({
+	async getRoles() {
+		return await http('/roles');
+	},
 	async fetchUsers() {
 		return await http(`/users`);
 	},
 	async addUser(user) {
-		return await http('/users/new', {
+		return await http('/users', {
 			method: 'POST',
 			body: user
 		});
@@ -13,7 +16,7 @@ export default http => ({
 	},
 	async updateUser(id, user) {
 		return await http(`/users/${id}`, {
-			method: 'PUT',
+			method: 'PATCH',
 			body: JSON.stringify(user)
 		});
 	},

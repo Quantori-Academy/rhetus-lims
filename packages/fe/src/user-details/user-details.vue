@@ -1,41 +1,61 @@
 <script setup>
-import { ElForm, ElInput, ElButton, ElFormItem, ElSelect, ElOption } from 'element-plus';
+import {
+	ElForm,
+	ElInput,
+	ElButton,
+	ElFormItem,
+	ElSelect,
+	ElOption,
+	ElDatePicker
+} from 'element-plus';
+import { computed, onMounted, useTemplateRef, ref } from 'vue';
 import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg';
 import { $confirm } from '../lib/utils/feedback/confirm-msg.js/';
-import { computed, onMounted, useTemplateRef } from 'vue';
-import { ref } from 'vue';
 import { $api } from '../lib/api/index.js';
 import { $router } from '../lib/router/router';
 import { $isFormValid } from '../lib/utils/form-validation/is-form-valid.js';
+import { formRules } from './constants';
 
-const editingForm = ref(false);
-const formEl = useTemplateRef('form-ref');
-const user = ref(null);
-const originalUser = ref(null);
-const loading = ref(true);
 const props = defineProps({
 	id: {
 		type: String,
 		default: null
 	}
 });
-const rules = ref({
-	firstName: [{ required: true, message: "First name can't be empty" }],
-	lastName: [{ required: true, message: "Last name can't be empty", trigger: 'change' }],
-	email: [
-		{ required: true, message: "Email can't be empty" },
-		{ type: 'email', message: 'Please input a valid email address', trigger: 'blur' }
-	]
-});
+
+const editingForm = ref(false);
+const formEl = useTemplateRef('form-ref');
+const user = ref(null);
+const originalUser = ref(null);
+const loading = ref(true);
+const roles = ref([]);
+const rules = ref(formRules);
+
+async function setRoles() {
+	try {
+		const data = await $api.users.getRoles();
+		roles.value = data.roles;
+	} catch (error) {
+		$notifyUserAboutError(error);
+	}
+}
 
 onMounted(() => {
 	setUser(props.id);
+	setRoles();
 });
 const setUser = async id => {
 	try {
 		const data = await $api.users.fetchUser(id);
-		user.value = data;
-		originalUser.value = { ...data };
+		const { role, ...userData } = data;
+		user.value = {
+			...userData,
+			roleId: role.id
+		};
+		originalUser.value = {
+			...userData,
+			roleId: role.id
+		};
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating user');
 	} finally {
@@ -48,10 +68,13 @@ const formHasChanges = computed(() => {
 		user.value.firstName !== originalUser.value.firstName ||
 		user.value.lastName !== originalUser.value.lastName ||
 		user.value.email !== originalUser.value.email ||
-		user.value.role !== originalUser.value.role
+		user.value.roleId !== originalUser.value.roleId
 	);
 });
 
+const roleName = computed(() => {
+	return roles.value.find(role => role.id === user.value.roleId).name;
+});
 const toggleEdit = () => {
 	editingForm.value = !editingForm.value;
 };
@@ -65,10 +88,10 @@ async function validate() {
 }
 
 const confirmRoleChange = async () => {
-	if (user.value.role !== originalUser.value.role) {
+	if (user.value.roleId !== originalUser.value.roleId) {
 		try {
 			const confirmed = await $confirm(
-				`Are you sure you want to change the role to ${user.value.role}?`,
+				`Are you sure you want to change the role to ${roleName.value}?`,
 				'Confirm Role Change',
 				{
 					confirmButtonText: 'Yes, Change Role',
@@ -93,11 +116,10 @@ const handleSubmit = async () => {
 	if (!valid) return;
 	try {
 		const updatedUser = await $api.users.updateUser(user.value.id, user.value);
-		user.value = updatedUser;
-		originalUser.value = { ...updatedUser };
+		await setUser(props.id);
 		$notify({
 			title: 'Success',
-			message: 'Profile has been updated',
+			message: updatedUser.message,
 			type: 'success'
 		});
 		toggleEdit();
@@ -182,20 +204,24 @@ const deleteUser = async () => {
 			<el-form-item label="Email" prop="email">
 				<el-input v-model="user.email" :disabled="!editingForm" />
 			</el-form-item>
-			<el-form-item label="Role">
-				<el-select
-					v-model="user.role"
-					:disabled="!editingForm"
-					:placeholder="user.role"
-					@change="confirmRoleChange"
-				>
-					<el-option label="Admin" value="admin" />
-					<el-option label="Procurement officer" value="procurement_officer" />
-					<el-option label="Researcher" value="researcher" />
+			<el-form-item label="Role" prop="role">
+				<el-select v-model="user.roleId" :disabled="!editingForm" @change="confirmRoleChange">
+					<el-option
+						v-for="role of roles"
+						:key="role.id"
+						:label="role.name"
+						:value="role.id"
+					></el-option>
 				</el-select>
 			</el-form-item>
 			<el-form-item class="last-input" label="Creation date" prop="creationDate">
-				<el-input v-model="user.creationDate" :disabled="true" />
+				<el-date-picker
+					v-model="user.createdAt"
+					type="date"
+					format="YYYY-MM-DD"
+					value-format="YYYY-MM-DD"
+					:disabled="true"
+				/>
 			</el-form-item>
 			<el-button v-if="editingForm" type="primary" @click="handleSubmit">{{ '		Save' }}</el-button>
 			<el-button v-else type="primary" @click="toggleEdit">{{ 'Edit profile' }}</el-button>

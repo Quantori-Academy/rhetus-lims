@@ -1,54 +1,95 @@
 import { http, HttpResponse } from 'msw';
 import { api } from './api-url.js';
-const users = [
-	{
-		id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d',
-		username: 'molecule_master',
-		firstName: 'Anna',
-		lastName: 'Smith',
-		email: 'anna.smith@chemistry.com',
-		role: 'Admin',
-		creationDate: '2022-04-12'
-	},
-	{
-		id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b322',
-		username: 'reaction_queen',
-		firstName: 'Bella',
-		lastName: 'Rogers',
-		email: 'bella.rogers@organicchem.com',
-		role: 'Moderator',
-		creationDate: '2022-05-10'
-	},
-	{
-		id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b999',
-		username: 'synthesis_sorcerer',
-		firstName: 'Charlie',
-		lastName: 'Johnson',
-		email: 'charlie.johnson@chemistryworld.com',
-		role: 'User',
-		creationDate: '2022-06-15'
-	}
-];
 
-let userList = [
-	{
-		id: 'c7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3d3b333',
-		username: 'test1',
-		firstName: 'john',
-		lastName: 'white',
-		email: 'john@white.com',
-		role: { id: 0, name: 'Admin' },
-		lastLogin: '2024-09-26T10:15:06.720Z'
-	}
-];
+let userInfo = {
+	users: [
+		{
+			id: 'c7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3d3b333',
+			username: 'test1',
+			firstName: 'john',
+			lastName: 'white',
+			email: 'john@white.com',
+			role: {
+				id: 1,
+				name: 'administrator'
+			},
+			lastLogin: '2024-09-26T10:15:06.720Z',
+			createdAt: '2024-09-27T21:47:47.481Z'
+		},
+		{
+			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d',
+			username: 'molecule_master',
+			firstName: 'Anna',
+			lastName: 'Smith',
+			email: 'anna.smith@chemistry.com',
+			role: {
+				id: 1,
+				name: 'administrator'
+			},
+			lastLogin: '2024-09-26T10:15:06.720Z',
+			createdAt: '2024-09-27T21:47:47.481Z'
+		},
+		{
+			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b322',
+			username: 'reaction_queen',
+			firstName: 'Bella',
+			lastName: 'Rogers',
+			email: 'bella.rogers@organicchem.com',
+			role: {
+				id: 2,
+				name: 'procurement officer'
+			},
+			lastLogin: '2024-10-05T10:15:06.720Z',
+			createdAt: '2024-09-28T21:47:47.481Z'
+		},
+		{
+			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b999',
+			username: 'synthesis_sorcerer',
+			firstName: 'Charlie',
+			lastName: 'Johnson',
+			email: 'charlie.johnson@chemistryworld.com',
+			role: {
+				id: 3,
+				name: 'researcher'
+			},
+			lastLogin: '2024-10-06T10:15:06.720Z',
+			createdAt: '2024-09-20T21:47:47.481Z'
+		}
+	],
+	counts: 1
+};
+
+let roleInfo = {
+	roles: [
+		{
+			id: 1,
+			name: 'administrator'
+		},
+		{
+			id: 2,
+			name: 'procurement officer'
+		},
+		{
+			id: 3,
+			name: 'researcher'
+		}
+	]
+};
 
 export const usersHandlers = [
-	http.get(api('/users'), () => {
-		return HttpResponse.json(userList);
+	http.get(api('/roles'), () => {
+		return HttpResponse.json(roleInfo);
 	}),
-	http.post(api('/users/new'), async ({ request }) => {
+	http.get(api('/users'), () => {
+		return HttpResponse.json(userInfo);
+	}),
+	http.post(api('/users'), async ({ request }) => {
 		const user = await request.json();
-		userList.push(user);
+		const updatedUser = {
+			...user,
+			role: roleInfo.roles.find(role => role.id === user.roleId)
+		};
+		userInfo.users.push(updatedUser);
 		return HttpResponse.json({
 			status: 'success',
 			message: `user ${user.username} was created`
@@ -56,7 +97,7 @@ export const usersHandlers = [
 	}),
 	http.get(api('/users/:id'), req => {
 		const { id } = req.params;
-		const user = users.find(user => user.id === id);
+		const user = userInfo.users.find(user => user.id === id);
 		if (user) {
 			return HttpResponse.json(user);
 		} else {
@@ -64,10 +105,14 @@ export const usersHandlers = [
 		}
 	}),
 
-	http.put(api('/users/:id'), async ({ request, params }) => {
+	http.patch(api('/users/:id'), async ({ request, params }) => {
 		const { id } = params;
-		const updatedUser = await request.json();
-		const user = users.find(user => user.id === id);
+		const editedUser = await request.json();
+		const updatedUser = {
+			...editedUser,
+			role: roleInfo.roles.find(role => role.id === editedUser.roleId)
+		};
+		const user = userInfo.users.find(user => user.id === id);
 		if (user) {
 			Object.assign(user, updatedUser);
 			return HttpResponse.json(user);
@@ -78,7 +123,7 @@ export const usersHandlers = [
 	http.post(api('/users/:id/change-password'), async ({ request, params }) => {
 		const { id } = params;
 		const { confirm } = await request.json();
-		const user = users.find(user => user.id === id);
+		const user = userInfo.users.find(user => user.id === id);
 		if (user) {
 			if (confirm) {
 				return HttpResponse.json({
@@ -97,7 +142,7 @@ export const usersHandlers = [
 	}),
 	http.delete(api('/users/:id'), async ({ params }) => {
 		const { id } = params;
-		const userIndex = userList.findIndex(user => user.id === id);
+		const userIndex = userInfo.users.findIndex(user => user.id === id);
 		if (userIndex === -1) {
 			return HttpResponse.json(
 				{
@@ -107,7 +152,7 @@ export const usersHandlers = [
 				{ status: 404 }
 			);
 		}
-		userList.splice(userIndex, 1);
+		userInfo.users.splice(userIndex, 1);
 		return HttpResponse.json({
 			status: 'success',
 			message: `User was deleted`
