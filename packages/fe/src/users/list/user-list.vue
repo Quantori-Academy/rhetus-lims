@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { ElTable, ElTableColumn, ElButton } from 'element-plus';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { $api } from '../../lib/api/index.js';
@@ -7,6 +7,7 @@ import { $confirm } from '../../lib/utils/feedback/confirm-msg';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { formatDate } from '../../lib/utils/datetime/date-format.js';
 import { $router } from '../../lib/router/router.js';
+import PaginationTable from '../../lib/components/pagination-table.vue';
 
 const users = ref([]);
 const isLoading = ref(false);
@@ -60,8 +61,51 @@ async function setUsers() {
 		$notifyUserAboutError(error);
 	}
 
-	isLoading.value = false;
-}
+// 	isLoading.value = false;
+// }
+
+//  TEST
+const currentPage = ref(1);
+const currentLimit = ref(3);
+const totalItems = ref(0);
+
+const paginatedItems = ref([]);
+const setUsers = async (sortOptions = {}) => {
+	try {
+		const params = {
+			page: currentPage.value,
+			limit: currentLimit.value,
+			sort: JSON.stringify(sortOptions)
+		};
+
+		const queryString = new URLSearchParams(params).toString();
+		console.log(`/substances?${queryString}`);
+		const response = await $api.pagination.fetchPaginatedItems(`/substances?${queryString}`);
+		console.log(response);
+		users.value = response.items;
+		totalItems.value = response.total;
+	} catch (error) {
+		console.error('Failed to fetch items:', error);
+	}
+};
+const updatePaginatedItems = () => {
+	const start = (currentPage.value - 1) * currentLimit.value;
+	paginatedItems.value = users.value.slice(start, start + currentLimit.value);
+};
+
+const updatePage = newPage => {
+	currentPage.value = newPage;
+	updatePaginatedItems();
+};
+
+const updateLimit = newLimit => {
+	currentLimit.value = newLimit;
+	currentPage.value = 1;
+	updatePaginatedItems();
+};
+
+watch([currentPage, currentLimit], setUsers);
+// END TEST
 
 onMounted(() => {
 	setUsers();
@@ -101,6 +145,16 @@ onMounted(() => {
 				</template>
 			</el-table-column>
 		</el-table>
+		<pagination-table
+			:page="currentPage"
+			:limit="currentLimit"
+			:total-items="totalItems"
+			:page-sizes="[10, 20, 30, 40]"
+			:background="false"
+			:disabled="false"
+			@update:page="updatePage"
+			@update:limit="updateLimit"
+		/>
 	</div>
 </template>
 
