@@ -1,5 +1,13 @@
 <script setup>
-import { ElForm, ElInput, ElButton, ElFormItem, ElSelect, ElOption } from 'element-plus';
+import {
+	ElForm,
+	ElInput,
+	ElButton,
+	ElFormItem,
+	ElSelect,
+	ElOption,
+	ElDatePicker
+} from 'element-plus';
 import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg';
 import { $confirm } from '../lib/utils/feedback/confirm-msg.js/';
 import { computed, onMounted, useTemplateRef } from 'vue';
@@ -7,19 +15,20 @@ import { ref } from 'vue';
 import { $api } from '../lib/api/index.js';
 import { $router } from '../lib/router/router';
 import { $isFormValid } from '../lib/utils/form-validation/is-form-valid.js';
-import { formatDate } from '../lib/utils/datetime/date-format';
-const editingForm = ref(false);
-const formEl = useTemplateRef('form-ref');
-const user = ref(null);
-const originalUser = ref(null);
-const loading = ref(true);
-const roles = ref([]);
+
 const props = defineProps({
 	id: {
 		type: String,
 		default: null
 	}
 });
+
+const editingForm = ref(false);
+const formEl = useTemplateRef('form-ref');
+const user = ref(null);
+const originalUser = ref(null);
+const loading = ref(true);
+const roles = ref([]);
 const rules = ref({
 	firstName: [{ required: true, message: "First name can't be empty" }],
 	lastName: [{ required: true, message: "Last name can't be empty", trigger: 'change' }],
@@ -203,12 +212,7 @@ const deleteUser = async () => {
 				<el-input v-model="user.email" :disabled="!editingForm" />
 			</el-form-item>
 			<el-form-item label="Role" prop="role">
-				<el-select
-					v-model="user.roleId"
-					:disabled="!editingForm"
-					:placeholder="roles.value && roleName.value"
-					@change="confirmRoleChange"
-				>
+				<el-select v-model="user.roleId" :disabled="!editingForm" @change="confirmRoleChange">
 					<el-option
 						v-for="role of roles"
 						:key="role.id"
@@ -218,7 +222,13 @@ const deleteUser = async () => {
 				</el-select>
 			</el-form-item>
 			<el-form-item class="last-input" label="Creation date" prop="creationDate">
-				<el-input :value="formatDate(user.createdAt)" :disabled="true" />
+				<el-date-picker
+					v-model="user.createdAt"
+					type="date"
+					format="YYYY-MM-DD"
+					value-format="YYYY-MM-DD"
+					:disabled="true"
+				/>
 			</el-form-item>
 			<el-button v-if="editingForm" type="primary" @click="handleSubmit">{{ '		Save' }}</el-button>
 			<el-button v-else type="primary" @click="toggleEdit">{{ 'Edit profile' }}</el-button>
