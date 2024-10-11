@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, useTemplateRef } from 'vue';
+import { ref, onMounted, useTemplateRef } from 'vue';
 import { ElForm, ElInput, ElButton, ElFormItem } from 'element-plus';
 import { $api } from '../../lib/api';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
@@ -15,7 +15,6 @@ const props = defineProps({
 });
 const storage = ref(null);
 const isLoading = ref(false);
-const initialStorage = ref(null);
 const formEl = useTemplateRef('form-ref');
 const rules = ref(formRules);
 
@@ -24,7 +23,6 @@ const setStorage = async id => {
 	try {
 		const storageData = await $api.storages.fetchStorage(id);
 		storage.value = storageData;
-		initialStorage.value = { ...storageData };
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
@@ -35,25 +33,8 @@ const cancelEdit = () => {
 	$router.push({ name: 'storages-list' });
 };
 
-const isFormChanged = computed(() => {
-	return (
-		storage.value.room !== initialStorage.value.room ||
-		storage.value.name !== initialStorage.value.name ||
-		storage.value.description !== initialStorage.value.description
-	);
-});
-
 const handleSubmit = async () => {
 	try {
-		if (!isFormChanged.value) {
-			$notify({
-				title: 'Notification',
-				message: 'There is nothing to update',
-				type: 'info'
-			});
-			return;
-		}
-
 		if (!(await $isFormValid(formEl))) {
 			$notifyUserAboutError('Error submitting form');
 			return;
