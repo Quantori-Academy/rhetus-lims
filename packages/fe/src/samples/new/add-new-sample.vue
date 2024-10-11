@@ -6,7 +6,8 @@ import {
 	ElDatePicker,
 	ElButton,
 	ElFormItem,
-	ElSelectV2,
+	ElSelect,
+	ElOption,
 	ElInputNumber
 } from 'element-plus';
 import { quantityUnits } from '../../lib/constants/quantity-units';
@@ -104,22 +105,25 @@ onMounted(() => {
 				<el-input v-model="form.name" placeholder="Enter sample name" />
 			</el-form-item>
 			<el-form-item label="Reagents/Samples used" prop="reagentsAndSamples">
-				<el-select-v2
+				<el-select
 					v-model="form.reagentsAndSamples"
 					filterable
 					multiple
 					placeholder="Select reagents/samples used in this sample"
-					:options="reagentsAndSamplesOptions"
-				/>
+				>
+					<el-option
+						v-for="item of reagentsAndSamplesOptions"
+						:key="item.value"
+						:label="item.label"
+						:value="item.value"
+					/>
+				</el-select>
 			</el-form-item>
 			<div class="align-horizontal">
 				<el-form-item label="Quantity unit" prop="quantityUnit">
-					<el-select-v2
-						v-model="form.quantityUnit"
-						filterable
-						placeholder="Select a unit"
-						:options="quantityUnits.map(x => ({ value: x, label: x }))"
-					/>
+					<el-select v-model="form.quantityUnit" filterable placeholder="Select a unit">
+						<el-option v-for="item of quantityUnits" :key="item" :label="item" :value="item" />
+					</el-select>
 				</el-form-item>
 				<el-form-item label="Size" prop="size">
 					<el-input-number v-model="form.size" placeholder="Enter amount">
