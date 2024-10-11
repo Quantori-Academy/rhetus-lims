@@ -71,7 +71,7 @@ async function submit() {
 		$notify({ message: response.message, type: 'success' });
 		$router.push({ name: 'dashboard' });
 	} catch (error) {
-		$notifyUserAboutError(error);
+		$notifyUserAboutError(error.statusText);
 	} finally {
 		isSaving.value = false;
 	}
