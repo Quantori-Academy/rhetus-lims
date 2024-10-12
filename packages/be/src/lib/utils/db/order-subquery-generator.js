@@ -18,7 +18,7 @@ function generateOrderSubquery(data, sortDictionary) {
 
 			return sql.raw(`${sortProperty} ${lowerCasedOrder}`);
 		})
-		.filter(subquery => subquery);
+		.filter(Boolean);
 }
 
 export { generateOrderSubquery };
