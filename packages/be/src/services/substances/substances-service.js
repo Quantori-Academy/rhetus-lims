@@ -1,4 +1,4 @@
-import { and } from 'drizzle-orm';
+import { and, sql } from 'drizzle-orm';
 import { unionAll } from 'drizzle-orm/pg-core';
 import fp from 'fastify-plugin';
 import { generateFilterSubquery } from '../../lib/utils/db/filter-subquery-generator.js';
@@ -55,12 +55,7 @@ async function substancesService(server) {
 
 			// TODO: add correct sample query whet it will be implemented
 			// TODO: add join with storages when it will be implemented and change in select
-			// const samplesQuery = server.db
-			// 	.select({
-			// 		...schema.samples,
-			// 		category: sql`'sample'`.as('category')
-			// 	})
-			// 	.from(schema.samples);
+			const samplesQuery = sql.raw(`select *, 'sample' as category from sample_fake`);
 
 			const unionQuery = unionAll(reagentsQuery, samplesQuery);
 			let query = server.db.select().from(unionQuery.as('substances'));
