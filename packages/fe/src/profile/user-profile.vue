@@ -14,9 +14,9 @@ const newPassword = ref('');
 
 const setProfile = async () => {
 	try {
-    profile.value = await $api.users.fetchCurrentUserInfo();
-	} catch (err) {
-		$notifyUserAboutError(err);
+		profile.value = await $api.users.fetchCurrentUserInfo();
+	} catch (error) {
+		$notifyUserAboutError(error);
 	}
 };
 const cancelEdit = () => {
