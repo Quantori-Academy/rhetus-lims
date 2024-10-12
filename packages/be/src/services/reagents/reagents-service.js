@@ -1,4 +1,4 @@
-import { eq, and } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 import fp from 'fastify-plugin';
 import { schema } from '../../lib/db/schema/index.js';
 
@@ -84,6 +84,25 @@ async function reagentsService(server) {
 				.returning({ name: schema.reagents.name });
 
 			return result.length ? result[0].name : null;
+		},
+
+		getReagentsQuery: () => {
+			// TODO: add join with storages when it will be implemented and change in select
+			// TODO: add structure whet it will be implemented in next milestones
+			return server.db
+				.select({
+					id: schema.reagents.id,
+					name: schema.reagents.name,
+					quantityUnit: schema.reagents.quantityUnit,
+					quantity: schema.reagents.quantity,
+					quantityLeft: schema.reagents.quantityLeft,
+					expirationDate: schema.reagents.expirationDate,
+					storageLocationId: schema.reagents.storageLocationId,
+					description: schema.reagents.description,
+					category: sql`'reagent'`.as('category')
+				})
+				.from(schema.reagents)
+				.where(eq(schema.reagents.enabled, true));
 		}
 	});
 }
