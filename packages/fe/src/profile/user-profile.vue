@@ -4,6 +4,7 @@ import { $api } from '../lib/api';
 import { ElForm, ElFormItem, ElInput, ElButton } from 'element-plus';
 import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg';
 import { $confirm } from '../lib/utils/feedback/confirm-msg';
+import { $isFormValid } from '../lib/utils/form-validation/is-form-valid';
 
 const editable = ref(false);
 const profile = ref(null);
@@ -13,7 +14,7 @@ const newPassword = ref('');
 
 const setProfile = async () => {
 	try {
-		profile.value = await $api.users.fetchCurrentUserInfo();
+    profile.value = await $api.users.fetchCurrentUserInfo();
 	} catch (err) {
 		$notifyUserAboutError(err);
 	}
@@ -35,7 +36,7 @@ const rules = ref({
 	]
 });
 async function validate() {
-	return form.value.validate();
+	return $isFormValid(form);
 }
 const onProfileEdit = () => {
 	if (editable.value) {
@@ -94,19 +95,19 @@ onMounted(() => {
 			@submit="editHandler"
 		>
 			<el-form-item label="Username" prop="username">
-				<el-input v-model="profile.username" :readonly="true" :disabled="editable" />
+				<el-input v-model="profile.username" :disabled="true" />
 			</el-form-item>
 			<el-form-item label="First name" prop="firstName">
-				<el-input v-model="profile.firstName" :readonly="!editable" />
+				<el-input v-model="profile.firstName" :disabled="!editable" />
 			</el-form-item>
 			<el-form-item label="Last name" prop="lastName">
-				<el-input v-model="profile.lastName" :readonly="!editable" />
+				<el-input v-model="profile.lastName" :disabled="!editable" />
 			</el-form-item>
 			<el-form-item label="Email" prop="email">
-				<el-input v-model="profile.email" :readonly="!editable" />
+				<el-input v-model="profile.email" :disabled="!editable" />
 			</el-form-item>
 			<el-form-item label="Role" prop="role">
-				<el-input v-model="profile.role" :readonly="true" :disabled="editable" />
+				<el-input v-model="profile.role.name" :disabled="true" />
 			</el-form-item>
 			<el-form-item v-if="password" label="Password" prop="password">
 				<el-input v-model="newPassword" type="password" :readonly="!editable" />
