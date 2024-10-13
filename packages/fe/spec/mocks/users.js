@@ -77,12 +77,9 @@ let roleInfo = {
 };
 
 export const usersHandlers = [
-<<<<<<< HEAD
 	http.get(api('/roles'), () => {
 		return HttpResponse.json(roleInfo);
 	}),
-=======
->>>>>>> 9d007b6 (remove external changes fro testing purposes)
 	http.get(api('/users'), () => {
 		return HttpResponse.json(userInfo);
 	}),

@@ -53,28 +53,9 @@ const deleteUser = async id => {
 
 async function setUsers() {
 	isLoading.value = true;
-<<<<<<< HEAD
 	try {
 		const data = await $api.users.fetchUsers();
 		users.value = data.users;
-	} catch (error) {
-		$notifyUserAboutError(error);
-	}
-
-// 	isLoading.value = false;
-// }
-
-//  TEST
-const currentPage = ref(1);
-const currentLimit = ref(3);
-const totalItems = ref(0);
-
-const paginatedItems = ref([]);
-const setUsers = async (sortOptions = {}) => {
-=======
->>>>>>> 72de513 (refactor pagination functionality, make the paginated fetch reusable, add test data for users, remove separate pagination api calls)
-	try {
-		users.value = await $api.users.fetchUsers();
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
@@ -90,6 +71,7 @@ onMounted(() => {
 <template>
 	<div>
 		<el-button class="add-button" type="primary" @click="addNewUser">Add New User</el-button>
+
 		<el-table v-loading="isLoading" :data="users">
 			<el-table-column prop="username" label="User name" />
 			<el-table-column prop="firstName" label="First Name" />
