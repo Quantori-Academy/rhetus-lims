@@ -93,6 +93,11 @@ async function submit() {
 		return;
 	}
 
+	if (editingSample.value.quantityLeft <= 0) {
+		await deleteSample();
+		return;
+	}
+
 	isSaving.value = true;
 
 	try {
@@ -145,7 +150,7 @@ onMounted(() => setSample(props.id));
 			label-position="top"
 		>
 			<el-form-item label="Name" prop="name">
-				<el-input v-model="editingSample.name" placeholder="Enter sample name" disabled />
+				<el-input v-model="editingSample.name" disabled />
 			</el-form-item>
 			<div class="reagents-container">
 				<div class="label">Reagents/Samples used</div>
@@ -166,7 +171,7 @@ onMounted(() => setSample(props.id));
 					<el-select v-model="editingSample.quantityUnit" filterable disabled />
 				</el-form-item>
 				<el-form-item label="Size" prop="size">
-					<el-input-number v-model="editingSample.size" placeholder="Enter amount" disabled>
+					<el-input-number v-model="editingSample.size" disabled>
 						<template #suffix>
 							{{ form.quantityUnit }}
 						</template>
