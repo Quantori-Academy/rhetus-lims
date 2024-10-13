@@ -106,6 +106,7 @@ At first, quick decision-making and realizing that things change with less consu
 - [Prettier settings](./docs/prettier.md)
 - [MSW settings and explanation](./docs/prettier.md)
 - [How to add a new environment variable](./docs/env.md)
+- [How to run local BE or FE](./docs/local-development.md)
 
 Guides will help you understand some aspects of the work.
 
