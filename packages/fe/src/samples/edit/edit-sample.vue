@@ -14,6 +14,8 @@ import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg';
 import { $deepClone } from '../../lib/utils/deep-clone/deep-clone';
 import { $api } from '../../lib/api';
+import { $confirm } from '../../lib/utils/feedback/confirm-msg';
+import { $router } from '../../lib/router/router';
 
 const props = defineProps({ id: { type: String, default: null } });
 
@@ -54,6 +56,33 @@ function sampleWasEdited(edited, original) {
 		edited.storageLocation.cabinet === original.storageLocation.cabinet &&
 		edited.storageLocation.shelf === original.storageLocation.shelf
 	);
+}
+
+async function deleteSample() {
+	try {
+		await $confirm('Are you sure you want to delete this sample?', 'Delete Sample?', {
+			confirmButtonText: 'Delete',
+			cancelButtonText: 'Cancel',
+			type: 'warning'
+		});
+		try {
+			const response = await $api.samples.deleteSample(props.id);
+			$notify({
+				title: 'Success',
+				message: response.message,
+				type: 'success'
+			});
+			$router.push({ name: 'dashboard' });
+		} catch (error) {
+			$notifyUserAboutError(error);
+		}
+	} catch (error) {
+		$notify({
+			title: 'Canceled',
+			message: error.message || 'Sample deletion canceled',
+			type: 'info'
+		});
+	}
 }
 
 async function submit() {
@@ -105,7 +134,7 @@ onMounted(() => setSample(props.id));
 <template>
 	<div v-if="editingSample && !isLoading" class="container">
 		<div class="header">
-			<div class="title">{{ `${isEditing ? 'Editing ' : ''}${editingSample.name}` }}</div>
+			<div>{{ `${isEditing ? 'Editing ' : ''}${editingSample.name}` }}</div>
 			<el-button @click="toggleEditingMode">Edit</el-button>
 		</div>
 		<el-form
@@ -190,8 +219,11 @@ onMounted(() => setSample(props.id));
 				/>
 			</el-form-item>
 			<div v-if="isEditing" class="btn-container">
-				<el-button @click="cancel">Cancel</el-button>
-				<el-button :loading="isSaving" type="primary" @click="submit">Update</el-button>
+				<el-button type="danger" @click="deleteSample">Delete</el-button>
+				<div>
+					<el-button @click="cancel">Cancel</el-button>
+					<el-button :loading="isSaving" type="primary" @click="submit">Update</el-button>
+				</div>
 			</div>
 		</el-form>
 	</div>
@@ -206,6 +238,10 @@ onMounted(() => setSample(props.id));
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	margin-bottom: 12px;
+	color: black;
+	font-weight: 500;
+	font-size: large;
 }
 .reagents-container {
 	margin-bottom: 12px;
@@ -232,15 +268,9 @@ onMounted(() => setSample(props.id));
 		flex-basis: 0;
 	}
 }
-.title {
-	margin-bottom: 12px;
-	color: black;
-	font-weight: 500;
-	font-size: large;
-}
 .btn-container {
 	display: flex;
-	justify-content: end;
+	justify-content: space-between;
 }
 .el-input-number {
 	width: 100%;

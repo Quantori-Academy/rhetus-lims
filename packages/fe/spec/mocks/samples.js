@@ -208,8 +208,8 @@ export const samplesHandlers = [
 
 	http.delete(api('/samples/:id'), async ({ params }) => {
 		const { id } = params;
-		const sampleIndez = samples.findIndex(sample => sample.id === id);
-		if (sampleIndez === -1) {
+		const sampleIndex = samples.findIndex(sample => sample.id === id);
+		if (sampleIndex === -1) {
 			return HttpResponse.json(
 				{
 					status: 'error',
@@ -218,7 +218,7 @@ export const samplesHandlers = [
 				{ status: 404 }
 			);
 		}
-		samples.splice(sampleIndez, 1);
+		samples.splice(sampleIndex, 1);
 		return HttpResponse.json({
 			status: 'success',
 			message: `Sample was deleted`
