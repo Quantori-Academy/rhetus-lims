@@ -18,6 +18,7 @@ import SidebarMenu from '../../../sidebar/sidebar-menu.vue';
 	place-content: center;
 	gap: 4px;
 }
+
 .table-logo {
 	display: flex;
 	justify-content: center;
