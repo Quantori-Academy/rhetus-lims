@@ -105,6 +105,7 @@ At first, quick decision-making and realizing that things change with less consu
 - [Initial Setup of .env](./docs/setup-env.md)
 - [Prettier settings](./docs/prettier.md)
 - [MSW settings and explanation](./docs/prettier.md)
+- [How to add a new environment variable](./docs/env.md)
 
 Guides will help you understand some aspects of the work.
 
