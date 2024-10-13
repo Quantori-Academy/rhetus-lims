@@ -10,7 +10,7 @@ const samples = [
 		size: 100,
 		quantityLeft: 80,
 		expirationDate: '2024-11-30',
-		storageLocation: 3,
+		storageLocationId: 3,
 		description: 'Used as a precursor to various chemical compounds.'
 	},
 	{
@@ -21,7 +21,7 @@ const samples = [
 		size: 50,
 		quantityLeft: 20,
 		expirationDate: '2026-06-15',
-		storageLocation: 2,
+		storageLocationId: 2,
 		description: 'Essential electrolyte in the human body.'
 	},
 	{
@@ -32,7 +32,7 @@ const samples = [
 		size: 50,
 		quantityLeft: 20,
 		expirationDate: '2026-06-15',
-		storageLocation: 2,
+		storageLocationId: 2,
 		description: 'A highly reactive halogen element.'
 	},
 	{
@@ -43,7 +43,7 @@ const samples = [
 		size: 5,
 		quantityLeft: 3,
 		expirationDate: '2025-12-31',
-		storageLocation: 1,
+		storageLocationId: 1,
 		description: 'A common alcohol used as a solvent and in beverages.'
 	},
 	{
@@ -57,7 +57,7 @@ const samples = [
 		size: 10,
 		quantityLeft: 5,
 		expirationDate: '2027-01-01',
-		storageLocation: 2,
+		storageLocationId: 2,
 		description: 'Commonly known as table salt.'
 	},
 	{
@@ -68,7 +68,7 @@ const samples = [
 		size: 2,
 		quantityLeft: 2,
 		expirationDate: '2025-05-20',
-		storageLocation: 3,
+		storageLocationId: 3,
 		description: 'A weak acid with a distinctive sour taste and pungent smell.'
 	}
 ];
@@ -104,6 +104,21 @@ function findLocationByValue({ shelf, cabinet, room }) {
 	);
 }
 
+function findLocationById(id) {
+	const loc = storageLocations.find(loc => loc.id === id);
+
+	if (!loc) return null;
+
+	const name = loc.name.split(', ');
+
+	return {
+		id,
+		room: loc.room,
+		cabinet: name[0],
+		shelf: name[1]
+	};
+}
+
 export const samplesHandlers = [
 	http.get(api('/samples'), () => {
 		return HttpResponse.json({ samples, count: samples.length });
@@ -126,7 +141,7 @@ export const samplesHandlers = [
 
 		const newSample = {
 			...rest,
-			storageLocation: storageLocation.id
+			storageLocationId: storageLocation.id
 		};
 
 		samples.push(newSample);
@@ -136,11 +151,55 @@ export const samplesHandlers = [
 		});
 	}),
 
+	http.patch(api('/samples/:id'), async ({ request, params }) => {
+		const { id } = params;
+		const updatedSample = await request.json();
+
+		const sample = findSampleById(id);
+		if (!sample) {
+			return HttpResponse.json(
+				{
+					status: 'error',
+					message: `Sample not found`
+				},
+				{ status: 404 }
+			);
+		}
+
+		const { room, shelf, cabinet } = updatedSample.storageLocation;
+
+		const storageLocation = findLocationByValue({ shelf, cabinet, room });
+		if (!storageLocation) {
+			return HttpResponse.json(
+				{
+					status: 'error',
+					message: `Location not found`
+				},
+				{ status: 404 }
+			);
+		}
+
+		const updatedSampleData = {
+			...sample,
+			...updatedSample,
+			storageLocationId: storageLocation.id
+		};
+
+		const sampleIndex = samples.findIndex(s => s.id === id);
+		samples[sampleIndex] = updatedSampleData;
+
+		return HttpResponse.json({
+			status: 'success',
+			message: `Sample was updated successfully`
+		});
+	}),
+
 	http.get(api('/samples/:id'), req => {
 		const { id } = req.params;
 		const sample = samples.find(sample => sample.id === id);
 		if (sample) {
 			sample.reagentsAndSamples = sample.reagentsAndSamples.map(findSampleById);
+			sample.storageLocation = findLocationById(sample.storageLocationId);
 			return HttpResponse.json(sample);
 		} else {
 			return HttpResponse.json({ message: 'Sample not found' }, { status: 404 });
