@@ -7,11 +7,9 @@ import { $confirm } from '../../lib/utils/feedback/confirm-msg';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { formatDate } from '../../lib/utils/datetime/date-format.js';
 import { $router } from '../../lib/router/router.js';
-import PaginationComponent from '../../lib/components/pagination-universal.vue';
-import { usePagination } from '../../lib/utils/use-pagination.js';
 
 const users = ref([]);
-// const isLoading = ref(false);
+const isLoading = ref(false);
 
 function addNewUser() {
 	$router.push({ name: 'new-user' });
@@ -57,7 +55,6 @@ async function setUsers() {
 	isLoading.value = true;
 	try {
 		users.value = await $api.users.fetchUsers();
-		console.log(users.value);
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
@@ -68,29 +65,12 @@ async function setUsers() {
 onMounted(() => {
 	setUsers();
 });
-
-const endpoint = '/paginatedusers';
-const {
-	currentPage,
-	currentLimit,
-	totalItemsLength,
-	paginatedItems,
-	isLoading,
-	updatePage,
-	updateLimit,
-	setEndpoint
-} = usePagination($api.users.fetchPaginatedUsers);
-
-onMounted(() => {
-	setEndpoint(endpoint);
-});
 </script>
 
 <template>
 	<div>
 		<el-button class="add-button" type="primary" @click="addNewUser">Add New User</el-button>
-
-		<el-table v-loading="isLoading" :data="paginatedItems">
+		<el-table v-loading="isLoading" :data="users">
 			<el-table-column prop="username" label="User name" />
 			<el-table-column prop="firstName" label="First Name" />
 			<el-table-column prop="lastName" label="Last Name" />
@@ -120,14 +100,6 @@ onMounted(() => {
 				</template>
 			</el-table-column>
 		</el-table>
-		<pagination-component
-			:page="currentPage"
-			:limit="currentLimit"
-			:page-sizes="[5, 10, 20]"
-			:total-items="totalItemsLength"
-			@update:page="updatePage"
-			@update:limit="updateLimit"
-		/>
 	</div>
 </template>
 
