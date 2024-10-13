@@ -16,6 +16,7 @@ import { $deepClone } from '../../lib/utils/deep-clone/deep-clone';
 import { $api } from '../../lib/api';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg';
 import { $router } from '../../lib/router/router';
+import { formRules } from './constants';
 
 const props = defineProps({ id: { type: String, default: null } });
 
@@ -23,27 +24,7 @@ const formEl = useTemplateRef('form-el');
 const originalSample = ref(null);
 const editingSample = ref(null);
 
-const requiredRule = {
-	required: true,
-	message: 'Please enter a value',
-	trigger: ['blur', 'change']
-};
-const rules = reactive({
-	quantityLeft: [
-		requiredRule,
-		{
-			type: 'number',
-			min: 0,
-			message: "You can't add a sample that has none left",
-			trigger: ['blur', 'change']
-		}
-	],
-	storageLocation: {
-		room: [requiredRule],
-		cabinet: [requiredRule],
-		shelf: [requiredRule]
-	}
-});
+const rules = reactive(formRules);
 
 const isLoading = ref(true);
 const isSaving = ref(false);
@@ -142,18 +123,11 @@ onMounted(() => setSample(props.id));
 			<div>{{ `${isEditing ? 'Editing ' : ''}${editingSample.name}` }}</div>
 			<el-button @click="toggleEditingMode">Edit</el-button>
 		</div>
-		<el-form
-			ref="form-el"
-			:model="editingSample"
-			:rules="rules"
-			label-width="auto"
-			label-position="top"
-		>
+		<el-form ref="form-el" :model="editingSample" :rules="rules" label-position="top">
 			<el-form-item label="Name" prop="name">
 				<el-input v-model="editingSample.name" disabled />
 			</el-form-item>
-			<div class="reagents-container">
-				<div class="label">Reagents/Samples used</div>
+			<el-form-item label="Reagents/Samples used" prop="reagentsAndSamples">
 				<div class="tags">
 					<el-tag v-for="item of editingSample.reagentsAndSamples" :key="item.id" type="info">
 						<router-link
@@ -165,7 +139,7 @@ onMounted(() => setSample(props.id));
 						</router-link>
 					</el-tag>
 				</div>
-			</div>
+			</el-form-item>
 			<div class="align-horizontal">
 				<el-form-item label="Quantity unit" prop="quantityUnit">
 					<el-select v-model="editingSample.quantityUnit" filterable disabled />
@@ -248,22 +222,15 @@ onMounted(() => setSample(props.id));
 	font-weight: 500;
 	font-size: large;
 }
-.reagents-container {
-	margin-bottom: 12px;
-	.label {
-		margin-bottom: 12px;
-		color: #666;
-	}
-	.tags > * + * {
-		margin-left: 8px;
-	}
-	.link {
-		color: inherit;
-		text-decoration: none;
-	}
-	.link:hover {
-		color: var(--el-color-primary);
-	}
+.tags > * + * {
+	margin-left: 8px;
+}
+.link {
+	color: inherit;
+	text-decoration: none;
+}
+.link:hover {
+	color: var(--el-color-primary);
 }
 .align-horizontal {
 	display: flex;
