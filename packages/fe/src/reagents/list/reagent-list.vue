@@ -18,7 +18,10 @@ function addNewSample() {
 }
 
 function editReagent(id) {
-	$router.push({ name: 'reagent-details', params: { id: id }, query: { isEdit: true } });
+	$router.push({
+		name: 'reagent-details-edit',
+		params: { id: id }
+	});
 }
 
 function viewReagent(row) {
@@ -50,10 +53,11 @@ const deleteReagent = async id => {
 	}
 };
 
-async function setReagents() {
+async function setReagents(event = null) {
 	isLoading.value = true;
+	let query = createQuery(event);
 	try {
-		reagents.value = await $api.reagents.fetchReagents();
+		reagents.value = await $api.reagents.fetchReagents(query);
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
@@ -61,17 +65,13 @@ async function setReagents() {
 	}
 }
 
-async function setSortedReagents(event) {
-	const prop = event.prop;
-	const order = event.order === 'ascending' ? 'desc' : 'asc';
-	if (!prop || !order) return;
-	const query = {
-		sort: {
-			[prop]: order
-		}
-	};
-	const data = await $api.reagents.fetchSortedReagents(query);
-	reagents.value = data;
+function createQuery(event) {
+	let query = {};
+	if (event && event.prop && event.order) {
+		const order = event.order === 'ascending' ? 'desc' : 'asc';
+		query.sort = { [event.prop]: order };
+	}
+	return query;
 }
 
 onMounted(() => {
@@ -87,7 +87,7 @@ onMounted(() => {
 			v-loading="isLoading"
 			:data="reagents"
 			@row-click="viewReagent"
-			@sort-change="setSortedReagents"
+			@sort-change="setReagents"
 		>
 			<el-table-column prop="name" label="Name" sortable />
 			<el-table-column prop="category" label="Category" sortable />
