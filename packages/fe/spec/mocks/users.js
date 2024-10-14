@@ -159,7 +159,7 @@ export const usersHandlers = [
 		});
 	}),
 	http.get(api('/me'), () => {
-		const user = users[0];
+		const user = userInfo.users[0];
 		return HttpResponse.json(user);
 	})
 ];
