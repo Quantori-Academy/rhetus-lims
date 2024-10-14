@@ -30,5 +30,5 @@ export const reagents = pgTable('reagents', {
 	// TODO: add reference to storage, when it will be done
 	// .references(() => locations.id),
 	description: text('description').default(''),
-	enabled: boolean('enabled').default(true)
+	deleted: boolean('deleted').default(false)
 });

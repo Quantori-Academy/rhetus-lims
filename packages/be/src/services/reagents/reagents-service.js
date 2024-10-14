@@ -69,7 +69,7 @@ async function reagentsService(server) {
 				})
 				.from(schema.reagents)
 				// TODO: add join with storages when it will be implemented and change in select
-				.where(and(eq(schema.reagents.id, id), eq(schema.reagents.enabled, true)));
+				.where(and(eq(schema.reagents.id, id), eq(schema.reagents.deleted, false)));
 
 			return result[0];
 		},
@@ -78,7 +78,7 @@ async function reagentsService(server) {
 			const result = await server.db
 				.update(schema.reagents)
 				.set({
-					enabled: false
+					deleted: true
 				})
 				.where(eq(schema.reagents.id, id))
 				.returning({ name: schema.reagents.name });
@@ -102,7 +102,7 @@ async function reagentsService(server) {
 					category: sql`'reagent'`.as('category')
 				})
 				.from(schema.reagents)
-				.where(eq(schema.reagents.enabled, true));
+				.where(eq(schema.reagents.deleted, false));
 		}
 	});
 }
