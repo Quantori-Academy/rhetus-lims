@@ -166,6 +166,15 @@ export const samplesHandlers = [
 			);
 		}
 
+		if (updatedSample.quantityLeft <= 0) {
+			const sampleIndex = samples.findIndex(sample => sample.id === id);
+			samples.splice(sampleIndex, 1);
+			return HttpResponse.json({
+				status: 'success',
+				message: `Sample was removed successfully`
+			});
+		}
+
 		const { room, shelf, cabinet } = updatedSample.storageLocation;
 
 		const storageLocation = findLocationByValue({ shelf, cabinet, room });

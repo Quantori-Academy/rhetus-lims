@@ -75,8 +75,11 @@ async function submit() {
 	}
 
 	if (editingSample.value.quantityLeft <= 0) {
-		await deleteSample();
-		return;
+		await $confirm('Updating quntity left 0 will delete this sample', 'Delete Sample?', {
+			confirmButtonText: 'Delete',
+			cancelButtonText: 'Cancel',
+			type: 'warning'
+		});
 	}
 
 	isSaving.value = true;
@@ -84,6 +87,9 @@ async function submit() {
 	try {
 		const response = await $api.samples.updateSample(props.id, editingSample.value);
 		$notify({ message: response.message, type: 'success' });
+
+		if (editingSample.value.quantityLeft <= 0) $router.push({ name: 'dashboard' });
+
 		originalSample.value = $deepClone(editingSample.value);
 		isEditing.value = false;
 	} catch (error) {
