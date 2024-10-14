@@ -3,7 +3,7 @@ import S from 'fluent-json-schema';
 
 export function getConfig() {
 	const env = envSchema({
-		dotenv: true,
+		dotenv: { path: ['.env.local', '.env'] },
 		schema: S.object()
 			.prop('MODE', S.enum(['development', 'production']).required())
 			.prop('API_HOST', S.string().required())
