@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, reactive, ref, useTemplateRef } from 'vue';
+import { computed, onMounted, reactive, ref, useTemplateRef } from 'vue';
 import {
 	ElInput,
 	ElForm,
@@ -15,7 +15,7 @@ import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-
 import { $deepClone } from '../../lib/utils/deep-clone/deep-clone';
 import { $api } from '../../lib/api';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg';
-import { $router } from '../../lib/router/router';
+import { $route, $router } from '../../lib/router/router';
 import { formRules } from './constants';
 
 const props = defineProps({ id: { type: String, default: null } });
@@ -26,9 +26,9 @@ const editingSample = ref(null);
 
 const rules = reactive(formRules);
 
+const isEditing = computed(() => $route.value.name === 'edit-sample');
 const isLoading = ref(true);
 const isSaving = ref(false);
-const isEditing = ref(false);
 
 function sampleWasEdited(edited, original) {
 	return !(
@@ -69,14 +69,13 @@ async function submit() {
 	if (!(await $isFormValid(formEl))) return;
 
 	if (!sampleWasEdited(editingSample.value, originalSample.value)) {
-		toggleEditingMode();
+		toggleEditing();
 		return;
 	}
 
 	if (editingSample.value.quantityLeft <= 0) {
 		await $confirm('Updating quntity left 0 will delete this sample', 'Delete Sample?', {
 			confirmButtonText: 'Delete',
-			cancelButtonText: 'Cancel',
 			type: 'warning'
 		});
 	}
@@ -87,10 +86,12 @@ async function submit() {
 		const response = await $api.samples.updateSample(props.id, editingSample.value);
 		$notify({ message: response.message, type: 'success' });
 
-		if (editingSample.value.quantityLeft <= 0) $router.push({ name: 'dashboard' });
+		if (editingSample.value.quantityLeft <= 0) {
+			$router.push({ name: 'dashboard' });
+			return;
+		}
 
-		originalSample.value = $deepClone(editingSample.value);
-		isEditing.value = false;
+		toggleEditing();
 	} catch (error) {
 		$notifyUserAboutError(error.statusText);
 	} finally {
@@ -98,13 +99,11 @@ async function submit() {
 	}
 }
 
-function cancel() {
-	isEditing.value = false;
-	editingSample.value = $deepClone(originalSample.value);
-}
-
-function toggleEditingMode() {
-	isEditing.value = !isEditing.value;
+function toggleEditing() {
+	$router.push({
+		name: isEditing.value ? 'sample-details' : 'edit-sample',
+		params: { id: props.id }
+	});
 }
 
 async function setSample(id) {
@@ -126,7 +125,7 @@ onMounted(() => setSample(props.id));
 	<div v-if="editingSample && !isLoading" class="container">
 		<div class="header">
 			<div>{{ `${isEditing ? 'Editing ' : ''}${editingSample.name}` }}</div>
-			<el-button @click="toggleEditingMode">Edit</el-button>
+			<el-button v-if="!isEditing" @click="toggleEditing">Edit</el-button>
 		</div>
 		<el-form ref="form-el" :model="editingSample" :rules="rules" label-position="top">
 			<el-form-item label="Name" prop="name">
@@ -206,7 +205,7 @@ onMounted(() => setSample(props.id));
 			<div v-if="isEditing" class="btn-container">
 				<el-button type="danger" @click="deleteSample">Delete</el-button>
 				<div>
-					<el-button @click="cancel">Cancel</el-button>
+					<el-button @click="toggleEditing">Cancel</el-button>
 					<el-button :loading="isSaving" type="primary" @click="submit">Update</el-button>
 				</div>
 			</div>
@@ -222,7 +221,6 @@ onMounted(() => setSample(props.id));
 .header {
 	display: flex;
 	justify-content: space-between;
-	align-items: center;
 	margin-bottom: 12px;
 	color: black;
 	font-weight: 500;

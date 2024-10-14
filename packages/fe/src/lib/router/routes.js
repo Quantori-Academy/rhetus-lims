@@ -60,6 +60,12 @@ export const routes = [
 		props: true
 	},
 	{
+		path: '/samples/edit/:id',
+		name: 'edit-sample',
+		component: () => import('../../samples/edit/edit-sample.vue'),
+		props: true
+	},
+	{
 		path: '/storages/list',
 		name: 'storages-list',
 		component: () => import('../../storages/list/storage-list.vue')
