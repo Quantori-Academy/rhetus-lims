@@ -167,9 +167,6 @@ const deleteReagent = async () => {
 			<el-form-item label="Storage location" prop="storageLocation">
 				<el-input v-model="reagent.storageLocation.name" :disabled="!editingForm" />
 			</el-form-item>
-			<!-- <el-form-item label="Quantity left" prop="quantityLeft">
-				<el-input v-model="reagent.quantityLeft" :disabled="!editingForm" />
-			</el-form-item> -->
 			<el-form-item label="Quantity left" prop="quantityLeft">
 				<el-input-number
 					v-model="reagent.quantityLeft"
