@@ -3,8 +3,9 @@ import { ref, onMounted } from 'vue';
 import { ElTable, ElTableColumn, ElButton, ElTooltip } from 'element-plus';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { $api } from '../../lib/api/index.js';
-import { $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
+import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $router } from '../../lib/router/router.js';
+import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
 
 const storages = ref([]);
 const isLoading = ref(false);
@@ -20,9 +21,29 @@ function editStorageLocation(id) {
 	$router.push({ name: 'edit-storage', params: { id } });
 }
 
-function deleteStorageLocation(id) {
-	console.log('delete user', id);
+async function deleteStorageLocation(id) {
+	try {
+		await $confirm(
+			'Are you sure you want to delete this storage location?',
+			'Please, confirm your action',
+			{
+				confirmButtonText: 'Delete',
+				cancelButtonText: 'Cancel',
+				type: 'warning'
+			}
+		);
+		const response = await $api.storages.deleteStorage(id);
+		$notify({
+			title: 'Success',
+			message: response.message,
+			type: 'success'
+		});
+		await setStorages();
+	} catch (err) {
+		$notifyUserAboutError(err);
+	}
 }
+
 async function setStorages() {
 	isLoading.value = true;
 	try {

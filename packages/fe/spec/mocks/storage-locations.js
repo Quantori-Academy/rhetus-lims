@@ -51,5 +51,23 @@ export const storageLocationHandlers = [
 			{ status: 'success', message: `Storage location was updated` },
 			{ status: 200 }
 		);
+	}),
+	http.delete(api('/storages/:id'), async ({ params }) => {
+		const { id } = params;
+		const storageIndex = storageInfo.storages.findIndex(location => location.id === id);
+		if (storageIndex === -1) {
+			return HttpResponse.json(
+				{
+					status: 'error',
+					message: 'Storage location is not found'
+				},
+				{ status: 404 }
+			);
+		}
+		storageInfo.storages.splice(storageIndex, 1);
+		return HttpResponse.json({
+			status: 'success',
+			message: 'Storage location was deleted'
+		});
 	})
 ];
