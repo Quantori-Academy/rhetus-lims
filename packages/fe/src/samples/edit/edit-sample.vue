@@ -43,7 +43,6 @@ async function deleteSample() {
 	try {
 		await $confirm('Are you sure you want to delete this sample?', 'Delete Sample?', {
 			confirmButtonText: 'Delete',
-			cancelButtonText: 'Cancel',
 			type: 'warning'
 		});
 		try {
@@ -162,6 +161,7 @@ onMounted(() => setSample(props.id));
 						v-model="editingSample.quantityLeft"
 						placeholder="Enter amount"
 						:disabled="!isEditing"
+						min="0"
 					>
 						<template #suffix>
 							{{ editingSample.quantityUnit }}
