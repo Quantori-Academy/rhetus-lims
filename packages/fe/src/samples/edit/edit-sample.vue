@@ -153,7 +153,7 @@ onMounted(() => setSample(props.id));
 				<el-form-item label="Size" prop="size">
 					<el-input-number v-model="editingSample.size" disabled>
 						<template #suffix>
-							{{ form.quantityUnit }}
+							{{ editingSample.quantityUnit }}
 						</template>
 					</el-input-number>
 				</el-form-item>
@@ -164,7 +164,7 @@ onMounted(() => setSample(props.id));
 						:disabled="!isEditing"
 					>
 						<template #suffix>
-							{{ form.quantityUnit }}
+							{{ editingSample.quantityUnit }}
 						</template>
 					</el-input-number>
 				</el-form-item>
