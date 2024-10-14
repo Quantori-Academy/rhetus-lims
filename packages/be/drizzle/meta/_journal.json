@@ -64,6 +64,13 @@
       "when": 1728560415198,
       "tag": "0008_lowly_jean_grey",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1728914286494,
+      "tag": "0009_quiet_vision",
+      "breakpoints": true
     }
   ]
 }
