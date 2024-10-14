@@ -14,37 +14,30 @@ import { $confirm } from '../../lib/utils/feedback/confirm-msg.js/';
 import { computed, onMounted, useTemplateRef } from 'vue';
 import { ref } from 'vue';
 import { $api } from '../../lib/api/index.js';
-import { $router } from '../../lib/router/router';
-import { useRoute } from 'vue-router';
+import { $route, $router } from '../../lib/router/router';
+import { requiredRule } from './constants.js';
+import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 
 const props = defineProps({
 	id: {
 		type: String,
 		default: null
-	},
-	isEdit: {
-		type: Boolean,
-		default: false
 	}
 });
 
-const editingForm = ref(false);
 const formEl = useTemplateRef('form-ref');
 const reagent = ref(null);
 const loading = ref(false);
-
-const route = useRoute();
-const isEdit = computed(() => props.isEdit || route.query.isEdit === 'true');
+const isEdit = computed(() => $route.value.name === 'reagent-details-edit');
 
 onMounted(() => {
 	setReagent(props.id);
-	editingForm.value = isEdit.value;
 });
 
 const rules = ref({
-	quantityLeft: [{ required: true, message: "Quantity left can't be empty" }],
+	quantityLeft: [requiredRule('Quantity left')],
 	storageLocation: [
-		{ required: true, message: "Storage location can't be empty", trigger: 'change' },
+		requiredRule('Storage location'),
 		{
 			validator: (_, value, callback) => {
 				if (!value.name || value.name.trim() === '') {
@@ -70,25 +63,21 @@ const setReagent = async id => {
 };
 
 const toggleEdit = () => {
-	editingForm.value = !editingForm.value;
-	$router.push({
-		name: 'reagent-details',
-		params: { id: reagent.value.id },
-		query: { isEdit: true }
-	});
+	$router.push({ name: 'reagent-details-edit', params: { id: reagent.value.id } });
 };
 
 const cancelEdit = () => {
-	editingForm.value = false;
-	setReagent(props.id);
-	$router.push({ name: 'reagent-details', params: { id: props.id } });
+	formEl.value.resetFields();
+	$router.push({ name: 'reagent-details', params: { id: reagent.value.id } });
+	$notify({
+		title: 'Canceled',
+		message: 'Reagent deletion canceled',
+		type: 'info'
+	});
 };
 
-const validate = async () => formEl.value.validate();
-
 const handleSubmit = async () => {
-	const valid = await validate();
-	if (!valid) return;
+	if (!(await $isFormValid(formEl))) return;
 	try {
 		const updatedReagent = await $api.reagents.updateReagent(reagent.value.id, reagent.value);
 		reagent.value = updatedReagent;
@@ -97,14 +86,13 @@ const handleSubmit = async () => {
 			message: 'Reagent has been updated',
 			type: 'success'
 		});
-		toggleEdit();
+		$router.push({ name: 'reagent-details', params: { id: reagent.value.id } });
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating reagent');
 	}
 };
 
 const deleteReagent = async () => {
-	cancelEdit();
 	try {
 		await $confirm('Do you want to delete this reagent?', 'Warning', {
 			confirmButtonText: 'OK',
@@ -134,7 +122,7 @@ const deleteReagent = async () => {
 		<el-form
 			v-if="reagent"
 			ref="form-ref"
-			v-loading="loading"
+			v-loading="loading || !reagent"
 			label-position="top"
 			:model="reagent"
 			:rules="rules"
@@ -165,13 +153,13 @@ const deleteReagent = async () => {
 				<el-input v-model="reagent.catalogLink" :disabled="true" />
 			</el-form-item>
 			<el-form-item label="Storage location" prop="storageLocation">
-				<el-input v-model="reagent.storageLocation.name" :disabled="!editingForm" />
+				<el-input v-model="reagent.storageLocation.name" :disabled="!isEdit" />
 			</el-form-item>
 			<el-form-item label="Quantity left" prop="quantityLeft">
 				<el-input-number
 					v-model="reagent.quantityLeft"
 					placeholder="Enter amount"
-					:disabled="!editingForm"
+					:disabled="!isEdit"
 					:min="0"
 				>
 					<template #suffix>
@@ -191,10 +179,14 @@ const deleteReagent = async () => {
 			<el-form-item label="Expiration date" prop="expirationDate">
 				<el-date-picker v-model="reagent.expirationDate" type="date" disabled />
 			</el-form-item>
-			<el-button v-if="editingForm" type="primary" @click="handleSubmit">{{ 'Save' }}</el-button>
-			<el-button v-else type="primary" @click="toggleEdit">{{ 'Edit reagent' }}</el-button>
-			<el-button v-if="editingForm" @click="cancelEdit">Cancel</el-button>
-			<el-button type="danger" @click="deleteReagent">{{ 'Delete reagent' }}</el-button>
+			<template v-if="isEdit">
+				<el-button type="primary" @click="handleSubmit">{{ 'Save' }}</el-button>
+				<el-button @click="cancelEdit">Cancel</el-button>
+			</template>
+			<template v-else>
+				<el-button type="primary" @click="toggleEdit">{{ 'Edit reagent' }}</el-button>
+				<el-button type="danger" @click="deleteReagent">{{ 'Delete reagent' }}</el-button>
+			</template>
 		</el-form>
 	</div>
 </template>
