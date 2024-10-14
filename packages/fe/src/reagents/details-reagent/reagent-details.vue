@@ -1,5 +1,14 @@
 <script setup>
-import { ElForm, ElInput, ElButton, ElFormItem, ElSelect, ElOption } from 'element-plus';
+import {
+	ElForm,
+	ElInput,
+	ElButton,
+	ElFormItem,
+	ElSelect,
+	ElOption,
+	ElDatePicker,
+	ElInputNumber
+} from 'element-plus';
 import { $notifyUserAboutError, $notify } from '../../lib/utils/feedback/notify-msg';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg.js/';
 import { computed, onMounted, useTemplateRef } from 'vue';
@@ -7,12 +16,6 @@ import { ref } from 'vue';
 import { $api } from '../../lib/api/index.js';
 import { $router } from '../../lib/router/router';
 import { useRoute } from 'vue-router';
-import { formatDate } from '../../lib/utils/datetime/date-format.js';
-
-const editingForm = ref(false);
-const formEl = useTemplateRef('form-ref');
-const reagent = ref(null);
-const loading = ref(true);
 
 const props = defineProps({
 	id: {
@@ -24,6 +27,11 @@ const props = defineProps({
 		default: false
 	}
 });
+
+const editingForm = ref(false);
+const formEl = useTemplateRef('form-ref');
+const reagent = ref(null);
+const loading = ref(false);
 
 const route = useRoute();
 const isEdit = computed(() => props.isEdit || route.query.isEdit === 'true');
@@ -51,6 +59,7 @@ const rules = ref({
 });
 
 const setReagent = async id => {
+	loading.value = true;
 	try {
 		reagent.value = await $api.reagents.fetchReagent(id);
 	} catch (error) {
@@ -123,16 +132,14 @@ const deleteReagent = async () => {
 	<div class="reagent-details">
 		<h1>Reagent Details</h1>
 		<el-form
-			v-if="reagent && !loading"
+			v-if="reagent"
 			ref="form-ref"
+			v-loading="loading"
 			label-position="top"
 			:model="reagent"
 			:rules="rules"
 			@submit="handleSubmit"
 		>
-			<el-form-item label="ID" prop="id">
-				<span> {{ reagent.id }}</span>
-			</el-form-item>
 			<el-form-item label="Name" prop="name">
 				<el-input v-model="reagent.name" :disabled="true" />
 			</el-form-item>
@@ -160,8 +167,20 @@ const deleteReagent = async () => {
 			<el-form-item label="Storage location" prop="storageLocation">
 				<el-input v-model="reagent.storageLocation.name" :disabled="!editingForm" />
 			</el-form-item>
-			<el-form-item label="Quantity left" prop="quantityLeft">
+			<!-- <el-form-item label="Quantity left" prop="quantityLeft">
 				<el-input v-model="reagent.quantityLeft" :disabled="!editingForm" />
+			</el-form-item> -->
+			<el-form-item label="Quantity left" prop="quantityLeft">
+				<el-input-number
+					v-model="reagent.quantityLeft"
+					placeholder="Enter amount"
+					:disabled="!editingForm"
+					:min="0"
+				>
+					<template #suffix>
+						{{ editingSample.quantityUnit }}
+					</template>
+				</el-input-number>
 			</el-form-item>
 			<el-form-item label="Quantity" prop="quantity">
 				<el-input v-model="reagent.quantity" :disabled="true" />
@@ -173,14 +192,13 @@ const deleteReagent = async () => {
 				<el-input v-model="reagent.unitPrice" :disabled="true" />
 			</el-form-item>
 			<el-form-item label="Expiration date" prop="expirationDate">
-				<span> {{ formatDate(reagent.expirationDate) }}</span>
+				<el-date-picker v-model="reagent.expirationDate" type="date" disabled />
 			</el-form-item>
 			<el-button v-if="editingForm" type="primary" @click="handleSubmit">{{ 'Save' }}</el-button>
 			<el-button v-else type="primary" @click="toggleEdit">{{ 'Edit reagent' }}</el-button>
 			<el-button v-if="editingForm" @click="cancelEdit">Cancel</el-button>
 			<el-button type="danger" @click="deleteReagent">{{ 'Delete reagent' }}</el-button>
 		</el-form>
-		<div v-else>Loading reagent data...</div>
 	</div>
 </template>
 
