@@ -60,5 +60,10 @@ export const routes = [
 		path: '/storages/new',
 		name: 'new-storage',
 		component: () => import('../../storages/add-new/storage-new.vue')
+	},
+	{
+		path: '/reagents/list',
+		name: 'reagents-list',
+		component: () => import('../../reagents/list/reagent-list.vue')
 	}
 ];
