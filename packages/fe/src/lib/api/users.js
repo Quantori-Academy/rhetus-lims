@@ -1,3 +1,6 @@
+import { userInfo } from '../../../spec/mocks/users.js';
+import { env } from '../../env.js';
+
 export default http => ({
 	async getRoles() {
 		return await http('/roles');
@@ -32,6 +35,8 @@ export default http => ({
 		});
 	},
 	async fetchCurrentUserInfo() {
+		// For some reason, MSW doesn’t start up in time for this request. We need to fix that and remove this workaround.
+		if (env.msw.browser) return userInfo.users[0];
 		return await http('/me');
 	}
 });

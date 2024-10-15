@@ -11,8 +11,11 @@ function createDefaultFormValues() {
 }
 
 const form = ref(createDefaultFormValues());
+const isLoading = ref(false);
 
 async function resetPassword(form) {
+	isLoading.value = true;
+
 	try {
 		const response = await $api.auth.resetUserPassword(form.username);
 		$notify({
@@ -22,6 +25,8 @@ async function resetPassword(form) {
 		});
 	} catch (error) {
 		$notifyUserAboutError(error);
+	} finally {
+		isLoading.value = false;
 	}
 }
 
@@ -31,22 +36,78 @@ function onSubmit() {
 </script>
 
 <template>
-	<div class="wrapper">
-		<el-form :model="form" label-width="auto" label-position="top">
-			<el-form-item label="Username">
-				<el-input v-model="form.username" />
-			</el-form-item>
-			<el-form-item>
-				<el-button type="primary" @click="onSubmit"> Reset Password </el-button>
-			</el-form-item>
-		</el-form>
+	<div class="container">
+		<div class="login-form">
+			<div class="logo-container">
+				<img width="56" height="56" src="../lib/assets/images/logo.svg" alt="" />
+				<div class="logo-title">Rhetus Lims</div>
+			</div>
+
+			<div class="form-container">
+				<el-form
+					:model="form"
+					label-position="top"
+					class="form"
+					@submit.prevent
+					@keyup.enter="onSubmit"
+				>
+					<el-form-item label="Username">
+						<el-input v-model="form.username" class="input" />
+					</el-form-item>
+					<el-form-item>
+						<el-button type="primary" @click="onSubmit"> Reset Password </el-button>
+					</el-form-item>
+				</el-form>
+			</div>
+		</div>
 	</div>
 </template>
 
-<style scoped>
-.wrapper {
-	display: grid;
-	place-content: center;
-	gap: 24px;
+<style scope>
+.container {
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
+	padding-top: 160px;
+	height: 100vh;
+}
+
+.login-form {
+	margin: 0 20px;
+	width: 100%;
+	max-width: 465px;
+}
+
+.logo-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-bottom: 20px;
+
+	.logo-title {
+		margin-top: 20px;
+		font-weight: 700;
+		font-size: 20px;
+	}
+}
+
+.form-container {
+	width: 100%;
+}
+
+.form {
+	.forgot-password {
+		display: flex;
+		justify-content: end;
+		width: 100%;
+
+		a {
+			color: inherit;
+		}
+	}
+
+	.el-button {
+		width: 100%;
+	}
 }
 </style>
