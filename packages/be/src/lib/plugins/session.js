@@ -10,7 +10,7 @@ async function sessionPlugin(fastify) {
 	await fastify.register(fastifySession, {
 		secret: config.sessionSecret,
 		cookie: {
-			secure: config.prod,
+			secure: 'auto',
 			maxAge: 24 * 60 * 60 * 1000
 		},
 		saveUninitialized: false

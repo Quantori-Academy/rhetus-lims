@@ -16,5 +16,14 @@ export default defineConfig({
 		svgSpritemap({
 			pattern: 'icons/*.svg'
 		})
-	]
+	],
+	server: {
+		proxy: {
+			'/api': {
+				target: 'https://vm3.quantori.academy',
+				changeOrigin: true,
+				secure: false
+			}
+		}
+	}
 });
