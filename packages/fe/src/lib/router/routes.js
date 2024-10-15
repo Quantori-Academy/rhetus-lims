@@ -73,5 +73,17 @@ export const routes = [
 		path: '/reagents/list',
 		name: 'reagents-list',
 		component: () => import('../../reagents/list/reagent-list.vue')
+	},
+	{
+		path: '/reagents/:id',
+		name: 'reagent-details',
+		component: () => import('../../reagents/details-reagent/reagent-details.vue'),
+		props: true
+	},
+	{
+		path: '/reagent/:id/edit',
+		name: 'reagent-details-edit',
+		component: () => import('../../reagents/details-reagent/reagent-details.vue'),
+		props: true
 	}
 ];
