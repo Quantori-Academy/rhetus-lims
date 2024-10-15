@@ -1,7 +1,3 @@
-<script>
-import { $route } from '../lib/router/router.js';
-</script>
-
 <template>
 	<div class="top-bar-container">home / {{ $route.name }}</div>
 </template>

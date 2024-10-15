@@ -1,5 +1,5 @@
 <script setup>
-import { inject, ref } from 'vue';
+import { inject } from 'vue';
 import { ElButton } from 'element-plus';
 import RhIcon from '../lib/components/rh-icon.vue';
 import { $route } from '../lib/router/router.js';
