@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, reactive, ref, useTemplateRef } from 'vue';
+import { computed, onMounted, ref, useTemplateRef } from 'vue';
 import {
 	ElInput,
 	ElForm,
@@ -12,32 +12,21 @@ import {
 } from 'element-plus';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg';
-import { $deepClone } from '../../lib/utils/deep-clone/deep-clone';
 import { $api } from '../../lib/api';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg';
 import { $route, $router } from '../../lib/router/router';
-import { formRules } from './constants';
+import { emptySample, formRules } from './constants';
 
 const props = defineProps({ id: { type: String, default: null } });
 
 const formEl = useTemplateRef('form-el');
-const originalSample = ref(null);
-const editingSample = ref(null);
+const sample = ref(emptySample);
 
-const rules = reactive(formRules);
+const rules = ref(formRules);
 
 const isEditing = computed(() => $route.value.name === 'edit-sample');
 const isLoading = ref(true);
 const isSaving = ref(false);
-
-function sampleWasEdited(edited, original) {
-	return !(
-		edited.quantityLeft === original.quantityLeft &&
-		edited.storageLocation.room === original.storageLocation.room &&
-		edited.storageLocation.cabinet === original.storageLocation.cabinet &&
-		edited.storageLocation.shelf === original.storageLocation.shelf
-	);
-}
 
 async function deleteSample() {
 	try {
@@ -68,13 +57,8 @@ async function deleteSample() {
 async function submit() {
 	if (!(await $isFormValid(formEl))) return;
 
-	if (!sampleWasEdited(editingSample.value, originalSample.value)) {
-		toggleEditing();
-		return;
-	}
-
-	if (editingSample.value.quantityLeft <= 0) {
-		await $confirm('Updating quntity left 0 will delete this sample', 'Delete Sample?', {
+	if (sample.value.quantityLeft <= 0) {
+		await $confirm('Updating quntity left to 0 will delete this sample', 'Delete Sample?', {
 			confirmButtonText: 'Delete',
 			type: 'warning'
 		});
@@ -83,10 +67,10 @@ async function submit() {
 	isSaving.value = true;
 
 	try {
-		const response = await $api.samples.updateSample(props.id, editingSample.value);
+		const response = await $api.samples.updateSample(props.id, sample.value);
 		$notify({ message: response.message, type: 'success' });
 
-		if (editingSample.value.quantityLeft <= 0) {
+		if (sample.value.quantityLeft <= 0) {
 			$router.push({ name: 'dashboard' });
 			return;
 		}
@@ -109,8 +93,7 @@ function toggleEditing() {
 async function setSample(id) {
 	try {
 		const res = await $api.samples.fetchSample(id);
-		originalSample.value = $deepClone(res);
-		editingSample.value = $deepClone(res);
+		sample.value = res;
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
@@ -122,18 +105,18 @@ onMounted(() => setSample(props.id));
 </script>
 
 <template>
-	<div v-if="editingSample && !isLoading" class="container">
+	<div v-loading="isLoading" class="container">
 		<div class="header">
-			<div>{{ `${isEditing ? 'Editing ' : ''}${editingSample.name}` }}</div>
+			<div>{{ `${isEditing ? 'Editing ' : ''}${sample.name}` }}</div>
 			<el-button v-if="!isEditing" @click="toggleEditing">Edit</el-button>
 		</div>
-		<el-form ref="form-el" :model="editingSample" :rules="rules" label-position="top">
+		<el-form ref="form-el" :model="sample" :rules="rules" label-position="top">
 			<el-form-item label="Name" prop="name">
-				<el-input v-model="editingSample.name" disabled />
+				<el-input v-model="sample.name" disabled />
 			</el-form-item>
 			<el-form-item label="Reagents/Samples used" prop="reagentsAndSamples">
 				<div class="tags">
-					<el-tag v-for="item of editingSample.reagentsAndSamples" :key="item.id" type="info">
+					<el-tag v-for="item of sample.reagentsAndSamples" :key="item.id" type="info">
 						<router-link
 							class="link"
 							target="_blank"
@@ -146,49 +129,49 @@ onMounted(() => setSample(props.id));
 			</el-form-item>
 			<div class="align-horizontal">
 				<el-form-item label="Quantity unit" prop="quantityUnit">
-					<el-select v-model="editingSample.quantityUnit" filterable disabled />
+					<el-select v-model="sample.quantityUnit" filterable disabled />
 				</el-form-item>
 				<el-form-item label="Size" prop="size">
-					<el-input-number v-model="editingSample.size" disabled>
+					<el-input-number v-model="sample.size" disabled>
 						<template #suffix>
-							{{ editingSample.quantityUnit }}
+							{{ sample.quantityUnit }}
 						</template>
 					</el-input-number>
 				</el-form-item>
 				<el-form-item label="Quantity left" prop="quantityLeft">
 					<el-input-number
-						v-model="editingSample.quantityLeft"
+						v-model="sample.quantityLeft"
 						placeholder="Enter amount"
 						:disabled="!isEditing"
-						min="0"
+						:min="0"
 					>
 						<template #suffix>
-							{{ editingSample.quantityUnit }}
+							{{ sample.quantityUnit }}
 						</template>
 					</el-input-number>
 				</el-form-item>
 			</div>
 			<el-form-item label="Expiration date" prop="expirationDate">
-				<el-date-picker v-model="editingSample.expirationDate" type="date" disabled />
+				<el-date-picker v-model="sample.expirationDate" type="date" disabled />
 			</el-form-item>
 			<div class="align-horizontal">
 				<el-form-item label="Room" prop="storageLocation.room">
 					<el-input
-						v-model="editingSample.storageLocation.room"
+						v-model="sample.storageLocation.room"
 						placeholder="Enter room"
 						:disabled="!isEditing"
 					/>
 				</el-form-item>
 				<el-form-item label="Cabinet" prop="storageLocation.cabinet">
 					<el-input
-						v-model="editingSample.storageLocation.cabinet"
+						v-model="sample.storageLocation.cabinet"
 						placeholder="Enter cabinet"
 						:disabled="!isEditing"
 					/>
 				</el-form-item>
 				<el-form-item label="Shelf" prop="storageLocation.shelf">
 					<el-input
-						v-model="editingSample.storageLocation.shelf"
+						v-model="sample.storageLocation.shelf"
 						placeholder="Enter shelf"
 						:disabled="!isEditing"
 					/>
@@ -196,7 +179,7 @@ onMounted(() => setSample(props.id));
 			</div>
 			<el-form-item label="Description" prop="description">
 				<el-input
-					v-model="editingSample.description"
+					v-model="sample.description"
 					type="textarea"
 					placeholder="Enter description"
 					disabled
@@ -211,7 +194,6 @@ onMounted(() => setSample(props.id));
 			</div>
 		</el-form>
 	</div>
-	<div v-else class="title">Loading sample...</div>
 </template>
 
 <style>

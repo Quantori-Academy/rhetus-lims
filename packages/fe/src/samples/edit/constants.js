@@ -19,3 +19,18 @@ export const formRules = {
 		shelf: [requiredRule]
 	}
 };
+
+export const emptySample = {
+	name: '',
+	reagentsAndSamples: [],
+	quantityUnit: '',
+	size: 1,
+	quantityLeft: 1,
+	expirationDate: '',
+	storageLocation: {
+		room: '',
+		cabinet: '',
+		shelf: ''
+	},
+	description: ''
+};
