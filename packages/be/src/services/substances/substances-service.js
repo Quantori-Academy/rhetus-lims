@@ -98,6 +98,19 @@ async function substancesService(server) {
 			const orderSubqueries = generateOrderSubquery(sort, sortDictionary);
 
 			return query.orderBy(...orderSubqueries);
+		},
+
+		changeSubstanceQuantity: async (id, data) => {
+			//TODO: add sample logic after it will be implemented
+			const { code, status, message } = await server.reagentsService.changeReagentQuantity(
+				id,
+				data
+			);
+			// data.category === 'reagent'
+			// 	? server.reagentsService.changeReagentQuantity(id, data)
+			// 	: server.samplesService.changeSampleQuantity(id, data);
+
+			return { code, status, message };
 		}
 	});
 }
