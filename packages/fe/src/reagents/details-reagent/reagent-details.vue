@@ -177,6 +177,7 @@ const deleteReagent = async (reachedZero = false) => {
 					/>
 				</el-select>
 			</el-form-item>
+
 			<el-form-item label="Quantity left" prop="quantityLeft">
 				<el-input-number
 					v-model="reagent.quantityLeft"
