@@ -1,132 +1,170 @@
 <script setup>
-import { ref } from 'vue';
-import { ElRow, ElButton } from 'element-plus';
-import RhIcon from '~/lib/components/rh-icon.vue';
+import { inject, ref } from 'vue';
+import { ElButton } from 'element-plus';
+import RhIcon from '../lib/components/rh-icon.vue';
+import { $route } from '../lib/router/router.js';
+import { navigationLink } from './constants.js';
 
-const menu = ref(true);
-
-const handleSidebarClose = () => {
-	menu.value = false;
-};
-
-const handleSidebarOpen = () => {
-	menu.value = true;
-};
+const { user } = inject('user');
 </script>
 
 <template>
-	<div :class="['sidebar', { open: menu }]">
-		<nav v-if="menu" class="menu">
-			<el-row class="show-row">
-				<img class="logo" src="../lib/assets/images/logo.svg" />
-				<el-button circle class="mobile" @click="handleSidebarClose">
-					<rh-icon name="angle-left"></rh-icon>
+	<nav class="sidebar">
+		<div class="user-bar">
+			<router-link class="logo" to="/">
+				<img src="../lib/assets/images/logo.svg" width="30" height="30" alt="Rhetus logo" />
+			</router-link>
+
+			<div class="toggle-and-profile">
+				<el-button>
+					<rh-icon name="envelope" angle="-90deg" size="22" />
 				</el-button>
-			</el-row>
 
-			<el-row class="link">
-				<router-link to="/profile">
-					<rh-icon name="user"></rh-icon>
-					<span>Profile</span>
-				</router-link>
-			</el-row>
-
-			<el-row class="link">
-				<router-link to="/users/list">
-					<rh-icon name="users"></rh-icon>
-					<span>Users List</span>
-				</router-link>
-			</el-row>
-
-			<el-row class="link">
-				<router-link to="/storages/list">
-					<rh-icon name="building"></rh-icon>
-					<span>Storages</span>
-				</router-link>
-			</el-row>
-
-			<el-row class="link">
-				<router-link to="/reagents/list">
-					<rh-icon name="asteriks"></rh-icon>
-					<span>Reagents List</span>
-				</router-link>
-			</el-row>
-		</nav>
-	</div>
-
-	<div v-if="!menu" class="header">
-		<el-row class="show-row">
-			<el-button circle @click="handleSidebarOpen">
-				<rh-icon name="angle-right"></rh-icon>
-			</el-button>
-		</el-row>
-	</div>
+				<div class="profile">
+					<router-link v-if="user" to="/profile">{{ user.username.slice(0, 2) }}</router-link>
+				</div>
+			</div>
+		</div>
+		<div class="navigation">
+			<div class="project-name">Rhetus</div>
+			<ul class="navigation-list">
+				<li
+					v-for="link of navigationLink"
+					:key="link.name"
+					:class="{ 'active-route': $route.path === link.path }"
+				>
+					<router-link :to="link.path">
+						<div class="active-route-marker"></div>
+						<rh-icon :name="link.icon" />
+						{{ link.name }}
+					</router-link>
+				</li>
+			</ul>
+		</div>
+	</nav>
 </template>
 
-<style scoped>
+<style>
 .sidebar {
 	position: fixed;
-	width: 250px;
-	height: 100%;
-	overflow: hidden;
-	transition: width 0.3s ease;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	display: flex;
+	flex-direction: column;
 
-	.menu {
-		padding-top: 1rem;
-		height: 100%;
-		background-color: #f2f3f8;
+	width: 18rem;
+	background-color: #fbfafd;
+}
 
-		.link {
-			padding: 0;
-			height: 50px;
+.user-bar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 8px 12px;
+	padding-bottom: 16px;
+	background-color: #eeecf0;
+
+	.logo {
+		display: flex;
+		align-items: center;
+		padding: 4px 4px;
+		border-radius: 6px;
+
+		&:hover {
+			background-color: #d6d5d9;
+		}
+	}
+
+	.toggle-and-profile {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+
+		button {
+			width: 36px;
+			height: 36px;
+			border: none;
+			background: transparent;
 
 			&:hover {
-				background-color: #c0c0c0;
+				background-color: #d6d5d9;
 			}
+		}
+	}
 
+	.profile {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		width: 36px;
+		height: 36px;
+		border-radius: 6px;
+
+		&:hover {
+			background-color: #d6d5d9;
+		}
+
+		a {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 32px;
+			height: 32px;
+			border: 1px solid #d6d5d9;
+			border-radius: 100%;
+			background: #fbfafd;
+			color: inherit;
+			text-decoration: none;
+		}
+	}
+}
+
+.navigation {
+	.project-name {
+		padding: 12px 16px;
+		font-weight: 700;
+	}
+
+	.navigation-list {
+		padding: 0;
+		list-style: none;
+
+		.active-route-marker {
+			width: 3px;
+			height: 20px;
+			border-radius: 6px;
+			background-color: transparent;
+		}
+
+		li {
 			a {
 				display: flex;
 				align-items: center;
-				padding: 0 20px;
-				width: 100%;
-				color: #080808;
+				gap: 8px;
+				margin: 4px;
+				padding: 4px 8px;
+				border-radius: 6px;
+				color: inherit;
 				text-decoration: none;
+				font-size: 16px;
+
+				&:hover {
+					background-color: #e1e0e4;
+				}
 			}
 		}
-	}
-	.show-row {
-		justify-content: space-between;
-		padding: 0 20px 40px;
-		color: #080808;
-		font-size: 1.5rem;
-	}
-	.logo {
-		width: 30px;
-		height: 30px;
-	}
-}
-.mobile {
-	display: none;
-}
-.header {
-	position: fixed;
-	height: 30px;
-}
-@media (max-width: 768px) {
-	.sidebar {
-		z-index: 2;
-		width: 100%;
-		max-width: 250px;
-		transform: translateX(-250px);
-		transition: transform 0.3s ease;
 
-		&.open {
-			transform: translateX(0);
+		.active-route {
+			.active-route-marker {
+				background-color: blue;
+			}
+
+			a {
+				background-color: #e1e0e4;
+			}
 		}
-	}
-
-	.mobile {
-		display: inline-flex;
 	}
 }
 </style>

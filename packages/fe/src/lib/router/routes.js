@@ -1,3 +1,5 @@
+import LoginLayout from './layout/login-layout.vue';
+
 export const routes = [
 	{
 		path: '/',
@@ -22,12 +24,18 @@ export const routes = [
 	{
 		path: '/login',
 		name: 'login',
-		component: () => import('../../login/login-page.vue')
+		component: () => import('../../login/login-page.vue'),
+		meta: {
+			layout: LoginLayout
+		}
 	},
 	{
 		path: '/reset-password',
 		name: 'reset-password',
-		component: () => import('../../reset-password/reset-password.vue')
+		component: () => import('../../reset-password/reset-password.vue'),
+		meta: {
+			layout: LoginLayout
+		}
 	},
 	{
 		path: '/users/:id',

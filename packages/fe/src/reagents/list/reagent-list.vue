@@ -108,10 +108,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.reagent-table {
-	padding-left: 15rem;
-	width: 90vw;
-}
 .reagent__action-buttons {
 	display: flex;
 	flex-direction: row;

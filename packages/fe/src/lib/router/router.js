@@ -8,4 +8,6 @@ const $router = createRouter({
 	routes
 });
 
-export { $router };
+const $route = $router.currentRoute;
+
+export { $router, $route };
