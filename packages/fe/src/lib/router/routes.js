@@ -81,12 +81,6 @@ export const routes = [
 		props: true
 	},
 	{
-		path: '/reagents/edit/:id',
-		name: 'reagent-details-edit',
-		component: () => import('../../reagents/details-reagent/reagent-details.vue'),
-		props: true
-	},
-	{
 		path: '/reagent/:id/edit',
 		name: 'reagent-details-edit',
 		component: () => import('../../reagents/details-reagent/reagent-details.vue'),
