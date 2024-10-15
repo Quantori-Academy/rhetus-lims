@@ -11,8 +11,7 @@ import {
 } from 'element-plus';
 import { $notifyUserAboutError, $notify } from '../../lib/utils/feedback/notify-msg';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg.js/';
-import { computed, onMounted, useTemplateRef } from 'vue';
-import { ref } from 'vue';
+import { computed, onMounted, useTemplateRef, ref } from 'vue';
 import { $api } from '../../lib/api/index.js';
 import { $route, $router } from '../../lib/router/router';
 import { requiredRule } from './constants.js';
@@ -29,6 +28,7 @@ const formEl = useTemplateRef('form-ref');
 const reagent = ref(null);
 const loading = ref(false);
 const storages = ref([]);
+const storageDisplayValue = ref('');
 const isEdit = computed(() => $route.value.name === 'reagent-details-edit');
 
 onMounted(() => {
@@ -37,25 +37,17 @@ onMounted(() => {
 });
 
 const rules = ref({
-	quantityLeft: [requiredRule('Quantity left')],
-	storageLocation: [
-		requiredRule('Storage location'),
-		{
-			validator: (_, value, callback) => {
-				if (!value.name || value.name.trim() === '') {
-					callback(new Error("Storage location can't be empty"));
-				} else {
-					callback();
-				}
-			},
-			trigger: 'change'
-		}
-	]
+	quantityLeft: [requiredRule('Quantity left')]
 });
+
 async function setStorages() {
 	try {
 		const data = await $api.storages.fetchStorages();
 		storages.value = data.storages;
+		const foundStorage = storages.value.find(
+			storage => storage.id === reagent.value.storageLocationId
+		);
+		storageDisplayValue.value = foundStorage ? foundStorage.name : 'Select a storage';
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
@@ -162,16 +154,21 @@ const deleteReagent = async () => {
 			<el-form-item label="Catalog link" prop="catalogLink">
 				<el-input v-model="reagent.catalogLink" :disabled="true" />
 			</el-form-item>
-			<el-form-item label="Storage location" prop="storageLocation">
-				<el-select v-model="reagent.storageLocation.name" :disabled="!isEdit">
+			<el-form-item label="Storage location" prop="storageLocationId">
+				<el-select
+					v-model="reagent.storageLocationId"
+					:disabled="!isEdit"
+					:placeholder="reagent && storageDisplayValue"
+				>
 					<el-option
 						v-for="storage of storages"
 						:key="storage.id"
 						:label="storage.name"
 						:value="storage.id"
-					></el-option>
+					/>
 				</el-select>
 			</el-form-item>
+
 			<el-form-item label="Quantity left" prop="quantityLeft">
 				<el-input-number
 					v-model="reagent.quantityLeft"
@@ -179,9 +176,6 @@ const deleteReagent = async () => {
 					:disabled="!isEdit"
 					:min="0"
 				>
-					<template #suffix>
-						{{ editingSample.quantityUnit }}
-					</template>
 				</el-input-number>
 			</el-form-item>
 			<el-form-item label="Quantity" prop="quantity">

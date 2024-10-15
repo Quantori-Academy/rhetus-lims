@@ -43,10 +43,7 @@ const reagentDetails = [
 		quantity: 500,
 		unitPrice: 12.5,
 		quantityLeft: 25.0,
-		storageLocation: {
-			id: 1,
-			name: 'Shelf A1'
-		},
+		storageLocationId: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',
 		expirationDate: '2025-05-15T00:00:00.000Z'
 	},
 	{
@@ -62,10 +59,7 @@ const reagentDetails = [
 		unitSize: '1 L bottle',
 		unitPrice: 8.99,
 		quantityLeft: 15.0,
-		storageLocation: {
-			id: 2,
-			name: 'Cabinet B2'
-		},
+		storageLocationId: 'c7b3d8e0-5e0b-4b0f-8b3a-3b93f5g6d6d4g6g',
 		expirationDate: '2024-11-30T00:00:00.000Z'
 	},
 	{
@@ -82,10 +76,7 @@ const reagentDetails = [
 		quantity: 1000,
 		unitPrice: 8.99,
 		quantityLeft: 15.0,
-		storageLocation: {
-			id: 2,
-			name: 'Cabinet B2'
-		},
+		storageLocationId: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',
 		expirationDate: '2024-11-30T00:00:00.000Z'
 	}
 ];
