@@ -28,10 +28,12 @@ const props = defineProps({
 const formEl = useTemplateRef('form-ref');
 const reagent = ref(null);
 const loading = ref(false);
+const storages = ref([]);
 const isEdit = computed(() => $route.value.name === 'reagent-details-edit');
 
 onMounted(() => {
 	setReagent(props.id);
+	setStorages();
 });
 
 const rules = ref({
@@ -50,6 +52,14 @@ const rules = ref({
 		}
 	]
 });
+async function setStorages() {
+	try {
+		const data = await $api.storages.fetchStorages();
+		storages.value = data.storages;
+	} catch (error) {
+		$notifyUserAboutError(error);
+	}
+}
 
 const setReagent = async id => {
 	loading.value = true;
@@ -153,7 +163,14 @@ const deleteReagent = async () => {
 				<el-input v-model="reagent.catalogLink" :disabled="true" />
 			</el-form-item>
 			<el-form-item label="Storage location" prop="storageLocation">
-				<el-input v-model="reagent.storageLocation.name" :disabled="!isEdit" />
+				<el-select v-model="reagent.storageLocation.name" :disabled="!isEdit">
+					<el-option
+						v-for="storage of storages"
+						:key="storage.id"
+						:label="storage.name"
+						:value="storage.id"
+					></el-option>
+				</el-select>
 			</el-form-item>
 			<el-form-item label="Quantity left" prop="quantityLeft">
 				<el-input-number
@@ -177,7 +194,13 @@ const deleteReagent = async () => {
 				<el-input v-model="reagent.unitPrice" :disabled="true" />
 			</el-form-item>
 			<el-form-item label="Expiration date" prop="expirationDate">
-				<el-date-picker v-model="reagent.expirationDate" type="date" disabled />
+				<el-date-picker
+					v-model="reagent.expirationDate"
+					type="date"
+					format="YYYY-MM-DD"
+					value-format="YYYY-MM-DD"
+					disabled
+				/>
 			</el-form-item>
 			<template v-if="isEdit">
 				<el-button type="primary" @click="handleSubmit">{{ 'Save' }}</el-button>
