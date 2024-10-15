@@ -41,7 +41,7 @@ async function deleteSample() {
 				message: response.message,
 				type: 'success'
 			});
-			$router.push({ name: 'dashboard' });
+			$router.push({ name: 'reagents-list' });
 		} catch (error) {
 			$notifyUserAboutError(error);
 		}
@@ -71,7 +71,7 @@ async function submit() {
 		$notify({ message: response.message, type: 'success' });
 
 		if (sample.value.quantityLeft <= 0) {
-			$router.push({ name: 'dashboard' });
+			$router.push({ name: 'reagents-list' });
 			return;
 		}
 
