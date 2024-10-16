@@ -1,5 +1,5 @@
 {
-  "id": "77b7bc0e-28b3-41c3-b60b-6fb5d1052433",
+  "id": "08552b5d-20dc-4777-9c39-e0e279c4183f",
   "prevId": "6ceb19c5-2128-4ce6-ba00-211049b5c0ec",
   "version": "7",
   "dialect": "postgresql",
@@ -127,93 +127,6 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.substances_quantity_changes": {
-      "name": "substances_quantity_changes",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "uuid_generate_v4()"
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "reagent_id": {
-          "name": "reagent_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "sample_id": {
-          "name": "sample_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "previous_value": {
-          "name": "previous_value",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "target_value": {
-          "name": "target_value",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "change_reason": {
-          "name": "change_reason",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "substances_quantity_changes_user_id_users_id_fk": {
-          "name": "substances_quantity_changes_user_id_users_id_fk",
-          "tableFrom": "substances_quantity_changes",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "substances_quantity_changes_reagent_id_reagents_id_fk": {
-          "name": "substances_quantity_changes_reagent_id_reagents_id_fk",
-          "tableFrom": "substances_quantity_changes",
-          "tableTo": "reagents",
-          "columnsFrom": [
-            "reagent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
     "public.users": {
       "name": "users",
       "schema": "",
@@ -270,7 +183,8 @@
           "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         },
         "password_reset_status": {
           "name": "password_reset_status",
@@ -279,6 +193,13 @@
           "primaryKey": false,
           "notNull": false,
           "default": "'none'"
+        },
+        "deleted": {
+          "name": "deleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
         }
       },
       "indexes": {},
