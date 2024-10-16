@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { ElTable, ElTableColumn, ElButton, ElTooltip } from 'element-plus';
+import { ElTable, ElTableColumn, ElButton } from 'element-plus';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { $api } from '../../lib/api/index.js';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
@@ -32,15 +32,23 @@ async function deleteStorageLocation(id) {
 				type: 'warning'
 			}
 		);
-		const response = await $api.storages.deleteStorage(id);
+		try {
+			const response = await $api.storages.deleteStorage(id);
+			$notify({
+				title: 'Success',
+				message: response.message,
+				type: 'success'
+			});
+			await setStorages();
+		} catch (err) {
+			$notifyUserAboutError(err);
+		}
+	} catch {
 		$notify({
-			title: 'Success',
-			message: response.message,
-			type: 'success'
+			title: 'Canceled',
+			message: 'Deletion canceled',
+			type: 'info'
 		});
-		await setStorages();
-	} catch (err) {
-		$notifyUserAboutError(err);
 	}
 }
 
@@ -71,29 +79,23 @@ onMounted(() => {
 			<el-table-column prop="room" label="Room" width="180" />
 			<el-table-column prop="name" label="Name" width="180" />
 			<el-table-column prop="description" label="Description" width="180" />
-			<el-table-column width="80">
+			<el-table-column>
 				<template #default="{ row }">
-					<el-tooltip class="box-item" effect="dark" content="View content" placement="top-end">
-						<el-button @click="() => viewStorageLocation(row.id)"><rh-icon name="eye" /></el-button>
-					</el-tooltip>
+					<el-button @click="() => viewStorageLocation(row.id)"><rh-icon name="eye" /></el-button>
 				</template>
 			</el-table-column>
-			<el-table-column width="80">
+			<el-table-column>
 				<template #default="{ row }">
-					<el-tooltip class="box-item" effect="dark" content="Edit" placement="top-end">
-						<el-button @click="() => editStorageLocation(row.id)"
-							><rh-icon name="pencil"
-						/></el-button>
-					</el-tooltip>
+					<el-button @click="() => editStorageLocation(row.id)"
+						><rh-icon name="pencil"
+					/></el-button>
 				</template>
 			</el-table-column>
-			<el-table-column width="80">
+			<el-table-column>
 				<template #default="{ row }">
-					<el-tooltip class="box-item" effect="dark" content="Delete" placement="top-end">
-						<el-button type="danger" @click="() => deleteStorageLocation(row.id)">
-							<rh-icon color="white" name="trash" />
-						</el-button>
-					</el-tooltip>
+					<el-button type="danger" @click="() => deleteStorageLocation(row.id)">
+						<rh-icon color="white" name="trash" />
+					</el-button>
 				</template>
 			</el-table-column>
 		</el-table>
