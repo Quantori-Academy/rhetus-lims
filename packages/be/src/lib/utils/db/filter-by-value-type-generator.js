@@ -13,7 +13,9 @@ function generateArrayFilter(filterData, optionProperty, formatMapping) {
 
 	return inArray(
 		filterKey,
-		value.map(item => formatMapping[optionProperty](item))
+		Object.entries(formatMapping).length !== 0
+			? value.map(item => formatMapping[optionProperty](item))
+			: value
 	);
 }
 
@@ -28,7 +30,10 @@ function generateFilterByValueType(filterData, optionProperty, formatMapping) {
 		return generateDateFilter(filterKey, value);
 	}
 
-	return generateDefaultFilter(filterKey, formatMapping[optionProperty](value));
+	return generateDefaultFilter(
+		filterKey,
+		Object.entries(formatMapping).length !== 0 ? formatMapping[optionProperty](value) : value
+	);
 }
 
 export { generateFilterByValueType };
