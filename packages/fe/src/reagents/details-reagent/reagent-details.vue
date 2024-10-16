@@ -30,6 +30,7 @@ const loading = ref(false);
 const storages = ref([]);
 const storageDisplayValue = ref('');
 const isEdit = computed(() => $route.value.name === 'reagent-details-edit');
+const isOutOfStock = computed(() => reagent.value.quantityLeft === 0);
 
 onMounted(() => {
 	setReagent(props.id);
@@ -83,7 +84,7 @@ const handleSubmit = async () => {
 	try {
 		const updatedReagent = await $api.reagents.updateReagent(reagent.value.id, reagent.value);
 		reagent.value = updatedReagent;
-		if (reagent.value.quantityLeft === 0) {
+		if (isOutOfStock.value) {
 			await deleteReagent(true);
 		} else {
 			$notify({
