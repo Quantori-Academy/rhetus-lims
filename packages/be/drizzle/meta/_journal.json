@@ -78,6 +78,13 @@
       "when": 1728994931671,
       "tag": "0010_hot_power_pack",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1729089494054,
+      "tag": "0012_fuzzy_timeslip",
+      "breakpoints": true
     }
   ]
 }

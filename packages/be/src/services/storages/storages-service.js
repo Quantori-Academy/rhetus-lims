@@ -4,7 +4,10 @@ import { generateFilterSubquery } from '../../lib/utils/db/filter-subquery-gener
 import { generateOrderSubquery } from '../../lib/utils/db/order-subquery-generator.js';
 import fp from 'fastify-plugin';
 
-const formatMapping = {};
+const formatMapping = {
+	name: string => `${string.charAt(0).toUpperCase()}${string.slice(1).toLowerCase()}`,
+	room: string => `${string.charAt(0).toUpperCase()}${string.slice(1).toLowerCase()}`
+};
 
 const optionsDictionary = {
 	name: {
@@ -28,10 +31,9 @@ async function storagesService(server) {
 			const result = await server.db
 				.insert(schema.storages)
 				.values({
-					name: name,
-					room: room,
-					description: description,
-					createdAt: new Date()
+					name: formatMapping.name(name),
+					room: formatMapping.room(room),
+					description
 				})
 				.returning({ name: schema.storages.name });
 			return result.length ? result[0].name : null;

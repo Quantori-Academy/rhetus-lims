@@ -8,6 +8,6 @@ export const storages = pgTable('storages', {
 	room: varchar('room', { length: 300 }).notNull(),
 	name: varchar('name', { length: 300 }).notNull(),
 	description: text('description'),
-	createdAt: timestamp('created_at').notNull(),
+	createdAt: timestamp('created_at').notNull().defaultNow(),
 	deleted: boolean('deleted').default(false)
 });

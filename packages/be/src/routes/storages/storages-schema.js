@@ -21,6 +21,7 @@ const createStorage = {
 };
 
 const getStorages = {
+	security: [{ Session: [] }],
 	response: {
 		200: S.object()
 			.prop('storages', S.array().items(Storage.without(['createdAt'])))
