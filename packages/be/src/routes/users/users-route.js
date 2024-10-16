@@ -16,10 +16,10 @@ async function users(server, options) {
 
 	async function onCreateUser(req, reply) {
 		try {
-			const isUserExist = await server.usersService.getUserByUsername(req.body.username);
+			const isUniqUsername = await server.usersService.isUniqUsername(req.body.username);
 
-			if (isUserExist) {
-				reply
+			if (!isUniqUsername) {
+				return reply
 					.code(409)
 					.send({ status: 'error', message: `Sorry. User '${req.body.username}' already exists` });
 			}
@@ -163,7 +163,7 @@ async function users(server, options) {
 				});
 			}
 
-			const username = await server.usersService.deleteUser(userId);
+			const username = await server.usersService.softDeleteUser(userId);
 
 			return reply.code(200).send({ status: 'success', message: `User '${username}' was deleted` });
 		} catch (err) {

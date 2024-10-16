@@ -57,8 +57,7 @@ async function usersService(server) {
 					lastName: formatMapping.lastName(lastName),
 					email: formatMapping.email(email),
 					roleId,
-					lastLogin: null,
-					createdAt: new Date()
+					lastLogin: null
 				})
 				.returning({ username: schema.users.username });
 
@@ -69,7 +68,9 @@ async function usersService(server) {
 			const result = await server.db
 				.select()
 				.from(schema.users)
-				.where(eq(schema.users.username, username.toLowerCase()));
+				.where(
+					and(eq(schema.users.username, username.toLowerCase()), eq(schema.users.deleted, false))
+				);
 
 			return result[0];
 		},
@@ -87,11 +88,12 @@ async function usersService(server) {
 						name: schema.roles.name
 					},
 					createdAt: schema.users.createdAt,
-					hasPasswordResetRequests: eq(schema.users.passwordResetStatus, Status.ACTIVE)
+					hasPasswordResetRequests: eq(schema.users.passwordResetStatus, Status.ACTIVE),
+					deleted: schema.users.deleted
 				})
 				.from(schema.users)
 				.innerJoin(schema.roles, eq(schema.users.roleId, schema.roles.id))
-				.where(eq(schema.users.id, id));
+				.where(and(eq(schema.users.id, id), eq(schema.users.deleted, false)));
 
 			return result[0];
 		},
@@ -118,12 +120,13 @@ async function usersService(server) {
 					lastLogin: schema.users.lastLogin
 				})
 				.from(schema.users)
-				.innerJoin(schema.roles, eq(schema.users.roleId, schema.roles.id));
+				.innerJoin(schema.roles, eq(schema.users.roleId, schema.roles.id))
+				.where(eq(schema.users.deleted, false));
 
 			if (options) {
 				const filterSubQueries = generateFilterSubquery(options, formatMapping, optionsDictionary);
 
-				query.where(and(...filterSubQueries));
+				query.where(and(...filterSubQueries, eq(schema.users.deleted, false)));
 			}
 
 			const count = await query;
@@ -153,9 +156,10 @@ async function usersService(server) {
 			return result.length ? result[0].username : null;
 		},
 
-		deleteUser: async id => {
+		softDeleteUser: async id => {
 			const result = await server.db
-				.delete(schema.users)
+				.update(schema.users)
+				.set({ deleted: true })
 				.where(eq(schema.users.id, id))
 				.returning({ username: schema.users.username });
 
@@ -218,6 +222,15 @@ async function usersService(server) {
 				status: 'success',
 				message: `User '${username}' was updated`
 			};
+		},
+
+		isUniqUsername: async username => {
+			const result = await server.db
+				.select()
+				.from(schema.users)
+				.where(eq(schema.users.username, username.toLowerCase()));
+
+			return result.length === 0;
 		}
 	});
 }
