@@ -77,7 +77,7 @@ async function submit() {
 
 		toggleEditing();
 	} catch (error) {
-		$notifyUserAboutError(error.statusText);
+		$notifyUserAboutError(error);
 	} finally {
 		isSaving.value = false;
 	}
@@ -91,6 +91,7 @@ function toggleEditing() {
 }
 
 async function setSample(id) {
+	isLoading.value = true;
 	try {
 		const res = await $api.samples.fetchSample(id);
 		sample.value = res;
