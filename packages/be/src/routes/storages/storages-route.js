@@ -49,7 +49,7 @@ async function storages(server, options) {
 
 	async function onGetStorage(req, reply) {
 		try {
-			const storageId = Number(req.params.id);
+			const storageId = req.params.id;
 			const storage = await server.storagesService.getStorageById(storageId);
 			if (!storage) {
 				return reply.code(404).send({ status: 'error', message: `No such storage location found` });
@@ -70,7 +70,7 @@ async function storages(server, options) {
 
 	async function onUpdateStorage(req, reply) {
 		try {
-			const storageId = Number(req.params.id);
+			const storageId = req.params.id;
 			const storage = await server.storagesService.getStorageById(storageId);
 			if (!storage) {
 				return reply.code(404).send({ status: 'error', message: `No such storage location found` });
@@ -92,11 +92,22 @@ async function storages(server, options) {
 
 	async function onDeleteStorage(req, reply) {
 		try {
-			const storageId = Number(req.params.id);
+			const storageId = req.params.id;
 			const storage = await server.storagesService.getStorageById(storageId);
 			if (!storage) {
 				return reply.code(404).send({ status: 'error', message: `No such storage location found` });
 			}
+			//TODO: before delete should check that current storage don't have reagents
+			// const isReagentsInside = await server.reagentsService.getReagentsByStorageId(storageId);
+
+			// if(isReagentsInside) {
+			// 	return reply.code(409).send({ status: 'error', message: `This storage has reagents` });
+			// }
+
+			const storageName = await server.storagesService.softDeleteStorage(storageId);
+			return reply
+				.code(200)
+				.send({ status: 'success', message: `Storage '${storageName}' was deleted` });
 		} catch (err) {
 			return reply.code(500).send(err);
 		}

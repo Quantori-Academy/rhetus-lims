@@ -5,7 +5,7 @@ const statusMessage = S.object()
 	.prop('message', S.string().required());
 
 const Storage = S.object()
-	.prop('id', S.number().required().minimum(1))
+	.prop('id', S.string().format(S.FORMATS.UUID).required())
 	.prop('room', S.string().required().maxLength(300))
 	.prop('name', S.string().required().maxLength(300))
 	.prop('description', S.string())
@@ -66,4 +66,4 @@ const deleteStorage = {
 	}
 };
 
-export { createStorage, getStorages, getStorage, updateStorage, deleteStorage };
+export { createStorage, getStorages, getStorage, updateStorage, deleteStorage, Storage };
