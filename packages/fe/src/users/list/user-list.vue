@@ -7,6 +7,7 @@ import { $confirm } from '../../lib/utils/feedback/confirm-msg';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { formatDate } from '../../lib/utils/datetime/date-format.js';
 import { $router } from '../../lib/router/router.js';
+import RhFiltering from '../../lib/components/rh-filtering.vue';
 
 const users = ref([]);
 const isLoading = ref(false);
@@ -73,7 +74,11 @@ onMounted(() => {
 
 <template>
 	<div>
-		<el-button class="add-button" type="primary" @click="addNewUser">Add New User</el-button>
+		<rh-filtering>
+			<template #action-buttons></template>
+			<el-button class="add-button" type="primary" @click="addNewUser">Add New User</el-button>
+			<template #filters></template>
+		</rh-filtering>
 
 		<el-table v-loading="isLoading" :data="users">
 			<el-table-column prop="username" min-width="150" label="User name" />
