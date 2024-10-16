@@ -11,16 +11,16 @@ export const routes = [
 		name: 'users-list',
 		component: () => import('../../users/list/user-list.vue'),
 		meta: {
-			authorities: ['administrator'],
-		},
+			authorities: ['administrator']
+		}
 	},
 	{
 		path: '/users/new',
 		name: 'new-user',
 		component: () => import('../../users/new/add-new-user.vue'),
 		meta: {
-			authorities: ['administrator'],
-		},
+			authorities: ['administrator']
+		}
 	},
 	{
 		path: '/login',
@@ -44,8 +44,8 @@ export const routes = [
 		component: () => import('../../user-details/user-details.vue'),
 		props: true,
 		meta: {
-			authorities: ['administrator'],
-		},
+			authorities: ['administrator']
+		}
 	},
 	{
 		path: '/profile',
@@ -80,16 +80,16 @@ export const routes = [
 		component: () => import('../../storages/edit/storage-edit.vue'),
 		props: true,
 		meta: {
-			authorities: ['administrator'],
-		},
+			authorities: ['administrator']
+		}
 	},
 	{
 		path: '/storages/new',
 		name: 'new-storage',
 		component: () => import('../../storages/add-new/storage-new.vue'),
 		meta: {
-			authorities: ['administrator'],
-		},
+			authorities: ['administrator']
+		}
 	},
 	{
 		path: '/reagents/list',
