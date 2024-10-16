@@ -2,7 +2,7 @@
 import { ElForm, ElInput, ElButton, ElFormItem } from 'element-plus';
 import { ref } from 'vue';
 import { $api } from '../lib/api/index.js';
-import { $notifyUserAboutError, $notify } from '../../src/lib/utils/feedback/notify-msg.js';
+import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg.js';
 
 function createDefaultFormValues() {
 	return {

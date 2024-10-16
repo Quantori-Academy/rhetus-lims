@@ -183,7 +183,6 @@ const deleteUser = async () => {
 
 <template>
 	<div class="wrapper">
-		<h1>User Details</h1>
 		<el-form
 			v-if="user && !loading"
 			ref="form-ref"

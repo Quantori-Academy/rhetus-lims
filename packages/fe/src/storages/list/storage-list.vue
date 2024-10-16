@@ -42,7 +42,6 @@ onMounted(() => {
 
 <template>
 	<div class="wrapper">
-		<h1>Storage Location Management</h1>
 		<el-button class="add-button" type="primary" @click="addNewStorageLocation"
 			>Add New Storage Location</el-button
 		>

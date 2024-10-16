@@ -120,7 +120,6 @@ const deleteReagent = async () => {
 
 <template>
 	<div class="reagent-details">
-		<h1>Reagent Details</h1>
 		<el-form
 			v-if="reagent"
 			ref="form-ref"
