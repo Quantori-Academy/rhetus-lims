@@ -9,12 +9,18 @@ export const routes = [
 	{
 		path: '/users/list',
 		name: 'users-list',
-		component: () => import('../../users/list/user-list.vue')
+		component: () => import('../../users/list/user-list.vue'),
+		meta: {
+			authorities: ['administrator'],
+		},
 	},
 	{
 		path: '/users/new',
 		name: 'new-user',
-		component: () => import('../../users/new/add-new-user.vue')
+		component: () => import('../../users/new/add-new-user.vue'),
+		meta: {
+			authorities: ['administrator'],
+		},
 	},
 	{
 		path: '/login',
@@ -36,7 +42,10 @@ export const routes = [
 		path: '/users/:id',
 		name: 'user-details',
 		component: () => import('../../user-details/user-details.vue'),
-		props: true
+		props: true,
+		meta: {
+			authorities: ['administrator'],
+		},
 	},
 	{
 		path: '/profile',
@@ -69,12 +78,18 @@ export const routes = [
 		path: '/storages/:id',
 		name: 'edit-storage',
 		component: () => import('../../storages/edit/storage-edit.vue'),
-		props: true
+		props: true,
+		meta: {
+			authorities: ['administrator'],
+		},
 	},
 	{
 		path: '/storages/new',
 		name: 'new-storage',
-		component: () => import('../../storages/add-new/storage-new.vue')
+		component: () => import('../../storages/add-new/storage-new.vue'),
+		meta: {
+			authorities: ['administrator'],
+		},
 	},
 	{
 		path: '/reagents/list',
