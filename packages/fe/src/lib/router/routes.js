@@ -19,7 +19,7 @@ export const routes = [
 	{
 		path: '/login',
 		name: 'login',
-		component: () => import('../../auth/login-page.vue'),
+		component: () => import('../../auth/login-page/login-page.vue'),
 		meta: {
 			layout: LoginLayout
 		}
@@ -27,7 +27,7 @@ export const routes = [
 	{
 		path: '/reset-password',
 		name: 'reset-password',
-		component: () => import('../../auth/reset-password.vue'),
+		component: () => import('../../auth/reset-password/reset-password.vue'),
 		meta: {
 			layout: LoginLayout
 		}
