@@ -76,22 +76,22 @@ onMounted(() => {
 			>Add New Storage Location</el-button
 		>
 		<el-table v-loading="isLoading" :data="storages">
-			<el-table-column prop="room" label="Room" width="180" />
-			<el-table-column prop="name" label="Name" width="180" />
-			<el-table-column prop="description" label="Description" width="180" />
-			<el-table-column>
+			<el-table-column prop="room" label="Room" />
+			<el-table-column prop="name" label="Name" />
+			<el-table-column prop="description" label="Description" />
+			<el-table-column width="80">
 				<template #default="{ row }">
 					<el-button @click="() => viewStorageLocation(row.id)"><rh-icon name="eye" /></el-button>
 				</template>
 			</el-table-column>
-			<el-table-column>
+			<el-table-column width="80">
 				<template #default="{ row }">
 					<el-button @click="() => editStorageLocation(row.id)"
 						><rh-icon name="pencil"
 					/></el-button>
 				</template>
 			</el-table-column>
-			<el-table-column>
+			<el-table-column width="80">
 				<template #default="{ row }">
 					<el-button type="danger" @click="() => deleteStorageLocation(row.id)">
 						<rh-icon color="white" name="trash" />
