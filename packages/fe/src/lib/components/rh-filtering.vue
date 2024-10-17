@@ -1,65 +1,33 @@
-<script setup>
-import { ref } from 'vue';
-import { ElButton, ElInput, ElDatePicker, ElSelect } from 'element-plus';
-import RhIcon from './rh-icon.vue';
-
-const visible = ref(true);
-const toggleFilterView = () => {
-	visible.value = !visible.value;
-};
-</script>
-
 <template>
-	<slot name="action-buttons">
-		<div class="action-buttons">
-			<el-button @click="toggleFilterView">
-				<rh-icon color="#409eff" name="sliders-h" />
-				Hide filters
-			</el-button>
-			<el-button type="primary">Add New User</el-button>
-		</div>
-	</slot>
+	<div class="action-buttons">
+		<slot name="action-buttons" />
+	</div>
 
-	<slot v-if="visible" name="filters">
-		<div class="filters">
-			<el-input class="filter" placeholder="String filter">
-				<template #prefix>
-					<rh-icon name="search" />
-				</template>
-			</el-input>
-			<el-date-picker class="filter" type="date" placeholder="Date filter" />
-			<el-select class="filter" placeholder="Select filter" />
-			<el-select
-				class="filter"
-				multiple
-				collapse-tags
-				collapse-tags-tooltip
-				placeholder="Big select filter"
-			/>
-		</div>
-		<div class="second-row">
-			<el-button>Reset filters</el-button>
-		</div>
-	</slot>
+	<div class="filter">
+		<slot name="filters" />
+	</div>
+
+	<div class="after-buttons">
+		<slot name="after-buttons" />
+	</div>
 </template>
 
-<style scoped>
+<style>
 .action-buttons {
 	display: flex;
 	justify-content: end;
+	align-items: center;
+	margin: 20px 0;
 }
-.filters {
+
+.filter {
 	display: flex;
 	flex-wrap: wrap;
-	justify-content: space-between;
-	padding: 20px 0;
-
-	div {
-		width: 200px;
-	}
+	justify-content: start;
+	padding: 5px 0;
 }
 
-.second-row {
+.after-buttons {
 	display: flex;
 	justify-content: end;
 }

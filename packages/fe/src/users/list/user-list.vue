@@ -8,9 +8,15 @@ import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-
 import { formatDate } from '../../lib/utils/datetime/date-format.js';
 import { $router } from '../../lib/router/router.js';
 import RhFiltering from '../../lib/components/rh-filtering.vue';
+import UsersFilters from '../../filters/users-filters.vue';
 
 const users = ref([]);
 const isLoading = ref(false);
+const visible = ref(true);
+
+const toggleFilterView = () => {
+	visible.value = !visible.value;
+};
 
 function addNewUser() {
 	$router.push({ name: 'new-user' });
@@ -74,10 +80,22 @@ onMounted(() => {
 
 <template>
 	<div>
-		<rh-filtering>
-			<template #action-buttons></template>
-			<el-button class="add-button" type="primary" @click="addNewUser">Add New User</el-button>
-			<template #filters></template>
+		<rh-filtering @reset-filters="resetAllFilters">
+			<template #action-buttons>
+				<el-button @click="toggleFilterView">
+					<rh-icon color="#409eff" name="sliders-h" />
+					{{ visible ? 'Hide filters' : 'Show filters' }}
+				</el-button>
+				<el-button class="add-button" type="primary" @click="addNewUser">Add New User</el-button>
+			</template>
+
+			<template v-if="visible" #filters>
+				<users-filters v-model:filters="filters" />
+			</template>
+
+			<template v-if="visible" #after-buttons>
+				<el-button>Reset filters</el-button>
+			</template>
 		</rh-filtering>
 
 		<el-table v-loading="isLoading" :data="users">
@@ -117,10 +135,3 @@ onMounted(() => {
 		</el-table>
 	</div>
 </template>
-
-<style scoped>
-.add-button {
-	margin-top: 20px;
-	margin-bottom: 20px;
-}
-</style>
