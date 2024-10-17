@@ -6,6 +6,8 @@ import { $api } from '../../lib/api/index.js';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $router } from '../../lib/router/router.js';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
+import RhFilters from '../../lib/components/rh-filters.vue';
+import StorageFilters from '../../filters/storage-filters.vue';
 
 const storages = ref([]);
 const isLoading = ref(false);
@@ -72,9 +74,18 @@ onMounted(() => {
 
 <template>
 	<div class="wrapper">
-		<el-button class="add-button" type="primary" @click="addNewStorageLocation"
-			>Add New Storage Location</el-button
-		>
+		<rh-filters>
+			<template #actionButtons>
+				<el-button class="add-button" type="primary" @click="addNewStorageLocation">
+					Add New Storage Location
+				</el-button>
+			</template>
+
+			<template #filters>
+				<storage-filters />
+			</template>
+		</rh-filters>
+
 		<el-table v-loading="isLoading" :data="storages">
 			<el-table-column prop="room" min-width="150" label="Room" />
 			<el-table-column prop="name" min-width="150" label="Name" />

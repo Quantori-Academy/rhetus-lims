@@ -2,18 +2,48 @@
 import { ElDatePicker, ElInput } from 'element-plus';
 import RhIcon from '../lib/components/rh-icon.vue';
 import FilterItem from './filter-item.vue';
+import { reactive, watch } from 'vue';
+
+const props = defineProps({
+	filters: {
+		type: Object,
+		required: true
+	}
+});
+
+const emit = defineEmits(['update:filters']);
+const filters = reactive({ ...props.filters });
+
+watch(
+	filters,
+	newFilters => {
+		emit('update:filters', newFilters);
+	},
+	{ deep: true }
+);
 </script>
 
 <template>
-	<filter-item>
-		<el-input class="filter" placeholder="String filter">
-			<template #prefix>
-				<rh-icon name="search" />
-			</template>
-		</el-input>
-	</filter-item>
+	<div class="filters-container">
+		<filter-item>
+			<el-input v-model="filters.role" class="filter" placeholder="String filter">
+				<template #prefix>
+					<rh-icon name="search" />
+				</template>
+			</el-input>
+		</filter-item>
 
-	<filter-item>
-		<el-date-picker class="filter" type="date" placeholder="Date filter" />
-	</filter-item>
+		<filter-item>
+			<el-date-picker v-model="filters.date" class="filter" type="date" placeholder="Date filter" />
+		</filter-item>
+	</div>
 </template>
+
+<style scoped>
+.filters-container {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: start;
+	margin: 20px 0 15px 0;
+}
+</style>

@@ -1,9 +1,11 @@
 <template>
-	<div class="filter-item"><slot /></div>
+	<div class="filter-item">
+		<slot />
+	</div>
 </template>
 
 <style>
 .filter-item {
-	margin-right: 10px;
+	margin: 5px 12px 5px 0;
 }
 </style>

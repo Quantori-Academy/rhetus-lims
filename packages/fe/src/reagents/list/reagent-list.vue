@@ -6,6 +6,8 @@ import { $router } from '../../lib/router/router.js';
 import { $api } from '../../lib/api/index.js';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
+import RhFilters from '../../lib/components/rh-filters.vue';
+import SubstanceFilters from '../../filters/substance-filters.vue';
 
 const reagents = ref(null);
 const isLoading = ref(false);
@@ -89,10 +91,17 @@ onMounted(() => {
 
 <template>
 	<div class="reagent-table">
-		<div class="top-buttons">
-			<el-button type="primary" @click="addNewReagent">Add New Reagent</el-button>
-			<el-button type="primary" @click="addNewSample">Add New Sample</el-button>
-		</div>
+		<rh-filters>
+			<template #actionButtons>
+				<el-button type="primary" @click="addNewReagent">Add New Reagent</el-button>
+				<el-button type="primary" @click="addNewSample">Add New Sample</el-button>
+			</template>
+
+			<template #filters>
+				<substance-filters />
+			</template>
+		</rh-filters>
+
 		<el-table
 			v-loading="isLoading"
 			:data="reagents"
