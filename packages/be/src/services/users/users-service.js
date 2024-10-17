@@ -120,14 +120,13 @@ async function usersService(server) {
 					lastLogin: schema.users.lastLogin
 				})
 				.from(schema.users)
-				.innerJoin(schema.roles, eq(schema.users.roleId, schema.roles.id))
-				.where(eq(schema.users.deleted, false));
+				.innerJoin(schema.roles, eq(schema.users.roleId, schema.roles.id));
 
-			if (options) {
-				const filterSubQueries = generateFilterSubquery(options, formatMapping, optionsDictionary);
-
-				query.where(and(...filterSubQueries, eq(schema.users.deleted, false)));
-			}
+			query = server.usersService.applyFilters(query, {
+				options,
+				formatMapping,
+				optionsDictionary
+			});
 
 			const count = await query;
 			const users = await query.limit(limit).offset(offset);
@@ -231,6 +230,18 @@ async function usersService(server) {
 				.where(eq(schema.users.username, username.toLowerCase()));
 
 			return result.length === 0;
+		},
+
+		applyFilters: (query, filterData) => {
+			const { options, formatMapping, optionsDictionary } = filterData;
+
+			if (!options) {
+				return query.where(eq(schema.users.deleted, false));
+			}
+
+			const filterSubQueries = generateFilterSubquery(options, formatMapping, optionsDictionary);
+
+			return query.where(and(...filterSubQueries, eq(schema.users.deleted, false)));
 		}
 	});
 }
