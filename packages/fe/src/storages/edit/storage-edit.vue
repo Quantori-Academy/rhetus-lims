@@ -59,7 +59,6 @@ onMounted(() => {
 
 <template>
 	<div v-loading="isLoading" class="wrapper">
-		<h1>Storage Location Edit</h1>
 		<el-form
 			v-if="storage"
 			ref="form-ref"

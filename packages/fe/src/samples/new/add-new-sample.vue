@@ -99,7 +99,6 @@ onMounted(() => {
 
 <template>
 	<div class="container">
-		<div class="title">New Sample</div>
 		<el-form ref="form-el" :model="form" :rules="rules" label-width="auto" label-position="top">
 			<el-form-item label="Name" prop="name">
 				<el-input v-model="form.name" placeholder="Enter sample name" />
