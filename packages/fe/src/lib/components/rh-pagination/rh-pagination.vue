@@ -1,6 +1,7 @@
 <script setup>
-import { ref, watch, defineProps, defineEmits } from 'vue';
+import { ref, watch, defineProps, defineEmits, computed } from 'vue';
 import { ElPagination } from 'element-plus';
+import { defaultPaginationValues } from './constants';
 
 const props = defineProps({
 	pagination: {
@@ -17,18 +18,13 @@ const props = defineProps({
 	}
 });
 
-const defaultPaginationValues = {
-	page: 1,
-	size: 2,
-	totalElements: 0
-};
-
-const currentPage = ref(defaultPaginationValues.page);
+const page = ref(defaultPaginationValues.page);
+const needPagination = computed(() => props.pagination.totalElements > props.pagination.size);
 
 watch(
 	() => props.pagination,
 	newPagination => {
-		currentPage.value = newPagination.page;
+		page.value = newPagination.page;
 	},
 	{ deep: true }
 );
@@ -42,7 +38,8 @@ const handlePageChange = newPage => {
 <template>
 	<div class="pagination-container">
 		<el-pagination
-			:current-page="currentPage"
+			v-if="needPagination"
+			:current-page="page + 1"
 			:page-size="pagination.size"
 			:total="pagination.totalElements"
 			:layout="layout"
