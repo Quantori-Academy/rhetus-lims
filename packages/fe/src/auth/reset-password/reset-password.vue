@@ -1,8 +1,8 @@
 <script setup>
 import { ElForm, ElInput, ElButton, ElFormItem } from 'element-plus';
 import { ref } from 'vue';
-import { $api } from '../lib/api/index.js';
-import { $notifyUserAboutError, $notify } from '../../src/lib/utils/feedback/notify-msg.js';
+import { $api } from '../../lib/api/index.js';
+import { $notifyUserAboutError, $notify } from '../../lib/utils/feedback/notify-msg.js';
 
 function createDefaultFormValues() {
 	return {
@@ -39,7 +39,7 @@ function onSubmit() {
 	<div class="container">
 		<div class="login-form">
 			<div class="logo-container">
-				<img width="56" height="56" src="../lib/assets/images/logo.svg" alt="" />
+				<img width="56" height="56" src="../../lib/assets/images/logo.svg" alt="" />
 				<div class="logo-title">Rhetus Lims</div>
 			</div>
 

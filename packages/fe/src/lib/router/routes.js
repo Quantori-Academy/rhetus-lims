@@ -7,11 +7,6 @@ export const routes = [
 		component: () => import('../../dashboard/main-dashboard.vue')
 	},
 	{
-		path: '/form',
-		name: 'form',
-		component: () => import('../../form/main-form.vue')
-	},
-	{
 		path: '/users/list',
 		name: 'users-list',
 		component: () => import('../../users/list/user-list.vue')
@@ -24,7 +19,7 @@ export const routes = [
 	{
 		path: '/login',
 		name: 'login',
-		component: () => import('../../login/login-page.vue'),
+		component: () => import('../../auth/login-page/login-page.vue'),
 		meta: {
 			layout: LoginLayout
 		}
@@ -32,7 +27,7 @@ export const routes = [
 	{
 		path: '/reset-password',
 		name: 'reset-password',
-		component: () => import('../../reset-password/reset-password.vue'),
+		component: () => import('../../auth/reset-password/reset-password.vue'),
 		meta: {
 			layout: LoginLayout
 		}
@@ -52,6 +47,18 @@ export const routes = [
 		path: '/samples/new',
 		name: 'new-sample',
 		component: () => import('../../samples/new/add-new-sample.vue')
+	},
+	{
+		path: '/samples/:id',
+		name: 'sample-details',
+		component: () => import('../../samples/edit/edit-sample.vue'),
+		props: true
+	},
+	{
+		path: '/samples/edit/:id',
+		name: 'edit-sample',
+		component: () => import('../../samples/edit/edit-sample.vue'),
+		props: true
 	},
 	{
 		path: '/storages/list',

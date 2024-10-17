@@ -84,7 +84,6 @@ onMounted(() => {
 
 <template>
 	<div class="profile">
-		<h1>Profile</h1>
 		<el-form
 			v-if="profile"
 			ref="form"

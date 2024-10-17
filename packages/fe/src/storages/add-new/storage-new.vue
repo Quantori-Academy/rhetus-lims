@@ -45,7 +45,6 @@ const addStorage = async () => {
 
 <template>
 	<div class="wrapper">
-		<h1>Add Storage Location</h1>
 		<el-form ref="form-ref" label-position="top" :model="storage" :rules="rules">
 			<el-form-item label="Room" prop="room">
 				<el-input v-model="storage.room"></el-input>

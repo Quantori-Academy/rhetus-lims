@@ -30,6 +30,7 @@ const loading = ref(false);
 const storages = ref([]);
 const storageDisplayValue = ref('');
 const isEdit = computed(() => $route.value.name === 'reagent-details-edit');
+const isOutOfStock = computed(() => reagent.value.quantityLeft === 0);
 
 onMounted(() => {
 	setReagent(props.id);
@@ -69,28 +70,54 @@ const toggleEdit = () => {
 };
 
 const cancelEdit = () => {
-	formEl.value.resetFields();
 	$router.push({ name: 'reagent-details', params: { id: reagent.value.id } });
 	$notify({
 		title: 'Canceled',
 		message: 'Reagent deletion canceled',
 		type: 'info'
 	});
+	formEl.value.resetFields();
 };
 
 const handleSubmit = async () => {
 	if (!(await $isFormValid(formEl))) return;
 	try {
-		const updatedReagent = await $api.reagents.updateReagent(reagent.value.id, reagent.value);
-		reagent.value = updatedReagent;
-		$notify({
-			title: 'Success',
-			message: 'Reagent has been updated',
-			type: 'success'
-		});
-		$router.push({ name: 'reagent-details', params: { id: reagent.value.id } });
+		if (isOutOfStock.value) {
+			await deleteReagentZero();
+		} else {
+			const updatedReagent = await $api.reagents.updateReagent(reagent.value.id, reagent.value);
+			reagent.value = updatedReagent;
+			$notify({
+				title: 'Success',
+				message: 'Reagent has been updated',
+				type: 'success'
+			});
+			$router.push({ name: 'reagent-details', params: { id: reagent.value.id } });
+		}
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating reagent');
+	}
+};
+const deleteReagentZero = async () => {
+	try {
+		await $confirm('Quantity reached 0. Do you want to delete this reagent?', 'Warning', {
+			confirmButtonText: 'OK',
+			cancelButtonText: 'Cancel',
+			type: 'warning'
+		});
+		await $api.reagents.updateReagent(reagent.value.id, reagent.value);
+		$notify({
+			title: 'Success',
+			message: 'Reagent deletion was requested',
+			type: 'success'
+		});
+		await $router.push({ name: 'reagents-list' });
+	} catch {
+		$notify({
+			title: 'Canceled',
+			message: 'Reagent deletion was canceled',
+			type: 'info'
+		});
 	}
 };
 
@@ -111,7 +138,7 @@ const deleteReagent = async () => {
 	} catch {
 		$notify({
 			title: 'Canceled',
-			message: 'Reagent deletion canceled',
+			message: 'Reagent deletion was canceled',
 			type: 'info'
 		});
 	}
@@ -120,7 +147,6 @@ const deleteReagent = async () => {
 
 <template>
 	<div class="reagent-details">
-		<h1>Reagent Details</h1>
 		<el-form
 			v-if="reagent"
 			ref="form-ref"
@@ -168,7 +194,6 @@ const deleteReagent = async () => {
 					/>
 				</el-select>
 			</el-form-item>
-
 			<el-form-item label="Quantity left" prop="quantityLeft">
 				<el-input-number
 					v-model="reagent.quantityLeft"
@@ -213,17 +238,24 @@ const deleteReagent = async () => {
 	display: flex;
 	flex-direction: column;
 	gap: 5rem;
-	padding-bottom: 5rem;
-	width: 50vw;
+	padding: 3rem;
+	max-width: 70vw;
 	color: black;
 }
 .reagent-details :deep(.el-input__wrapper),
 .reagent-details :deep(.el-select__wrapper) {
 	background-color: transparent;
 }
+
 .quantity-unit-wrapper {
 	display: flex;
 	flex-direction: row;
 	gap: 10px;
+}
+@media screen and (max-width: 578px) {
+	.el-button {
+		margin: 0;
+		margin-top: 10px;
+	}
 }
 </style>
