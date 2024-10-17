@@ -40,9 +40,7 @@ onMounted(() => {
 const rules = ref({
 	quantityLeft: [requiredRule('Quantity left')]
 });
-const showNotification = (title, message, type) => {
-	$notify({ title, message, type });
-};
+
 async function setStorages() {
 	try {
 		const data = await $api.storages.fetchStorages();
@@ -73,7 +71,11 @@ const toggleEdit = () => {
 
 const cancelEdit = () => {
 	$router.push({ name: 'reagent-details', params: { id: reagent.value.id } });
-	showNotification('Canceled', 'Reagent deletion canceled', 'info');
+	$notify({
+		title: 'Canceled',
+		message: 'Reagent deletion canceled',
+		type: 'info'
+	});
 	formEl.value.resetFields();
 };
 
@@ -85,7 +87,11 @@ const handleSubmit = async () => {
 		} else {
 			const updatedReagent = await $api.reagents.updateReagent(reagent.value.id, reagent.value);
 			reagent.value = updatedReagent;
-			showNotification('Success', 'Reagent has been updated', 'success');
+			$notify({
+				title: 'Success',
+				message: 'Reagent has been updated',
+				type: 'success'
+			});
 			$router.push({ name: 'reagent-details', params: { id: reagent.value.id } });
 		}
 	} catch (error) {
@@ -100,10 +106,18 @@ const deleteReagentZero = async () => {
 			type: 'warning'
 		});
 		await $api.reagents.updateReagent(reagent.value.id, reagent.value);
-		showNotification('Success', 'Reagent deletion was requested', 'success');
+		$notify({
+			title: 'Success',
+			message: 'Reagent deletion was requested',
+			type: 'success'
+		});
 		await $router.push({ name: 'reagents-list' });
 	} catch {
-		showNotification('Canceled', 'Reagent deletion was canceled', 'info');
+		$notify({
+			title: 'Canceled',
+			message: 'Reagent deletion was canceled',
+			type: 'info'
+		});
 	}
 };
 
@@ -115,10 +129,18 @@ const deleteReagent = async () => {
 			type: 'warning'
 		});
 		const response = await $api.reagents.deleteReagent(props.id);
-		showNotification('Success', response.message, 'success');
+		$notify({
+			title: 'Success',
+			message: response.message,
+			type: 'success'
+		});
 		await $router.push({ name: 'reagents-list' });
 	} catch {
-		showNotification('Canceled', 'Reagent deletion was canceled', 'info');
+		$notify({
+			title: 'Canceled',
+			message: 'Reagent deletion was canceled',
+			type: 'info'
+		});
 	}
 };
 </script>
