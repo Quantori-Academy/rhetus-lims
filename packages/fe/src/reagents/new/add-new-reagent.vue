@@ -40,7 +40,7 @@ const requiredRule = {
 };
 const rules = reactive({
 	name: [requiredRule],
-	casNumber: [requiredRule],
+	// casNumber: [requiredRule],
 	producer: [requiredRule],
 	catalogId: [requiredRule],
 	catalogLink: [requiredRule],
@@ -90,12 +90,14 @@ function cancel() {
 			<el-form-item label="Producer" prop="producer">
 				<el-input v-model="form.producer" />
 			</el-form-item>
-			<el-form-item label="Catalog ID" prop="catalogId">
-				<el-input v-model="form.catalogId" />
-			</el-form-item>
-			<el-form-item label="Catalog link" prop="catalogLink">
-				<el-input v-model="form.catalogLink" />
-			</el-form-item>
+			<div class="align-horizontal">
+				<el-form-item label="Catalog ID" prop="catalogId">
+					<el-input v-model="form.catalogId" />
+				</el-form-item>
+				<el-form-item label="Catalog link" prop="catalogLink">
+					<el-input v-model="form.catalogLink" />
+				</el-form-item>
+			</div>
 			<div class="align-horizontal">
 				<el-form-item label="Quantity" prop="quantity">
 					<el-input-number v-model="form.quantity" placeholder="Enter amount" :min="0">
@@ -142,6 +144,7 @@ function cancel() {
 
 <style>
 .container {
+	padding: 1rem;
 	width: 42vw;
 }
 .align-horizontal {

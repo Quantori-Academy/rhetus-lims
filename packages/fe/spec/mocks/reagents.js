@@ -80,7 +80,31 @@ const reagentDetails = [
 		expirationDate: '2024-11-30T00:00:00.000Z'
 	}
 ];
-
+const storageLocations = [
+	{
+		id: 1,
+		room: 'Building 1, Room 2',
+		name: 'Cabinet 3, Shelf 4'
+	},
+	{
+		id: 2,
+		room: 'Building 1, Room 3',
+		name: 'Cabinet 1, Shelf 2'
+	},
+	{
+		id: 3,
+		room: 'Building 2, Room 1',
+		name: 'Cabinet 2, Shelf 1'
+	}
+];
+function findLocationByValue({ shelf, cabinet, room }) {
+	const name = `${cabinet.trim().toLowerCase()}, ${shelf.trim().toLowerCase()}`;
+	return storageLocations.find(
+		location =>
+			location.name.toLowerCase() === name &&
+			location.room.toLowerCase() === room.trim().toLowerCase()
+	);
+}
 export const reagentsHandlers = [
 	http.get(api('/reagents'), () => {
 		return HttpResponse.json(reagents);
@@ -131,5 +155,32 @@ export const reagentsHandlers = [
 		} else {
 			return HttpResponse.json({ message: 'Reagent not found' }, { status: 404 });
 		}
+	}),
+
+	http.post(api('/reagents'), async ({ request }) => {
+		const reagent = await request.json();
+		const { room, shelf, cabinet, ...rest } = reagent;
+
+		const storageLocation = findLocationByValue({ shelf, cabinet, room });
+		if (!storageLocation) {
+			return HttpResponse.json(
+				{
+					status: 'error',
+					message: `Location not found`
+				},
+				{ status: 404 }
+			);
+		}
+
+		const newReagent = {
+			...rest,
+			storageLocationId: storageLocation.id
+		};
+
+		reagentDetails.push(newReagent);
+		return HttpResponse.json({
+			status: 'success',
+			message: `New reagent was created`
+		});
 	})
 ];
