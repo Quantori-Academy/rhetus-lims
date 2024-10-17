@@ -40,7 +40,9 @@ onMounted(() => {
 const rules = ref({
 	quantityLeft: [requiredRule('Quantity left')]
 });
-
+const showNotification = (title, message, type) => {
+	$notify({ title, message, type });
+};
 async function setStorages() {
 	try {
 		const data = await $api.storages.fetchStorages();
@@ -71,60 +73,52 @@ const toggleEdit = () => {
 
 const cancelEdit = () => {
 	$router.push({ name: 'reagent-details', params: { id: reagent.value.id } });
-	$notify({
-		title: 'Canceled',
-		message: 'Reagent deletion canceled',
-		type: 'info'
-	});
+	showNotification('Canceled', 'Reagent deletion canceled', 'info');
 	formEl.value.resetFields();
 };
 
 const handleSubmit = async () => {
 	if (!(await $isFormValid(formEl))) return;
 	try {
-		const updatedReagent = await $api.reagents.updateReagent(reagent.value.id, reagent.value);
-		reagent.value = updatedReagent;
 		if (isOutOfStock.value) {
-			await deleteReagent(true);
+			await deleteReagentZero();
 		} else {
-			$notify({
-				title: 'Success',
-				message: 'Reagent has been updated',
-				type: 'success'
-			});
+			const updatedReagent = await $api.reagents.updateReagent(reagent.value.id, reagent.value);
+			reagent.value = updatedReagent;
+			showNotification('Success', 'Reagent has been updated', 'success');
 			$router.push({ name: 'reagent-details', params: { id: reagent.value.id } });
 		}
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating reagent');
 	}
 };
-
-const deleteReagent = async (reachedZero = false) => {
+const deleteReagentZero = async () => {
 	try {
-		await $confirm(
-			reachedZero === true
-				? 'Quantity reached 0. Do you want to delete this reagent?'
-				: 'Do you want to delete this reagent?',
-			'Warning',
-			{
-				confirmButtonText: 'OK',
-				cancelButtonText: 'Cancel',
-				type: 'warning'
-			}
-		);
-		const response = await $api.reagents.deleteReagent(props.id);
-		$notify({
-			title: 'Success',
-			message: response.message,
-			type: 'success'
+		await $confirm('Quantity reached 0. Do you want to delete this reagent?', 'Warning', {
+			confirmButtonText: 'OK',
+			cancelButtonText: 'Cancel',
+			type: 'warning'
 		});
+		await $api.reagents.updateReagent(reagent.value.id, reagent.value);
+		showNotification('Success', 'Reagent deletion was requested', 'success');
 		await $router.push({ name: 'reagents-list' });
 	} catch {
-		$notify({
-			title: 'Canceled',
-			message: 'Reagent deletion canceled',
-			type: 'info'
+		showNotification('Canceled', 'Reagent deletion was canceled', 'info');
+	}
+};
+
+const deleteReagent = async () => {
+	try {
+		await $confirm('Do you want to delete this reagent?', 'Warning', {
+			confirmButtonText: 'OK',
+			cancelButtonText: 'Cancel',
+			type: 'warning'
 		});
+		const response = await $api.reagents.deleteReagent(props.id);
+		showNotification('Success', response.message, 'success');
+		await $router.push({ name: 'reagents-list' });
+	} catch {
+		showNotification('Canceled', 'Reagent deletion was canceled', 'info');
 	}
 };
 </script>
