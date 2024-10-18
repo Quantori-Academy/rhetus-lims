@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, reactive, ref, useTemplateRef } from 'vue';
+import { onMounted, ref, useTemplateRef } from 'vue';
 import {
 	ElInput,
 	ElForm,
@@ -34,7 +34,7 @@ const form = ref({
 	description: ''
 });
 
-const rules = reactive({
+const rules = ref({
 	name: [requiredRule('Name')],
 	producer: [requiredRule('Producer')],
 	catalogId: [requiredRule('Catalog ID')],
@@ -59,7 +59,7 @@ async function submit() {
 	try {
 		const response = await $api.reagents.addReagent(form.value);
 		$notify({ message: response.message, type: 'success' });
-		$router.push({ name: 'dashboard' });
+		$router.push({ name: 'reagents' });
 	} catch (error) {
 		$notifyUserAboutError(error.statusText);
 	} finally {
@@ -69,21 +69,23 @@ async function submit() {
 
 function cancel() {
 	formEl.value.resetFields();
-	$router.push({ name: 'dashboard' });
+	$router.push({ name: 'reagents' });
 }
 async function setStorages() {
+	isSaving.value = true;
 	try {
 		const data = await $api.storages.fetchStorages();
 		storages.value = data.storages;
 	} catch (error) {
 		$notifyUserAboutError(error);
+	} finally {
+		isSaving.value = false;
 	}
 }
 </script>
 
 <template>
 	<div class="container">
-		<div class="title">New Reagent</div>
 		<el-form ref="form-el" :model="form" :rules="rules" label-width="auto" label-position="top">
 			<el-form-item label="Name" prop="name">
 				<el-input v-model="form.name" placeholder="Enter reagent name" />
@@ -159,10 +161,6 @@ async function setStorages() {
 		flex-grow: 1;
 		flex-basis: 0;
 	}
-}
-.title {
-	padding-bottom: 2rem;
-	font-size: large;
 }
 .btn-container {
 	display: flex;
