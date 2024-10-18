@@ -1,4 +1,13 @@
-import { integer, pgTable, serial, timestamp, varchar, text, pgEnum } from 'drizzle-orm/pg-core';
+import {
+	integer,
+	pgTable,
+	serial,
+	timestamp,
+	varchar,
+	text,
+	pgEnum,
+	boolean
+} from 'drizzle-orm/pg-core';
 import { roles } from './roles.js';
 
 export const Status = {
@@ -18,6 +27,7 @@ export const users = pgTable('users', {
 	email: varchar('email', { length: 256 }).notNull(),
 	roleId: integer('role_id').references(() => roles.id),
 	lastLogin: timestamp('last_login'),
-	createdAt: timestamp('created_at').notNull(),
-	passwordResetStatus: passwordResetStatusEnum('password_reset_status').default('none')
+	createdAt: timestamp('created_at').notNull().defaultNow(),
+	passwordResetStatus: passwordResetStatusEnum('password_reset_status').default('none'),
+	deleted: boolean('deleted').notNull().default(false)
 });

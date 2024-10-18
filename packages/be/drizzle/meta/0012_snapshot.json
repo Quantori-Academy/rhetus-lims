@@ -1,6 +1,6 @@
 {
-  "id": "77b7bc0e-28b3-41c3-b60b-6fb5d1052433",
-  "prevId": "6ceb19c5-2128-4ce6-ba00-211049b5c0ec",
+  "id": "37b1bde8-3585-4e68-b1a9-94c2d748e99e",
+  "prevId": "900a444d-2e21-4676-9914-114076e99acd",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -127,6 +127,55 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
+    "public.storages": {
+      "name": "storages",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuid_generate_v4()"
+        },
+        "room": {
+          "name": "room",
+          "type": "varchar(300)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(300)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted": {
+          "name": "deleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "public.substances_quantity_changes": {
       "name": "substances_quantity_changes",
       "schema": "",
@@ -148,13 +197,15 @@
           "name": "reagent_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": null
         },
         "sample_id": {
           "name": "sample_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": null
         },
         "previous_value": {
           "name": "previous_value",
@@ -270,7 +321,8 @@
           "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         },
         "password_reset_status": {
           "name": "password_reset_status",
@@ -279,6 +331,13 @@
           "primaryKey": false,
           "notNull": false,
           "default": "'none'"
+        },
+        "deleted": {
+          "name": "deleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
         }
       },
       "indexes": {},
