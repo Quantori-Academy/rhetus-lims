@@ -67,24 +67,4 @@ const deleteSample = {
 	}
 };
 
-const updateSample = {
-	security: [{ Session: [] }],
-	params: S.object().prop('id', S.string()),
-	body: S.object()
-		.prop('quantityLeft', S.number().minimum(0))
-		.prop(
-			'storageLocation',
-			S.object()
-				.prop('room', S.string().required())
-				.prop('cabinet', S.string().required())
-				.prop('shelf', S.string().required())
-		),
-	response: {
-		200: statusMessage,
-		400: statusMessage,
-		404: statusMessage,
-		500: statusMessage
-	}
-};
-
-export { createSample, getSample, deleteSample, updateSample };
+export { createSample, getSample, deleteSample };

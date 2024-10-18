@@ -139,26 +139,6 @@ async function samplesService(server) {
 			return result.length ? result[0].name : null;
 		},
 
-		updateSample: async (id, data) => {
-			const { quantityLeft, storageLocationId } = data;
-
-			const dataForUpdate = {};
-			if (quantityLeft) dataForUpdate.quantityLeft = quantityLeft;
-			if (storageLocationId) dataForUpdate.storageLocationId = storageLocationId;
-
-			if (Object.keys(dataForUpdate).length === 0) {
-				return null;
-			}
-
-			const result = await server.db
-				.update(schema.samples)
-				.set(dataForUpdate)
-				.where(eq(schema.samples.id, id))
-				.returning({ name: schema.samples.name });
-
-			return result.length ? result[0].name : null;
-		},
-
 		changeSampleQuantity: async (id, data) => {
 			const { userId, quantityUsed, reason } = data;
 

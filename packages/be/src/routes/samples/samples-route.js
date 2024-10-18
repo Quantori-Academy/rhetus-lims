@@ -112,60 +112,6 @@ async function samples(server, options) {
 			return reply.code(500).send(err);
 		}
 	}
-
-	server.route({
-		method: 'PATCH',
-		path: options.prefix + 'samples/:id',
-		preValidation: [server.authenticate],
-		schema: schema.updateSample,
-		handler: onUpdateSample
-	});
-
-	async function onUpdateSample(req, reply) {
-		try {
-			const id = req.params.id;
-
-			const sample = await server.samplesService.getSampleById(id);
-
-			if (!sample) {
-				return reply.code(404).send({ status: 'error', message: `No such sample` });
-			}
-
-			const {
-				quantityLeft
-				// storageLocation: { room, cabinet, shelf }
-			} = req.body;
-
-			if (quantityLeft <= 0) {
-				const sampleName = await server.samplesService.softDeleteSample(id);
-
-				return reply
-					.code(200)
-					.send({ status: 'success', message: `${sampleName} was removed since it ran out` });
-			}
-
-			// TODO
-			// const location = await server.locationsService.findLocationByName({
-			// 	room,
-			// 	name: cabinet + ', ' + shelf
-			// });
-			// if (!location) {
-			// 	return reply.code(400).send({
-			// 		status: 'error',
-			// 		message: `No storage location ${room} ${cabinet} ${shelf} found`
-			// 	});
-			// }
-
-			const sampleName = await server.samplesService.updateSample(id, {
-				quantityLeft
-				// storageLocationId: location.id
-			});
-
-			return reply.code(200).send({ status: 'success', message: `${sampleName} was updated` });
-		} catch (err) {
-			return reply.code(500).send(err);
-		}
-	}
 }
 
 export default fp(samples);
