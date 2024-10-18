@@ -92,5 +92,10 @@ export const routes = [
 		name: 'reagent-details-edit',
 		component: () => import('../../reagents/details-reagent/reagent-details.vue'),
 		props: true
+	},
+	{
+		path: '/reagents/new',
+		name: 'new-reagent',
+		component: () => import('../../reagents/new/add-new-reagent.vue')
 	}
 ];

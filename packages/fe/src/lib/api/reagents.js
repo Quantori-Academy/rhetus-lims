@@ -18,5 +18,11 @@ export default http => ({
 			method: 'PUT',
 			body: JSON.stringify(item)
 		});
+	},
+	async addReagent(reagent) {
+		return await http('/reagents', {
+			method: 'POST',
+			body: reagent
+		});
 	}
 });
