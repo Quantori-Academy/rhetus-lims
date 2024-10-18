@@ -103,6 +103,52 @@ async function reagentsService(server) {
 				})
 				.from(schema.reagents)
 				.where(eq(schema.reagents.deleted, false));
+		},
+
+		changeReagentQuantity: async (id, data) => {
+			const { userId, quantityUsed, quantityLeft: reqQuantityLeft, reason } = data;
+
+			const { quantityLeft, name } = await server.reagentsService.getReagentById(id);
+
+			const diff = quantityLeft - quantityUsed;
+
+			const canQuantityChange = diff >= 0 && diff === reqQuantityLeft;
+
+			if (!canQuantityChange) {
+				return {
+					code: 409,
+					status: 'error',
+					message: `Quantity of reagent '${name}' cannot be changed. Check sending values`
+				};
+			}
+
+			await server.db.insert(schema.substancesQuantityChanges).values({
+				userId,
+				reagentId: id,
+				previousValue: quantityLeft,
+				targetValue: reqQuantityLeft,
+				changeReason: reason
+			});
+
+			const result = await server.db
+				.update(schema.reagents)
+				.set({
+					quantityLeft: reqQuantityLeft
+				})
+				.where(eq(schema.reagents.id, id))
+				.returning({
+					reagentName: schema.reagents.name
+				});
+
+			if (diff === 0) {
+				await server.reagentsService.softDeleteReagent(id);
+			}
+
+			return {
+				code: 200,
+				status: 'success',
+				message: `Quantity of reagent '${result[0].reagentName}' was changed`
+			};
 		}
 	});
 }

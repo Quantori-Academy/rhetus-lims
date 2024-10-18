@@ -71,6 +71,13 @@
       "when": 1728914286494,
       "tag": "0009_quiet_vision",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1728994931671,
+      "tag": "0010_hot_power_pack",
+      "breakpoints": true
     }
   ]
 }

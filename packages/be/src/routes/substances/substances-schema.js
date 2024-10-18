@@ -1,5 +1,10 @@
 import S from 'fluent-json-schema';
 
+const categoriesEnum = {
+	SAMPLE: 'sample',
+	REAGENT: 'reagent'
+};
+
 const statusMessage = S.object()
 	.prop('status', S.string().required())
 	.prop('message', S.string().required());
@@ -41,4 +46,20 @@ const getSubstances = {
 	}
 };
 
-export { getSubstances };
+const changeQuantity = {
+	security: [{ Session: [] }],
+	params: S.object().prop('id', S.string()),
+	body: S.object()
+		.prop('category', S.string().enum(Object.values(categoriesEnum)).required())
+		.prop('quantityUsed', S.number().required().minimum(0))
+		.prop('quantityLeft', S.number().required().minimum(0))
+		.prop('reason', S.string().required().minLength(1)),
+	response: {
+		200: statusMessage,
+		404: statusMessage,
+		409: statusMessage,
+		500: statusMessage
+	}
+};
+
+export { getSubstances, changeQuantity };
