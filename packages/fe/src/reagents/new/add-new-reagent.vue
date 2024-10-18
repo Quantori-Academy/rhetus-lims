@@ -26,8 +26,9 @@ const form = ref({
 	producer: '',
 	catalogId: '',
 	catalogLink: '',
+	quantity: 1,
 	quantityUnit: '',
-	quantity: 0,
+	unitPrice: 0,
 	expirationDate: '',
 	storageLocationId: '',
 	description: ''
@@ -38,13 +39,14 @@ const rules = reactive({
 	producer: [requiredRule('Producer')],
 	catalogId: [requiredRule('Catalog ID')],
 	catalogLink: [requiredRule('Catalog link')],
-	quantityUnit: [requiredRule('Unit')],
 	quantity: [
 		requiredRule('Quantity'),
 		{ type: 'number', min: 1, message: 'Quantity cannot be zero', trigger: ['blur', 'change'] }
 	],
+	quantityUnit: [requiredRule('Unit')],
+	unitPrice: [requiredRule('Price')],
 	expirationDate: [requiredRule('Expiration date')],
-	storageLocationId: [requiredRule('Storage lcoation')]
+	storageLocationId: [requiredRule('Storage location')]
 });
 
 onMounted(() => {
@@ -102,8 +104,7 @@ async function setStorages() {
 			</div>
 			<div class="align-horizontal">
 				<el-form-item label="Quantity" prop="quantity">
-					<el-input-number v-model="form.quantity" placeholder="Enter amount" :min="0">
-					</el-input-number>
+					<el-input-number v-model="form.quantity" placeholder="Enter amount" :min="1" />
 				</el-form-item>
 				<el-form-item label="Unit" prop="quantityUnit">
 					<el-select v-model="form.quantityUnit" filterable placeholder="Select a unit">
