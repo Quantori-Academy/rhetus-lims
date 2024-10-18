@@ -1,90 +1,97 @@
 {
-	"version": "7",
-	"dialect": "postgresql",
-	"entries": [
-		{
-			"idx": 0,
-			"version": "7",
-			"when": 1727468007158,
-			"tag": "0000_square_payback",
-			"breakpoints": true
-		},
-		{
-			"idx": 1,
-			"version": "7",
-			"when": 1727468019640,
-			"tag": "0001_polite_glorian",
-			"breakpoints": true
-		},
-		{
-			"idx": 2,
-			"version": "7",
-			"when": 1727680739502,
-			"tag": "0002_freezing_black_widow",
-			"breakpoints": true
-		},
-		{
-			"idx": 3,
-			"version": "7",
-			"when": 1728003626569,
-			"tag": "0003_silent_the_twelve",
-			"breakpoints": true
-		},
-		{
-			"idx": 4,
-			"version": "7",
-			"when": 1728005711018,
-			"tag": "0004_orange_unicorn",
-			"breakpoints": true
-		},
-		{
-			"idx": 5,
-			"version": "7",
-			"when": 1728132399861,
-			"tag": "0005_needy_wendigo",
-			"breakpoints": true
-		},
-		{
-			"idx": 6,
-			"version": "7",
-			"when": 1728489373475,
-			"tag": "0006_remarkable_dreadnoughts",
-			"breakpoints": true
-		},
-		{
-			"idx": 7,
-			"version": "7",
-			"when": 1728489394264,
-			"tag": "0007_tough_exodus",
-			"breakpoints": true
-		},
-		{
-			"idx": 8,
-			"version": "7",
-			"when": 1728560415198,
-			"tag": "0008_lowly_jean_grey",
-			"breakpoints": true
-		},
-		{
-			"idx": 9,
-			"version": "7",
-			"when": 1728914286494,
-			"tag": "0009_quiet_vision",
-			"breakpoints": true
-		},
-		{
-			"idx": 10,
-			"version": "7",
-			"when": 1728994931671,
-			"tag": "0010_hot_power_pack",
-			"breakpoints": true
-		},
-		{
-			"idx": 11,
-			"version": "7",
-			"when": 1729237806604,
-			"tag": "0011_dear_titania",
-			"breakpoints": true
-		}
-	]
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1727468007158,
+      "tag": "0000_square_payback",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1727468019640,
+      "tag": "0001_polite_glorian",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1727680739502,
+      "tag": "0002_freezing_black_widow",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1728003626569,
+      "tag": "0003_silent_the_twelve",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1728005711018,
+      "tag": "0004_orange_unicorn",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1728132399861,
+      "tag": "0005_needy_wendigo",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1728489373475,
+      "tag": "0006_remarkable_dreadnoughts",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1728489394264,
+      "tag": "0007_tough_exodus",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1728560415198,
+      "tag": "0008_lowly_jean_grey",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1728914286494,
+      "tag": "0009_quiet_vision",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1728994931671,
+      "tag": "0010_hot_power_pack",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1729237806604,
+      "tag": "0011_dear_titania",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1729244699342,
+      "tag": "0012_worthless_hobgoblin",
+      "breakpoints": true
+    }
+  ]
 }
