@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, ref, useTemplateRef } from 'vue';
+import { onMounted, reactive, ref, useTemplateRef } from 'vue';
 import {
 	ElInput,
 	ElForm,
@@ -15,9 +15,11 @@ import { $router } from '../../lib/router/router';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg';
 import { $api } from '../../lib/api';
 import { quantityUnits } from '../../lib/constants/quantity-units.js';
+import { requiredRule } from './constants.js';
 
 const formEl = useTemplateRef('form-el');
 const isSaving = ref(false);
+const storages = ref([]);
 const form = ref({
 	name: '',
 	casNumber: '',
@@ -27,39 +29,31 @@ const form = ref({
 	quantityUnit: '',
 	quantity: 0,
 	expirationDate: '',
-	room: '',
-	cabinet: '',
-	shelf: '',
+	storageLocationId: '',
 	description: ''
 });
 
-const requiredRule = {
-	required: true,
-	message: 'Please enter a value',
-	trigger: ['blur', 'change']
-};
 const rules = reactive({
-	name: [requiredRule],
-	// casNumber: [requiredRule],
-	producer: [requiredRule],
-	catalogId: [requiredRule],
-	catalogLink: [requiredRule],
-	quantityUnit: [requiredRule],
+	name: [requiredRule('Name')],
+	producer: [requiredRule('Producer')],
+	catalogId: [requiredRule('Catalog ID')],
+	catalogLink: [requiredRule('Catalog link')],
+	quantityUnit: [requiredRule('Unit')],
 	quantity: [
-		requiredRule,
+		requiredRule('Quantity'),
 		{ type: 'number', min: 1, message: 'Quantity cannot be zero', trigger: ['blur', 'change'] }
 	],
-	expirationDate: [requiredRule],
-	room: [requiredRule],
-	cabinet: [requiredRule],
-	shelf: [requiredRule]
+	expirationDate: [requiredRule('Expiration date')],
+	storageLocationId: [requiredRule('Storage lcoation')]
+});
+
+onMounted(() => {
+	setStorages();
 });
 
 async function submit() {
 	if (!(await $isFormValid(formEl))) return;
-
 	isSaving.value = true;
-
 	try {
 		const response = await $api.reagents.addReagent(form.value);
 		$notify({ message: response.message, type: 'success' });
@@ -75,6 +69,14 @@ function cancel() {
 	formEl.value.resetFields();
 	$router.push({ name: 'dashboard' });
 }
+async function setStorages() {
+	try {
+		const data = await $api.storages.fetchStorages();
+		storages.value = data.storages;
+	} catch (error) {
+		$notifyUserAboutError(error);
+	}
+}
 </script>
 
 <template>
@@ -88,14 +90,14 @@ function cancel() {
 				<el-input v-model="form.casNumber" placeholder="Indicate CAS number" />
 			</el-form-item>
 			<el-form-item label="Producer" prop="producer">
-				<el-input v-model="form.producer" />
+				<el-input v-model="form.producer" placeholder="Add producer" />
 			</el-form-item>
 			<div class="align-horizontal">
 				<el-form-item label="Catalog ID" prop="catalogId">
-					<el-input v-model="form.catalogId" />
+					<el-input v-model="form.catalogId" placeholder="Add catalog id" />
 				</el-form-item>
 				<el-form-item label="Catalog link" prop="catalogLink">
-					<el-input v-model="form.catalogLink" />
+					<el-input v-model="form.catalogLink" placeholder="Add catalog link" />
 				</el-form-item>
 			</div>
 			<div class="align-horizontal">
@@ -110,27 +112,27 @@ function cancel() {
 				</el-form-item>
 			</div>
 			<el-form-item label="Price per unit" prop="unitPrice">
-				<el-input v-model="form.unitPrice" />
+				<el-input v-model="form.unitPrice" placeholder="Price per unit" />
 			</el-form-item>
 			<el-form-item label="Expiration date" prop="expirationDate">
 				<el-date-picker
 					v-model="form.expirationDate"
+					placeholder="Indicate expiration date"
 					type="date"
 					format="YYYY-MM-DD"
 					value-format="YYYY-MM-DD"
 				/>
 			</el-form-item>
-			<div class="align-horizontal">
-				<el-form-item label="Room" prop="room">
-					<el-input v-model="form.room" placeholder="Enter room" />
-				</el-form-item>
-				<el-form-item label="Cabinet" prop="cabinet">
-					<el-input v-model="form.cabinet" placeholder="Enter cabinet" />
-				</el-form-item>
-				<el-form-item label="Shelf" prop="shelf">
-					<el-input v-model="form.shelf" placeholder="Enter shelf" />
-				</el-form-item>
-			</div>
+			<el-form-item label="Storage location" prop="storageLocation">
+				<el-select v-model="form.storageLocationId" placeholder="Select storage location">
+					<el-option
+						v-for="storage of storages"
+						:key="storage.id"
+						:label="storage.name"
+						:value="storage.id"
+					/>
+				</el-select>
+			</el-form-item>
 			<el-form-item label="Description" prop="description">
 				<el-input v-model="form.description" type="textarea" placeholder="Enter description" />
 			</el-form-item>
@@ -144,8 +146,9 @@ function cancel() {
 
 <style>
 .container {
-	padding: 1rem;
-	width: 42vw;
+	margin: 0 auto;
+	padding-bottom: 3rem;
+	max-width: 60vw;
 }
 .align-horizontal {
 	display: flex;
@@ -157,9 +160,7 @@ function cancel() {
 	}
 }
 .title {
-	margin-bottom: 12px;
-	color: black;
-	font-weight: 500;
+	padding-bottom: 2rem;
 	font-size: large;
 }
 .btn-container {
@@ -177,7 +178,6 @@ function cancel() {
 @media (max-width: 768px) {
 	.container {
 		padding-bottom: 24px;
-		width: 80vw;
 	}
 	.align-horizontal {
 		display: block;
