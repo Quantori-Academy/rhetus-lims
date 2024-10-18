@@ -1,390 +1,368 @@
 {
-  "id": "900a444d-2e21-4676-9914-114076e99acd",
-  "prevId": "77b7bc0e-28b3-41c3-b60b-6fb5d1052433",
-  "version": "7",
-  "dialect": "postgresql",
-  "tables": {
-    "public.reagents": {
-      "name": "reagents",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "uuid_generate_v4()"
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(256)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "cas_number": {
-          "name": "cas_number",
-          "type": "varchar(12)",
-          "primaryKey": false,
-          "notNull": false,
-          "default": null
-        },
-        "producer": {
-          "name": "producer",
-          "type": "varchar(256)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "catalog_id": {
-          "name": "catalog_id",
-          "type": "varchar(256)",
-          "primaryKey": false,
-          "notNull": false,
-          "default": null
-        },
-        "catalog_link": {
-          "name": "catalog_link",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "default": null
-        },
-        "unit_price": {
-          "name": "unit_price",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "quantity_unit": {
-          "name": "quantity_unit",
-          "type": "varchar(256)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "quantity": {
-          "name": "quantity",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "quantity_left": {
-          "name": "quantity_left",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "expiration_date": {
-          "name": "expiration_date",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "storage_location_id": {
-          "name": "storage_location_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "''"
-        },
-        "deleted": {
-          "name": "deleted",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "public.roles": {
-      "name": "roles",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "name",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "public.storages": {
-      "name": "storages",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "uuid_generate_v4()"
-        },
-        "room": {
-          "name": "room",
-          "type": "varchar(300)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(300)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "deleted": {
-          "name": "deleted",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "public.substances_quantity_changes": {
-      "name": "substances_quantity_changes",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "uuid_generate_v4()"
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "reagent_id": {
-          "name": "reagent_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false,
-          "default": null
-        },
-        "sample_id": {
-          "name": "sample_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false,
-          "default": null
-        },
-        "previous_value": {
-          "name": "previous_value",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "target_value": {
-          "name": "target_value",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "change_reason": {
-          "name": "change_reason",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "substances_quantity_changes_user_id_users_id_fk": {
-          "name": "substances_quantity_changes_user_id_users_id_fk",
-          "tableFrom": "substances_quantity_changes",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "substances_quantity_changes_reagent_id_reagents_id_fk": {
-          "name": "substances_quantity_changes_reagent_id_reagents_id_fk",
-          "tableFrom": "substances_quantity_changes",
-          "tableTo": "reagents",
-          "columnsFrom": [
-            "reagent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "public.users": {
-      "name": "users",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "username": {
-          "name": "username",
-          "type": "varchar(256)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "password": {
-          "name": "password",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "first_name": {
-          "name": "first_name",
-          "type": "varchar(256)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "last_name": {
-          "name": "last_name",
-          "type": "varchar(256)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "email": {
-          "name": "email",
-          "type": "varchar(256)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "role_id": {
-          "name": "role_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "last_login": {
-          "name": "last_login",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "password_reset_status": {
-          "name": "password_reset_status",
-          "type": "password_request_status",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'none'"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "users_role_id_roles_id_fk": {
-          "name": "users_role_id_roles_id_fk",
-          "tableFrom": "users",
-          "tableTo": "roles",
-          "columnsFrom": [
-            "role_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "users_username_unique": {
-          "name": "users_username_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "username"
-          ]
-        }
-      }
-    }
-  },
-  "enums": {
-    "public.name": {
-      "name": "name",
-      "schema": "public",
-      "values": [
-        "administrator",
-        "procurement officer",
-        "researcher"
-      ]
-    },
-    "public.password_request_status": {
-      "name": "password_request_status",
-      "schema": "public",
-      "values": [
-        "none",
-        "active",
-        "confirmed"
-      ]
-    }
-  },
-  "schemas": {},
-  "sequences": {},
-  "_meta": {
-    "columns": {},
-    "schemas": {},
-    "tables": {}
-  }
+	"id": "900a444d-2e21-4676-9914-114076e99acd",
+	"prevId": "77b7bc0e-28b3-41c3-b60b-6fb5d1052433",
+	"version": "7",
+	"dialect": "postgresql",
+	"tables": {
+		"public.reagents": {
+			"name": "reagents",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "uuid",
+					"primaryKey": true,
+					"notNull": true,
+					"default": "uuid_generate_v4()"
+				},
+				"name": {
+					"name": "name",
+					"type": "varchar(256)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"cas_number": {
+					"name": "cas_number",
+					"type": "varchar(12)",
+					"primaryKey": false,
+					"notNull": false,
+					"default": null
+				},
+				"producer": {
+					"name": "producer",
+					"type": "varchar(256)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"catalog_id": {
+					"name": "catalog_id",
+					"type": "varchar(256)",
+					"primaryKey": false,
+					"notNull": false,
+					"default": null
+				},
+				"catalog_link": {
+					"name": "catalog_link",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"default": null
+				},
+				"unit_price": {
+					"name": "unit_price",
+					"type": "real",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"quantity_unit": {
+					"name": "quantity_unit",
+					"type": "varchar(256)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"quantity": {
+					"name": "quantity",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"quantity_left": {
+					"name": "quantity_left",
+					"type": "real",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"expiration_date": {
+					"name": "expiration_date",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"storage_location_id": {
+					"name": "storage_location_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"description": {
+					"name": "description",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"default": "''"
+				},
+				"deleted": {
+					"name": "deleted",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": false,
+					"default": false
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"public.roles": {
+			"name": "roles",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"name": {
+					"name": "name",
+					"type": "name",
+					"typeSchema": "public",
+					"primaryKey": false,
+					"notNull": false
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"public.storages": {
+			"name": "storages",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "uuid",
+					"primaryKey": true,
+					"notNull": true,
+					"default": "uuid_generate_v4()"
+				},
+				"room": {
+					"name": "room",
+					"type": "varchar(300)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"name": {
+					"name": "name",
+					"type": "varchar(300)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"description": {
+					"name": "description",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"deleted": {
+					"name": "deleted",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": false,
+					"default": false
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"public.substances_quantity_changes": {
+			"name": "substances_quantity_changes",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "uuid",
+					"primaryKey": true,
+					"notNull": true,
+					"default": "uuid_generate_v4()"
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"reagent_id": {
+					"name": "reagent_id",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": false,
+					"default": null
+				},
+				"sample_id": {
+					"name": "sample_id",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": false,
+					"default": null
+				},
+				"previous_value": {
+					"name": "previous_value",
+					"type": "real",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"target_value": {
+					"name": "target_value",
+					"type": "real",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"change_reason": {
+					"name": "change_reason",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"substances_quantity_changes_user_id_users_id_fk": {
+					"name": "substances_quantity_changes_user_id_users_id_fk",
+					"tableFrom": "substances_quantity_changes",
+					"tableTo": "users",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				},
+				"substances_quantity_changes_reagent_id_reagents_id_fk": {
+					"name": "substances_quantity_changes_reagent_id_reagents_id_fk",
+					"tableFrom": "substances_quantity_changes",
+					"tableTo": "reagents",
+					"columnsFrom": ["reagent_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"public.users": {
+			"name": "users",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"username": {
+					"name": "username",
+					"type": "varchar(256)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"password": {
+					"name": "password",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"first_name": {
+					"name": "first_name",
+					"type": "varchar(256)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"last_name": {
+					"name": "last_name",
+					"type": "varchar(256)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"email": {
+					"name": "email",
+					"type": "varchar(256)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"role_id": {
+					"name": "role_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"last_login": {
+					"name": "last_login",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"password_reset_status": {
+					"name": "password_reset_status",
+					"type": "password_request_status",
+					"typeSchema": "public",
+					"primaryKey": false,
+					"notNull": false,
+					"default": "'none'"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"users_role_id_roles_id_fk": {
+					"name": "users_role_id_roles_id_fk",
+					"tableFrom": "users",
+					"tableTo": "roles",
+					"columnsFrom": ["role_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {
+				"users_username_unique": {
+					"name": "users_username_unique",
+					"nullsNotDistinct": false,
+					"columns": ["username"]
+				}
+			}
+		}
+	},
+	"enums": {
+		"public.name": {
+			"name": "name",
+			"schema": "public",
+			"values": ["administrator", "procurement officer", "researcher"]
+		},
+		"public.password_request_status": {
+			"name": "password_request_status",
+			"schema": "public",
+			"values": ["none", "active", "confirmed"]
+		}
+	},
+	"schemas": {},
+	"sequences": {},
+	"_meta": {
+		"columns": {},
+		"schemas": {},
+		"tables": {}
+	}
 }
