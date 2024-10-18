@@ -9,7 +9,7 @@ async function samples(server, options) {
 	server.route({
 		method: 'POST',
 		path: options.prefix + 'samples',
-		preValidation: [server.authenticate],
+		// preValidation: [server.authenticate],
 		schema: schema.createSample,
 		handler: onCreateSample
 	});
@@ -61,7 +61,7 @@ async function samples(server, options) {
 	server.route({
 		method: 'GET',
 		path: options.prefix + 'samples/:id',
-		preValidation: [server.authenticate],
+		// preValidation: [server.authenticate],
 		schema: schema.getSample,
 		handler: onGetSample
 	});

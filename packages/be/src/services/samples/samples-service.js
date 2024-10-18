@@ -35,7 +35,7 @@ async function samplesService(server) {
 				.returning({ id: schema.samples.id, name: schema.samples.name });
 
 			const components = reagentsAndSamples.map(x => ({
-				id: sample.id,
+				id: sample[0].id,
 				category: x.category,
 				quantityUsed: x.quantityUsed,
 				quantityUnit: x.quantityUnit,
@@ -64,6 +64,7 @@ async function samplesService(server) {
 		},
 
 		getSampleById: async id => {
+			// Query to get the sample details
 			const sample = await server.db
 				.select({
 					id: schema.samples.id,
@@ -72,65 +73,58 @@ async function samplesService(server) {
 					quantityLeft: schema.samples.quantityLeft,
 					quantity: schema.samples.quantity,
 					expirationDate: schema.samples.expirationDate,
-					description: schema.samples.description
-					// storageLocation: {
-					// 	id: schema.locations.id,
-					// 	name: schema.locations.name
-					// }
+					description: schema.samples.description,
+					storageLocation: {
+						id: schema.storages.id,
+						name: schema.storages.name,
+						room: schema.storages.room,
+						description: schema.storages.description
+					}
 				})
 				.from(schema.samples)
+				.innerJoin(schema.storages, eq(schema.storages.id, schema.samples.storageId))
 				.where(and(eq(id, schema.samples.id), eq(schema.samples.deleted, false)))
 				.limit(1);
 
 			if (!sample[0]) return null;
 
-			// const reagents = await server.db
-			// 	.select({
-			// 		id: schema.sampleReagentUsage.childReagentId,
-			// 		name: schema.reagents.name,
-			// 		quantityUnit: schema.reagents.quantityUnit,
-			// 		quantity: schema.reagents.quantity,
-			// 		quantityLeft: schema.reagents.quantityLeft,
-			// 		expirationDate: schema.reagents.expirationDate,
-			// 		description: schema.reagents.description,
-			// 		// storageLocation: {
-			// 		// 	id: schema.locations.id,
-			// 		// 	name: schema.locations.name
-			// 		// }
-			// 		category: sql`'reagent'`.as('category')
-			// 	})
-			// 	.from(schema.sampleReagentUsage)
-			// 	.innerJoin(
-			// 		schema.reagents,
-			// 		eq(schema.reagents.id, schema.sampleReagentUsage.childReagentId)
-			// 	)
-			// 	.where(eq(id, schema.sampleReagentUsage.parentSampleId));
+			const reagentsAndSamples = await server.db
+				.select({
+					id: schema.components.reagentId,
+					name: schema.reagents.name,
+					quantityUsed: schema.components.quantityUsed,
+					quantityUnit: schema.reagents.quantityUnit,
+					quantity: schema.reagents.quantity,
+					quantityLeft: schema.reagents.quantityLeft,
+					expirationDate: schema.reagents.expirationDate,
+					description: schema.reagents.description,
+					category: sql`'reagent'`.as('category')
+				})
+				.from(schema.components)
+				.innerJoin(schema.reagents, eq(schema.reagents.id, schema.components.reagentId))
+				.where(eq(id, schema.components.id))
+				.union(
+					server.db
+						.select({
+							id: schema.components.sampleId,
+							name: schema.samples.name,
+							quantityUsed: schema.components.quantityUsed,
+							quantityUnit: schema.samples.quantityUnit,
+							quantity: schema.samples.quantity,
+							quantityLeft: schema.samples.quantityLeft,
+							expirationDate: schema.samples.expirationDate,
+							description: schema.samples.description,
+							category: sql`'sample'`.as('category')
+						})
+						.from(schema.components)
+						.innerJoin(schema.samples, eq(schema.samples.id, schema.components.sampleId))
+						.where(eq(id, schema.components.id))
+				);
 
-			// const samples = await server.db
-			// 	.select({
-			// 		id: schema.sampleSampleUsage.childSampleId,
-			// 		name: schema.samples.name,
-			// 		quantityUnit: schema.samples.quantityUnit,
-			// 		quantityLeft: schema.samples.quantityLeft,
-			// 		quantity: schema.samples.size,
-			// 		expirationDate: schema.samples.expirationDate,
-			// 		description: schema.samples.description,
-			// 		// storageLocation: {
-			// 		// 	id: schema.locations.id,
-			// 		// 	name: schema.locations.name
-			// 		// }
-			// 		category: sql`'sample'`.as('category')
-			// 	})
-			// 	.from(schema.sampleSampleUsage)
-			// 	.innerJoin(schema.samples, eq(schema.samples.id, schema.sampleSampleUsage.childSampleId))
-			// 	.where(eq(id, schema.sampleSampleUsage.parentSampleId));
-
-			const result = {
-				...sample[0]
-				// reagentsAndSamples: [...reagents, ...samples]
+			return {
+				...sample[0],
+				reagentsAndSamples
 			};
-
-			return result;
 		},
 
 		softDeleteSample: async id => {

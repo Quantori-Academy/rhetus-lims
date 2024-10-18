@@ -1,5 +1,6 @@
 import S from 'fluent-json-schema';
 import { Substance } from '../substances/substances-schema.js';
+import { Storage } from '../storages/storages-schema.js';
 
 const statusMessage = S.object()
 	.prop('status', S.string().required())
@@ -44,9 +45,13 @@ const getSample = {
 			.prop('quantityLeft', S.number().required())
 			.prop('expirationDate', S.string().format(S.FORMATS.DATE_TIME).required())
 			.prop('description', S.string())
-			// TODO add location
-			// .prop('storageLocation', S.object()...)
-			.prop('reagentsAndSamples', S.array().items(Substance.without('storageLocationId'))),
+			.prop('storageLocation', Storage.without(['createdAt']))
+			.prop(
+				'reagentsAndSamples',
+				S.array().items(
+					Substance.without('storageLocationId').prop('quantityUsed', S.number().required())
+				)
+			),
 		404: statusMessage,
 		500: statusMessage
 	}
