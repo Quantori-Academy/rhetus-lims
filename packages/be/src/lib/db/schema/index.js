@@ -1,7 +1,8 @@
 import { users } from './users.js';
 import { roles } from './roles.js';
 import { reagents } from './reagents.js';
-import { substancesQuantityChanges } from './substances-quantity-changes.js';import { storages } from './storages.js';
+import { substancesQuantityChanges } from './substances-quantity-changes.js';
+import { storages } from './storages.js';
 
 export const schema = {
 	users,
