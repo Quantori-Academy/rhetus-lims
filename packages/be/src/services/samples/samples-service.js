@@ -1,7 +1,7 @@
 import fp from 'fastify-plugin';
 import { schema } from '../../lib/db/schema/index.js';
 import { and, eq, sql } from 'drizzle-orm';
-import { Category, components } from '../../lib/db/schema/components.js';
+import { Category } from '../../lib/db/schema/components.js';
 
 const formatMapping = {
 	name: string => `${string.charAt(0).toUpperCase()}${string.slice(1).toLowerCase()}`
@@ -54,6 +54,10 @@ async function samplesService(server) {
 						? await server.reagentsService.getReagentById(components[i].id)
 						: await server.samplesService.getSampleById(components[i].id);
 
+				if (!substance) {
+					return false;
+				}
+
 				const diff = substance.quantityLeft - components[i].quantityUsed;
 
 				if (diff < 0) {
@@ -64,7 +68,6 @@ async function samplesService(server) {
 		},
 
 		getSampleById: async id => {
-			// Query to get the sample details
 			const sample = await server.db
 				.select({
 					id: schema.samples.id,

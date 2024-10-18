@@ -7,7 +7,7 @@
 		"pnpm": "^9.0.0"
 	},
 	"scripts": {
-		"dev": "node --watch --env-file .env.local src/server.js",
+		"dev": "node --watch --env-file .env src/server.js",
 		"start": "node --env-file .env src/server.js",
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "node src/lib/db/migrate.js",

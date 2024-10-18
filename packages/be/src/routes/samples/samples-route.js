@@ -9,7 +9,7 @@ async function samples(server, options) {
 	server.route({
 		method: 'POST',
 		path: options.prefix + 'samples',
-		// preValidation: [server.authenticate],
+		preValidation: [server.authenticate],
 		schema: schema.createSample,
 		handler: onCreateSample
 	});
@@ -35,20 +35,25 @@ async function samples(server, options) {
 
 			const sampleName = await server.samplesService.createSample(req.body);
 
-			for (let i = 0; i < reagentsAndSamples.length; i++) {
-				const substance =
-					reagentsAndSamples[i].category === Category.REAGENT
-						? await server.reagentsService.getReagentById(reagentsAndSamples[i].id)
-						: await server.samplesService.getSampleById(reagentsAndSamples[i].id);
+			const getSubstanceById = async item => {
+				return item.category === Category.REAGENT
+					? server.reagentsService.getReagentById(item.id)
+					: server.samplesService.getSampleById(item.id);
+			};
 
-				await server.substancesService.changeSubstanceQuantity(reagentsAndSamples[i].id, {
-					category: reagentsAndSamples[i].category,
-					quantityUsed: reagentsAndSamples[i].quantityUsed,
-					quantityLeft: substance.quantityLeft - reagentsAndSamples[i].quantityUsed,
-					userId: 1,
-					reason: `Used in making ${sampleName}`
-				});
-			}
+			await Promise.all(
+				reagentsAndSamples.map(async item => {
+					const substance = await getSubstanceById(item);
+
+					await server.substancesService.changeSubstanceQuantity(item.id, {
+						category: item.category,
+						quantityUsed: item.quantityUsed,
+						quantityLeft: substance.quantityLeft - item.quantityUsed,
+						userId: req.session.user.id,
+						reason: `Used in making ${sampleName}`
+					});
+				})
+			);
 
 			return reply
 				.code(201)
@@ -61,7 +66,7 @@ async function samples(server, options) {
 	server.route({
 		method: 'GET',
 		path: options.prefix + 'samples/:id',
-		// preValidation: [server.authenticate],
+		preValidation: [server.authenticate],
 		schema: schema.getSample,
 		handler: onGetSample
 	});

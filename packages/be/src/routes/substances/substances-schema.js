@@ -10,7 +10,7 @@ const statusMessage = S.object()
 	.prop('status', S.string().required())
 	.prop('message', S.string().required());
 
-export const Substance = S.object()
+const Substance = S.object()
 	.prop('id', S.string().format(S.FORMATS.UUID).required())
 	.prop('name', S.string().minLength(1).required())
 	.prop('category', S.string().required())
@@ -60,4 +60,4 @@ const changeQuantity = {
 	}
 };
 
-export { getSubstances, changeQuantity };
+export { getSubstances, changeQuantity, Substance };
