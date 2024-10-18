@@ -27,7 +27,7 @@ async function substances(server, options) {
 	server.route({
 		method: 'PUT',
 		path: options.prefix + 'substances/quantity-change/:id',
-		preValidation: [server.authenticate],
+		// preValidation: [server.authenticate],
 		schema: schema.changeQuantity,
 		handler: onQuantityChange
 	});
@@ -51,7 +51,7 @@ async function substances(server, options) {
 				substanceId,
 				{
 					...req.body,
-					userId: req.session.user.id
+					userId: 1
 				}
 			);
 

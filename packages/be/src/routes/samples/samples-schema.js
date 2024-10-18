@@ -9,18 +9,20 @@ const createSample = {
 	security: [{ Session: [] }],
 	body: S.object()
 		.prop('name', S.string().required())
-		.prop('size', S.number().required())
+		.prop('quantity', S.number().required())
 		.prop('quantityUnit', S.string().required())
 		.prop('quantityLeft', S.number().required())
 		.prop('expirationDate', S.string().format(S.FORMATS.DATE_TIME).required())
-		.prop('room', S.string().required())
-		.prop('cabinet', S.string().required())
-		.prop('shelf', S.string().required())
+		.prop('storageId', S.string().required())
 		.prop('description', S.string())
 		.prop(
 			'reagentsAndSamples',
 			S.array().items(
-				S.object().prop('id', S.string().required()).prop('category', S.string().required())
+				S.object()
+					.prop('id', S.string().required())
+					.prop('quantityUsed', S.number().required())
+					.prop('quantityUnit', S.string().required())
+					.prop('category', S.string().required())
 			)
 		),
 	response: {
@@ -37,7 +39,7 @@ const getSample = {
 		200: S.object()
 			.prop('id', S.string().format(S.FORMATS.UUID).required())
 			.prop('name', S.string().required())
-			.prop('size', S.number().required())
+			.prop('quantity', S.number().required())
 			.prop('quantityUnit', S.string().required())
 			.prop('quantityLeft', S.number().required())
 			.prop('expirationDate', S.string().format(S.FORMATS.DATE_TIME).required())

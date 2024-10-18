@@ -3,6 +3,7 @@ import { sql } from 'drizzle-orm';
 
 import { users } from './users.js';
 import { reagents } from './reagents.js';
+import { samples } from './samples.js';
 
 export const substancesQuantityChanges = pgTable('substances_quantity_changes', {
 	id: uuid('id')
@@ -12,9 +13,9 @@ export const substancesQuantityChanges = pgTable('substances_quantity_changes', 
 	reagentId: uuid('reagent_id')
 		.references(() => reagents.id)
 		.default(null),
-	sampleId: uuid('sample_id').default(null),
-	// TODO: add reference after samples will be implemented
-	// .references(() => samples.id),
+	sampleId: uuid('sample_id')
+		.references(() => samples.id)
+		.default(null),
 	previousValue: real('previous_value').notNull(),
 	targetValue: real('target_value').notNull(),
 	changeReason: text('change_reason').notNull(),

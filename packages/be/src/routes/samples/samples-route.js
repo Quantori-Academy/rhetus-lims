@@ -1,6 +1,7 @@
 import fp from 'fastify-plugin';
 import * as schema from './samples-schema.js';
 import samplesService from '../../services/samples/samples-service.js';
+import { Category } from '../../lib/db/schema/components.js';
 
 async function samples(server, options) {
 	await server.register(samplesService);
@@ -15,35 +16,39 @@ async function samples(server, options) {
 
 	async function onCreateSample(req, reply) {
 		try {
-			// TODO
-			// const { room, cabinet, shelf } = req.body;
-			// const location = await server.locationsService.findLocationByName({
-			// 	room,
-			// 	name: cabinet + ', ' + shelf
-			// });
-			// if (!location) {
-			// 	return reply
-			// 		.code(400)
-			// 		.send({
-			// 			status: 'error',
-			// 			message: `No storage location ${room} ${cabinet} ${shelf} found`
-			// 		});
-			// }
+			const storage = await server.storagesService.getStorageById(req.body.storageId);
 
-			const { reagentsAndSamples, name } = req.body;
-
-			const areComponentsValid = await validateReagentsAndSamples(reagentsAndSamples);
-			if (!areComponentsValid) {
-				return reply.code(400).send({
-					status: 'error',
-					message: `Reagent or sample used in making ${name} not found`
-				});
+			if (!storage) {
+				return reply.code(400).send({ status: 'error', message: `No such storage location` });
 			}
 
-			// TODO: add location id
-			const sampleName = await server.samplesService.createSample({
-				...req.body
-			});
+			const { reagentsAndSamples } = req.body;
+
+			const insufficientComponent =
+				await server.samplesService.areComponentsInsufficient(reagentsAndSamples);
+
+			if (insufficientComponent) {
+				return reply
+					.code(400)
+					.send({ status: 'error', message: `Not enough ${insufficientComponent} left` });
+			}
+
+			const sampleName = await server.samplesService.createSample(req.body);
+
+			for (let i = 0; i < reagentsAndSamples.length; i++) {
+				const substance =
+					reagentsAndSamples[i].category === Category.REAGENT
+						? await server.reagentsService.getReagentById(reagentsAndSamples[i].id)
+						: await server.samplesService.getSampleById(reagentsAndSamples[i].id);
+
+				await server.substancesService.changeSubstanceQuantity(reagentsAndSamples[i].id, {
+					category: reagentsAndSamples[i].category,
+					quantityUsed: reagentsAndSamples[i].quantityUsed,
+					quantityLeft: substance.quantityLeft - reagentsAndSamples[i].quantityUsed,
+					userId: 1,
+					reason: `Used in making ${sampleName}`
+				});
+			}
 
 			return reply
 				.code(201)
@@ -51,20 +56,6 @@ async function samples(server, options) {
 		} catch (err) {
 			return reply.code(500).send(err);
 		}
-	}
-
-	async function validateReagentsAndSamples(array) {
-		for (let i = 0; i < array.length; i++) {
-			const substance =
-				array[i].category === 'reagent'
-					? await server.reagentsService.getReagentById(array[i].id)
-					: await server.samplesService.getSampleById(array[i].id);
-
-			if (!substance) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 	server.route({

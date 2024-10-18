@@ -3,6 +3,7 @@ import { unionAll } from 'drizzle-orm/pg-core';
 import fp from 'fastify-plugin';
 import { generateFilterSubquery } from '../../lib/utils/db/filter-subquery-generator.js';
 import { generateOrderSubquery } from '../../lib/utils/db/order-subquery-generator.js';
+import { Category } from '../../lib/db/schema/components.js';
 
 const formatMapping = {
 	name: string => `${string.charAt(0).toUpperCase()}${string.slice(1).toLowerCase()}`,
@@ -97,14 +98,10 @@ async function substancesService(server) {
 		},
 
 		changeSubstanceQuantity: async (id, data) => {
-			//TODO: add sample logic after it will be implemented
-			const { code, status, message } = await server.reagentsService.changeReagentQuantity(
-				id,
-				data
-			);
-			// data.category === 'reagent'
-			// 	? server.reagentsService.changeReagentQuantity(id, data)
-			// 	: server.samplesService.changeSampleQuantity(id, data);
+			const { code, status, message } =
+				data.category === Category.REAGENT
+					? await server.reagentsService.changeReagentQuantity(id, data)
+					: await server.samplesService.changeSampleQuantity(id, data);
 
 			return { code, status, message };
 		}

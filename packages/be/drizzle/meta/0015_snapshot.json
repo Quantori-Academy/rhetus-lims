@@ -1,6 +1,6 @@
 {
-  "id": "d488f263-d56a-427d-a243-dadb6fa04f6c",
-  "prevId": "1df3f2dd-7d13-4561-b2b6-6896fe11a34a",
+  "id": "1b0d5f80-1d6a-418f-81da-455f794464ba",
+  "prevId": "d488f263-d56a-427d-a243-dadb6fa04f6c",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -18,13 +18,15 @@
           "name": "sample_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": null
         },
         "reagent_id": {
           "name": "reagent_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": null
         },
         "quantity_used": {
           "name": "quantity_used",
@@ -439,6 +441,19 @@
           "tableTo": "reagents",
           "columnsFrom": [
             "reagent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "substances_quantity_changes_sample_id_samples_id_fk": {
+          "name": "substances_quantity_changes_sample_id_samples_id_fk",
+          "tableFrom": "substances_quantity_changes",
+          "tableTo": "samples",
+          "columnsFrom": [
+            "sample_id"
           ],
           "columnsTo": [
             "id"
