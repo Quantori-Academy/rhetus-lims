@@ -1,10 +1,11 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { ElTable, ElTableColumn, ElButton, ElTooltip } from 'element-plus';
+import { ElTable, ElTableColumn, ElButton } from 'element-plus';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { $api } from '../../lib/api/index.js';
-import { $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
+import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $router } from '../../lib/router/router.js';
+import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
 
 const storages = ref([]);
 const isLoading = ref(false);
@@ -20,9 +21,37 @@ function editStorageLocation(id) {
 	$router.push({ name: 'edit-storage', params: { id } });
 }
 
-function deleteStorageLocation(id) {
-	console.log('delete user', id);
+async function deleteStorageLocation(id) {
+	try {
+		await $confirm(
+			'Are you sure you want to delete this storage location?',
+			'Please, confirm your action',
+			{
+				confirmButtonText: 'Delete',
+				cancelButtonText: 'Cancel',
+				type: 'warning'
+			}
+		);
+		try {
+			const response = await $api.storages.deleteStorage(id);
+			$notify({
+				title: 'Success',
+				message: response.message,
+				type: 'success'
+			});
+			await setStorages();
+		} catch (err) {
+			$notifyUserAboutError(err);
+		}
+	} catch {
+		$notify({
+			title: 'Canceled',
+			message: 'Deletion canceled',
+			type: 'info'
+		});
+	}
 }
+
 async function setStorages() {
 	isLoading.value = true;
 	try {
@@ -46,32 +75,26 @@ onMounted(() => {
 			>Add New Storage Location</el-button
 		>
 		<el-table v-loading="isLoading" :data="storages">
-			<el-table-column prop="room" label="Room" width="180" />
-			<el-table-column prop="name" label="Name" width="180" />
-			<el-table-column prop="description" label="Description" width="180" />
+			<el-table-column prop="room" label="Room" />
+			<el-table-column prop="name" label="Name" />
+			<el-table-column prop="description" label="Description" />
 			<el-table-column width="80">
 				<template #default="{ row }">
-					<el-tooltip class="box-item" effect="dark" content="View content" placement="top-end">
-						<el-button @click="() => viewStorageLocation(row.id)"><rh-icon name="eye" /></el-button>
-					</el-tooltip>
+					<el-button @click="() => viewStorageLocation(row.id)"><rh-icon name="eye" /></el-button>
 				</template>
 			</el-table-column>
 			<el-table-column width="80">
 				<template #default="{ row }">
-					<el-tooltip class="box-item" effect="dark" content="Edit" placement="top-end">
-						<el-button @click="() => editStorageLocation(row.id)"
-							><rh-icon name="pencil"
-						/></el-button>
-					</el-tooltip>
+					<el-button @click="() => editStorageLocation(row.id)"
+						><rh-icon name="pencil"
+					/></el-button>
 				</template>
 			</el-table-column>
 			<el-table-column width="80">
 				<template #default="{ row }">
-					<el-tooltip class="box-item" effect="dark" content="Delete" placement="top-end">
-						<el-button type="danger" @click="() => deleteStorageLocation(row.id)">
-							<rh-icon color="white" name="trash" />
-						</el-button>
-					</el-tooltip>
+					<el-button type="danger" @click="() => deleteStorageLocation(row.id)">
+						<rh-icon color="white" name="trash" />
+					</el-button>
 				</template>
 			</el-table-column>
 		</el-table>
