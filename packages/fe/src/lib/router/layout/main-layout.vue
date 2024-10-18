@@ -4,6 +4,7 @@ import PageWithSidebar from '../../../sidebar/page-with-sidebar.vue';
 
 import { $api } from '../../api/index.js';
 import { $router } from '../router.js';
+import { $notify } from '../../utils/feedback/notify-msg.js';
 
 const user = ref(null);
 const isAuthorized = computed(() => !!user.value);
@@ -28,6 +29,26 @@ provide('auth', {
 
 onMounted(() => {
 	setUser();
+});
+
+$router.beforeEach((to, from, next) => {
+	const routeRoles = to.meta.roles || [];
+	const userRole = user.value?.role?.name;
+
+	if (routeRoles.length === 0) {
+		return next();
+	}
+
+	if (routeRoles.includes(userRole)) {
+		return next();
+	} else {
+		$notify({
+			title: 'Error',
+			message:
+				'You do not have the credentials to access this page. Please consult your administator',
+			type: 'error'
+		});
+	}
 });
 </script>
 
