@@ -9,8 +9,7 @@ const formatMapping = {
 	casNumber: string => string.toLowerCase(),
 	quantityUnit: string => string.toLowerCase(),
 	category: string => string.toLowerCase(),
-	// TODO: after storage implementing check is number or string(uuid)
-	storage_location_id: string => Number(string)
+	storage_location_id: string => string
 };
 
 const optionsDictionary = {
@@ -22,7 +21,6 @@ const optionsDictionary = {
 		property: 'category',
 		schema: 'union'
 	},
-	// TODO: add location field when it will be implemented
 	location: {
 		property: 'storage_location_id',
 		schema: 'union'
@@ -36,7 +34,6 @@ const optionsDictionary = {
 const sortDictionary = {
 	name: 'name',
 	category: 'category',
-	// TODO: add location field when it will be implemented
 	location: 'storage_location_id',
 	expirationdate: 'expiration_date'
 };
@@ -54,7 +51,6 @@ async function substancesService(server) {
 			const reagentsQuery = server.reagentsService.getReagentsQuery();
 
 			// TODO: add correct sample query whet it will be implemented
-			// TODO: add join with storages when it will be implemented and change in select
 			const samplesQuery = sql.raw(`select *, 'sample' as category from sample_fake`);
 
 			const unionQuery = unionAll(reagentsQuery, samplesQuery);

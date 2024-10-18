@@ -1,4 +1,5 @@
 import S from 'fluent-json-schema';
+import { Storage } from '../storages/storages-schema.js';
 
 const categoriesEnum = {
 	SAMPLE: 'sample',
@@ -13,12 +14,9 @@ const Substance = S.object()
 	.prop('id', S.string().format(S.FORMATS.UUID).required())
 	.prop('name', S.string().minLength(1).required())
 	.prop('category', S.string().required())
-	// TODO: add structure after it will be implemented in next milestones
-	// .prop('structure', S.string().required())
 	.prop('description', S.string().required())
 	.prop('quantityLeft', S.number().required())
-	// TODO: Check is it number or string(UUID) after location management will be implemented
-	.prop('storageLocationId', S.number().required())
+	.prop('storageLocationId', S.string().format(S.FORMATS.UUID).required())
 	.prop('quantityUnit', S.string().minLength(1).required())
 	.prop('quantity', S.number().required())
 	.prop('expirationDate', S.string().format(S.FORMATS.DATE_TIME).required());
@@ -35,10 +33,10 @@ const getSubstances = {
 			.prop(
 				'substances',
 				S.array().items(
-					Substance
-					// TODO: add Location schema after it will be implemented
-					// .prop('location', Location)
-					// .required()
+					Substance.without(['storageLocationId']).prop(
+						'storageLocation',
+						Storage.without(['createdAt'])
+					)
 				)
 			)
 			.prop('count', S.number()),
