@@ -127,7 +127,11 @@ async function setStorages() {
 				/>
 			</el-form-item>
 			<el-form-item label="Storage location" prop="storageLocation">
-				<el-select v-model="form.storageLocationId" placeholder="Select storage location">
+				<el-select
+					v-model="form.storageLocationId"
+					placeholder="Select storage location"
+					:loading="isLoading"
+				>
 					<el-option
 						v-for="storage of storages"
 						:key="storage.id"
