@@ -48,20 +48,20 @@ async function samplesService(server) {
 		},
 
 		areComponentsInsufficient: async components => {
-			for (let i = 0; i < components.length; i++) {
-				const substance =
-					components[i].category === Category.REAGENT
-						? await server.reagentsService.getReagentById(components[i].id)
-						: await server.samplesService.getSampleById(components[i].id);
+			for (const component of components) {
+				const substance = await server.substancesService.getSubstanceById(
+					component.id,
+					component.category
+				);
 
 				if (!substance) {
-					return false;
+					return true;
 				}
 
-				const diff = substance.quantityLeft - components[i].quantityUsed;
+				const diff = substance.quantityLeft - component.quantityUsed;
 
 				if (diff < 0) {
-					return substance.name;
+					return true;
 				}
 			}
 			return false;

@@ -1,7 +1,6 @@
 import fp from 'fastify-plugin';
 import * as schema from './samples-schema.js';
 import samplesService from '../../services/samples/samples-service.js';
-import { Category } from '../../lib/db/schema/components.js';
 
 async function samples(server, options) {
 	await server.register(samplesService);
@@ -28,22 +27,14 @@ async function samples(server, options) {
 				await server.samplesService.areComponentsInsufficient(reagentsAndSamples);
 
 			if (insufficientComponent) {
-				return reply
-					.code(400)
-					.send({ status: 'error', message: `Not enough ${insufficientComponent} left` });
+				return reply.code(400).send({ status: 'error', message: `Not enough components left` });
 			}
 
 			const sampleName = await server.samplesService.createSample(req.body);
 
-			const getSubstanceById = async item => {
-				return item.category === Category.REAGENT
-					? server.reagentsService.getReagentById(item.id)
-					: server.samplesService.getSampleById(item.id);
-			};
-
 			await Promise.all(
 				reagentsAndSamples.map(async item => {
-					const substance = await getSubstanceById(item);
+					const substance = await server.substancesService.getSubstanceById(item.id, item.category);
 
 					await server.substancesService.changeSubstanceQuantity(item.id, {
 						category: item.category,

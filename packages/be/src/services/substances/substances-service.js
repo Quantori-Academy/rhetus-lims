@@ -73,6 +73,12 @@ async function substancesService(server) {
 			};
 		},
 
+		getSubstanceById: async (id, category) => {
+			return category === Category.REAGENT
+				? await server.reagentsService.getReagentById(id)
+				: await server.samplesService.getSampleById(id);
+		},
+
 		applyFilters: (query, filterData) => {
 			const { options, formatMapping, optionsDictionary } = filterData;
 
