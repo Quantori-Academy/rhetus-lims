@@ -26,7 +26,7 @@ watch(
 <template>
 	<div class="filters-container">
 		<filter-item>
-			<el-input v-model="filters.role" class="filter" placeholder="String filter">
+			<el-input v-model="filters.role" clearable class="filter" placeholder="String filter">
 				<template #prefix>
 					<rh-icon name="search" />
 				</template>
@@ -34,7 +34,14 @@ watch(
 		</filter-item>
 
 		<filter-item>
-			<el-date-picker v-model="filters.date" class="filter" type="date" placeholder="Date filter" />
+			<el-date-picker
+				v-model="filters.date"
+				class="filter"
+				type="date"
+				placeholder="Date filter"
+				format="YYYY/MM/DD"
+				value-format="YYYY-MM-DD"
+			/>
 		</filter-item>
 	</div>
 </template>
@@ -45,5 +52,9 @@ watch(
 	flex-wrap: wrap;
 	justify-content: start;
 	margin: 20px 0 15px 0;
+}
+
+::v-deep .el-input {
+	width: 300px;
 }
 </style>

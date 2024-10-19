@@ -26,7 +26,7 @@ export let userInfo = {
 				id: 1,
 				name: 'administrator'
 			},
-			lastLogin: '2024-09-26T10:15:06.720Z',
+			lastLogin: '2024-09-27T10:15:06.720Z',
 			createdAt: '2024-09-27T21:47:47.481Z'
 		},
 		{
@@ -80,8 +80,33 @@ export const usersHandlers = [
 	http.get(api('/roles'), () => {
 		return HttpResponse.json(roleInfo);
 	}),
-	http.get(api('/users'), () => {
-		return HttpResponse.json(userInfo);
+	http.get(api('/users'), req => {
+		const url = new URL(req.request.url);
+		const options = url.searchParams.get('options');
+		const parsedOptions = JSON.parse(options);
+
+		if (parsedOptions === null) {
+			return HttpResponse.json(userInfo);
+		} else {
+			const filteredUsers = userInfo.users.filter(user => {
+				let matchesDate = true;
+				let matchesRole = true;
+
+				if (parsedOptions.date) {
+					matchesDate = user.lastLogin.startsWith(parsedOptions.date);
+				}
+
+				if (parsedOptions.role) {
+					matchesRole = user.role.name.includes(parsedOptions.role);
+				}
+
+				return matchesDate && matchesRole;
+			});
+
+			return HttpResponse.json({
+				items: filteredUsers
+			});
+		}
 	}),
 	http.post(api('/users'), async ({ request }) => {
 		const user = await request.json();

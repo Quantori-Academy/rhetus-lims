@@ -7,6 +7,14 @@ const visible = ref(true);
 const toggleFilterView = () => {
 	visible.value = !visible.value;
 };
+
+const emit = defineEmits(['reset-filters', 'set-filters']);
+const resetFilters = () => {
+	emit('reset-filters');
+};
+const setFilters = () => {
+	emit('set-filters');
+};
 </script>
 
 <template>
@@ -22,7 +30,8 @@ const toggleFilterView = () => {
 
 	<div v-if="visible" class="after-buttons">
 		<slot name="afterButtons">
-			<el-button>Reset filters</el-button>
+			<el-button @click="setFilters">Apply filters</el-button>
+			<el-button @click="resetFilters">Reset filters</el-button>
 		</slot>
 	</div>
 </template>

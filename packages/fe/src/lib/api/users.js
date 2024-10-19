@@ -5,8 +5,14 @@ export default http => ({
 	async getRoles() {
 		return await http('/roles');
 	},
-	async fetchUsers() {
-		return await http(`/users`);
+	async fetchUsers(params) {
+		return await http(
+			`/users`,
+			{ query: params },
+			{
+				method: 'GET'
+			}
+		);
 	},
 	async addUser(user) {
 		return await http('/users', {

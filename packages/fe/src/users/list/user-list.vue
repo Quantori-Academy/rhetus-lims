@@ -60,6 +60,20 @@ const deleteUser = async id => {
 	}
 };
 
+async function setFilteredUsers() {
+	isLoading.value = true;
+	try {
+		const params = {
+			options: { role: filters.value.role, date: filters.value.date }
+		};
+		const response = await $api.users.fetchUsers(params);
+		users.value = response.items;
+	} catch (error) {
+		$notifyUserAboutError(error);
+	}
+	isLoading.value = false;
+}
+
 async function setUsers() {
 	isLoading.value = true;
 	try {
@@ -72,6 +86,12 @@ async function setUsers() {
 	isLoading.value = false;
 }
 
+function resetAllFilters() {
+	filters.value.role = '';
+	filters.value.date = null;
+	setUsers();
+}
+
 onMounted(() => {
 	setUsers();
 });
@@ -79,7 +99,7 @@ onMounted(() => {
 
 <template>
 	<div>
-		<rh-filters @reset-filters="resetAllFilters">
+		<rh-filters @reset-filters="resetAllFilters" @set-filters="setFilteredUsers">
 			<template #actionButtons>
 				<el-button class="add-button" type="primary" @click="addNewUser">Add New User</el-button>
 			</template>
