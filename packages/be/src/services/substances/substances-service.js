@@ -3,7 +3,7 @@ import { unionAll } from 'drizzle-orm/pg-core';
 import fp from 'fastify-plugin';
 import { generateFilterSubquery } from '../../lib/utils/db/filter-subquery-generator.js';
 import { generateOrderSubquery } from '../../lib/utils/db/order-subquery-generator.js';
-import { Category } from '../../lib/db/schema/components.js';
+import { Category } from '../../routes/substances/substances-schema.js';
 
 const formatMapping = {
 	name: string => `${string.charAt(0).toUpperCase()}${string.slice(1).toLowerCase()}`,

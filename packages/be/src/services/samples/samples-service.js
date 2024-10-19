@@ -1,7 +1,7 @@
 import fp from 'fastify-plugin';
 import { schema } from '../../lib/db/schema/index.js';
 import { and, eq, sql } from 'drizzle-orm';
-import { Category } from '../../lib/db/schema/components.js';
+import { Category } from '../../routes/substances/substances-schema.js';
 
 const formatMapping = {
 	name: string => `${string.charAt(0).toUpperCase()}${string.slice(1).toLowerCase()}`
@@ -36,9 +36,7 @@ async function samplesService(server) {
 
 			const components = reagentsAndSamples.map(x => ({
 				id: sample[0].id,
-				category: x.category,
 				quantityUsed: x.quantityUsed,
-				quantityUnit: x.quantityUnit,
 				...(x.category === Category.REAGENT ? { reagentId: x.id } : { sampleId: x.id })
 			}));
 

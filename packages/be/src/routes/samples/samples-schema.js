@@ -22,7 +22,6 @@ const createSample = {
 				S.object()
 					.prop('id', S.string().required())
 					.prop('quantityUsed', S.number().required())
-					.prop('quantityUnit', S.string().required())
 					.prop('category', S.string().required())
 			)
 		),
