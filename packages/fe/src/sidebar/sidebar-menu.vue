@@ -1,27 +1,29 @@
 <script setup>
 import { inject } from 'vue';
-import { ElButton } from 'element-plus';
 import RhIcon from '../lib/components/rh-icon.vue';
 import { $route } from '../lib/router/router.js';
 import { navigationLink } from './constants.js';
+import SidebarButton from './sidebar-button.vue';
 
 const { user } = inject('user');
 </script>
 
 <template>
 	<nav class="sidebar">
-		<div class="user-bar">
-			<router-link class="logo" to="/">
-				<img src="../lib/assets/images/logo.svg" width="30" height="30" alt="Rhetus logo" />
-			</router-link>
+		<div class="user-bar-container">
+			<div class="user-bar">
+				<router-link to="/" class="logo link">
+					<img src="../lib/assets/images/logo.svg" width="24" height="24" alt="Rhetus logo" />
+				</router-link>
 
-			<div class="toggle-and-profile">
-				<el-button>
-					<rh-icon name="envelope" angle="-90deg" size="22" />
-				</el-button>
+				<div class="toggle-and-profile">
+					<sidebar-button />
 
-				<div class="profile">
-					<router-link v-if="user" to="/profile">{{ user.username.slice(0, 2) }}</router-link>
+					<router-link v-if="user" to="/profile" class="link">
+						<div class="profile">
+							{{ user.username.slice(0, 2) }}
+						</div>
+					</router-link>
 				</div>
 			</div>
 		</div>
@@ -50,47 +52,54 @@ const { user } = inject('user');
 	top: 0;
 	bottom: 0;
 	left: 0;
+
 	display: flex;
 	flex-direction: column;
 
-	width: 18rem;
-	background-color: #fbfafd;
+	width: var(--sidebar-width);
+
+	border-right: 1px solid var(--border-color);
+	background-color: var(--bg-color);
 }
 
-.user-bar {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 8px 12px;
-	padding-bottom: 16px;
+.user-bar-container {
+	padding: 8px;
+	min-height: var(--top-bar-height);
+	border-bottom: 1px solid #eeecf0;
+
 	background-color: #eeecf0;
 
-	.logo {
+	.user-bar {
 		display: flex;
+		justify-content: space-between;
 		align-items: center;
-		padding: 4px 4px;
-		border-radius: 6px;
+
+		.toggle-and-profile {
+			display: flex;
+			align-items: center;
+			gap: 6px;
+		}
+	}
+
+	.link {
+		padding: 4px;
+		border: none;
+		border-radius: 4px;
+		background: transparent;
+		color: inherit;
+		text-decoration: none;
 
 		&:hover {
 			background-color: #d6d5d9;
 		}
+
+		&:active {
+			background-color: var(--bg-color-active);
+		}
 	}
 
-	.toggle-and-profile {
-		display: flex;
-		align-items: center;
-		gap: 6px;
-
-		button {
-			width: 36px;
-			height: 36px;
-			border: none;
-			background: transparent;
-
-			&:hover {
-				background-color: #d6d5d9;
-			}
-		}
+	.logo {
+		max-height: 32px;
 	}
 
 	.profile {
@@ -98,26 +107,11 @@ const { user } = inject('user');
 		justify-content: center;
 		align-items: center;
 
-		width: 36px;
-		height: 36px;
-		border-radius: 6px;
+		width: 24px;
+		height: 24px;
 
-		&:hover {
-			background-color: #d6d5d9;
-		}
-
-		a {
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			width: 32px;
-			height: 32px;
-			border: 1px solid #d6d5d9;
-			border-radius: 100%;
-			background: #fbfafd;
-			color: inherit;
-			text-decoration: none;
-		}
+		border: 1px solid var(--border-color);
+		border-radius: 50%;
 	}
 }
 
@@ -158,7 +152,7 @@ const { user } = inject('user');
 
 		.active-route {
 			.active-route-marker {
-				background-color: blue;
+				background-color: #0eabe2;
 			}
 
 			a {

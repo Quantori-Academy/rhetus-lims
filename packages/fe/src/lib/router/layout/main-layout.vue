@@ -7,6 +7,7 @@ import { $router } from '../router.js';
 
 const user = ref(null);
 const isAuthorized = computed(() => !!user.value);
+const isSidebarOpen = ref(true);
 
 async function setUser() {
 	try {
@@ -32,31 +33,39 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="page-with-sidebar">
-		<top-bar />
+	<div class="page-with-sidebar" :class="{ 'sidebar-collapsed': !isSidebarOpen }">
 		<sidebar-menu />
 
-		<div class="wrapper">
-			<div class="content-wrapper">
-				<router-view></router-view>
-			</div>
+		<div class="content-wrapper">
+			<top-bar />
+			<router-view></router-view>
 		</div>
 	</div>
 </template>
 
 <style scoped>
-.wrapper {
-	padding-top: 48px;
+.page-with-sidebar {
+	--sidebar-width: 256px;
+	--top-bar-height: 48px;
+	--bg-color: #fbfafd;
+	--border-color: #05050614;
+	--bg-color-active: #c0bec2;
+
+	padding-left: var(--sidebar-width);
+}
+
+.sidebar-collapsed {
+	padding-left: 0;
 }
 
 .content-wrapper {
-	margin: 0 auto;
-	margin-top: 16px;
-	width: 100%;
-	max-width: 1296px;
-}
+	padding-top: var(--top-bar-height);
+	padding-bottom: 100px;
 
-.page-with-sidebar {
-	padding-left: 18rem;
+	width: 100%;
+
+	transition-property: padding;
+	transition-duration: 200ms;
+	transition-timing-function: ease;
 }
 </style>
