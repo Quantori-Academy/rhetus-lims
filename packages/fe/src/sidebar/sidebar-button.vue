@@ -5,7 +5,7 @@ import RhIcon from '../lib/components/rh-icon.vue';
 
 <template>
 	<el-button class="sidebar-button">
-		<rh-icon name="th-large" size="20" />
+		<rh-icon name="sidebar" size="20" />
 	</el-button>
 </template>
 

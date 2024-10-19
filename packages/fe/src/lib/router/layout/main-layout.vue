@@ -50,6 +50,7 @@ onMounted(() => {
 	--bg-color: #fbfafd;
 	--border-color: #05050614;
 	--bg-color-active: #c0bec2;
+	--text-color: #38485b;
 
 	padding-left: var(--sidebar-width);
 }

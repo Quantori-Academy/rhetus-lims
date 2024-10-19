@@ -11,7 +11,7 @@ import SidebarButton from '../sidebar/sidebar-button.vue';
 				<div class="breadcrumb-links">
 					<nav>
 						<ol>
-							<li>home</li>
+							<li>Home</li>
 							<li class="current-page">
 								{{ $route.name }}
 							</li>
@@ -62,7 +62,6 @@ import SidebarButton from '../sidebar/sidebar-button.vue';
 .breadcrumb-links {
 	ol {
 		padding: 0;
-		padding-left: 4px;
 	}
 
 	li {

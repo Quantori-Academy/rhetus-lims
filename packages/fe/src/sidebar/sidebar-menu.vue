@@ -38,7 +38,7 @@ const { user } = inject('user');
 					<router-link :to="link.path">
 						<div class="active-route-marker"></div>
 						<rh-icon :name="link.icon" />
-						{{ link.name }}
+						<span class="route-name">{{ link.name }}</span>
 					</router-link>
 				</li>
 			</ul>
@@ -60,6 +60,8 @@ const { user } = inject('user');
 
 	border-right: 1px solid var(--border-color);
 	background-color: var(--bg-color);
+
+	color: var(--text-color);
 }
 
 .user-bar-container {
@@ -117,46 +119,69 @@ const { user } = inject('user');
 
 .navigation {
 	.project-name {
-		padding: 12px 16px;
-		font-weight: 700;
+		padding: 8px 12px;
+		font-weight: 600;
 	}
 
 	.navigation-list {
-		padding: 0;
-		list-style: none;
-
-		.active-route-marker {
-			width: 3px;
-			height: 20px;
-			border-radius: 6px;
-			background-color: transparent;
-		}
-
-		li {
-			a {
-				display: flex;
-				align-items: center;
-				gap: 8px;
-				margin: 4px;
-				padding: 4px 8px;
-				border-radius: 6px;
-				color: inherit;
-				text-decoration: none;
-				font-size: 16px;
-
-				&:hover {
-					background-color: #e1e0e4;
-				}
-			}
-		}
+		padding: 4px;
 
 		.active-route {
 			.active-route-marker {
-				background-color: #0eabe2;
+				opacity: 100;
 			}
 
 			a {
 				background-color: #e1e0e4;
+			}
+		}
+
+		li {
+			list-style: none;
+
+			a {
+				position: relative;
+				display: flex;
+				justify-content: start;
+				align-items: center;
+				gap: 8px;
+				margin-bottom: 2px;
+				padding: 4px 8px;
+
+				border-radius: 4px;
+
+				color: inherit;
+				text-decoration: none;
+
+				&:focus {
+					background-color: #e1e0e4;
+				}
+
+				&:hover {
+					background-color: #e1e0e4;
+				}
+
+				&:active {
+					background-color: #cac9cb;
+				}
+			}
+
+			.active-route-marker {
+				opacity: 0;
+				position: absolute;
+				top: 4px;
+				bottom: 4px;
+				left: 4px;
+				margin-right: 4px;
+				width: 3px;
+				border-radius: 3px;
+				background-color: #0eabe2;
+			}
+
+			.route-name {
+				flex-grow: 1;
+				line-height: 1.5;
+				font-weight: 600;
 			}
 		}
 	}

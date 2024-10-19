@@ -27,6 +27,6 @@ html {
 :focus-visible {
 	box-shadow:
 		0 0 0 1px #fff,
-		0 0 0 3px #1f75cb;
+		0 0 0 3px #218ec7;
 	outline: none;
 }
