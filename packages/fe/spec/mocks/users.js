@@ -76,6 +76,25 @@ let roleInfo = {
 	]
 };
 
+function filterUsers(parsedOptions) {
+	const filteredUsers = userInfo.users.filter(user => {
+		let matchesDate = true;
+		let matchesRole = true;
+
+		if (parsedOptions.date) {
+			matchesDate = user.lastLogin.startsWith(parsedOptions.date);
+		}
+		if (parsedOptions.role) {
+			matchesRole = user.role.name.includes(parsedOptions.role);
+		}
+		return matchesDate && matchesRole;
+	});
+
+	return HttpResponse.json({
+		items: filteredUsers
+	});
+}
+
 export const usersHandlers = [
 	http.get(api('/roles'), () => {
 		return HttpResponse.json(roleInfo);
@@ -88,24 +107,7 @@ export const usersHandlers = [
 		if (parsedOptions === null) {
 			return HttpResponse.json(userInfo);
 		} else {
-			const filteredUsers = userInfo.users.filter(user => {
-				let matchesDate = true;
-				let matchesRole = true;
-
-				if (parsedOptions.date) {
-					matchesDate = user.lastLogin.startsWith(parsedOptions.date);
-				}
-
-				if (parsedOptions.role) {
-					matchesRole = user.role.name.includes(parsedOptions.role);
-				}
-
-				return matchesDate && matchesRole;
-			});
-
-			return HttpResponse.json({
-				items: filteredUsers
-			});
+			return filterUsers(parsedOptions);
 		}
 	}),
 	http.post(api('/users'), async ({ request }) => {
