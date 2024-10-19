@@ -59,7 +59,15 @@ onMounted(() => {
 	--bg-color-active: #c0bec2;
 	--text-color: #38485b;
 
-	padding-left: var(--sidebar-width);
+	padding-left: 0;
+
+	transition-property: padding;
+	transition-duration: 200ms;
+	transition-timing-function: ease;
+
+	@media (min-width: 1200px) {
+		padding-left: var(--sidebar-width);
+	}
 }
 
 .page-with-sidebar-collapsed {
