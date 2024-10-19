@@ -92,6 +92,13 @@
       "when": 1729244699342,
       "tag": "0012_worthless_hobgoblin",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1729261599090,
+      "tag": "0013_classy_goblin_queen",
+      "breakpoints": true
     }
   ]
 }

@@ -61,14 +61,16 @@ async function reagentsService(server) {
 					quantity: schema.reagents.quantity,
 					quantityLeft: schema.reagents.quantityLeft,
 					expirationDate: schema.reagents.expirationDate,
-					description: schema.reagents.description
-					// storageLocation: {
-					// 	id: schema.locations.id,
-					// 	name: schema.locations.name
-					// }
+					description: schema.reagents.description,
+					storageLocation: {
+						id: schema.storages.id,
+						room: schema.storages.room,
+						name: schema.storages.name,
+						description: schema.storages.description
+					}
 				})
 				.from(schema.reagents)
-				// TODO: add join with storages when it will be implemented and change in select
+				.innerJoin(schema.storages, eq(schema.reagents.storageLocationId, schema.storages.id))
 				.where(and(eq(schema.reagents.id, id), eq(schema.reagents.deleted, false)));
 
 			return result[0];
@@ -87,8 +89,6 @@ async function reagentsService(server) {
 		},
 
 		getReagentsQuery: () => {
-			// TODO: add join with storages when it will be implemented and change in select
-			// TODO: add structure whet it will be implemented in next milestones
 			return server.db
 				.select({
 					id: schema.reagents.id,
@@ -97,11 +97,17 @@ async function reagentsService(server) {
 					quantity: schema.reagents.quantity,
 					quantityLeft: schema.reagents.quantityLeft,
 					expirationDate: schema.reagents.expirationDate,
-					storageLocationId: schema.reagents.storageLocationId,
+					storageLocation: {
+						id: schema.storages.id,
+						room: schema.storages.room,
+						name: schema.storages.name,
+						description: schema.storages.description
+					},
 					description: schema.reagents.description,
 					category: sql`'reagent'`.as('category')
 				})
 				.from(schema.reagents)
+				.innerJoin(schema.storages, eq(schema.reagents.storageLocationId, schema.storages.id))
 				.where(eq(schema.reagents.deleted, false));
 		},
 

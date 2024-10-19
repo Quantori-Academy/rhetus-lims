@@ -1,4 +1,5 @@
 import S from 'fluent-json-schema';
+import { Storage } from '../storages/storages-schema.js';
 
 const statusMessage = S.object()
 	.prop('status', S.string().required())
@@ -17,8 +18,7 @@ const Reagent = S.object()
 	.prop('quantityLeft', S.number().required())
 	.prop('expirationDate', S.string().format(S.FORMATS.DATE_TIME).required())
 	.prop('description', S.string().required())
-	// TODO: Check is it number or string(UUID) after location management will be implemented
-	.prop('storageLocationId', S.number().required())
+	.prop('storageLocationId', S.string().format(S.FORMATS.UUID).required())
 	.prop('category', S.string().required());
 
 const createReagent = {
@@ -35,9 +35,10 @@ const getReagent = {
 	security: [{ Session: [] }],
 	params: S.object().prop('id', S.string()),
 	response: {
-		200: Reagent.without(['storageLocationId']),
-		// TODO: import storage schema and use it here after implementation
-		// .prop('storageLocation', StorageLocation).required(),
+		200: Reagent.without(['storageLocationId']).prop(
+			'storageLocation',
+			Storage.without(['createdAt'])
+		),
 		404: statusMessage,
 		500: statusMessage
 	}

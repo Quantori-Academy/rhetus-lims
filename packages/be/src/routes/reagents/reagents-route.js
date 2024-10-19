@@ -16,12 +16,13 @@ async function reagents(server, options) {
 
 	async function onCreateReagent(req, reply) {
 		try {
-			// TODO: uncomment location checking when storage management will be done
-			// const isLocationExist = await server.locationsService.getLocationById(req.body.storageLocationId);
+			const isLocationExist = await server.storagesService.getStorageById(
+				req.body.storageLocationId
+			);
 
-			// if (!isLocationExist) {
-			// 	return reply.code(409).send({ status: 'error', message: `No such storage location` });
-			// }
+			if (!isLocationExist) {
+				return reply.code(409).send({ status: 'error', message: `No such storage location` });
+			}
 
 			const reagentName = await server.reagentsService.createReagent(req.body);
 
