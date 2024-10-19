@@ -21,10 +21,10 @@ async function samples(server, options) {
 				return reply.code(400).send({ status: 'error', message: `No such storage location` });
 			}
 
-			const { reagentsAndSamples } = req.body;
+			const { components } = req.body;
 
 			const insufficientComponent =
-				await server.samplesService.areComponentsInsufficient(reagentsAndSamples);
+				await server.samplesService.areComponentsInsufficient(components);
 
 			if (insufficientComponent) {
 				return reply.code(400).send({ status: 'error', message: `Not enough components left` });
@@ -33,7 +33,7 @@ async function samples(server, options) {
 			const sampleName = await server.samplesService.createSample(req.body);
 
 			await Promise.all(
-				reagentsAndSamples.map(async item => {
+				components.map(async item => {
 					const substance = await server.substancesService.getSubstanceById(item.id, item.category);
 
 					await server.substancesService.changeSubstanceQuantity(item.id, {

@@ -17,7 +17,7 @@ async function samplesService(server) {
 				quantityUnit,
 				expirationDate,
 				description,
-				reagentsAndSamples,
+				components,
 				storageId
 			} = data;
 
@@ -34,13 +34,13 @@ async function samplesService(server) {
 				})
 				.returning({ id: schema.samples.id, name: schema.samples.name });
 
-			const components = reagentsAndSamples.map(x => ({
+			const sampleComponents = components.map(x => ({
 				id: sample[0].id,
 				quantityUsed: x.quantityUsed,
 				...(x.category === Category.REAGENT ? { reagentId: x.id } : { sampleId: x.id })
 			}));
 
-			await server.db.insert(schema.components).values(components);
+			await server.db.insert(schema.components).values(sampleComponents);
 
 			return sample.length ? sample[0].name : null;
 		},
@@ -89,7 +89,7 @@ async function samplesService(server) {
 
 			if (!sample[0]) return null;
 
-			const reagentsAndSamples = await server.db
+			const components = await server.db
 				.select({
 					id: schema.components.reagentId,
 					name: schema.reagents.name,
@@ -124,7 +124,7 @@ async function samplesService(server) {
 
 			return {
 				...sample[0],
-				reagentsAndSamples
+				components
 			};
 		},
 

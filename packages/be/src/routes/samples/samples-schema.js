@@ -17,7 +17,7 @@ const createSample = {
 		.prop('storageId', S.string().required())
 		.prop('description', S.string())
 		.prop(
-			'reagentsAndSamples',
+			'components',
 			S.array().items(
 				S.object()
 					.prop('id', S.string().required())
@@ -46,7 +46,7 @@ const getSample = {
 			.prop('description', S.string())
 			.prop('storageLocation', Storage.without(['createdAt']))
 			.prop(
-				'reagentsAndSamples',
+				'components',
 				S.array().items(
 					Substance.without('storageLocationId').prop('quantityUsed', S.number().required())
 				)
