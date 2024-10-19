@@ -1,12 +1,25 @@
 <script setup>
 import SidebarButton from '../sidebar/sidebar-button.vue';
+
+const props = defineProps({
+	isSidebarOpen: {
+		type: Boolean,
+		required: true
+	}
+});
+
+const emit = defineEmits('toggle-collapse');
+
+function handleCollapse() {
+	emit('toggle-collapse');
+}
 </script>
 
 <template>
 	<div class="top-bar-fixed">
 		<div class="top-bar-container">
 			<div class="breadcrumb-links-container">
-				<sidebar-button v-if="false" />
+				<sidebar-button v-if="!props.isSidebarOpen" @click="handleCollapse" />
 
 				<div class="breadcrumb-links">
 					<nav>
@@ -31,7 +44,7 @@ import SidebarButton from '../sidebar/sidebar-button.vue';
 	left: var(--sidebar-width);
 
 	z-index: 10;
-	padding: 0 24px;
+	padding: 0 16px;
 	width: 100%;
 
 	border-bottom: 1px solid var(--border-color);

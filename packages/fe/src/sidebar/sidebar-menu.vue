@@ -6,6 +6,12 @@ import { navigationLink } from './constants.js';
 import SidebarButton from './sidebar-button.vue';
 
 const { user } = inject('user');
+
+const emit = defineEmits('toggle-collapse');
+
+function handleCollapse() {
+	emit('toggle-collapse');
+}
 </script>
 
 <template>
@@ -17,7 +23,7 @@ const { user } = inject('user');
 				</router-link>
 
 				<div class="toggle-and-profile">
-					<sidebar-button />
+					<sidebar-button @click="handleCollapse" />
 
 					<router-link v-if="user" to="/profile" class="link">
 						<div class="profile">
@@ -62,6 +68,11 @@ const { user } = inject('user');
 	background-color: var(--bg-color);
 
 	color: var(--text-color);
+	transform: translate3d(0, 0, 0);
+
+	transition-property: transform;
+	transition-duration: 200ms;
+	transition-timing-function: ease;
 }
 
 .user-bar-container {

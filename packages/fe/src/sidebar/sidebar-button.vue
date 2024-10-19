@@ -1,10 +1,16 @@
 <script setup>
 import { ElButton } from 'element-plus';
 import RhIcon from '../lib/components/rh-icon.vue';
+
+const emit = defineEmits(['click']);
+
+function clickHandler() {
+	emit('click');
+}
 </script>
 
 <template>
-	<el-button class="sidebar-button">
+	<el-button class="sidebar-button" @click="clickHandler">
 		<rh-icon name="sidebar" size="20" />
 	</el-button>
 </template>

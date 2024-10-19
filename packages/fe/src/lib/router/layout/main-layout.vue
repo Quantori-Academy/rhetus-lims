@@ -17,6 +17,10 @@ async function setUser() {
 	}
 }
 
+function handleToggle() {
+	isSidebarOpen.value = !isSidebarOpen.value;
+}
+
 provide('user', {
 	user,
 	isAdmin: user.value?.role?.name === 'administrator',
@@ -33,12 +37,15 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="page-with-sidebar" :class="{ 'sidebar-collapsed': !isSidebarOpen }">
-		<sidebar-menu />
+	<div class="page-with-sidebar" :class="{ 'page-with-sidebar-collapsed': !isSidebarOpen }">
+		<sidebar-menu @toggle-collapse="handleToggle" />
 
 		<div class="content-wrapper">
-			<top-bar />
-			<router-view></router-view>
+			<top-bar :is-sidebar-open="isSidebarOpen" @toggle-collapse="handleToggle" />
+
+			<div class="container-fluid">
+				<router-view />
+			</div>
 		</div>
 	</div>
 </template>
@@ -55,8 +62,16 @@ onMounted(() => {
 	padding-left: var(--sidebar-width);
 }
 
-.sidebar-collapsed {
+.page-with-sidebar-collapsed {
 	padding-left: 0;
+
+	.sidebar {
+		transform: translate3d(-100%, 0, 0);
+	}
+
+	.top-bar-fixed {
+		left: 0;
+	}
 }
 
 .content-wrapper {
@@ -68,5 +83,11 @@ onMounted(() => {
 	transition-property: padding;
 	transition-duration: 200ms;
 	transition-timing-function: ease;
+}
+
+.container-fluid {
+	margin: 0 auto;
+	padding: 0 24px;
+	max-width: 1296px;
 }
 </style>
