@@ -22,11 +22,3 @@ html {
 .el-form-item__label {
 	font-weight: 700;
 }
-
-:focus,
-:focus-visible {
-	box-shadow:
-		0 0 0 1px #fff,
-		0 0 0 3px #218ec7;
-	outline: none;
-}

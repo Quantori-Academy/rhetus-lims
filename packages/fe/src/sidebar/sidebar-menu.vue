@@ -52,7 +52,7 @@ function handleCollapse() {
 	</nav>
 </template>
 
-<style>
+<style scoped>
 .sidebar {
 	position: fixed;
 	top: 0;
@@ -75,6 +75,14 @@ function handleCollapse() {
 	transition-property: transform;
 	transition-duration: 200ms;
 	transition-timing-function: ease;
+
+	:focus,
+	:focus-visible {
+		box-shadow:
+			0 0 0 1px #fff,
+			0 0 0 3px #218ec7;
+		outline: none;
+	}
 }
 
 .user-bar-container {
