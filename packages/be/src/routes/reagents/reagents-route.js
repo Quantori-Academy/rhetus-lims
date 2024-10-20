@@ -21,7 +21,7 @@ async function reagents(server, options) {
 			);
 
 			if (!isLocationExist) {
-				return reply.code(409).send({ status: 'error', message: `No such storage location` });
+				return reply.code(404).send({ status: 'error', message: `No such storage location` });
 			}
 
 			const reagentName = await server.reagentsService.createReagent(req.body);

@@ -26,7 +26,7 @@ const createReagent = {
 	body: Reagent.without(['id', 'category']),
 	response: {
 		201: statusMessage,
-		409: statusMessage,
+		404: statusMessage,
 		500: statusMessage
 	}
 };

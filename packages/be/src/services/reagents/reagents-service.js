@@ -39,7 +39,7 @@ async function reagentsService(server) {
 					quantity,
 					quantityLeft,
 					expirationDate: new Date(expirationDate),
-					storageLocationId,
+					storageId: storageLocationId,
 					description
 				})
 				.returning({ name: schema.reagents.name });
@@ -70,7 +70,7 @@ async function reagentsService(server) {
 					}
 				})
 				.from(schema.reagents)
-				.innerJoin(schema.storages, eq(schema.reagents.storageLocationId, schema.storages.id))
+				.innerJoin(schema.storages, eq(schema.reagents.storageId, schema.storages.id))
 				.where(and(eq(schema.reagents.id, id), eq(schema.reagents.deleted, false)));
 
 			return result[0];
@@ -97,17 +97,11 @@ async function reagentsService(server) {
 					quantity: schema.reagents.quantity,
 					quantityLeft: schema.reagents.quantityLeft,
 					expirationDate: schema.reagents.expirationDate,
-					storageLocation: {
-						id: schema.storages.id,
-						room: schema.storages.room,
-						name: schema.storages.name,
-						description: schema.storages.description
-					},
+					storageLocationId: schema.reagents.storageId,
 					description: schema.reagents.description,
 					category: sql`'reagent'`.as('category')
 				})
 				.from(schema.reagents)
-				.innerJoin(schema.storages, eq(schema.reagents.storageLocationId, schema.storages.id))
 				.where(eq(schema.reagents.deleted, false));
 		},
 
