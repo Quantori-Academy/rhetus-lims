@@ -7,7 +7,7 @@ import SidebarButton from './sidebar-button.vue';
 
 const { user } = inject('user');
 
-const emit = defineEmits('toggle-collapse');
+const emit = defineEmits(['toggle-collapse']);
 
 function handleCollapse() {
 	emit('toggle-collapse');

@@ -1,5 +1,6 @@
 <script setup>
-import SidebarButton from '../sidebar/sidebar-button.vue';
+import SidebarButton from '../sidebar-button.vue';
+import BreadcrumbsLinks from './breadcrumbs/breadcrumbs-links.vue';
 
 const props = defineProps({
 	isSidebarOpen: {
@@ -8,7 +9,7 @@ const props = defineProps({
 	}
 });
 
-const emit = defineEmits('toggle-collapse');
+const emit = defineEmits(['toggle-collapse']);
 
 function handleCollapse() {
 	emit('toggle-collapse');
@@ -18,20 +19,11 @@ function handleCollapse() {
 <template>
 	<div class="top-bar-fixed">
 		<div class="top-bar-container">
-			<div class="breadcrumb-links-container">
-				<sidebar-button v-if="!props.isSidebarOpen" @click="handleCollapse" />
-
-				<div class="breadcrumb-links">
-					<nav>
-						<ol>
-							<li>Home</li>
-							<li class="current-page">
-								{{ $route.name }}
-							</li>
-						</ol>
-					</nav>
-				</div>
-			</div>
+			<breadcrumbs-links>
+				<template #before>
+					<sidebar-button v-if="!props.isSidebarOpen" @click="handleCollapse" />
+				</template>
+			</breadcrumbs-links>
 		</div>
 	</div>
 </template>
@@ -53,6 +45,14 @@ function handleCollapse() {
 	transition-property: width, left, right;
 	transition-duration: 200ms;
 	transition-timing-function: ease;
+
+	:focus,
+	:focus-visible {
+		box-shadow:
+			0 0 0 1px #fff,
+			0 0 0 3px #218ec7;
+		outline: none;
+	}
 }
 
 .top-bar-container {
