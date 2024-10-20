@@ -108,6 +108,16 @@ async function substancesService(server) {
 					: await server.samplesService.changeSampleQuantity(id, data);
 
 			return { code, status, message };
+		},
+
+		canQuantityChange: async (id, data) => {
+			const { quantityUsed, quantityLeft: reqQuantityLeft, category } = data;
+
+			const { quantityLeft } = await server.substancesService.getSubstanceById(id, category);
+
+			const diff = quantityLeft - quantityUsed;
+
+			return diff >= 0 && diff === reqQuantityLeft;
 		}
 	});
 }
