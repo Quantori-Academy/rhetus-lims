@@ -16,7 +16,7 @@ export const reagents = pgTable('reagents', {
 	quantity: real('quantity').notNull(),
 	quantityLeft: real('quantity_left').notNull(),
 	expirationDate: timestamp('expiration_date').default(null),
-	storageLocationId: uuid('storage_location_id').references(() => storages.id),
+	storageId: uuid('storage_id').references(() => storages.id),
 	description: text('description').default(''),
 	deleted: boolean('deleted').default(false)
 });
