@@ -1,5 +1,4 @@
 import S from 'fluent-json-schema';
-import { Storage } from '../storages/storages-schema.js';
 
 const Category = {
 	REAGENT: 'reagent',
@@ -29,17 +28,7 @@ const getSubstances = {
 		.prop('options', S.string())
 		.prop('sort', S.string()),
 	response: {
-		200: S.object()
-			.prop(
-				'substances',
-				S.array().items(
-					Substance.without(['storageLocationId']).prop(
-						'storageLocation',
-						Storage.without(['createdAt'])
-					)
-				)
-			)
-			.prop('count', S.number()),
+		200: S.object().prop('substances', S.array().items(Substance)).prop('count', S.number()),
 		500: statusMessage
 	}
 };
