@@ -191,10 +191,10 @@ async function samplesService(server) {
 					id: schema.samples.id,
 					name: schema.samples.name,
 					quantityUnit: schema.samples.quantityUnit,
-					quantity: schema.samples.size,
+					quantity: schema.samples.quantity,
 					quantityLeft: schema.samples.quantityLeft,
 					expirationDate: schema.samples.expirationDate,
-					storageLocationId: schema.samples.storageLocationId,
+					storageLocationId: schema.samples.storageId,
 					description: schema.samples.description,
 					category: sql`'sample'`.as('category')
 				})
