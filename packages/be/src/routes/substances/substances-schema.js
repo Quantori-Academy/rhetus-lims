@@ -1,9 +1,9 @@
 import S from 'fluent-json-schema';
 import { Storage } from '../storages/storages-schema.js';
 
-const categoriesEnum = {
-	SAMPLE: 'sample',
-	REAGENT: 'reagent'
+const Category = {
+	REAGENT: 'reagent',
+	SAMPLE: 'sample'
 };
 
 const statusMessage = S.object()
@@ -48,7 +48,7 @@ const changeQuantity = {
 	security: [{ Session: [] }],
 	params: S.object().prop('id', S.string()),
 	body: S.object()
-		.prop('category', S.string().enum(Object.values(categoriesEnum)).required())
+		.prop('category', S.string().enum(Object.values(Category)).required())
 		.prop('quantityUsed', S.number().required().minimum(0))
 		.prop('quantityLeft', S.number().required().minimum(0))
 		.prop('reason', S.string().required().minLength(1)),
@@ -60,4 +60,4 @@ const changeQuantity = {
 	}
 };
 
-export { getSubstances, changeQuantity };
+export { getSubstances, changeQuantity, Substance, Category };

@@ -1,9 +1,85 @@
 {
-  "id": "37b1bde8-3585-4e68-b1a9-94c2d748e99e",
-  "prevId": "900a444d-2e21-4676-9914-114076e99acd",
+  "id": "d4b1905e-dd8c-4219-a931-7ebf044c09e6",
+  "prevId": "1b0d5f80-1d6a-418f-81da-455f794464ba",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.components": {
+      "name": "components",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sample_id": {
+          "name": "sample_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false,
+          "default": null
+        },
+        "reagent_id": {
+          "name": "reagent_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false,
+          "default": null
+        },
+        "quantity_used": {
+          "name": "quantity_used",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "components_id_samples_id_fk": {
+          "name": "components_id_samples_id_fk",
+          "tableFrom": "components",
+          "tableTo": "samples",
+          "columnsFrom": [
+            "id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "components_sample_id_samples_id_fk": {
+          "name": "components_sample_id_samples_id_fk",
+          "tableFrom": "components",
+          "tableTo": "samples",
+          "columnsFrom": [
+            "sample_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "components_reagent_id_reagents_id_fk": {
+          "name": "components_reagent_id_reagents_id_fk",
+          "tableFrom": "components",
+          "tableTo": "reagents",
+          "columnsFrom": [
+            "reagent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "public.reagents": {
       "name": "reagents",
       "schema": "",
@@ -32,7 +108,8 @@
           "name": "producer",
           "type": "varchar(256)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false,
+          "default": null
         },
         "catalog_id": {
           "name": "catalog_id",
@@ -52,7 +129,8 @@
           "name": "unit_price",
           "type": "real",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": 0
         },
         "quantity_unit": {
           "name": "quantity_unit",
@@ -62,7 +140,7 @@
         },
         "quantity": {
           "name": "quantity",
-          "type": "integer",
+          "type": "real",
           "primaryKey": false,
           "notNull": true
         },
@@ -76,11 +154,12 @@
           "name": "expiration_date",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false,
+          "default": null
         },
         "storage_location_id": {
           "name": "storage_location_id",
-          "type": "integer",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
@@ -100,7 +179,21 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "reagents_storage_location_id_storages_id_fk": {
+          "name": "reagents_storage_location_id_storages_id_fk",
+          "tableFrom": "reagents",
+          "tableTo": "storages",
+          "columnsFrom": [
+            "storage_location_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
@@ -124,6 +217,87 @@
       },
       "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.samples": {
+      "name": "samples",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuid_generate_v4()"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quantity_unit": {
+          "name": "quantity_unit",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quantity_left": {
+          "name": "quantity_left",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expiration_date": {
+          "name": "expiration_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "storage_id": {
+          "name": "storage_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "''"
+        },
+        "deleted": {
+          "name": "deleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "samples_storage_id_storages_id_fk": {
+          "name": "samples_storage_id_storages_id_fk",
+          "tableFrom": "samples",
+          "tableTo": "storages",
+          "columnsFrom": [
+            "storage_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
@@ -254,6 +428,19 @@
           "tableTo": "reagents",
           "columnsFrom": [
             "reagent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "substances_quantity_changes_sample_id_samples_id_fk": {
+          "name": "substances_quantity_changes_sample_id_samples_id_fk",
+          "tableFrom": "substances_quantity_changes",
+          "tableTo": "samples",
+          "columnsFrom": [
+            "sample_id"
           ],
           "columnsTo": [
             "id"
