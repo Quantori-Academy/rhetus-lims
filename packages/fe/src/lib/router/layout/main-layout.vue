@@ -44,7 +44,9 @@ onMounted(() => {
 			<top-bar :is-sidebar-open="isSidebarOpen" @toggle-collapse="handleToggle" />
 
 			<div class="container-fluid">
-				<router-view />
+				<main>
+					<router-view />
+				</main>
 			</div>
 		</div>
 	</div>
