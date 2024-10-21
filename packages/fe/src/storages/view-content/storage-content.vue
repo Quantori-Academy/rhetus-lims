@@ -39,11 +39,17 @@ onMounted(() => {
 <template>
 	<div>
 		<el-table v-loading="isLoading" :data="substances" @row-click="viewSubstance">
-			<el-table-column prop="name" label="Name" sortable />
-			<el-table-column prop="category" label="Category" sortable />
+			<el-table-column prop="name" label="Name" />
+			<el-table-column prop="category" label="Category" />
 			<el-table-column prop="structure" label="Structure" />
 			<el-table-column prop="description" label="Description" />
 			<el-table-column prop="quantityLeft" label="Quantity Left" />
 		</el-table>
 	</div>
 </template>
+
+<style scoped>
+:deep(.el-table__row):hover {
+	cursor: pointer;
+}
+</style>
