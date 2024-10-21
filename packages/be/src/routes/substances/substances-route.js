@@ -37,10 +37,7 @@ async function substances(server, options) {
 			const { category, quantityUsed, reason } = req.body;
 
 			const substanceId = req.params.id;
-			const substance =
-				category === schema.Category.REAGENT
-					? await server.reagentsService.getReagentById(substanceId)
-					: await server.samplesService.getSampleById(substanceId);
+			const substance = await server.substancesService.getSubstanceById(substanceId, category);
 
 			if (!substance) {
 				return reply.code(404).send({ status: 'error', message: `No such ${category}` });
