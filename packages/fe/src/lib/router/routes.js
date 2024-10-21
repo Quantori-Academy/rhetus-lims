@@ -1,4 +1,5 @@
 import LoginLayout from './layout/login-layout.vue';
+import { roles } from '../constants/roles.js';
 
 export const routes = [
 	{
@@ -11,7 +12,7 @@ export const routes = [
 		name: 'users-list',
 		component: () => import('../../users/list/user-list.vue'),
 		meta: {
-			roles: ['administrator']
+			roles: [roles.ADMIN]
 		}
 	},
 	{
@@ -19,7 +20,7 @@ export const routes = [
 		name: 'new-user',
 		component: () => import('../../users/new/add-new-user.vue'),
 		meta: {
-			roles: ['administrator']
+			roles: [roles.ADMIN]
 		}
 	},
 	{
@@ -44,7 +45,7 @@ export const routes = [
 		component: () => import('../../user-details/user-details.vue'),
 		props: true,
 		meta: {
-			roles: ['administrator']
+			roles: [roles.ADMIN]
 		}
 	},
 	{
@@ -80,7 +81,7 @@ export const routes = [
 		component: () => import('../../storages/edit/storage-edit.vue'),
 		props: true,
 		meta: {
-			roles: ['administrator']
+			roles: [roles.ADMIN]
 		}
 	},
 	{
@@ -88,7 +89,7 @@ export const routes = [
 		name: 'new-storage',
 		component: () => import('../../storages/add-new/storage-new.vue'),
 		meta: {
-			roles: ['administrator']
+			roles: [roles.ADMIN]
 		}
 	},
 	{

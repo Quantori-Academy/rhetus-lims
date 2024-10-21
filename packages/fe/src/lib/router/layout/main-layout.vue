@@ -48,6 +48,7 @@ $router.beforeEach((to, from, next) => {
 				'You do not have the credentials to access this page. Please consult your administator',
 			type: 'error'
 		});
+		$router.push({ name: 'dashboard' });
 	}
 });
 </script>
