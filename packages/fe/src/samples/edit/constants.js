@@ -20,7 +20,7 @@ export const formRules = {
 
 export const emptySample = {
 	name: '',
-	reagentsAndSamples: [],
+	components: [],
 	quantityUnit: '',
 	quantity: 1,
 	quantityLeft: 1,

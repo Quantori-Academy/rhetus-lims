@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref, useTemplateRef } from 'vue';
+import { computed, onMounted, ref, useTemplateRef, watch } from 'vue';
 import {
 	ElInput,
 	ElForm,
@@ -8,8 +8,9 @@ import {
 	ElFormItem,
 	ElSelect,
 	ElInputNumber,
-	ElTag,
-	ElOption
+	ElOption,
+	ElTable,
+	ElTableColumn
 } from 'element-plus';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg';
@@ -61,7 +62,7 @@ async function submit() {
 	if (!(await $isFormValid(formEl))) return;
 
 	if (sample.value.quantityLeft <= 0) {
-		await $confirm('Updating quntity left to 0 will delete this sample', 'Delete Sample?', {
+		await $confirm('Updating quantity left to 0 will delete this sample', 'Delete Sample?', {
 			confirmButtonText: 'Delete',
 			type: 'warning'
 		});
@@ -73,8 +74,8 @@ async function submit() {
 		const originalSample = await $api.samples.fetchSample(props.id);
 		if (originalSample.quantityLeft != sample.value.quantityLeft) {
 			const response = await $api.reagents.changeSubstanceQuantity(props.id, {
-				category: 'sample',
 				id: props.id,
+				category: 'sample',
 				quantityLeft: sample.value.quantityLeft,
 				quantityUsed: originalSample.quantityLeft - sample.value.quantityLeft
 			});
@@ -95,6 +96,13 @@ function toggleEditing() {
 	});
 }
 
+function redirect(row) {
+	$router.push({
+		name: row.category.toLowerCase() === 'reagent' ? 'reagent-details' : 'sample-details',
+		params: { id: row.id }
+	});
+}
+
 async function setStorages() {
 	try {
 		const data = await $api.storages.fetchStorages();
@@ -109,7 +117,6 @@ async function setSample(id) {
 	try {
 		const res = await $api.samples.fetchSample(id);
 		sample.value = res;
-		console.log(res);
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
@@ -121,6 +128,11 @@ onMounted(() => {
 	setSample(props.id);
 	setStorages();
 });
+
+watch(
+	() => props.id,
+	newId => setSample(newId)
+);
 </script>
 
 <template>
@@ -134,17 +146,20 @@ onMounted(() => {
 				<el-input v-model="sample.name" disabled />
 			</el-form-item>
 			<el-form-item label="Reagents/Samples used" prop="components">
-				<div class="tags">
-					<el-tag v-for="item of sample.components" :key="item.id" type="info">
-						<router-link
-							class="link"
-							target="_blank"
-							:to="{ name: 'sample-details', params: { id: item.id } }"
-						>
-							{{ item.name }}
-						</router-link>
-					</el-tag>
-				</div>
+				<el-table
+					:data="
+						sample.components.map(x => ({
+							...x,
+							quantityUsed: x.quantityUsed + ' ' + x.quantityUnit
+						}))
+					"
+					:border="true"
+					@row-click="redirect"
+				>
+					<el-table-column prop="name" label="Name" width="200" />
+					<el-table-column prop="category" label="Category" width="200" />
+					<el-table-column prop="quantityUsed" label="Quantiy Used" />
+				</el-table>
 			</el-form-item>
 			<div class="align-horizontal">
 				<el-form-item label="Quantity unit" prop="quantityUnit">
@@ -219,16 +234,6 @@ onMounted(() => {
 	color: black;
 	font-weight: 500;
 	font-size: large;
-}
-.tags > * + * {
-	margin-left: 8px;
-}
-.link {
-	color: inherit;
-	text-decoration: none;
-}
-.link:hover {
-	color: var(--el-color-primary);
 }
 .align-horizontal {
 	display: flex;

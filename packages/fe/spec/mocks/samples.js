@@ -26,6 +26,7 @@ const samplesDetails = [
 	{
 		id: '3fa85f64-5717-4562-b3fc-2c963f66afb6',
 		name: 'Super water',
+		category: 'Sample',
 		quantity: 500,
 		quantityUnit: 'ml',
 		quantityLeft: 300,
@@ -52,6 +53,7 @@ const samplesDetails = [
 	{
 		id: '3fa85f64-5717-4562-b3fb-2c963f66afa6',
 		name: 'Water (H2O)',
+		category: 'Sample',
 		quantity: 500,
 		quantityLeft: 1000,
 		quantityUnit: 'ml',
