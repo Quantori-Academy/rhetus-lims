@@ -18,9 +18,33 @@ const storageInfo = {
 	count: 1
 };
 
+function filterStorages(parsedOptions) {
+	const filteredStorages = storageInfo.storages.filter(storage => {
+		let matchesRoom = true;
+		let matchesName = true;
+		if (parsedOptions.room) {
+			matchesRoom = storage.room.includes(parsedOptions.room);
+		}
+		if (parsedOptions.name) {
+			matchesName = storage.name.includes(parsedOptions.name);
+		}
+		return matchesRoom && matchesName;
+	});
+	return HttpResponse.json({
+		items: filteredStorages
+	});
+}
+
 export const storageLocationHandlers = [
-	http.get(api('/storages'), () => {
-		return HttpResponse.json(storageInfo);
+	http.get(api('/storages'), req => {
+		const url = new URL(req.request.url);
+		const options = url.searchParams.get('options');
+		const parsedOptions = JSON.parse(options);
+		if (parsedOptions === null) {
+			return HttpResponse.json(storageInfo);
+		} else {
+			return filterStorages(parsedOptions);
+		}
 	}),
 	http.get(api('/storages/:id'), req => {
 		const { id } = req.params;

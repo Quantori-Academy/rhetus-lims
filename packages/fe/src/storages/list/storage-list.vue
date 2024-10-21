@@ -10,7 +10,12 @@ import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
 import StorageFilters from '../storage-filters.vue';
 
 const storages = ref([]);
+const initialStorages = ref([]);
 const isLoading = ref(false);
+const filters = ref({
+	room: '',
+	name: ''
+});
 
 function addNewStorageLocation() {
 	$router.push({ name: 'new-storage' });
@@ -58,8 +63,11 @@ async function deleteStorageLocation(id) {
 async function setStorages() {
 	isLoading.value = true;
 	try {
-		const data = await $api.storages.fetchStorages();
-		storages.value = data.storages;
+		const params = {
+			options: { room: filters.value.room, name: filters.value.name }
+		};
+		const data = await $api.storages.fetchStorages(params);
+		storages.value = data.items;
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
@@ -67,22 +75,47 @@ async function setStorages() {
 	}
 }
 
+async function setInitialStorages() {
+	isLoading.value = true;
+	try {
+		const data = await $api.storages.fetchStorages();
+		const uniqueStorages = data.storages.reduce((acc, storage) => {
+			if (!acc.some(item => item.room === storage.room)) {
+				acc.push(storage);
+			}
+			return acc;
+		}, []);
+		initialStorages.value = uniqueStorages;
+	} catch (error) {
+		$notifyUserAboutError(error);
+	} finally {
+		isLoading.value = false;
+	}
+}
+
+function resetAllFilters() {
+	filters.value.room = '';
+	filters.value.name = '';
+	setStorages();
+}
+
 onMounted(() => {
+	setInitialStorages();
 	setStorages();
 });
 </script>
 
 <template>
 	<div class="wrapper">
-		<rh-filters>
+		<rh-filters @reset-filters="resetAllFilters" @set-filters="setStorages">
 			<template #action-buttons>
-				<el-button class="add-button" type="primary" @click="addNewStorageLocation">
+				<el-button type="primary" @click="addNewStorageLocation">
 					Add New Storage Location
 				</el-button>
 			</template>
 
 			<template #filters>
-				<storage-filters />
+				<storage-filters v-model:filters="filters" :storages="initialStorages" />
 			</template>
 		</rh-filters>
 
@@ -112,10 +145,3 @@ onMounted(() => {
 		</el-table>
 	</div>
 </template>
-
-<style scoped>
-.add-button {
-	margin: 20px 0;
-	margin-top: 20px;
-}
-</style>

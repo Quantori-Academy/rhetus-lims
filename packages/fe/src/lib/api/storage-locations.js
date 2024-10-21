@@ -1,6 +1,6 @@
 export default http => ({
-	async fetchStorages() {
-		return await http('/storages');
+	async fetchStorages(params) {
+		return await http('/storages', { query: params });
 	},
 	async fetchStorage(id) {
 		return await http(`/storages/${id}`);
