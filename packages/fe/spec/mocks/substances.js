@@ -43,6 +43,9 @@ export const substancesHandlers = [
 		const filteredSubstances = substancesData.substances.filter(
 			substance => substance.storageLocationId === id
 		);
-		return HttpResponse.json(filteredSubstances);
+		return HttpResponse.json({
+			substances: filteredSubstances,
+			count: filteredSubstances.length
+		});
 	})
 ];
