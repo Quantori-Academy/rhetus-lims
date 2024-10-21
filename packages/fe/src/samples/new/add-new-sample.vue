@@ -19,6 +19,7 @@ import { emptyComponent, formRules } from './constants';
 import rhIcon from '../../lib/components/rh-icon.vue';
 
 const componentOptions = ref([]);
+const storages = ref([]);
 
 const formEl = useTemplateRef('form-el');
 const form = ref({
@@ -28,9 +29,7 @@ const form = ref({
 	size: 1,
 	quantityLeft: 1,
 	expirationDate: '',
-	room: '',
-	cabinet: '',
-	shelf: '',
+	storageId: '',
 	description: ''
 });
 
@@ -90,7 +89,19 @@ const filteredComponentOptions = computed(() => {
 	return componentOptions.value.filter(isOptionChosen);
 });
 
-onMounted(() => setComponents());
+async function setStorages() {
+	try {
+		const data = await $api.storages.fetchStorages();
+		storages.value = data.storages;
+	} catch (error) {
+		$notifyUserAboutError(error);
+	}
+}
+
+onMounted(() => {
+	setComponents();
+	setStorages();
+});
 </script>
 
 <template>
@@ -99,6 +110,7 @@ onMounted(() => setComponents());
 			<el-form-item label="Name" prop="name">
 				<el-input v-model="form.name" placeholder="Enter sample name" />
 			</el-form-item>
+
 			<el-form-item label="Reagents/Samples used" prop="components">
 				<div
 					v-for="(component, index) of form.components"
@@ -143,6 +155,7 @@ onMounted(() => setComponents());
 			<div class="add-btn">
 				<el-button @click="addComponent">Add component</el-button>
 			</div>
+
 			<div class="align-horizontal">
 				<el-form-item label="Quantity unit" prop="quantityUnit">
 					<el-select v-model="form.quantityUnit" filterable placeholder="Select a unit">
@@ -150,14 +163,14 @@ onMounted(() => setComponents());
 					</el-select>
 				</el-form-item>
 				<el-form-item label="Size" prop="size">
-					<el-input-number v-model="form.size" placeholder="Enter amount">
+					<el-input-number v-model="form.size" placeholder="Enter amount" :min="0">
 						<template #suffix>
 							<span>{{ form.quantityUnit }}</span>
 						</template>
 					</el-input-number>
 				</el-form-item>
 				<el-form-item label="Quantity left" prop="quantityLeft">
-					<el-input-number v-model="form.quantityLeft" placeholder="Enter amount">
+					<el-input-number v-model="form.quantityLeft" placeholder="Enter amount" :min="0">
 						<template #suffix>
 							{{ form.quantityUnit }}
 						</template>
@@ -175,17 +188,16 @@ onMounted(() => setComponents());
 				/>
 			</el-form-item>
 
-			<div class="align-horizontal">
-				<el-form-item label="Room" prop="room">
-					<el-input v-model="form.room" placeholder="Enter room" />
-				</el-form-item>
-				<el-form-item label="Cabinet" prop="cabinet">
-					<el-input v-model="form.cabinet" placeholder="Enter cabinet" />
-				</el-form-item>
-				<el-form-item label="Shelf" prop="shelf">
-					<el-input v-model="form.shelf" placeholder="Enter shelf" />
-				</el-form-item>
-			</div>
+			<el-form-item label="Storage location" prop="storageId">
+				<el-select v-model="form.storageId" placeholder="Select storage location">
+					<el-option
+						v-for="storage of storages"
+						:key="storage.id"
+						:label="storage.name"
+						:value="storage.id"
+					/>
+				</el-select>
+			</el-form-item>
 
 			<el-form-item label="Description" prop="description">
 				<el-input v-model="form.description" type="textarea" placeholder="Enter description" />
@@ -199,9 +211,11 @@ onMounted(() => setComponents());
 	</div>
 </template>
 
-<style scoped>
+<style>
 .container {
-	width: 42vw;
+	margin: 0 auto;
+	padding-bottom: 18px;
+	max-width: 48vw;
 }
 .w-full {
 	width: 100%;

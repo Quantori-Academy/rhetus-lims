@@ -6,7 +6,7 @@ const requiredRule = {
 
 export const formRules = {
 	name: [requiredRule],
-	reagentsAndSamples: [requiredRule],
+	components: [requiredRule],
 	quantityUnit: [requiredRule],
 	size: [
 		requiredRule,
@@ -22,14 +22,12 @@ export const formRules = {
 		}
 	],
 	expirationDate: [requiredRule],
-	room: [requiredRule],
-	cabinet: [requiredRule],
-	shelf: [requiredRule]
+	storageId: [requiredRule]
 };
 
 export const emptyComponent = {
 	id: '',
-	label: 'Select component',
+	label: 'Select reagent',
 	quantityUsed: 0,
 	quantityLeft: 0,
 	quantityUnit: '',
