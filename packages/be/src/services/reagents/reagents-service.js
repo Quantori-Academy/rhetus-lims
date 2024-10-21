@@ -106,41 +106,31 @@ async function reagentsService(server) {
 		},
 
 		changeReagentQuantity: async (id, data) => {
-			const { userId, quantityUsed, quantityLeft: reqQuantityLeft, reason } = data;
+			const { userId, quantityUsed, reason } = data;
 
-			const { quantityLeft, name } = await server.reagentsService.getReagentById(id);
+			const { quantityLeft } = await server.reagentsService.getReagentById(id);
 
-			const diff = quantityLeft - quantityUsed;
-
-			const canQuantityChange = diff >= 0 && diff === reqQuantityLeft;
-
-			if (!canQuantityChange) {
-				return {
-					code: 409,
-					status: 'error',
-					message: `Quantity of reagent '${name}' cannot be changed. Check sending values`
-				};
-			}
+			const targetValue = quantityLeft - quantityUsed;
 
 			await server.db.insert(schema.substancesQuantityChanges).values({
 				userId,
 				reagentId: id,
 				previousValue: quantityLeft,
-				targetValue: reqQuantityLeft,
+				targetValue,
 				changeReason: reason
 			});
 
 			const result = await server.db
 				.update(schema.reagents)
 				.set({
-					quantityLeft: reqQuantityLeft
+					quantityLeft: targetValue
 				})
 				.where(eq(schema.reagents.id, id))
 				.returning({
 					reagentName: schema.reagents.name
 				});
 
-			if (diff === 0) {
+			if (targetValue === 0) {
 				await server.reagentsService.softDeleteReagent(id);
 			}
 

@@ -143,38 +143,29 @@ async function samplesService(server) {
 		changeSampleQuantity: async (id, data) => {
 			const { userId, quantityUsed, reason } = data;
 
-			const { quantityLeft, name } = await server.samplesService.getSampleById(id);
+			const { quantityLeft } = await server.samplesService.getSampleById(id);
 
-			const diff = quantityLeft - quantityUsed;
-			const canQuantityChange = diff >= 0;
-
-			if (!canQuantityChange) {
-				return {
-					code: 409,
-					status: 'error',
-					message: `Quantity of sample '${name}' cannot be changed. Check sending values`
-				};
-			}
+			const targetValue = quantityLeft - quantityUsed;
 
 			await server.db.insert(schema.substancesQuantityChanges).values({
 				userId,
 				sampleId: id,
 				previousValue: quantityLeft,
-				targetValue: diff,
+				targetValue,
 				changeReason: reason
 			});
 
 			const result = await server.db
 				.update(schema.samples)
 				.set({
-					quantityLeft: diff
+					quantityLeft: targetValue
 				})
 				.where(eq(schema.samples.id, id))
 				.returning({
 					sampleName: schema.samples.name
 				});
 
-			if (diff === 0) {
+			if (targetValue === 0) {
 				await server.samplesService.softDeleteSample(id);
 			}
 

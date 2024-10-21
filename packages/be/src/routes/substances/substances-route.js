@@ -34,23 +34,33 @@ async function substances(server, options) {
 
 	async function onQuantityChange(req, reply) {
 		try {
-			const { category } = req.body;
+			const { category, quantityUsed, reason } = req.body;
 
 			const substanceId = req.params.id;
-			const substance = server.reagentsService.getReagentById(substanceId);
-			// TODO: add sample checking after it will be implemented
-			// category === 'reagent'
-			// 	? server.reagentsService.getReagentById(substanceId)
-			// 	: server.samplesService.getSampleById(substanceId);
+			const substance = await server.substancesService.getSubstanceById(substanceId, category);
 
 			if (!substance) {
 				return reply.code(404).send({ status: 'error', message: `No such ${category}` });
 			}
 
+			const canQuantityChange = await server.substancesService.canQuantityChange(
+				substanceId,
+				req.body
+			);
+
+			if (!canQuantityChange) {
+				return reply.code(409).send({
+					status: 'error',
+					message: `Quantity of ${category} '${substance.name}' cannot be changed. Check sending values`
+				});
+			}
+
 			const { code, status, message } = await server.substancesService.changeSubstanceQuantity(
 				substanceId,
 				{
-					...req.body,
+					category,
+					quantityUsed,
+					reason,
 					userId: req.session.user.id
 				}
 			);

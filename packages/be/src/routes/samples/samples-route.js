@@ -34,12 +34,9 @@ async function samples(server, options) {
 
 			await Promise.all(
 				components.map(async item => {
-					const substance = await server.substancesService.getSubstanceById(item.id, item.category);
-
 					await server.substancesService.changeSubstanceQuantity(item.id, {
 						category: item.category,
 						quantityUsed: item.quantityUsed,
-						quantityLeft: substance.quantityLeft - item.quantityUsed,
 						userId: req.session.user.id,
 						reason: `Used in making ${sampleName}`
 					});
