@@ -18,8 +18,7 @@ async function sessionPlugin(fastify) {
 
 	fastify.decorate('authenticate', async (request, reply) => {
 		if (!request.session.user) {
-			reply.code(401);
-			return { status: 'error', message: 'Unauthorized' };
+			return reply.code(401).send({ status: 'error', message: 'Unauthorized' });
 		}
 	});
 }

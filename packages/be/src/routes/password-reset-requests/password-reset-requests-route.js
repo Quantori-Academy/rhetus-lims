@@ -17,18 +17,21 @@ async function passwordResetRequests(server, options) {
 			const user = await server.usersService.getUserByUsername(req.body.username);
 
 			if (!user) {
-				reply.code(400);
-				return { status: 'error', message: `User '${req.body.username}' not found.` };
+				return reply
+					.code(400)
+					.send({ status: 'error', message: `User '${req.body.username}' not found.` });
 			}
 
 			await server.usersService.updateUser(user.id, { passwordResetStatus: Status.ACTIVE });
 
-			reply.code(201);
-			return { status: 'success', message: `Password reset request sent for '${username}'.` };
+			return reply
+				.code(201)
+				.send({ status: 'success', message: `Password reset request sent for '${username}'.` });
 		} catch (err) {
 			server.log.error(err);
-			reply.code(500);
-			return { status: 'error', message: 'Oops! Something went wrong. Try again later.' };
+			return reply
+				.code(500)
+				.send({ status: 'error', message: 'Oops! Something went wrong. Try again later.' });
 		}
 	}
 
@@ -46,29 +49,29 @@ async function passwordResetRequests(server, options) {
 			const user = await server.usersService.getUserByUsername(req.body.username);
 
 			if (!user) {
-				reply.code(400);
-				return { status: 'error', message: `User '${req.body.username}' not found.` };
+				return reply
+					.code(400)
+					.send({ status: 'error', message: `User '${req.body.username}' not found.` });
 			}
 
 			if (user.passwordResetStatus !== Status.ACTIVE) {
-				reply.code(400);
-				return {
+				return reply.code(400).send({
 					status: 'error',
 					message: `User '${req.body.username}' does not have an active request.`
-				};
+				});
 			}
 
 			await server.usersService.updateUser(user.id, { passwordResetStatus: Status.CONFIRMED });
 
-			reply.code(200);
-			return {
+			return reply.code(200).send({
 				status: 'success',
 				message: `Password reset request confirmed for '${username}'.`
-			};
+			});
 		} catch (err) {
 			server.log.error(err);
-			reply.code(500);
-			return { status: 'error', message: 'Oops! Something went wrong. Try again later.' };
+			return reply
+				.code(500)
+				.send({ status: 'error', message: 'Oops! Something went wrong. Try again later.' });
 		}
 	}
 }

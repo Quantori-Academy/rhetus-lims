@@ -17,16 +17,14 @@ async function auth(server, options) {
 			const user = await server.usersService.getUserByUsername(username);
 
 			if (!user) {
-				reply.code(400);
-				return { status: 'success', message: 'User not found.' };
+				return reply.code(400).send({ status: 'success', message: 'User not found.' });
 			}
 
 			const isPasswordValid = await bcrypt.compare(password, user.password);
 
 			// require a valid password only when the user doesn't have a confirmed reset request
 			if (user.passwordResetStatus !== Status.CONFIRMED && !isPasswordValid) {
-				reply.code(401);
-				return { status: 'error', message: 'Invalid credentials.' };
+				return reply.code(401).send({ status: 'error', message: 'Invalid credentials.' });
 			}
 
 			let message = 'Successfully logged in.';
@@ -43,12 +41,12 @@ async function auth(server, options) {
 
 			req.session.user = { id: user.id };
 
-			reply.code(200);
-			return { status: 'success', message };
+			return reply.code(200).send({ status: 'success', message });
 		} catch (err) {
 			server.log.error(err);
-			reply.code(500);
-			return { status: 'error', message: 'Oops! Something went wrong. Try again later.' };
+			return reply
+				.code(500)
+				.send({ status: 'error', message: 'Oops! Something went wrong. Try again later.' });
 		}
 	}
 }
