@@ -37,15 +37,21 @@ const rules = ref(formRules);
 const isSaving = ref(false);
 
 async function submit() {
-	// console.log(form.value);
 	if (!(await $isFormValid(formEl))) return;
 
 	isSaving.value = true;
 
 	try {
-		const response = await $api.samples.addSample(form.value);
+		const response = await $api.samples.addSample({
+			...form.value,
+			components: form.value.components.map(x => ({
+				id: x.id,
+				catgeory: x.category,
+				quantityUsed: x.quantityUsed
+			}))
+		});
 		$notify({ message: response.message, type: 'success' });
-		$router.push({ name: 'dashboard' });
+		$router.push({ name: 'reagents-list' });
 	} catch (error) {
 		$notifyUserAboutError(error.statusText);
 	} finally {
@@ -55,7 +61,7 @@ async function submit() {
 
 function cancel() {
 	formEl.value.resetFields();
-	$router.push({ name: 'dashboard' });
+	$router.push({ name: 'reagents-list' });
 }
 
 const removeComponent = index => {

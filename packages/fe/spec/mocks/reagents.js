@@ -31,13 +31,24 @@ const substances = [
 		quantityUnit: 'g',
 		storageLocation: 'Shelf C3',
 		structure: 'O=[Mn](=O)(=O)=O[O-].[K+]'
+	},
+	{
+		id: '3fa85f64-5717-4562-b3fb-2c963f66afa6',
+		name: 'Water (H2O)',
+		category: 'sample',
+		description: 'A universal solvent used to dilute potassium permanganate for reaction purposes.',
+		quantityLeft: 1000,
+		quantityUnit: 'ml',
+		storageLocation: 'Shelf C3',
+		structure: 'O-H-O'
 	}
 ];
+
 const reagentDetails = [
 	{
 		id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d',
 		name: 'Sodium Chloride',
-		category: 'Reagent',
+		category: 'reagent',
 		description: 'Common salt used in various chemical reactions and as a preservative.',
 		casNumber: '7647-14-5',
 		producer: 'Chemical Co.',
@@ -53,7 +64,7 @@ const reagentDetails = [
 	{
 		id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b322',
 		name: 'Acetic Acid',
-		category: 'Reagent',
+		category: 'reagent',
 		description:
 			'A colorless liquid organic compound with a pungent smell used in the production of various chemicals.',
 		casNumber: '64-19-7',
@@ -69,7 +80,7 @@ const reagentDetails = [
 	{
 		id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b999',
 		name: 'Acetic Acid',
-		category: 'Reagent',
+		category: 'reagent',
 		description:
 			'A colorless liquid organic compound with a pungent smell used in the production of various chemicals.',
 		casNumber: '64-19-7',
@@ -84,6 +95,38 @@ const reagentDetails = [
 		expirationDate: '2024-11-30T00:00:00.000Z'
 	}
 ];
+
+const samplesDetails = [
+	{
+		id: '3fa85f64-5717-4562-b3fc-2c963f66afb6',
+		name: 'Potassium Permanganate',
+		quantity: 500,
+		quantityUnit: 'grams',
+		quantityLeft: 300,
+		expirationDate: '2025-10-19T00:00:00.000Z',
+		description:
+			'A dark purple, crystalline compound used as a strong oxidizing agent in various chemical reactions.',
+		storageLocation: {
+			id: '3fa85f64-5717-4562-b3fa-2c963f66afa6',
+			room: 'Building 1, Room 2',
+			name: 'Cabinet 3, Shelf 4'
+		},
+		components: [
+			{
+				id: '3fa85f64-5717-4562-b3fb-2c963f66afa6',
+				name: 'Water (H2O)',
+				category: 'sample',
+				description:
+					'A universal solvent used to dilute potassium permanganate for reaction purposes.',
+				quantityLeft: 1000,
+				quantityUnit: 'ml',
+				quantity: 1000,
+				quantityUsed: 200
+			}
+		]
+	}
+];
+
 const storageLocations = [
 	{
 		id: 1,
@@ -186,5 +229,21 @@ export const reagentsHandlers = [
 			status: 'success',
 			message: `New reagent was created`
 		});
+	}),
+	http.post(api('/samples'), async ({ request }) => {
+		const sample = await request.json();
+		substances.push({ ...sample, category: 'sample' });
+		return HttpResponse.json({
+			status: 'success',
+			message: `New sample was created`
+		});
+	}),
+	http.get(api('/samples/:id'), req => {
+		const sample = samplesDetails.find(sample => sample.id === req.params.id);
+		if (sample) {
+			return HttpResponse.json(sample);
+		} else {
+			return HttpResponse.json({ message: 'Sample not found' }, { status: 404 });
+		}
 	})
 ];

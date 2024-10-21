@@ -104,51 +104,9 @@ function findLocationByValue({ shelf, cabinet, room }) {
 	);
 }
 
-function findLocationById(id) {
-	const loc = storageLocations.find(loc => loc.id === id);
-
-	if (!loc) return null;
-
-	const name = loc.name.split(', ');
-
-	return {
-		id,
-		room: loc.room,
-		cabinet: name[0],
-		shelf: name[1]
-	};
-}
-
 export const samplesHandlers = [
 	http.get(api('/samples'), () => {
 		return HttpResponse.json({ samples, count: samples.length });
-	}),
-
-	http.post(api('/samples'), async ({ request }) => {
-		const sample = await request.json();
-		const { room, shelf, cabinet, ...rest } = sample;
-
-		const storageLocation = findLocationByValue({ shelf, cabinet, room });
-		if (!storageLocation) {
-			return HttpResponse.json(
-				{
-					status: 'error',
-					message: `Location not found`
-				},
-				{ status: 404 }
-			);
-		}
-
-		const newSample = {
-			...rest,
-			storageLocationId: storageLocation.id
-		};
-
-		samples.push(newSample);
-		return HttpResponse.json({
-			status: 'success',
-			message: `New sample was created`
-		});
 	}),
 
 	http.patch(api('/samples/:id'), async ({ request, params }) => {
@@ -201,18 +159,6 @@ export const samplesHandlers = [
 			status: 'success',
 			message: `Sample was updated successfully`
 		});
-	}),
-
-	http.get(api('/samples/:id'), req => {
-		const { id } = req.params;
-		const sample = samples.find(sample => sample.id === id);
-		if (sample) {
-			sample.reagentsAndSamples = sample.reagentsAndSamples.map(findSampleById);
-			sample.storageLocation = findLocationById(sample.storageLocationId);
-			return HttpResponse.json(sample);
-		} else {
-			return HttpResponse.json({ message: 'Sample not found' }, { status: 404 });
-		}
 	}),
 
 	http.delete(api('/samples/:id'), async ({ params }) => {
