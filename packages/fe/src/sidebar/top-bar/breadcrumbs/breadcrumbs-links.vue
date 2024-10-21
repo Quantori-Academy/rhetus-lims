@@ -10,6 +10,7 @@
 						{{ $route.name }}
 					</li>
 				</ol>
+				<div class="page-title">{{ $route.meta.title }}</div>
 			</nav>
 		</div>
 	</div>
