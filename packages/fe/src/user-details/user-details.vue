@@ -99,26 +99,24 @@ const handleSubmit = async () => {
 		$notifyUserAboutError(error.message || 'Error updating user');
 	}
 };
+
 const confirmRoleChange = async () => {
-	if (user.value.roleId !== originalUser.value.roleId) {
-		try {
-			const confirmed = await $confirm(
-				`Are you sure you want to change the role to ${roleName.value}?`,
-				'Confirm Role Change',
-				{
-					confirmButtonText: 'Yes, Change Role',
-					cancelButtonText: 'Cancel',
-					type: 'warning'
-				}
-			);
-			originalUser.value.roleId = user.value.roleId;
-			return confirmed;
-		} catch (error) {
-			$notifyUserAboutError(error.message || 'Role update canceled');
-			return false;
-		}
+	try {
+		const confirmed = await $confirm(
+			`Are you sure you want to change the role to ${roleName.value}?`,
+			'Confirm Role Change',
+			{
+				confirmButtonText: 'Yes, Change Role',
+				cancelButtonText: 'Cancel',
+				type: 'warning'
+			}
+		);
+		return confirmed;
+	} catch (error) {
+		$notifyUserAboutError(error.message || 'Role update canceled');
+		user.value.roleId = originalUser.value.roleId;
+		return false;
 	}
-	return true;
 };
 
 const changePassword = async () => {
