@@ -5,7 +5,7 @@ const samples = [
 	{
 		id: 'a7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3c3b333',
 		name: 'Methanol',
-		reagentsAndSamples: [],
+		components: [],
 		quantityUnit: 'ml',
 		size: 100,
 		quantityLeft: 80,
@@ -16,7 +16,7 @@ const samples = [
 	{
 		id: 'a7a3d8e0-5e0b-4b0f-8b3a-4f9f4b3c3b333',
 		name: 'Sodium',
-		reagentsAndSamples: [],
+		components: [],
 		quantityUnit: 'g',
 		size: 50,
 		quantityLeft: 20,
@@ -27,7 +27,7 @@ const samples = [
 	{
 		id: 'a7a3d8e1-2e0b-4b0f-8b3a-4f9f4b3c3b333',
 		name: 'Chlorine',
-		reagentsAndSamples: [],
+		components: [],
 		quantityUnit: 'g',
 		size: 50,
 		quantityLeft: 20,
@@ -38,7 +38,7 @@ const samples = [
 	{
 		id: 'c7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3d3b331',
 		name: 'Ethanol',
-		reagentsAndSamples: [],
+		components: [],
 		quantityUnit: 'L',
 		size: 5,
 		quantityLeft: 3,
@@ -49,7 +49,7 @@ const samples = [
 	{
 		id: 'c7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3d3b334',
 		name: 'Sodium Chloride',
-		reagentsAndSamples: [
+		components: [
 			'a7a3d8e0-5e0b-4b0f-8b3a-4f9f4b3c3b333',
 			'a7a3d8e1-2e0b-4b0f-8b3a-4f9f4b3c3b333'
 		],
@@ -63,7 +63,7 @@ const samples = [
 	{
 		id: 'c7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3c3b333',
 		name: 'Acetic Acid',
-		reagentsAndSamples: ['a7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3c3b333'],
+		components: ['a7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3c3b333'],
 		quantityUnit: 'L',
 		size: 2,
 		quantityLeft: 2,

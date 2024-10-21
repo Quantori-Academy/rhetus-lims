@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, reactive, ref, useTemplateRef } from 'vue';
+import { computed, onMounted, ref, useTemplateRef } from 'vue';
 import {
 	ElInput,
 	ElForm,
@@ -15,13 +15,15 @@ import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
 import { $router } from '../../lib/router/router';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg';
 import { $api } from '../../lib/api';
+import { emptyComponent, formRules } from './constants';
+import rhIcon from '../../lib/components/rh-icon.vue';
 
-const reagentsAndSamplesOptions = ref([]);
+const componentOptions = ref([]);
 
 const formEl = useTemplateRef('form-el');
 const form = ref({
 	name: '',
-	reagentsAndSamples: [],
+	components: [emptyComponent],
 	quantityUnit: '',
 	size: 1,
 	quantityLeft: 1,
@@ -32,37 +34,11 @@ const form = ref({
 	description: ''
 });
 
-const requiredRule = {
-	required: true,
-	message: 'Please enter a value',
-	trigger: ['blur', 'change']
-};
-const rules = reactive({
-	name: [requiredRule],
-	reagentsAndSamples: [requiredRule],
-	quantityUnit: [requiredRule],
-	size: [
-		requiredRule,
-		{ type: 'number', min: 0, message: 'Size cannot be negative', trigger: ['blur', 'change'] }
-	],
-	quantityLeft: [
-		requiredRule,
-		{
-			type: 'number',
-			min: 0,
-			message: "You can't add a sample that has none left",
-			trigger: ['blur', 'change']
-		}
-	],
-	expirationDate: [requiredRule],
-	room: [requiredRule],
-	cabinet: [requiredRule],
-	shelf: [requiredRule]
-});
-
+const rules = ref(formRules);
 const isSaving = ref(false);
 
 async function submit() {
+	// console.log(form.value);
 	if (!(await $isFormValid(formEl))) return;
 
 	isSaving.value = true;
@@ -83,18 +59,38 @@ function cancel() {
 	$router.push({ name: 'dashboard' });
 }
 
-async function setReagentsAndSamples() {
+const removeComponent = index => {
+	form.value.components.splice(index, 1);
+};
+
+const addComponent = () => {
+	form.value.components.push(emptyComponent);
+};
+
+async function setComponents() {
 	try {
-		const res = await $api.samples.fetchSamples();
-		reagentsAndSamplesOptions.value = res.samples.map(x => ({ value: x.id, label: x.name }));
+		const res = await $api.reagents.fetchSubstances();
+		componentOptions.value = res.substances.map(x => ({
+			id: x.id,
+			label: x.name,
+			category: x.category,
+			quantityLeft: x.quantityLeft,
+			quantityUnit: x.quantityUnit,
+			quantityUsed: 0
+		}));
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
 }
 
-onMounted(() => {
-	setReagentsAndSamples();
+const isOptionChosen = option =>
+	!form.value.components.some(component => component.id === option.id);
+
+const filteredComponentOptions = computed(() => {
+	return componentOptions.value.filter(isOptionChosen);
 });
+
+onMounted(() => setComponents());
 </script>
 
 <template>
@@ -103,21 +99,50 @@ onMounted(() => {
 			<el-form-item label="Name" prop="name">
 				<el-input v-model="form.name" placeholder="Enter sample name" />
 			</el-form-item>
-			<el-form-item label="Reagents/Samples used" prop="reagentsAndSamples">
-				<el-select
-					v-model="form.reagentsAndSamples"
-					filterable
-					multiple
-					placeholder="Select reagents/samples used in this sample"
+			<el-form-item label="Reagents/Samples used" prop="components">
+				<div
+					v-for="(component, index) of form.components"
+					:key="component.id + index"
+					:prop="'components.' + index + '.id'"
+					class="align-horizontal w-full"
 				>
-					<el-option
-						v-for="item of reagentsAndSamplesOptions"
-						:key="item.value"
-						:label="item.label"
-						:value="item.value"
-					/>
-				</el-select>
+					<el-select
+						v-model="form.components[index]"
+						value-key="id"
+						filterable
+						placeholder="Select reagent/sample"
+					>
+						<el-option
+							v-for="item of filteredComponentOptions"
+							:key="item.id"
+							:label="item.label"
+							:value="item"
+						/>
+					</el-select>
+					<div class="w-full">
+						<el-input-number
+							v-model="component.quantityUsed"
+							:min="0"
+							label="Quantity used"
+							placeholder="Enter quantity used"
+						>
+							<template #suffix>
+								{{ component.quantityUnit }}
+							</template>
+						</el-input-number>
+						<div class="subscript">
+							Future quantity: {{ component.quantityLeft - component.quantityUsed }}
+							{{ component.quantityUnit }}
+						</div>
+					</div>
+					<el-button type="danger" @click="() => removeComponent(index)">
+						<rh-icon color="white" name="trash" />
+					</el-button>
+				</div>
 			</el-form-item>
+			<div class="add-btn">
+				<el-button @click="addComponent">Add component</el-button>
+			</div>
 			<div class="align-horizontal">
 				<el-form-item label="Quantity unit" prop="quantityUnit">
 					<el-select v-model="form.quantityUnit" filterable placeholder="Select a unit">
@@ -139,6 +164,7 @@ onMounted(() => {
 					</el-input-number>
 				</el-form-item>
 			</div>
+
 			<el-form-item label="Expiration date" prop="expirationDate">
 				<el-date-picker
 					v-model="form.expirationDate"
@@ -148,6 +174,7 @@ onMounted(() => {
 					placeholder="Pick a date (YYYY-MM-DD)"
 				/>
 			</el-form-item>
+
 			<div class="align-horizontal">
 				<el-form-item label="Room" prop="room">
 					<el-input v-model="form.room" placeholder="Enter room" />
@@ -159,9 +186,11 @@ onMounted(() => {
 					<el-input v-model="form.shelf" placeholder="Enter shelf" />
 				</el-form-item>
 			</div>
+
 			<el-form-item label="Description" prop="description">
 				<el-input v-model="form.description" type="textarea" placeholder="Enter description" />
 			</el-form-item>
+
 			<div class="btn-container">
 				<el-button @click="cancel">Cancel</el-button>
 				<el-button :loading="isSaving" type="primary" @click="submit">Create</el-button>
@@ -170,9 +199,12 @@ onMounted(() => {
 	</div>
 </template>
 
-<style>
+<style scoped>
 .container {
 	width: 42vw;
+}
+.w-full {
+	width: 100%;
 }
 .align-horizontal {
 	display: flex;
@@ -183,11 +215,9 @@ onMounted(() => {
 		flex-basis: 0;
 	}
 }
-.title {
-	margin-bottom: 12px;
-	color: black;
-	font-weight: 500;
-	font-size: large;
+.subscript {
+	opacity: 0.6;
+	font-size: small;
 }
 .btn-container {
 	display: flex;
@@ -200,6 +230,11 @@ onMounted(() => {
 .el-date-editor.el-input,
 .el-date-editor.el-input__wrapper {
 	width: 100%;
+}
+.add-btn {
+	margin-top: -12px;
+	margin-bottom: 12px;
+	text-align: end;
 }
 
 @media (max-width: 768px) {
