@@ -197,20 +197,18 @@ export const reagentsHandlers = [
 		const { id } = params;
 		const { quantityUsed, category } = body;
 		const substance = substances.find(sample => sample.id === id);
-		if (substance) {
-			substance.quantityLeft -= quantityUsed;
+		if (!substance) return HttpResponse.json({ message: 'Sample not found' }, { status: 404 });
 
-			if (category.toLowerCase() === 'reagent') {
-				const reagent = reagents.find(x => x.id === id);
-				reagent.quantityLeft -= quantityUsed;
-			} else {
-				const sample = samples.find(x => x.id === id);
-				sample.quantityLeft -= quantityUsed;
-			}
+		substance.quantityLeft -= quantityUsed;
 
-			return HttpResponse.json({ status: 'success', message: 'Updated substance quantity' });
+		if (category.toLowerCase() === 'reagent') {
+			const reagent = reagents.find(x => x.id === id);
+			reagent.quantityLeft -= quantityUsed;
 		} else {
-			return HttpResponse.json({ message: 'Sample not found' }, { status: 404 });
+			const sample = samples.find(x => x.id === id);
+			sample.quantityLeft -= quantityUsed;
 		}
+
+		return HttpResponse.json({ status: 'success', message: 'Updated substance quantity' });
 	})
 ];

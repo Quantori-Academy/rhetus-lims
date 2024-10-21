@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref, useTemplateRef } from 'vue';
+import { onMounted, ref, useTemplateRef } from 'vue';
 import {
 	ElInput,
 	ElForm,
@@ -18,7 +18,6 @@ import { $api } from '../../lib/api';
 import { emptyComponent, formRules } from './constants';
 import rhIcon from '../../lib/components/rh-icon.vue';
 
-const componentOptions = ref([]);
 const storages = ref([]);
 
 const formEl = useTemplateRef('form-el');
@@ -72,6 +71,11 @@ const addComponent = () => {
 	form.value.components.push(emptyComponent);
 };
 
+const componentOptions = ref([]);
+
+const isOptionChosen = option =>
+	!form.value.components.some(component => component.id === option.id);
+
 async function setComponents() {
 	try {
 		const res = await $api.reagents.fetchSubstances();
@@ -87,13 +91,6 @@ async function setComponents() {
 		$notifyUserAboutError(error);
 	}
 }
-
-const isOptionChosen = option =>
-	!form.value.components.some(component => component.id === option.id);
-
-const filteredComponentOptions = computed(() => {
-	return componentOptions.value.filter(isOptionChosen);
-});
 
 async function setStorages() {
 	try {
@@ -131,10 +128,11 @@ onMounted(() => {
 						placeholder="Select reagent/sample"
 					>
 						<el-option
-							v-for="item of filteredComponentOptions"
+							v-for="item of componentOptions"
 							:key="item.id"
 							:label="item.label"
 							:value="item"
+							:disabled="!isOptionChosen(item)"
 						/>
 					</el-select>
 					<div class="w-full">
