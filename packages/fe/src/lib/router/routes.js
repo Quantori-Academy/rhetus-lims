@@ -39,6 +39,12 @@ export const routes = [
 		props: true
 	},
 	{
+		path: '/users/:id/edit',
+		name: 'user-details-edit',
+		component: () => import('../../user-details/user-details.vue'),
+		props: true
+	},
+	{
 		path: '/profile',
 		name: 'user-profile',
 		component: () => import('../../profile/user-profile.vue')

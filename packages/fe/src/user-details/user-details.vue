@@ -12,7 +12,7 @@ import { computed, onMounted, useTemplateRef, ref } from 'vue';
 import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg';
 import { $confirm } from '../lib/utils/feedback/confirm-msg.js/';
 import { $api } from '../lib/api/index.js';
-import { $router } from '../lib/router/router';
+import { $route, $router } from '../lib/router/router';
 import { $isFormValid } from '../lib/utils/form-validation/is-form-valid.js';
 import { formRules } from './constants';
 
@@ -23,28 +23,35 @@ const props = defineProps({
 	}
 });
 
-const editingForm = ref(false);
 const formEl = useTemplateRef('form-ref');
 const user = ref(null);
+const loading = ref(false);
 const originalUser = ref(null);
-const loading = ref(true);
 const roles = ref([]);
 const rules = ref(formRules);
-
-async function setRoles() {
-	try {
-		const data = await $api.users.getRoles();
-		roles.value = data.roles;
-	} catch (error) {
-		$notifyUserAboutError(error);
-	}
-}
+const roleName = computed(() => {
+	return roles.value.find(role => role.id === user.value.roleId).name;
+});
+const isEdit = computed(() => $route.value.name === 'user-details-edit');
 
 onMounted(() => {
 	setUser(props.id);
 	setRoles();
 });
+
+async function setRoles() {
+	loading.value = true;
+	try {
+		const data = await $api.users.getRoles();
+		roles.value = data.roles;
+	} catch (error) {
+		$notifyUserAboutError(error);
+	} finally {
+		loading.value = false;
+	}
+}
 const setUser = async id => {
+	loading.value = true;
 	try {
 		const data = await $api.users.fetchUser(id);
 		const { role, ...userData } = data;
@@ -62,31 +69,36 @@ const setUser = async id => {
 		loading.value = false;
 	}
 };
-const formHasChanges = computed(() => {
-	if (!originalUser.value) return false;
-	return (
-		user.value.firstName !== originalUser.value.firstName ||
-		user.value.lastName !== originalUser.value.lastName ||
-		user.value.email !== originalUser.value.email ||
-		user.value.roleId !== originalUser.value.roleId
-	);
-});
 
-const roleName = computed(() => {
-	return roles.value.find(role => role.id === user.value.roleId).name;
-});
 const toggleEdit = () => {
-	editingForm.value = !editingForm.value;
+	$router.push({ name: 'user-details-edit', params: { id: user.value.id } });
 };
-
 const cancelEdit = () => {
-	editingForm.value = false;
+	$router.push({ name: 'user-details', params: { id: user.value.id } });
+	$notify({
+		title: 'Canceled',
+		message: 'User deletion canceled',
+		type: 'info'
+	});
 	user.value = { ...originalUser.value };
+	formEl.value.resetFields();
 };
-async function validate() {
-	return $isFormValid(formEl);
-}
 
+const handleSubmit = async () => {
+	if (!(await $isFormValid(formEl))) return;
+	try {
+		const updatedUser = await $api.users.updateUser(user.value.id, user.value);
+		user.value = updatedUser;
+		$notify({
+			title: 'Success',
+			message: 'User has been updated',
+			type: 'success'
+		});
+		$router.push({ name: 'user-details', params: { id: user.value.id } });
+	} catch (error) {
+		$notifyUserAboutError(error.message || 'Error updating user');
+	}
+};
 const confirmRoleChange = async () => {
 	if (user.value.roleId !== originalUser.value.roleId) {
 		try {
@@ -99,6 +111,7 @@ const confirmRoleChange = async () => {
 					type: 'warning'
 				}
 			);
+			originalUser.value.roleId = user.value.roleId;
 			return confirmed;
 		} catch (error) {
 			$notifyUserAboutError(error.message || 'Role update canceled');
@@ -107,26 +120,7 @@ const confirmRoleChange = async () => {
 	}
 	return true;
 };
-const handleSubmit = async () => {
-	if (!formHasChanges.value) {
-		toggleEdit();
-		return;
-	}
-	const valid = await validate();
-	if (!valid) return;
-	try {
-		const updatedUser = await $api.users.updateUser(user.value.id, user.value);
-		await setUser(props.id);
-		$notify({
-			title: 'Success',
-			message: updatedUser.message,
-			type: 'success'
-		});
-		toggleEdit();
-	} catch (error) {
-		$notifyUserAboutError(error.message || 'Error updating user');
-	}
-};
+
 const changePassword = async () => {
 	try {
 		const confirmed = await $confirm(
@@ -184,8 +178,9 @@ const deleteUser = async () => {
 <template>
 	<div class="wrapper">
 		<el-form
-			v-if="user && !loading"
+			v-if="user"
 			ref="form-ref"
+			v-loading="loading || !user"
 			label-position="top"
 			:model="user"
 			:rules="rules"
@@ -195,16 +190,16 @@ const deleteUser = async () => {
 				<el-input v-model="user.username" :disabled="true" />
 			</el-form-item>
 			<el-form-item label="First name" prop="firstName">
-				<el-input v-model="user.firstName" :disabled="!editingForm" />
+				<el-input v-model="user.firstName" :disabled="!isEdit" />
 			</el-form-item>
 			<el-form-item label="Last name" prop="lastName">
-				<el-input v-model="user.lastName" :disabled="!editingForm" />
+				<el-input v-model="user.lastName" :disabled="!isEdit" />
 			</el-form-item>
 			<el-form-item label="Email" prop="email">
-				<el-input v-model="user.email" :disabled="!editingForm" />
+				<el-input v-model="user.email" :disabled="!isEdit" />
 			</el-form-item>
 			<el-form-item label="Role" prop="role">
-				<el-select v-model="user.roleId" :disabled="!editingForm" @change="confirmRoleChange">
+				<el-select v-model="user.roleId" :disabled="!isEdit" @change="confirmRoleChange">
 					<el-option
 						v-for="role of roles"
 						:key="role.id"
@@ -222,15 +217,16 @@ const deleteUser = async () => {
 					:disabled="true"
 				/>
 			</el-form-item>
-			<el-button v-if="editingForm" type="primary" @click="handleSubmit">{{ '		Save' }}</el-button>
-			<el-button v-else type="primary" @click="toggleEdit">{{ 'Edit profile' }}</el-button>
-			<el-button v-if="editingForm" @click="cancelEdit">Cancel</el-button>
-			<el-button v-if="!editingForm" type="warning" @click="changePassword"
-				>Change password</el-button
-			>
-			<el-button type="danger" @click="deleteUser">{{ 'Delete user' }}</el-button>
+			<template v-if="isEdit">
+				<el-button type="primary" @click="handleSubmit">{{ '		Save' }}</el-button>
+				<el-button @click="cancelEdit">Cancel</el-button>
+			</template>
+			<template v-else>
+				<el-button type="primary" @click="toggleEdit">{{ 'Edit profile' }}</el-button>
+				<el-button type="warning" @click="changePassword">Change password</el-button>
+				<el-button type="danger" @click="deleteUser">{{ 'Delete user' }}</el-button>
+			</template>
 		</el-form>
-		<div v-else>Loading user data...</div>
 	</div>
 </template>
 
