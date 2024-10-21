@@ -1,7 +1,7 @@
 <script setup>
-import SidebarMenu from '../../../sidebar/sidebar-menu.vue';
-import TopBar from '../../../top-bar/top-bar.vue';
 import { computed, onMounted, provide, ref } from 'vue';
+import PageWithSidebar from '../../../sidebar/page-with-sidebar.vue';
+
 import { $api } from '../../api/index.js';
 import { $router } from '../router.js';
 
@@ -32,31 +32,7 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="page-with-sidebar">
-		<top-bar />
-		<sidebar-menu />
-
-		<div class="wrapper">
-			<div class="content-wrapper">
-				<router-view></router-view>
-			</div>
-		</div>
-	</div>
+	<page-with-sidebar>
+		<router-view />
+	</page-with-sidebar>
 </template>
-
-<style scoped>
-.wrapper {
-	padding-top: 48px;
-}
-
-.content-wrapper {
-	margin: 0 auto;
-	margin-top: 16px;
-	width: 100%;
-	max-width: 1296px;
-}
-
-.page-with-sidebar {
-	padding-left: 18rem;
-}
-</style>
