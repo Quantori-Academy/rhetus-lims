@@ -38,6 +38,7 @@ async function storagesService(server) {
 				.returning({ name: schema.storages.name });
 			return result.length ? result[0].name : null;
 		},
+
 		getStorages: async queryParams => {
 			const limit = Number(queryParams.limit) || 10;
 			const page = Number(queryParams.page) || 1;
@@ -71,6 +72,7 @@ async function storagesService(server) {
 				count: count.length
 			};
 		},
+
 		getStorageById: async id => {
 			const result = await server.db
 				.select()
@@ -78,6 +80,7 @@ async function storagesService(server) {
 				.where(and(eq(schema.storages.id, id), eq(schema.storages.deleted, false)));
 			return result[0];
 		},
+
 		updateStorage: async (id, data) => {
 			const result = await server.db
 				.update(schema.storages)
@@ -86,6 +89,7 @@ async function storagesService(server) {
 				.returning({ name: schema.storages.name });
 			return result.length ? result[0].name : null;
 		},
+
 		softDeleteStorage: async id => {
 			const result = await server.db
 				.update(schema.storages)
@@ -96,6 +100,18 @@ async function storagesService(server) {
 				.returning({ name: schema.storages.name });
 			return result.length ? result[0].name : null;
 		},
+
+		isStorageEmpty: async id => {
+			const reagents = await server.reagentsService.getReagentsByStorageId(id);
+			const samples = await server.samplesService.getSamplesByStorageId(id);
+
+			if (reagents.length > 0 || samples.length > 0) {
+				return false;
+			}
+
+			return true;
+		},
+
 		applyFilters: (query, filterData) => {
 			const { options, formatMapping, optionsDictionary } = filterData;
 

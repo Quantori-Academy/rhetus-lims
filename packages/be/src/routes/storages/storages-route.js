@@ -97,12 +97,14 @@ async function storages(server, options) {
 			if (!storage) {
 				return reply.code(404).send({ status: 'error', message: `No such storage location found` });
 			}
-			//TODO: before delete should check that current storage don't have reagents
-			// const isReagentsInside = await server.reagentsService.getReagentsByStorageId(storageId);
 
-			// if(isReagentsInside) {
-			// 	return reply.code(409).send({ status: 'error', message: `This storage has reagents` });
-			// }
+			const isStorageEmpty = await server.storagesService.isStorageEmpty(storageId);
+
+			if (!isStorageEmpty) {
+				return reply
+					.code(409)
+					.send({ status: 'error', message: `Can't delete, this storage is not empty` });
+			}
 
 			const storageName = await server.storagesService.softDeleteStorage(storageId);
 			return reply

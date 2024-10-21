@@ -191,6 +191,22 @@ async function samplesService(server) {
 				})
 				.from(schema.samples)
 				.where(eq(schema.samples.deleted, false));
+		},
+
+		getSamplesByStorageId: async id => {
+			return await server.db
+				.select({
+					id: schema.samples.id,
+					name: schema.samples.name,
+					quantityUnit: schema.samples.quantityUnit,
+					quantity: schema.samples.quantity,
+					quantityLeft: schema.samples.quantityLeft,
+					expirationDate: schema.samples.expirationDate,
+					description: schema.samples.description,
+					category: sql`'sample'`.as('category')
+				})
+				.from(schema.samples)
+				.where(and(eq(schema.samples.storageId, id), eq(schema.samples.deleted, false)));
 		}
 	});
 }
