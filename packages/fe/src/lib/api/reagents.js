@@ -24,5 +24,11 @@ export default http => ({
 			method: 'POST',
 			body: reagent
 		});
+	},
+	async changeSubstanceQuantity(id, body) {
+		return await http(`/substances/quantity-change/${id}`, {
+			method: 'PUT',
+			body
+		});
 	}
 });

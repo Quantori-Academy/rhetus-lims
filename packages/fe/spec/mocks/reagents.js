@@ -190,5 +190,27 @@ export const reagentsHandlers = [
 			status: 'success',
 			message: `New reagent was created`
 		});
+	}),
+
+	http.put(api('/substances/quantity-change/:id'), async ({ request, params }) => {
+		const body = await request.json();
+		const { id } = params;
+		const { quantityUsed, category } = body;
+		const substance = substances.find(sample => sample.id === id);
+		if (substance) {
+			substance.quantityLeft -= quantityUsed;
+
+			if (category.toLowerCase() === 'reagent') {
+				const reagent = reagents.find(x => x.id === id);
+				reagent.quantityLeft -= quantityUsed;
+			} else {
+				const sample = samples.find(x => x.id === id);
+				sample.quantityLeft -= quantityUsed;
+			}
+
+			return HttpResponse.json({ status: 'success', message: 'Updated substance quantity' });
+		} else {
+			return HttpResponse.json({ message: 'Sample not found' }, { status: 404 });
+		}
 	})
 ];

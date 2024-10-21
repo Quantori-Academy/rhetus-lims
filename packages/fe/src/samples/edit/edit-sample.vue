@@ -8,7 +8,8 @@ import {
 	ElFormItem,
 	ElSelect,
 	ElInputNumber,
-	ElTag
+	ElTag,
+	ElOption
 } from 'element-plus';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg';
@@ -18,6 +19,8 @@ import { $route, $router } from '../../lib/router/router';
 import { emptySample, formRules } from './constants';
 
 const props = defineProps({ id: { type: String, default: null } });
+
+const storages = ref([]);
 
 const formEl = useTemplateRef('form-el');
 const sample = ref(emptySample);
@@ -67,14 +70,16 @@ async function submit() {
 	isSaving.value = true;
 
 	try {
-		const response = await $api.samples.updateSample(props.id, sample.value);
-		$notify({ message: response.message, type: 'success' });
-
-		if (sample.value.quantityLeft <= 0) {
-			$router.push({ name: 'reagents-list' });
-			return;
+		const originalSample = await $api.samples.fetchSample(props.id);
+		if (originalSample.quantityLeft != sample.value.quantityLeft) {
+			const response = await $api.reagents.changeSubstanceQuantity(props.id, {
+				category: 'sample',
+				id: props.id,
+				quantityLeft: sample.value.quantityLeft,
+				quantityUsed: originalSample.quantityLeft - sample.value.quantityLeft
+			});
+			$notify({ message: response.message, type: 'success' });
 		}
-
 		toggleEditing();
 	} catch (error) {
 		$notifyUserAboutError(error);
@@ -90,11 +95,21 @@ function toggleEditing() {
 	});
 }
 
+async function setStorages() {
+	try {
+		const data = await $api.storages.fetchStorages();
+		storages.value = data.storages;
+	} catch (error) {
+		$notifyUserAboutError(error);
+	}
+}
+
 async function setSample(id) {
 	isLoading.value = true;
 	try {
 		const res = await $api.samples.fetchSample(id);
 		sample.value = res;
+		console.log(res);
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
@@ -102,7 +117,10 @@ async function setSample(id) {
 	}
 }
 
-onMounted(() => setSample(props.id));
+onMounted(() => {
+	setSample(props.id);
+	setStorages();
+});
 </script>
 
 <template>
@@ -115,9 +133,9 @@ onMounted(() => setSample(props.id));
 			<el-form-item label="Name" prop="name">
 				<el-input v-model="sample.name" disabled />
 			</el-form-item>
-			<el-form-item label="Reagents/Samples used" prop="reagentsAndSamples">
+			<el-form-item label="Reagents/Samples used" prop="components">
 				<div class="tags">
-					<el-tag v-for="item of sample.reagentsAndSamples" :key="item.id" type="info">
+					<el-tag v-for="item of sample.components" :key="item.id" type="info">
 						<router-link
 							class="link"
 							target="_blank"
@@ -132,8 +150,8 @@ onMounted(() => setSample(props.id));
 				<el-form-item label="Quantity unit" prop="quantityUnit">
 					<el-select v-model="sample.quantityUnit" filterable disabled />
 				</el-form-item>
-				<el-form-item label="Size" prop="size">
-					<el-input-number v-model="sample.size" disabled>
+				<el-form-item label="Quantity" prop="quantity">
+					<el-input-number v-model="sample.quantity" disabled>
 						<template #suffix>
 							{{ sample.quantityUnit }}
 						</template>
@@ -155,29 +173,20 @@ onMounted(() => setSample(props.id));
 			<el-form-item label="Expiration date" prop="expirationDate">
 				<el-date-picker v-model="sample.expirationDate" type="date" disabled />
 			</el-form-item>
-			<div class="align-horizontal">
-				<el-form-item label="Room" prop="storageLocation.room">
-					<el-input
-						v-model="sample.storageLocation.room"
-						placeholder="Enter room"
-						:disabled="!isEditing"
+			<el-form-item label="Storage location" prop="storageLocation.id">
+				<el-select
+					v-model="sample.storageLocation.id"
+					placeholder="Select storage location"
+					:disabled="!isEditing"
+				>
+					<el-option
+						v-for="storage of storages"
+						:key="storage.id"
+						:label="storage.name"
+						:value="storage.id"
 					/>
-				</el-form-item>
-				<el-form-item label="Cabinet" prop="storageLocation.cabinet">
-					<el-input
-						v-model="sample.storageLocation.cabinet"
-						placeholder="Enter cabinet"
-						:disabled="!isEditing"
-					/>
-				</el-form-item>
-				<el-form-item label="Shelf" prop="storageLocation.shelf">
-					<el-input
-						v-model="sample.storageLocation.shelf"
-						placeholder="Enter shelf"
-						:disabled="!isEditing"
-					/>
-				</el-form-item>
-			</div>
+				</el-select>
+			</el-form-item>
 			<el-form-item label="Description" prop="description">
 				<el-input
 					v-model="sample.description"
@@ -199,7 +208,9 @@ onMounted(() => setSample(props.id));
 
 <style>
 .container {
-	width: 42vw;
+	margin: 0 auto;
+	padding-bottom: 18px;
+	max-width: 48vw;
 }
 .header {
 	display: flex;

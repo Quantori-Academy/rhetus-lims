@@ -10,6 +10,15 @@ export const samples = [
 		quantityLeft: 1000,
 		quantityUnit: 'ml',
 		storageLocation: 'Building 1, Room 12'
+	},
+	{
+		id: '3fa85f64-5717-4562-b3fc-2c963f66afb6',
+		name: 'Super water',
+		category: 'Sample',
+		description: 'Tastes yum.',
+		quantityUnit: 'g',
+		quantityLeft: 300,
+		storageLocation: 'Building 1, Room 12'
 	}
 ];
 
@@ -18,7 +27,7 @@ const samplesDetails = [
 		id: '3fa85f64-5717-4562-b3fc-2c963f66afb6',
 		name: 'Super water',
 		quantity: 500,
-		quantityUnit: 'grams',
+		quantityUnit: 'ml',
 		quantityLeft: 300,
 		expirationDate: '2025-10-19T00:00:00.000Z',
 		description: 'Tastes yum.',
@@ -31,7 +40,7 @@ const samplesDetails = [
 			{
 				id: '3fa85f64-5717-4562-b3fb-2c963f66afa6',
 				name: 'Water (H2O)',
-				category: 'sample',
+				category: 'Sample',
 				description: 'A universal solvent.',
 				quantityLeft: 1000,
 				quantityUnit: 'ml',
@@ -39,6 +48,21 @@ const samplesDetails = [
 				quantityUsed: 200
 			}
 		]
+	},
+	{
+		id: '3fa85f64-5717-4562-b3fb-2c963f66afa6',
+		name: 'Water (H2O)',
+		quantity: 500,
+		quantityLeft: 1000,
+		quantityUnit: 'ml',
+		expirationDate: '2025-10-19T00:00:00.000Z',
+		description: 'A universal solvent',
+		storageLocation: {
+			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',
+			room: 'Building 1, Room 12',
+			name: 'Cabinet 1, shelf 3'
+		},
+		components: []
 	}
 ];
 
