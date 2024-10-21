@@ -8,7 +8,7 @@ export const formRules = {
 	name: [requiredRule],
 	components: [requiredRule],
 	quantityUnit: [requiredRule],
-	size: [
+	quantity: [
 		requiredRule,
 		{ type: 'number', min: 0, message: 'Size cannot be negative', trigger: ['blur', 'change'] }
 	],

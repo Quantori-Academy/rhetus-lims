@@ -26,7 +26,7 @@ const form = ref({
 	name: '',
 	components: [emptyComponent],
 	quantityUnit: '',
-	size: 1,
+	quantity: 1,
 	quantityLeft: 1,
 	expirationDate: '',
 	storageId: '',
@@ -168,8 +168,8 @@ onMounted(() => {
 						<el-option v-for="item of quantityUnits" :key="item" :label="item" :value="item" />
 					</el-select>
 				</el-form-item>
-				<el-form-item label="Size" prop="size">
-					<el-input-number v-model="form.size" placeholder="Enter amount" :min="0">
+				<el-form-item label="Quantity" prop="quantity">
+					<el-input-number v-model="form.quantity" placeholder="Enter amount" :min="0">
 						<template #suffix>
 							<span>{{ form.quantityUnit }}</span>
 						</template>
