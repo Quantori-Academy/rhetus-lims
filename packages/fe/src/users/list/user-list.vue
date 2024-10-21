@@ -7,8 +7,8 @@ import { $confirm } from '../../lib/utils/feedback/confirm-msg';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { formatDate } from '../../lib/utils/datetime/date-format.js';
 import { $router } from '../../lib/router/router.js';
-import RhFilters from '../../lib/components/rh-filters.vue';
-import UsersFilters from '../../filters/users-filters.vue';
+import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
+import UsersFilters from '../users-filters.vue';
 
 const users = ref([]);
 const isLoading = ref(false);
@@ -60,25 +60,14 @@ const deleteUser = async id => {
 	}
 };
 
-async function setFilteredUsers() {
+async function setUsers() {
 	isLoading.value = true;
 	try {
 		const params = {
 			options: { role: filters.value.role, date: filters.value.date }
 		};
-		const response = await $api.users.fetchUsers(params);
-		users.value = response.items;
-	} catch (error) {
-		$notifyUserAboutError(error);
-	}
-	isLoading.value = false;
-}
-
-async function setUsers() {
-	isLoading.value = true;
-	try {
-		const data = await $api.users.fetchUsers();
-		users.value = data.users;
+		const data = await $api.users.fetchUsers(params);
+		users.value = data.items;
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
@@ -99,8 +88,8 @@ onMounted(() => {
 
 <template>
 	<div>
-		<rh-filters @reset-filters="resetAllFilters" @set-filters="setFilteredUsers">
-			<template #actionButtons>
+		<rh-filters @reset-filters="resetAllFilters" @set-filters="setUsers">
+			<template #action-buttons>
 				<el-button class="add-button" type="primary" @click="addNewUser">Add New User</el-button>
 			</template>
 

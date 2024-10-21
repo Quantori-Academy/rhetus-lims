@@ -6,8 +6,8 @@ import { $router } from '../../lib/router/router.js';
 import { $api } from '../../lib/api/index.js';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
-import RhFilters from '../../lib/components/rh-filters.vue';
-import SubstanceFilters from '../../filters/substance-filters.vue';
+import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
+import SubstanceFilters from '../substance-filters.vue';
 
 const reagents = ref(null);
 const isLoading = ref(false);
@@ -92,7 +92,7 @@ onMounted(() => {
 <template>
 	<div class="reagent-table">
 		<rh-filters>
-			<template #actionButtons>
+			<template #action-buttons>
 				<el-button type="primary" @click="addNewReagent">Add New Reagent</el-button>
 				<el-button type="primary" @click="addNewSample">Add New Sample</el-button>
 			</template>

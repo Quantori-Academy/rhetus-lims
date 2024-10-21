@@ -1,7 +1,7 @@
 <script setup>
 import { ElDatePicker, ElInput } from 'element-plus';
 import RhIcon from '../lib/components/rh-icon.vue';
-import FilterItem from './filter-item.vue';
+import FilterItem from '../lib/components/rh-filters/filter-item.vue';
 import { reactive, watch } from 'vue';
 
 const props = defineProps({

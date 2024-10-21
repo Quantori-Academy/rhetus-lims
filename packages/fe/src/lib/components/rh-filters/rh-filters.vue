@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { ElButton } from 'element-plus';
-import RhIcon from './rh-icon.vue';
+import RhIcon from '../rh-icon.vue';
 const visible = ref(true);
 
 const toggleFilterView = () => {
@@ -23,13 +23,13 @@ const setFilters = () => {
 			<rh-icon color="#409eff" name="sliders-h" />
 			{{ visible ? 'Hide filters' : 'Show filters' }}
 		</el-button>
-		<slot name="actionButtons" />
+		<slot name="action-buttons" />
 	</div>
 
 	<slot v-if="visible" name="filters" />
 
 	<div v-if="visible" class="after-buttons">
-		<slot name="afterButtons">
+		<slot name="after-buttons">
 			<el-button @click="setFilters">Apply filters</el-button>
 			<el-button @click="resetFilters">Reset filters</el-button>
 		</slot>

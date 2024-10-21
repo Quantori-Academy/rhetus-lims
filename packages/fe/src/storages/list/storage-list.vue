@@ -6,8 +6,8 @@ import { $api } from '../../lib/api/index.js';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $router } from '../../lib/router/router.js';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
-import RhFilters from '../../lib/components/rh-filters.vue';
-import StorageFilters from '../../filters/storage-filters.vue';
+import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
+import StorageFilters from '../storage-filters.vue';
 
 const storages = ref([]);
 const isLoading = ref(false);
@@ -75,7 +75,7 @@ onMounted(() => {
 <template>
 	<div class="wrapper">
 		<rh-filters>
-			<template #actionButtons>
+			<template #action-buttons>
 				<el-button class="add-button" type="primary" @click="addNewStorageLocation">
 					Add New Storage Location
 				</el-button>
