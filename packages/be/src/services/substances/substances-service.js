@@ -1,4 +1,4 @@
-import { and, sql } from 'drizzle-orm';
+import { and } from 'drizzle-orm';
 import { unionAll } from 'drizzle-orm/pg-core';
 import fp from 'fastify-plugin';
 import { generateFilterSubquery } from '../../lib/utils/db/filter-subquery-generator.js';
@@ -10,7 +10,7 @@ const formatMapping = {
 	casNumber: string => string.toLowerCase(),
 	quantityUnit: string => string.toLowerCase(),
 	category: string => string.toLowerCase(),
-	storage_location_id: string => string
+	storage_id: string => string
 };
 
 const optionsDictionary = {
@@ -23,7 +23,7 @@ const optionsDictionary = {
 		schema: 'union'
 	},
 	location: {
-		property: 'storage_location_id',
+		property: 'storage_id',
 		schema: 'union'
 	},
 	expirationdate: {
@@ -35,7 +35,7 @@ const optionsDictionary = {
 const sortDictionary = {
 	name: 'name',
 	category: 'category',
-	location: 'storage_location_id',
+	location: 'storage_id',
 	expirationdate: 'expiration_date'
 };
 
@@ -50,9 +50,7 @@ async function substancesService(server) {
 			const offset = page === 1 ? 0 : (page - 1) * limit;
 
 			const reagentsQuery = server.reagentsService.getReagentsQuery();
-
-			// TODO: add correct sample query whet it will be implemented
-			const samplesQuery = sql.raw(`select *, 'sample' as category from sample_fake`);
+			const samplesQuery = server.samplesService.getSamplesQuery();
 
 			const unionQuery = unionAll(reagentsQuery, samplesQuery);
 			let query = server.db.select().from(unionQuery.as('substances'));
