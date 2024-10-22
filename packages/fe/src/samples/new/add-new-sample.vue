@@ -43,6 +43,7 @@ async function submit() {
 	try {
 		const response = await $api.samples.addSample({
 			...form.value,
+			quantityLeft: form.value.quantity,
 			components: form.value.components.map(x => ({
 				id: x.id,
 				category: x.category,
@@ -170,13 +171,6 @@ onMounted(() => {
 					<el-input-number v-model="form.quantity" placeholder="Enter amount" :min="0">
 						<template #suffix>
 							<span>{{ form.quantityUnit }}</span>
-						</template>
-					</el-input-number>
-				</el-form-item>
-				<el-form-item label="Quantity left" prop="quantityLeft">
-					<el-input-number v-model="form.quantityLeft" placeholder="Enter amount" :min="0">
-						<template #suffix>
-							{{ form.quantityUnit }}
 						</template>
 					</el-input-number>
 				</el-form-item>
