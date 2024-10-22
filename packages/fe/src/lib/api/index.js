@@ -4,11 +4,13 @@ import auth from './auth.js';
 import samples from './samples.js';
 import storageLocations from './storage-locations.js';
 import reagents from './reagents.js';
+import substances from './substances.js';
 
 export const $api = {
 	users: users(http),
 	auth: auth(http),
 	samples: samples(http),
 	storages: storageLocations(http),
-	reagents: reagents(http)
+	reagents: reagents(http),
+	substances: substances(http)
 };

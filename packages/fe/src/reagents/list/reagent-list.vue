@@ -57,7 +57,8 @@ async function setReagents(event = null) {
 	isLoading.value = true;
 	let query = createQuery(event);
 	try {
-		reagents.value = await $api.reagents.fetchReagents(query);
+		const response = await $api.substances.fetchSubstances(query);
+		reagents.value = response.substances;
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
@@ -81,8 +82,10 @@ onMounted(() => {
 
 <template>
 	<div class="reagent-table">
-		<el-button type="primary" @click="addNewReagent">Add New Reagent</el-button>
-		<el-button type="primary" @click="addNewSample">Add New Sample</el-button>
+		<div class="top-buttons">
+			<el-button type="primary" @click="addNewReagent">Add New Reagent</el-button>
+			<el-button type="primary" @click="addNewSample">Add New Sample</el-button>
+		</div>
 		<el-table
 			v-loading="isLoading"
 			:data="reagents"
@@ -94,11 +97,17 @@ onMounted(() => {
 			<el-table-column prop="structure" label="Structure" />
 			<el-table-column prop="description" label="Description" />
 			<el-table-column prop="quantityLeft" label="Quantity Left" />
-			<el-table-column prop="storageLocation" label="Storage Location" />
-			<el-table-column>
+			<el-table-column prop="storageLocationId" label="Storage Location" />
+			<el-table-column width="80">
 				<template #default="{ row }">
-					<el-button @click="() => editReagent(row.id)"><rh-icon name="pencil" /></el-button>
-					<el-button type="danger" @click="() => deleteReagent(row.id)">
+					<el-button @click.stop="() => editReagent(row.id)">
+						<rh-icon name="pencil" />
+					</el-button>
+				</template>
+			</el-table-column>
+			<el-table-column width="80">
+				<template #default="{ row }">
+					<el-button type="danger" @click.stop="() => deleteReagent(row.id)">
 						<rh-icon color="white" name="trash" />
 					</el-button>
 				</template>
@@ -108,6 +117,10 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.top-buttons {
+	margin-bottom: 10px;
+}
+
 .reagent__action-buttons {
 	display: flex;
 	flex-direction: row;

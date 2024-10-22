@@ -19,6 +19,7 @@ import { requiredRule } from './constants.js';
 
 const formEl = useTemplateRef('form-el');
 const isSaving = ref(false);
+const isLoading = ref(true);
 const storages = ref([]);
 const form = ref({
 	name: '',
@@ -57,9 +58,13 @@ async function submit() {
 	if (!(await $isFormValid(formEl))) return;
 	isSaving.value = true;
 	try {
-		const response = await $api.reagents.addReagent(form.value);
+		const response = await $api.reagents.addReagent({
+			...form.value,
+			quantityLeft: form.value.quantity
+		});
+
 		$notify({ message: response.message, type: 'success' });
-		$router.push({ name: 'reagents' });
+		$router.push({ name: 'reagents-list' });
 	} catch (error) {
 		$notifyUserAboutError(error.statusText);
 	} finally {
@@ -69,17 +74,17 @@ async function submit() {
 
 function cancel() {
 	formEl.value.resetFields();
-	$router.push({ name: 'reagents' });
+	$router.push({ name: 'reagents-list' });
 }
 async function setStorages() {
-	isSaving.value = true;
+	isLoading.value = true;
 	try {
 		const data = await $api.storages.fetchStorages();
 		storages.value = data.storages;
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
-		isSaving.value = false;
+		isLoading.value = false;
 	}
 }
 </script>
@@ -123,7 +128,6 @@ async function setStorages() {
 					placeholder="Indicate expiration date"
 					type="date"
 					format="YYYY-MM-DD"
-					value-format="YYYY-MM-DD"
 				/>
 			</el-form-item>
 			<el-form-item label="Storage location" prop="storageLocation">
