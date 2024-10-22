@@ -14,7 +14,7 @@ import { $confirm } from '../lib/utils/feedback/confirm-msg.js/';
 import { $api } from '../lib/api/index.js';
 import { $route, $router } from '../lib/router/router';
 import { $isFormValid } from '../lib/utils/form-validation/is-form-valid.js';
-import { formRules } from './constants';
+import { formRules, emptyUser } from './constants';
 
 const props = defineProps({
 	id: {
@@ -24,7 +24,7 @@ const props = defineProps({
 });
 
 const formEl = useTemplateRef('form-ref');
-const user = ref(null);
+const user = ref(emptyUser);
 const loading = ref(false);
 const originalUser = ref(null);
 const roles = ref([]);
@@ -176,9 +176,8 @@ const deleteUser = async () => {
 <template>
 	<div class="wrapper">
 		<el-form
-			v-if="user"
 			ref="form-ref"
-			v-loading="loading || !user"
+			v-loading="loading"
 			label-position="top"
 			:model="user"
 			:rules="rules"
