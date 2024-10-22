@@ -238,7 +238,7 @@ const deleteReagent = async () => {
 	display: flex;
 	flex-direction: column;
 	gap: 5rem;
-	padding: 3rem;
+	margin: 20px;
 	max-width: 70vw;
 	color: black;
 }

@@ -81,3 +81,9 @@ onMounted(() => {
 		</el-form>
 	</div>
 </template>
+
+<style scoped>
+.wrapper {
+	margin-top: 20px;
+}
+</style>

@@ -157,7 +157,7 @@ async function setStorages() {
 
 <style>
 .container {
-	margin: 0 auto;
+	margin-top: 20px;
 	padding-bottom: 3rem;
 	max-width: 60vw;
 }
