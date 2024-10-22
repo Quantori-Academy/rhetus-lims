@@ -10,7 +10,13 @@ import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
 import SubstanceFilters from '../substance-filters.vue';
 
 const reagents = ref(null);
+const initialReagents = ref([]);
 const isLoading = ref(false);
+const filters = ref({
+	name: '',
+	category: '',
+	quantity: null
+});
 
 function addNewReagent() {
 	$router.push({ name: 'new-reagent' });
@@ -65,9 +71,35 @@ const deleteSubstance = async row => {
 async function setReagents(event = null) {
 	isLoading.value = true;
 	let query = createQuery(event);
+	const params = {
+		...query,
+		options: {
+			category: filters.value.category,
+			name: filters.value.name,
+			quantity: filters.value.quantity
+		}
+	};
 	try {
-		const response = await $api.substances.fetchSubstances(query);
-		reagents.value = response.substances;
+		const data = await $api.reagents.fetchReagents(params);
+		reagents.value = data.items;
+	} catch (error) {
+		$notifyUserAboutError(error);
+	} finally {
+		isLoading.value = false;
+	}
+}
+
+async function setInitialReagents() {
+	isLoading.value = true;
+	try {
+		const data = await $api.reagents.fetchReagents();
+		const uniqueCategory = data.reduce((acc, reagent) => {
+			if (!acc.some(item => item.category === reagent.category)) {
+				acc.push(reagent);
+			}
+			return acc;
+		}, []);
+		initialReagents.value = uniqueCategory;
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
@@ -84,21 +116,29 @@ function createQuery(event) {
 	return query;
 }
 
+function resetAllFilters() {
+	filters.value.category = '';
+	filters.value.name = '';
+	filters.value.quantity = null;
+	setReagents();
+}
+
 onMounted(() => {
+	setInitialReagents();
 	setReagents();
 });
 </script>
 
 <template>
 	<div class="reagent-table">
-		<rh-filters>
+		<rh-filters @reset-filters="resetAllFilters" @set-filters="setReagents">
 			<template #action-buttons>
 				<el-button type="primary" @click="addNewReagent">Add New Reagent</el-button>
 				<el-button type="primary" @click="addNewSample">Add New Sample</el-button>
 			</template>
 
 			<template #filters>
-				<substance-filters />
+				<substance-filters v-model:filters="filters" :reagents="initialReagents" />
 			</template>
 		</rh-filters>
 

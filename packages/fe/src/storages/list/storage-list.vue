@@ -79,6 +79,7 @@ async function setInitialStorages() {
 	isLoading.value = true;
 	try {
 		const data = await $api.storages.fetchStorages();
+		console.log(data.storages);
 		const uniqueStorages = data.storages.reduce((acc, storage) => {
 			if (!acc.some(item => item.room === storage.room)) {
 				acc.push(storage);
