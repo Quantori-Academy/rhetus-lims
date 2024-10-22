@@ -20,7 +20,10 @@ function viewUserDetails(id) {
 }
 
 function editUser(id) {
-	$router.push({ name: 'edit-user', params: { id } });
+	$router.push({
+		name: 'user-details-edit',
+		params: { id: id }
+	});
 }
 
 const deleteUser = async id => {

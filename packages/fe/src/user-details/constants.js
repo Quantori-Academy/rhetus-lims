@@ -6,3 +6,16 @@ export const formRules = {
 		{ type: 'email', message: 'Please input a valid email address', trigger: 'blur' }
 	]
 };
+
+export const emptyUser = {
+	id: null,
+	username: '',
+	firstName: '',
+	lastName: '',
+	email: '',
+	role: {
+		id: null,
+		name: ''
+	},
+	createdAt: ''
+};
