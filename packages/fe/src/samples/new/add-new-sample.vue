@@ -177,13 +177,7 @@ onMounted(() => {
 			</div>
 
 			<el-form-item label="Expiration date" prop="expirationDate">
-				<el-date-picker
-					v-model="form.expirationDate"
-					type="date"
-					format="YYYY-MM-DD"
-					value-format="YYYY-MM-DD"
-					placeholder="Pick a date (YYYY-MM-DD)"
-				/>
+				<el-date-picker v-model="form.expirationDate" type="date" placeholder="Pick a date" />
 			</el-form-item>
 
 			<el-form-item label="Storage location" prop="storageId">
