@@ -58,7 +58,7 @@ function handleCollapse() {
 .top-bar-container {
 	display: flex;
 	align-items: center;
-
+	
 	gap: 2px;
 	width: 100%;
 	min-height: 48px;
