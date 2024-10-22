@@ -11,7 +11,7 @@ export const navigationLink = [
 	// },
 	{
 		path: '/reagents/list',
-		icon: 'asteriks',
+		icon: 'asterisk',
 		name: 'Reagents'
 	},
 	{
