@@ -13,7 +13,7 @@ export default http => ({
 	},
 	async updateStorage(id, storage) {
 		return await http(`/storages/${id}`, {
-			method: 'PUT',
+			method: 'PATCH',
 			body: storage
 		});
 	},

@@ -38,7 +38,7 @@ export const storageLocationHandlers = [
 			message: `Storage location was created`
 		});
 	}),
-	http.put(api('/storages/:id'), async ({ request, params }) => {
+	http.patch(api('/storages/:id'), async ({ request, params }) => {
 		const { id } = params;
 		const storage = storageInfo.storages.find(location => location.id === id);
 		if (!storage) {
