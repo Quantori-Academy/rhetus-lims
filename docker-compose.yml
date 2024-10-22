@@ -3,11 +3,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: frontend-export
-    volumes:
-      - frontend-files:/usr/share/nginx/html
+      target: frontend
+    ports:
+      - '80:80'
+      - '443:443'
     networks:
       - app-network
+    volumes:
+      - ../certs:/etc/nginx/certs:ro
+      - .github/workflows/nginx.conf:/etc/nginx/nginx.conf:ro
 
   backend:
     build:
@@ -16,21 +20,6 @@ services:
       target: backend
     networks:
       - app-network
-
-  nginx:
-    image: georgjung/nginx-brotli:latest
-    ports:
-      - '80:80'
-      - '443:443'
-    networks:
-      - app-network
-    volumes:
-      - frontend-files:/usr/share/nginx/html:ro
-      - ../certs:/etc/nginx/certs:ro
-      - .github/workflows/nginx.conf:/etc/nginx/nginx.conf:ro
-
-volumes:
-  frontend-files:
 
 networks:
   app-network:
