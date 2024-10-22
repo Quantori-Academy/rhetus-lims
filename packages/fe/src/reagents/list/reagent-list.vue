@@ -124,6 +124,10 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.reagent-table {
+	margin-top: 20px;
+}
+
 .top-buttons {
 	margin-bottom: 10px;
 }

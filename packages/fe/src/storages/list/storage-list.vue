@@ -15,6 +15,7 @@ function addNewStorageLocation() {
 }
 
 function viewStorageLocation(id) {
+	$router.push({ name: 'edit-storage', params: { id } });
 	console.log('view storage info', id);
 }
 function editStorageLocation(id) {
@@ -104,5 +105,6 @@ onMounted(() => {
 <style scoped>
 .add-button {
 	margin: 20px 0;
+	margin-top: 20px;
 }
 </style>
