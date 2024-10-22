@@ -139,6 +139,21 @@ async function reagentsService(server) {
 				status: 'success',
 				message: `Quantity of reagent '${result[0].reagentName}' was changed`
 			};
+		},
+		getReagentsByStorageId: async id => {
+			return await server.db
+				.select({
+					id: schema.reagents.id,
+					name: schema.reagents.name,
+					quantityUnit: schema.reagents.quantityUnit,
+					quantity: schema.reagents.quantity,
+					quantityLeft: schema.reagents.quantityLeft,
+					expirationDate: schema.reagents.expirationDate,
+					description: schema.reagents.description,
+					category: sql`'reagent'`.as('category')
+				})
+				.from(schema.reagents)
+				.where(and(eq(schema.reagents.storageId, id), eq(schema.reagents.deleted, false)));
 		}
 	});
 }

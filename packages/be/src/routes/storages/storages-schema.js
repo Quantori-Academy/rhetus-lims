@@ -63,6 +63,7 @@ const deleteStorage = {
 	response: {
 		200: statusMessage,
 		404: statusMessage,
+		409: statusMessage,
 		500: statusMessage
 	}
 };
