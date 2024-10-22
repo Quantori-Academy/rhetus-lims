@@ -1,5 +1,5 @@
 <script setup>
-import { ElSelect, ElInput, ElOption } from 'element-plus';
+import { ElSelect, ElInput, ElOption, ElInputNumber } from 'element-plus';
 import RhIcon from '../lib/components/rh-icon.vue';
 import FilterItem from '../lib/components/rh-filters/filter-item.vue';
 import { reactive, watch } from 'vue';
@@ -49,19 +49,7 @@ watch(
 		</filter-item>
 
 		<filter-item>
-			<el-input v-model="filters.quantity" clearable class="filter" placeholder="Enter quantity">
-				<template #prefix>
-					<rh-icon name="search" />
-				</template>
-			</el-input>
-		</filter-item>
-
-		<filter-item>
-			<el-input class="filter" placeholder="String filter">
-				<template #prefix>
-					<rh-icon name="search" />
-				</template>
-			</el-input>
+			<el-input-number v-model="filters.quantity" placeholder="Enter amount" :min="1" />
 		</filter-item>
 	</div>
 </template>
@@ -75,7 +63,8 @@ watch(
 }
 
 ::v-deep .el-input,
-.el-select {
+.el-select,
+.el-input-number {
 	width: 300px;
 }
 </style>

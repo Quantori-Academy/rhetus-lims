@@ -118,7 +118,6 @@ function filterReagents(parsedOptions) {
 		let matchesCategory = true;
 		let matchesName = true;
 		let matchesQuantity = true;
-		console.log(parseInt(reagent.quantityLeft) === 500);
 		if (parsedOptions.category) {
 			matchesCategory = reagent.category.includes(parsedOptions.category);
 		}
