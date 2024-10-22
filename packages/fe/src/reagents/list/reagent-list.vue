@@ -17,15 +17,18 @@ function addNewSample() {
 	$router.push({ name: 'new-sample' });
 }
 
-function editReagent(id) {
+function editSubstance(row) {
 	$router.push({
-		name: 'reagent-details-edit',
-		params: { id: id }
+		name: row.category.toLowerCase() === 'reagent' ? 'reagent-details-edit' : 'edit-sample',
+		params: { id: row.id }
 	});
 }
 
-function viewReagent(row) {
-	$router.push({ name: 'reagent-details', params: { id: row.id } });
+function viewSubstance(row) {
+	$router.push({
+		name: row.category.toLowerCase() === 'reagent' ? 'reagent-details' : 'sample-details',
+		params: { id: row.id }
+	});
 }
 const showNotification = (title, message, type) => {
 	$notify({ title, message, type });
@@ -42,10 +45,14 @@ const confirmDeleteReagent = async () => {
 		return false;
 	}
 };
-const deleteReagent = async id => {
+const deleteSubstance = async row => {
 	if (!(await confirmDeleteReagent())) return;
 	try {
-		await $api.reagents.deleteReagent(id);
+		if (row.category.toLowerCase() === 'reagent') {
+			await $api.reagents.deleteReagent(row.id);
+		} else {
+			await $api.samples.deleteSample(row.id);
+		}
 		showNotification('Success', 'Item is deleted', 'success');
 		await setReagents();
 	} catch (error) {
@@ -89,7 +96,7 @@ onMounted(() => {
 		<el-table
 			v-loading="isLoading"
 			:data="reagents"
-			@row-click="viewReagent"
+			@row-click="viewSubstance"
 			@sort-change="setReagents"
 		>
 			<el-table-column prop="name" label="Name" sortable />
@@ -100,14 +107,14 @@ onMounted(() => {
 			<el-table-column prop="storageLocationId" label="Storage Location" />
 			<el-table-column width="80">
 				<template #default="{ row }">
-					<el-button @click.stop="() => editReagent(row.id)">
+					<el-button @click.stop="() => editSubstance(row)">
 						<rh-icon name="pencil" />
 					</el-button>
 				</template>
 			</el-table-column>
 			<el-table-column width="80">
 				<template #default="{ row }">
-					<el-button type="danger" @click.stop="() => deleteReagent(row.id)">
+					<el-button type="danger" @click.stop="() => deleteSubstance(row)">
 						<rh-icon color="white" name="trash" />
 					</el-button>
 				</template>

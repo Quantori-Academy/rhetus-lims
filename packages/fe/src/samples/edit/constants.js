@@ -14,23 +14,21 @@ export const formRules = {
 		}
 	],
 	storageLocation: {
-		room: [requiredRule],
-		cabinet: [requiredRule],
-		shelf: [requiredRule]
+		id: [requiredRule]
 	}
 };
 
 export const emptySample = {
 	name: '',
-	reagentsAndSamples: [],
+	components: [],
 	quantityUnit: '',
-	size: 1,
+	quantity: 1,
 	quantityLeft: 1,
 	expirationDate: '',
 	storageLocation: {
+		id: '',
 		room: '',
-		cabinet: '',
-		shelf: ''
+		name: ''
 	},
 	description: ''
 };

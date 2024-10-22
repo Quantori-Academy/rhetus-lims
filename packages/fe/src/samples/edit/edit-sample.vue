@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref, useTemplateRef } from 'vue';
+import { computed, onMounted, ref, useTemplateRef, watch } from 'vue';
 import {
 	ElInput,
 	ElForm,
@@ -8,7 +8,9 @@ import {
 	ElFormItem,
 	ElSelect,
 	ElInputNumber,
-	ElTag
+	ElOption,
+	ElTable,
+	ElTableColumn
 } from 'element-plus';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg';
@@ -18,6 +20,8 @@ import { $route, $router } from '../../lib/router/router';
 import { emptySample, formRules } from './constants';
 
 const props = defineProps({ id: { type: String, default: null } });
+
+const storages = ref([]);
 
 const formEl = useTemplateRef('form-el');
 const sample = ref(emptySample);
@@ -58,7 +62,7 @@ async function submit() {
 	if (!(await $isFormValid(formEl))) return;
 
 	if (sample.value.quantityLeft <= 0) {
-		await $confirm('Updating quntity left to 0 will delete this sample', 'Delete Sample?', {
+		await $confirm('Updating quantity left to 0 will delete this sample', 'Delete Sample?', {
 			confirmButtonText: 'Delete',
 			type: 'warning'
 		});
@@ -67,14 +71,16 @@ async function submit() {
 	isSaving.value = true;
 
 	try {
-		const response = await $api.samples.updateSample(props.id, sample.value);
-		$notify({ message: response.message, type: 'success' });
-
-		if (sample.value.quantityLeft <= 0) {
-			$router.push({ name: 'reagents-list' });
-			return;
+		const originalSample = await $api.samples.fetchSample(props.id);
+		if (originalSample.quantityLeft != sample.value.quantityLeft) {
+			const response = await $api.reagents.changeSubstanceQuantity(props.id, {
+				category: 'sample',
+				quantityLeft: sample.value.quantityLeft,
+				quantityUsed: originalSample.quantityLeft - sample.value.quantityLeft,
+				reason: 'Experiment'
+			});
+			$notify({ message: response.message, type: 'success' });
 		}
-
 		toggleEditing();
 	} catch (error) {
 		$notifyUserAboutError(error);
@@ -90,6 +96,22 @@ function toggleEditing() {
 	});
 }
 
+function redirect(row) {
+	$router.push({
+		name: row.category.toLowerCase() === 'reagent' ? 'reagent-details' : 'sample-details',
+		params: { id: row.id }
+	});
+}
+
+async function setStorages() {
+	try {
+		const data = await $api.storages.fetchStorages();
+		storages.value = data.storages;
+	} catch (error) {
+		$notifyUserAboutError(error);
+	}
+}
+
 async function setSample(id) {
 	isLoading.value = true;
 	try {
@@ -102,7 +124,22 @@ async function setSample(id) {
 	}
 }
 
-onMounted(() => setSample(props.id));
+const componentTableData = computed(() =>
+	sample.value.components.map(x => ({
+		...x,
+		quantityUsed: `${x.quantityUsed} ${x.quantityUnit}`
+	}))
+);
+
+onMounted(() => {
+	setSample(props.id);
+	setStorages();
+});
+
+watch(
+	() => props.id,
+	newId => setSample(newId)
+);
 </script>
 
 <template>
@@ -115,25 +152,19 @@ onMounted(() => setSample(props.id));
 			<el-form-item label="Name" prop="name">
 				<el-input v-model="sample.name" disabled />
 			</el-form-item>
-			<el-form-item label="Reagents/Samples used" prop="reagentsAndSamples">
-				<div class="tags">
-					<el-tag v-for="item of sample.reagentsAndSamples" :key="item.id" type="info">
-						<router-link
-							class="link"
-							target="_blank"
-							:to="{ name: 'sample-details', params: { id: item.id } }"
-						>
-							{{ item.name }}
-						</router-link>
-					</el-tag>
-				</div>
+			<el-form-item label="Reagents/Samples used" prop="components">
+				<el-table :data="componentTableData" :border="true" @row-click="redirect">
+					<el-table-column prop="name" label="Name" width="200" />
+					<el-table-column prop="category" label="Category" width="200" />
+					<el-table-column prop="quantityUsed" label="Quantiy Used" />
+				</el-table>
 			</el-form-item>
 			<div class="align-horizontal">
 				<el-form-item label="Quantity unit" prop="quantityUnit">
 					<el-select v-model="sample.quantityUnit" filterable disabled />
 				</el-form-item>
-				<el-form-item label="Size" prop="size">
-					<el-input-number v-model="sample.size" disabled>
+				<el-form-item label="Quantity" prop="quantity">
+					<el-input-number v-model="sample.quantity" disabled>
 						<template #suffix>
 							{{ sample.quantityUnit }}
 						</template>
@@ -155,29 +186,20 @@ onMounted(() => setSample(props.id));
 			<el-form-item label="Expiration date" prop="expirationDate">
 				<el-date-picker v-model="sample.expirationDate" type="date" disabled />
 			</el-form-item>
-			<div class="align-horizontal">
-				<el-form-item label="Room" prop="storageLocation.room">
-					<el-input
-						v-model="sample.storageLocation.room"
-						placeholder="Enter room"
-						:disabled="!isEditing"
+			<el-form-item label="Storage location" prop="storageLocation.id">
+				<el-select
+					v-model="sample.storageLocation.id"
+					placeholder="Select storage location"
+					:disabled="!isEditing"
+				>
+					<el-option
+						v-for="storage of storages"
+						:key="storage.id"
+						:label="storage.name"
+						:value="storage.id"
 					/>
-				</el-form-item>
-				<el-form-item label="Cabinet" prop="storageLocation.cabinet">
-					<el-input
-						v-model="sample.storageLocation.cabinet"
-						placeholder="Enter cabinet"
-						:disabled="!isEditing"
-					/>
-				</el-form-item>
-				<el-form-item label="Shelf" prop="storageLocation.shelf">
-					<el-input
-						v-model="sample.storageLocation.shelf"
-						placeholder="Enter shelf"
-						:disabled="!isEditing"
-					/>
-				</el-form-item>
-			</div>
+				</el-select>
+			</el-form-item>
 			<el-form-item label="Description" prop="description">
 				<el-input
 					v-model="sample.description"
@@ -199,7 +221,7 @@ onMounted(() => setSample(props.id));
 
 <style>
 .container {
-	width: 42vw;
+	max-width: 48vw;
 }
 .header {
 	display: flex;
@@ -208,16 +230,6 @@ onMounted(() => setSample(props.id));
 	color: black;
 	font-weight: 500;
 	font-size: large;
-}
-.tags > * + * {
-	margin-left: 8px;
-}
-.link {
-	color: inherit;
-	text-decoration: none;
-}
-.link:hover {
-	color: var(--el-color-primary);
 }
 .align-horizontal {
 	display: flex;

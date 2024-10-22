@@ -1,123 +1,72 @@
 import { http, HttpResponse } from 'msw';
 import { api } from './api-url.js';
 
-const samples = [
+export const samples = [
 	{
-		id: 'a7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3c3b333',
-		name: 'Methanol',
-		reagentsAndSamples: [],
+		id: '3fa85f64-5717-4562-b3fb-2c963f66afa6',
+		name: 'Water (H2O)',
+		category: 'Sample',
+		description: 'A universal solvent',
+		quantityLeft: 1000,
 		quantityUnit: 'ml',
-		size: 100,
-		quantityLeft: 80,
-		expirationDate: '2024-11-30',
-		storageLocationId: 3,
-		description: 'Used as a precursor to various chemical compounds.'
+		storageLocation: 'Building 1, Room 12'
 	},
 	{
-		id: 'a7a3d8e0-5e0b-4b0f-8b3a-4f9f4b3c3b333',
-		name: 'Sodium',
-		reagentsAndSamples: [],
+		id: '3fa85f64-5717-4562-b3fc-2c963f66afb6',
+		name: 'Super water',
+		category: 'Sample',
+		description: 'Tastes yum.',
 		quantityUnit: 'g',
-		size: 50,
-		quantityLeft: 20,
-		expirationDate: '2026-06-15',
-		storageLocationId: 2,
-		description: 'Essential electrolyte in the human body.'
-	},
-	{
-		id: 'a7a3d8e1-2e0b-4b0f-8b3a-4f9f4b3c3b333',
-		name: 'Chlorine',
-		reagentsAndSamples: [],
-		quantityUnit: 'g',
-		size: 50,
-		quantityLeft: 20,
-		expirationDate: '2026-06-15',
-		storageLocationId: 2,
-		description: 'A highly reactive halogen element.'
-	},
-	{
-		id: 'c7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3d3b331',
-		name: 'Ethanol',
-		reagentsAndSamples: [],
-		quantityUnit: 'L',
-		size: 5,
-		quantityLeft: 3,
-		expirationDate: '2025-12-31',
-		storageLocationId: 1,
-		description: 'A common alcohol used as a solvent and in beverages.'
-	},
-	{
-		id: 'c7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3d3b334',
-		name: 'Sodium Chloride',
-		reagentsAndSamples: [
-			'a7a3d8e0-5e0b-4b0f-8b3a-4f9f4b3c3b333',
-			'a7a3d8e1-2e0b-4b0f-8b3a-4f9f4b3c3b333'
-		],
-		quantityUnit: 'kg',
-		size: 10,
-		quantityLeft: 5,
-		expirationDate: '2027-01-01',
-		storageLocationId: 2,
-		description: 'Commonly known as table salt.'
-	},
-	{
-		id: 'c7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3c3b333',
-		name: 'Acetic Acid',
-		reagentsAndSamples: ['a7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3c3b333'],
-		quantityUnit: 'L',
-		size: 2,
-		quantityLeft: 2,
-		expirationDate: '2025-05-20',
-		storageLocationId: 3,
-		description: 'A weak acid with a distinctive sour taste and pungent smell.'
+		quantityLeft: 300,
+		storageLocation: 'Building 1, Room 12'
 	}
 ];
 
-const storageLocations = [
+const samplesDetails = [
 	{
-		id: 1,
-		room: 'Building 1, Room 2',
-		name: 'Cabinet 3, Shelf 4'
+		id: '3fa85f64-5717-4562-b3fc-2c963f66afb6',
+		name: 'Super water',
+		category: 'Sample',
+		quantity: 500,
+		quantityUnit: 'ml',
+		quantityLeft: 300,
+		expirationDate: '2025-10-19T00:00:00.000Z',
+		description: 'Tastes yum.',
+		storageLocation: {
+			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',
+			room: 'Building 1, Room 12',
+			name: 'Cabinet 1, shelf 3'
+		},
+		components: [
+			{
+				id: '3fa85f64-5717-4562-b3fb-2c963f66afa6',
+				name: 'Water (H2O)',
+				category: 'Sample',
+				description: 'A universal solvent.',
+				quantityLeft: 1000,
+				quantityUnit: 'ml',
+				quantity: 1000,
+				quantityUsed: 200
+			}
+		]
 	},
 	{
-		id: 2,
-		room: 'Building 1, Room 3',
-		name: 'Cabinet 1, Shelf 2'
-	},
-	{
-		id: 3,
-		room: 'Building 2, Room 1',
-		name: 'Cabinet 2, Shelf 1'
+		id: '3fa85f64-5717-4562-b3fb-2c963f66afa6',
+		name: 'Water (H2O)',
+		category: 'Sample',
+		quantity: 500,
+		quantityLeft: 1000,
+		quantityUnit: 'ml',
+		expirationDate: '2025-10-19T00:00:00.000Z',
+		description: 'A universal solvent',
+		storageLocation: {
+			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',
+			room: 'Building 1, Room 12',
+			name: 'Cabinet 1, shelf 3'
+		},
+		components: []
 	}
 ];
-
-function findSampleById(id) {
-	return samples.find(sample => sample.id === id);
-}
-
-function findLocationByValue({ shelf, cabinet, room }) {
-	const name = `${cabinet.trim().toLowerCase()}, ${shelf.trim().toLowerCase()}`;
-	return storageLocations.find(
-		location =>
-			location.name.toLowerCase() === name &&
-			location.room.toLowerCase() === room.trim().toLowerCase()
-	);
-}
-
-function findLocationById(id) {
-	const loc = storageLocations.find(loc => loc.id === id);
-
-	if (!loc) return null;
-
-	const name = loc.name.split(', ');
-
-	return {
-		id,
-		room: loc.room,
-		cabinet: name[0],
-		shelf: name[1]
-	};
-}
 
 export const samplesHandlers = [
 	http.get(api('/samples'), () => {
@@ -126,89 +75,16 @@ export const samplesHandlers = [
 
 	http.post(api('/samples'), async ({ request }) => {
 		const sample = await request.json();
-		const { room, shelf, cabinet, ...rest } = sample;
-
-		const storageLocation = findLocationByValue({ shelf, cabinet, room });
-		if (!storageLocation) {
-			return HttpResponse.json(
-				{
-					status: 'error',
-					message: `Location not found`
-				},
-				{ status: 404 }
-			);
-		}
-
-		const newSample = {
-			...rest,
-			storageLocationId: storageLocation.id
-		};
-
-		samples.push(newSample);
+		samples.push({ ...sample, category: 'sample' });
 		return HttpResponse.json({
 			status: 'success',
 			message: `New sample was created`
 		});
 	}),
 
-	http.patch(api('/samples/:id'), async ({ request, params }) => {
-		const { id } = params;
-		const updatedSample = await request.json();
-
-		const sample = findSampleById(id);
-		if (!sample) {
-			return HttpResponse.json(
-				{
-					status: 'error',
-					message: `Sample not found`
-				},
-				{ status: 404 }
-			);
-		}
-
-		if (updatedSample.quantityLeft <= 0) {
-			const sampleIndex = samples.findIndex(sample => sample.id === id);
-			samples.splice(sampleIndex, 1);
-			return HttpResponse.json({
-				status: 'success',
-				message: `Sample was removed successfully`
-			});
-		}
-
-		const { room, shelf, cabinet } = updatedSample.storageLocation;
-
-		const storageLocation = findLocationByValue({ shelf, cabinet, room });
-		if (!storageLocation) {
-			return HttpResponse.json(
-				{
-					status: 'error',
-					message: `Location not found`
-				},
-				{ status: 404 }
-			);
-		}
-
-		const updatedSampleData = {
-			...sample,
-			...updatedSample,
-			storageLocationId: storageLocation.id
-		};
-
-		const sampleIndex = samples.findIndex(s => s.id === id);
-		samples[sampleIndex] = updatedSampleData;
-
-		return HttpResponse.json({
-			status: 'success',
-			message: `Sample was updated successfully`
-		});
-	}),
-
 	http.get(api('/samples/:id'), req => {
-		const { id } = req.params;
-		const sample = samples.find(sample => sample.id === id);
+		const sample = samplesDetails.find(sample => sample.id === req.params.id);
 		if (sample) {
-			sample.reagentsAndSamples = sample.reagentsAndSamples.map(findSampleById);
-			sample.storageLocation = findLocationById(sample.storageLocationId);
 			return HttpResponse.json(sample);
 		} else {
 			return HttpResponse.json({ message: 'Sample not found' }, { status: 404 });

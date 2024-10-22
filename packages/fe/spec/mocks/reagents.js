@@ -1,12 +1,15 @@
 import { http, HttpResponse } from 'msw';
 import { api } from './api-url.js';
+import { samples } from './samples.js';
+
 const reagents = [
 	{
 		id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d',
 		name: 'Sodium Chloride',
 		category: 'Reagent',
 		description: 'Common salt used in various chemical reactions and as a preservative.',
-		quantityLeft: '500g',
+		quantityLeft: 500,
+		quantityUnit: 'g',
 		storageLocation: 'Shelf A1',
 		structure: 'Cl[Na]'
 	},
@@ -15,20 +18,25 @@ const reagents = [
 		name: 'Acetic Acid',
 		category: 'Reagent',
 		description: 'Weak acid used in the production of synthetic fibers and food preservation.',
-		quantityLeft: '1L',
+		quantityLeft: 1,
+		quantityUnit: 'L',
 		storageLocation: 'Cabinet B2',
 		structure: 'CC(=O)O'
 	},
 	{
 		id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b999',
 		name: 'Potassium Permanganate',
-		category: 'Sample',
+		category: 'Reagent',
 		description: 'Used as an oxidant in various organic and inorganic reactions.',
-		quantityLeft: '250g',
+		quantityLeft: 250,
+		quantityUnit: 'g',
 		storageLocation: 'Shelf C3',
 		structure: 'O=[Mn](=O)(=O)=O[O-].[K+]'
 	}
 ];
+
+export const substances = [...reagents, ...samples];
+
 const reagentDetails = [
 	{
 		id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d',
@@ -114,7 +122,7 @@ export const reagentsHandlers = [
 		const url = new URL(requestUrl);
 		const productIds = url.searchParams.get('sort');
 		console.log(productIds);
-		return HttpResponse.json(reagents);
+		return HttpResponse.json({ substances, count: substances.length });
 	}),
 	http.delete(api('/reagents/:id'), async ({ params }) => {
 		const { id } = params;
@@ -182,5 +190,25 @@ export const reagentsHandlers = [
 			status: 'success',
 			message: `New reagent was created`
 		});
+	}),
+
+	http.put(api('/substances/quantity-change/:id'), async ({ request, params }) => {
+		const body = await request.json();
+		const { id } = params;
+		const { quantityUsed, category } = body;
+		const substance = substances.find(sample => sample.id === id);
+		if (!substance) return HttpResponse.json({ message: 'Sample not found' }, { status: 404 });
+
+		substance.quantityLeft -= quantityUsed;
+
+		if (category.toLowerCase() === 'reagent') {
+			const reagent = reagents.find(x => x.id === id);
+			reagent.quantityLeft -= quantityUsed;
+		} else {
+			const sample = samples.find(x => x.id === id);
+			sample.quantityLeft -= quantityUsed;
+		}
+
+		return HttpResponse.json({ status: 'success', message: 'Updated substance quantity' });
 	})
 ];
