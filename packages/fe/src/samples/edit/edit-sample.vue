@@ -221,8 +221,6 @@ watch(
 
 <style>
 .container {
-	margin: 0 auto;
-	padding-bottom: 18px;
 	max-width: 48vw;
 }
 .header {
