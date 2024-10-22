@@ -45,7 +45,7 @@ async function submit() {
 			...form.value,
 			components: form.value.components.map(x => ({
 				id: x.id,
-				catgeory: x.category,
+				category: x.category,
 				quantityUsed: x.quantityUsed
 			}))
 		});
