@@ -1,4 +1,5 @@
 import LoginLayout from './layout/login-layout.vue';
+import { roles } from '../constants/roles.js';
 
 export const routes = [
 	{
@@ -9,12 +10,18 @@ export const routes = [
 	{
 		path: '/users/list',
 		name: 'users-list',
-		component: () => import('../../users/list/user-list.vue')
+		component: () => import('../../users/list/user-list.vue'),
+		meta: {
+			roles: [roles.ADMIN]
+		}
 	},
 	{
 		path: '/users/new',
 		name: 'new-user',
-		component: () => import('../../users/new/add-new-user.vue')
+		component: () => import('../../users/new/add-new-user.vue'),
+		meta: {
+			roles: [roles.ADMIN]
+		}
 	},
 	{
 		path: '/login',
@@ -36,7 +43,10 @@ export const routes = [
 		path: '/users/:id',
 		name: 'user-details',
 		component: () => import('../../user-details/user-details.vue'),
-		props: true
+		props: true,
+		meta: {
+			roles: [roles.ADMIN]
+		}
 	},
 	{
 		path: '/users/:id/edit',
@@ -75,12 +85,18 @@ export const routes = [
 		path: '/storages/:id',
 		name: 'edit-storage',
 		component: () => import('../../storages/edit/storage-edit.vue'),
-		props: true
+		props: true,
+		meta: {
+			roles: [roles.ADMIN]
+		}
 	},
 	{
 		path: '/storages/new',
 		name: 'new-storage',
-		component: () => import('../../storages/add-new/storage-new.vue')
+		component: () => import('../../storages/add-new/storage-new.vue'),
+		meta: {
+			roles: [roles.ADMIN]
+		}
 	},
 	{
 		path: '/reagents/list',
