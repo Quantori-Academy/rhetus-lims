@@ -20,7 +20,6 @@ async function reagentsService(server) {
 				unitPrice,
 				quantityUnit,
 				quantity,
-				quantityLeft,
 				expirationDate,
 				storageLocationId,
 				description
@@ -37,7 +36,7 @@ async function reagentsService(server) {
 					unitPrice,
 					quantityUnit: formatMapping.quantityUnit(quantityUnit),
 					quantity,
-					quantityLeft,
+					quantityLeft: quantity,
 					expirationDate: new Date(expirationDate),
 					storageId: storageLocationId,
 					description

@@ -23,7 +23,7 @@ const Reagent = S.object()
 
 const createReagent = {
 	security: [{ Session: [] }],
-	body: Reagent.without(['id', 'category']),
+	body: Reagent.without(['id', 'category', 'quantityLeft']),
 	response: {
 		201: statusMessage,
 		404: statusMessage,
