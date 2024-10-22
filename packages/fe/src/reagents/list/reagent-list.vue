@@ -24,8 +24,11 @@ function editReagent(id) {
 	});
 }
 
-function viewReagent(row) {
-	$router.push({ name: 'reagent-details', params: { id: row.id } });
+function viewSubstance(row) {
+	$router.push({
+		name: row.category.toLowerCase() === 'reagent' ? 'reagent-details' : 'sample-details',
+		params: { id: row.id }
+	});
 }
 const showNotification = (title, message, type) => {
 	$notify({ title, message, type });
@@ -89,7 +92,7 @@ onMounted(() => {
 		<el-table
 			v-loading="isLoading"
 			:data="reagents"
-			@row-click="viewReagent"
+			@row-click="viewSubstance"
 			@sort-change="setReagents"
 		>
 			<el-table-column prop="name" label="Name" sortable />

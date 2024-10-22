@@ -26,7 +26,7 @@ const reagents = [
 	{
 		id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b999',
 		name: 'Potassium Permanganate',
-		category: 'Sample',
+		category: 'Reagent',
 		description: 'Used as an oxidant in various organic and inorganic reactions.',
 		quantityLeft: 250,
 		quantityUnit: 'g',
