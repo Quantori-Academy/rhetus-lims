@@ -57,7 +57,8 @@ async function setReagents(event = null) {
 	isLoading.value = true;
 	let query = createQuery(event);
 	try {
-		reagents.value = await $api.reagents.fetchReagents(query);
+		const response = await $api.substances.fetchSubstances(query);
+		reagents.value = response.substances;
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
