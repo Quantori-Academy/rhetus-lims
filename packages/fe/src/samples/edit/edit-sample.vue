@@ -124,6 +124,13 @@ async function setSample(id) {
 	}
 }
 
+const componentTableData = computed(() =>
+	sample.value.components.map(x => ({
+		...x,
+		quantityUsed: `${x.quantityUsed} ${x.quantityUnit}`
+	}))
+);
+
 onMounted(() => {
 	setSample(props.id);
 	setStorages();
@@ -146,16 +153,7 @@ watch(
 				<el-input v-model="sample.name" disabled />
 			</el-form-item>
 			<el-form-item label="Reagents/Samples used" prop="components">
-				<el-table
-					:data="
-						sample.components.map(x => ({
-							...x,
-							quantityUsed: x.quantityUsed + ' ' + x.quantityUnit
-						}))
-					"
-					:border="true"
-					@row-click="redirect"
-				>
+				<el-table :data="componentTableData" :border="true" @row-click="redirect">
 					<el-table-column prop="name" label="Name" width="200" />
 					<el-table-column prop="category" label="Category" width="200" />
 					<el-table-column prop="quantityUsed" label="Quantiy Used" />
