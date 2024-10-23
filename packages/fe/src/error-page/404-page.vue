@@ -14,6 +14,7 @@ function goHome() {
 				<img width="100" height="100" src="../lib/assets/images/logo.svg" alt="" />
 				<h1>404</h1>
 			</div>
+      <p>Oops! The page you're looking for doesn't exist.</p>
 			<el-button type="primary" @click="goHome">Go Home</el-button>
 		</div>
 	</div>
