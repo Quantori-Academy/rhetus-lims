@@ -22,10 +22,10 @@ function addNewStorageLocation() {
 }
 
 function viewStorageLocation(row) {
-	$router.push({ name: 'edit-storage', params: { id: row.id } });
+	$router.push({ name: 'edit-storage', params: { id: row.id }, query: { viewMode: true } });
 }
 function editStorageLocation(id) {
-	$router.push({ name: 'edit-storage', params: { id } });
+	$router.push({ name: 'edit-storage', params: { id }, query: { viewMode: false } });
 }
 
 async function deleteStorageLocation(id) {

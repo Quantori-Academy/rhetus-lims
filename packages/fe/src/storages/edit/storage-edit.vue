@@ -3,7 +3,6 @@ import { ref, onMounted, useTemplateRef } from 'vue';
 import { ElForm, ElInput, ElButton, ElFormItem } from 'element-plus';
 import { $api } from '../../lib/api';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
-import { $router } from '../../lib/router/router';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
 import { formRules } from '../constants';
 
@@ -11,13 +10,17 @@ const props = defineProps({
 	id: {
 		type: String,
 		default: null
+	},
+	viewMode: {
+		type: Boolean,
+		default: true
 	}
 });
 const storage = ref(null);
 const isLoading = ref(false);
 const formEl = useTemplateRef('form-ref');
 const rules = ref(formRules);
-const viewMode = ref(true);
+const isViewMode = ref(props.viewMode);
 
 const setStorage = async id => {
 	isLoading.value = true;
@@ -31,7 +34,7 @@ const setStorage = async id => {
 };
 
 const cancelEdit = () => {
-	viewMode.value = true;
+	isViewMode.value = true;
 	setStorage(props.id);
 };
 
@@ -48,14 +51,14 @@ const handleSubmit = async () => {
 			message: response.message,
 			type: 'success'
 		});
-		viewMode.value = true;
+		isViewMode.value = true;
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating storage');
 	}
 };
 
 const enableEditMode = () => {
-	viewMode.value = false;
+	isViewMode.value = false;
 };
 
 onMounted(() => {
@@ -74,15 +77,15 @@ onMounted(() => {
 			@submit="handleSubmit"
 		>
 			<el-form-item label="Room" prop="room">
-				<el-input v-model="storage.room" :disabled="viewMode" />
+				<el-input v-model="storage.room" :disabled="isViewMode" />
 			</el-form-item>
 			<el-form-item label="Name" prop="name">
-				<el-input v-model="storage.name" :disabled="viewMode" />
+				<el-input v-model="storage.name" :disabled="isViewMode" />
 			</el-form-item>
 			<el-form-item label="Description" prop="description">
-				<el-input v-model="storage.description" :disabled="viewMode" />
+				<el-input v-model="storage.description" :disabled="isViewMode" />
 			</el-form-item>
-			<div v-if="viewMode">
+			<div v-if="isViewMode">
 				<el-button @click="enableEditMode">Edit</el-button>
 			</div>
 			<div v-else>
