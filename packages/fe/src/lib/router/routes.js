@@ -116,7 +116,7 @@ export const routes = [
 		}),
 		meta: {
 			roles: [roles.ADMIN],
-			title: 'Edit Storage Details'
+			title: 'Storage Details'
 		}
 	},
 	{
