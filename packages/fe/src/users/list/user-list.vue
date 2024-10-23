@@ -117,11 +117,6 @@ onMounted(() => {
 			/>
 			<el-table-column width="80">
 				<template #default="{ row }">
-					<el-button @click="() => viewUserDetails(row.id)"><rh-icon name="eye" /></el-button>
-				</template>
-			</el-table-column>
-			<el-table-column width="80">
-				<template #default="{ row }">
 					<el-button @click="() => editUser(row.id)"><rh-icon name="pencil" /></el-button>
 				</template>
 			</el-table-column>

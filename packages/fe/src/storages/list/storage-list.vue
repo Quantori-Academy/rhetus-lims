@@ -105,11 +105,6 @@ onMounted(() => {
 			<el-table-column prop="description" min-width="200" label="Description" />
 			<el-table-column width="80">
 				<template #default="{ row }">
-					<el-button @click="() => viewStorageLocation(row.id)"><rh-icon name="eye" /></el-button>
-				</template>
-			</el-table-column>
-			<el-table-column width="80">
-				<template #default="{ row }">
 					<el-button @click="() => editStorageLocation(row.id)"
 						><rh-icon name="pencil"
 					/></el-button>
