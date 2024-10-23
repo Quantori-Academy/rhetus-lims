@@ -32,6 +32,10 @@ onMounted(() => {
 });
 
 $router.beforeEach((to, from, next) => {
+	if (!to.matched.length) {
+		return $router.push({ name: '404'});
+	}
+
 	const routeRoles = to.meta.roles || [];
 	const userRole = user.value?.role?.name;
 
@@ -48,7 +52,7 @@ $router.beforeEach((to, from, next) => {
 				'You do not have the credentials to access this page. Please consult your administator',
 			type: 'error'
 		});
-		$router.push({ name: 'dashboard' });
+		$router.push({ name: '404'});
 	}
 });
 </script>
