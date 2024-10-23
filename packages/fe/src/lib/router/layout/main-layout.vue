@@ -33,7 +33,7 @@ onMounted(() => {
 
 $router.beforeEach((to, from, next) => {
 	if (!to.matched.length) {
-		return $router.push({ name: '404'});
+		return $router.push({ name: '404' });
 	}
 
 	const routeRoles = to.meta.roles || [];
@@ -52,7 +52,7 @@ $router.beforeEach((to, from, next) => {
 				'You do not have the credentials to access this page. Please consult your administator',
 			type: 'error'
 		});
-		$router.push({ name: '404'});
+		$router.push({ name: '404' });
 	}
 });
 </script>
