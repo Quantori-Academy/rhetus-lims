@@ -54,7 +54,7 @@ async function users(server, options) {
 			const isOwner = authenticatedUserId === userId;
 
 			if (!isAdmin && !isOwner) {
-				reply
+				return reply
 					.code(403)
 					.send({ status: 'error', message: `Sorry. You have no permissions to view this user` });
 			}
@@ -105,7 +105,7 @@ async function users(server, options) {
 			const isOwner = authenticatedUserId === userId;
 
 			if (!isAdmin && !isOwner) {
-				reply
+				return reply
 					.code(403)
 					.send({ status: 'error', message: `Sorry. You have no permissions to change this user` });
 			}
