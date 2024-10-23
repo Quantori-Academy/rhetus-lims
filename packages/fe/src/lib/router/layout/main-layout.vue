@@ -31,6 +31,25 @@ onMounted(() => {
 	setUser();
 });
 
+function handleRoleCheck(routeRoles, userRole, next) {
+	if (routeRoles.length === 0) {
+		return next();
+	}
+
+	if (routeRoles.includes(userRole)) {
+		return next();
+	}
+
+	$notify({
+		title: 'Error',
+		message:
+			'You do not have the credentials to access this page. Please consult your administrator',
+		type: 'error'
+	});
+
+	$router.push({ name: '404' });
+}
+
 $router.beforeEach((to, from, next) => {
 	if (!to.matched.length) {
 		return $router.push({ name: '404' });
@@ -39,21 +58,7 @@ $router.beforeEach((to, from, next) => {
 	const routeRoles = to.meta.roles || [];
 	const userRole = user.value?.role?.name;
 
-	if (routeRoles.length === 0) {
-		return next();
-	}
-
-	if (routeRoles.includes(userRole)) {
-		return next();
-	} else {
-		$notify({
-			title: 'Error',
-			message:
-				'You do not have the credentials to access this page. Please consult your administator',
-			type: 'error'
-		});
-		$router.push({ name: '404' });
-	}
+	handleRoleCheck(routeRoles, userRole, next);
 });
 </script>
 
