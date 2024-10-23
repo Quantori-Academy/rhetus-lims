@@ -1,0 +1,585 @@
+{
+  "id": "ca34891b-3fb7-4c70-b351-c126dea20904",
+  "prevId": "85f7d852-d6c6-4cec-a571-2dc7328a7de2",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.components": {
+      "name": "components",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sample_id": {
+          "name": "sample_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false,
+          "default": null
+        },
+        "reagent_id": {
+          "name": "reagent_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false,
+          "default": null
+        },
+        "quantity_used": {
+          "name": "quantity_used",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "components_id_samples_id_fk": {
+          "name": "components_id_samples_id_fk",
+          "tableFrom": "components",
+          "columnsFrom": [
+            "id"
+          ],
+          "tableTo": "samples",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        },
+        "components_sample_id_samples_id_fk": {
+          "name": "components_sample_id_samples_id_fk",
+          "tableFrom": "components",
+          "columnsFrom": [
+            "sample_id"
+          ],
+          "tableTo": "samples",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        },
+        "components_reagent_id_reagents_id_fk": {
+          "name": "components_reagent_id_reagents_id_fk",
+          "tableFrom": "components",
+          "columnsFrom": [
+            "reagent_id"
+          ],
+          "tableTo": "reagents",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.reagents": {
+      "name": "reagents",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuid_generate_v4()"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cas_number": {
+          "name": "cas_number",
+          "type": "varchar(12)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": null
+        },
+        "producer": {
+          "name": "producer",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": null
+        },
+        "catalog_id": {
+          "name": "catalog_id",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": null
+        },
+        "catalog_link": {
+          "name": "catalog_link",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": null
+        },
+        "unit_price": {
+          "name": "unit_price",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "quantity_unit": {
+          "name": "quantity_unit",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quantity_left": {
+          "name": "quantity_left",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expiration_date": {
+          "name": "expiration_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": null
+        },
+        "storage_id": {
+          "name": "storage_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "''"
+        },
+        "deleted": {
+          "name": "deleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "reagents_storage_id_storages_id_fk": {
+          "name": "reagents_storage_id_storages_id_fk",
+          "tableFrom": "reagents",
+          "columnsFrom": [
+            "storage_id"
+          ],
+          "tableTo": "storages",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.roles": {
+      "name": "roles",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "name",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.samples": {
+      "name": "samples",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuid_generate_v4()"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quantity_unit": {
+          "name": "quantity_unit",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quantity_left": {
+          "name": "quantity_left",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expiration_date": {
+          "name": "expiration_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "storage_id": {
+          "name": "storage_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "''"
+        },
+        "deleted": {
+          "name": "deleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "samples_storage_id_storages_id_fk": {
+          "name": "samples_storage_id_storages_id_fk",
+          "tableFrom": "samples",
+          "columnsFrom": [
+            "storage_id"
+          ],
+          "tableTo": "storages",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.storages": {
+      "name": "storages",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuid_generate_v4()"
+        },
+        "room": {
+          "name": "room",
+          "type": "varchar(300)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(300)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted": {
+          "name": "deleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.substances_quantity_changes": {
+      "name": "substances_quantity_changes",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuid_generate_v4()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reagent_id": {
+          "name": "reagent_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false,
+          "default": null
+        },
+        "sample_id": {
+          "name": "sample_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false,
+          "default": null
+        },
+        "previous_value": {
+          "name": "previous_value",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "target_value": {
+          "name": "target_value",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "change_reason": {
+          "name": "change_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "substances_quantity_changes_user_id_users_id_fk": {
+          "name": "substances_quantity_changes_user_id_users_id_fk",
+          "tableFrom": "substances_quantity_changes",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "tableTo": "users",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        },
+        "substances_quantity_changes_reagent_id_reagents_id_fk": {
+          "name": "substances_quantity_changes_reagent_id_reagents_id_fk",
+          "tableFrom": "substances_quantity_changes",
+          "columnsFrom": [
+            "reagent_id"
+          ],
+          "tableTo": "reagents",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        },
+        "substances_quantity_changes_sample_id_samples_id_fk": {
+          "name": "substances_quantity_changes_sample_id_samples_id_fk",
+          "tableFrom": "substances_quantity_changes",
+          "columnsFrom": [
+            "sample_id"
+          ],
+          "tableTo": "samples",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "username": {
+          "name": "username",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "first_name": {
+          "name": "first_name",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "last_name": {
+          "name": "last_name",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role_id": {
+          "name": "role_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_login": {
+          "name": "last_login",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "password_reset_status": {
+          "name": "password_reset_status",
+          "type": "password_request_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'none'"
+        },
+        "deleted": {
+          "name": "deleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "users_role_id_roles_id_fk": {
+          "name": "users_role_id_roles_id_fk",
+          "tableFrom": "users",
+          "columnsFrom": [
+            "role_id"
+          ],
+          "tableTo": "roles",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_username_unique": {
+          "name": "users_username_unique",
+          "columns": [
+            "username"
+          ],
+          "nullsNotDistinct": false
+        }
+      }
+    }
+  },
+  "enums": {
+    "public.name": {
+      "name": "name",
+      "schema": "public",
+      "values": [
+        "administrator",
+        "procurement officer",
+        "researcher"
+      ]
+    },
+    "public.password_request_status": {
+      "name": "password_request_status",
+      "schema": "public",
+      "values": [
+        "none",
+        "active",
+        "confirmed"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
