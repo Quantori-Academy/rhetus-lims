@@ -80,7 +80,12 @@ onMounted(() => {
 			<el-table-column prop="firstName" min-width="150" label="First Name" />
 			<el-table-column prop="lastName" min-width="150" label="Last Name" />
 			<el-table-column prop="email" min-width="150" label="Email" />
-			<el-table-column prop="role" min-width="150" label="Role" :formatter="data => data.role.name" />
+			<el-table-column
+				prop="role"
+				min-width="150"
+				label="Role"
+				:formatter="data => data.role.name"
+			/>
 			<el-table-column
 				prop="lastLogin"
 				label="Last login"
