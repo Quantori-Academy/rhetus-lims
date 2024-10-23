@@ -21,8 +21,8 @@ function addNewStorageLocation() {
 	$router.push({ name: 'new-storage' });
 }
 
-function viewStorageLocation(id) {
-	$router.push({ name: 'edit-storage', params: { id } });
+function viewStorageLocation(row) {
+	$router.push({ name: 'edit-storage', params: { id: row.id } });
 	console.log('view storage info', id);
 }
 function editStorageLocation(id) {
@@ -99,7 +99,7 @@ onMounted(() => {
 			</template>
 		</rh-filters>
 
-		<el-table v-loading="isLoading" :data="storages">
+		<el-table v-loading="isLoading" :data="storages" @row-click="viewStorageLocation">
 			<el-table-column prop="room" min-width="150" label="Room" />
 			<el-table-column prop="name" min-width="150" label="Name" />
 			<el-table-column prop="description" min-width="200" label="Description" />
@@ -139,5 +139,9 @@ onMounted(() => {
 <style scoped>
 .storages-table {
 	margin-top: 20px;
+}
+
+:deep(.el-table__row):hover {
+	cursor: pointer;
 }
 </style>
