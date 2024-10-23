@@ -7,10 +7,9 @@
 				<ol>
 					<li>Home</li>
 					<li class="current-page">
-						{{ $route.name }}
+						{{ $route.meta.title }}
 					</li>
 				</ol>
-				<div class="page-title">{{ $route.meta.title }}</div>
 			</nav>
 		</div>
 	</div>
