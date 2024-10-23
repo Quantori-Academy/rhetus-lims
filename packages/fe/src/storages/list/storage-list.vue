@@ -23,7 +23,6 @@ function addNewStorageLocation() {
 
 function viewStorageLocation(row) {
 	$router.push({ name: 'edit-storage', params: { id: row.id } });
-	console.log('view storage info', id);
 }
 function editStorageLocation(id) {
 	$router.push({ name: 'edit-storage', params: { id } });
