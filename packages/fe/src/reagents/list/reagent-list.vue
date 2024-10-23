@@ -99,12 +99,12 @@ onMounted(() => {
 			@row-click="viewSubstance"
 			@sort-change="setReagents"
 		>
-			<el-table-column prop="name" label="Name" sortable />
-			<el-table-column prop="category" label="Category" sortable />
-			<el-table-column prop="structure" label="Structure" />
-			<el-table-column prop="description" label="Description" />
-			<el-table-column prop="quantityLeft" label="Quantity Left" />
-			<el-table-column prop="storageLocationId" label="Storage Location" />
+			<el-table-column prop="name" min-width="150" label="Name" sortable />
+			<el-table-column prop="category" min-width="150" label="Category" sortable />
+			<el-table-column prop="structure" min-width="200" label="Structure" />
+			<el-table-column prop="description" min-width="200" label="Description" />
+			<el-table-column prop="quantityLeft" min-width="80" label="Quantity Left" />
+			<el-table-column prop="storageLocationId" min-width="80" label="Storage Location" />
 			<el-table-column width="80">
 				<template #default="{ row }">
 					<el-button @click.stop="() => editSubstance(row)">

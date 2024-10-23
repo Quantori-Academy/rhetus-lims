@@ -76,9 +76,9 @@ onMounted(() => {
 			>Add New Storage Location</el-button
 		>
 		<el-table v-loading="isLoading" :data="storages">
-			<el-table-column prop="room" label="Room" />
-			<el-table-column prop="name" label="Name" />
-			<el-table-column prop="description" label="Description" />
+			<el-table-column prop="room" min-width="150" label="Room" />
+			<el-table-column prop="name" min-width="150" label="Name" />
+			<el-table-column prop="description" min-width="200" label="Description" />
 			<el-table-column width="80">
 				<template #default="{ row }">
 					<el-button @click="() => viewStorageLocation(row.id)"><rh-icon name="eye" /></el-button>

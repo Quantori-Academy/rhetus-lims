@@ -76,11 +76,11 @@ onMounted(() => {
 		<el-button class="add-button" type="primary" @click="addNewUser">Add New User</el-button>
 
 		<el-table v-loading="isLoading" :data="users">
-			<el-table-column prop="username" label="User name" />
-			<el-table-column prop="firstName" label="First Name" />
-			<el-table-column prop="lastName" label="Last Name" />
-			<el-table-column prop="email" label="Email" width="150" />
-			<el-table-column prop="role" label="Role" :formatter="data => data.role.name" />
+			<el-table-column prop="username" min-width="150" label="User name" />
+			<el-table-column prop="firstName" min-width="150" label="First Name" />
+			<el-table-column prop="lastName" min-width="150" label="Last Name" />
+			<el-table-column prop="email" min-width="150" label="Email" />
+			<el-table-column prop="role" min-width="150" label="Role" :formatter="data => data.role.name" />
 			<el-table-column
 				prop="lastLogin"
 				label="Last login"
