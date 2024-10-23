@@ -13,7 +13,7 @@ const props = defineProps({
 	},
 	viewMode: {
 		type: Boolean,
-		default: true
+		default: false
 	}
 });
 const storage = ref(null);
