@@ -56,7 +56,7 @@ const handleSubmit = async () => {
 
 const enableEditMode = () => {
 	viewMode.value = false;
-}
+};
 
 onMounted(() => {
 	setStorage(props.id);
@@ -83,7 +83,7 @@ onMounted(() => {
 				<el-input v-model="storage.description" :disabled="viewMode" />
 			</el-form-item>
 			<div v-if="viewMode">
-				<el-button  @click="enableEditMode">Edit</el-button>
+				<el-button @click="enableEditMode">Edit</el-button>
 			</div>
 			<div v-else>
 				<el-button @click="cancelEdit">Cancel</el-button>
