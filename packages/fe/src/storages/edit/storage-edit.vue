@@ -17,6 +17,7 @@ const storage = ref(null);
 const isLoading = ref(false);
 const formEl = useTemplateRef('form-ref');
 const rules = ref(formRules);
+const viewMode = ref(true);
 
 const setStorage = async id => {
 	isLoading.value = true;
@@ -30,7 +31,8 @@ const setStorage = async id => {
 };
 
 const cancelEdit = () => {
-	$router.push({ name: 'storages-list' });
+	viewMode.value = true;
+	setStorage(props.id);
 };
 
 const handleSubmit = async () => {
@@ -46,11 +48,15 @@ const handleSubmit = async () => {
 			message: response.message,
 			type: 'success'
 		});
-		$router.push({ name: 'storages-list' });
+		viewMode.value = true;
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating storage');
 	}
 };
+
+const enableEditMode = () => {
+	viewMode.value = false;
+}
 
 onMounted(() => {
 	setStorage(props.id);
@@ -68,16 +74,21 @@ onMounted(() => {
 			@submit="handleSubmit"
 		>
 			<el-form-item label="Room" prop="room">
-				<el-input v-model="storage.room" />
+				<el-input v-model="storage.room" :disabled="viewMode" />
 			</el-form-item>
 			<el-form-item label="Name" prop="name">
-				<el-input v-model="storage.name" />
+				<el-input v-model="storage.name" :disabled="viewMode" />
 			</el-form-item>
 			<el-form-item label="Description" prop="description">
-				<el-input v-model="storage.description" />
+				<el-input v-model="storage.description" :disabled="viewMode" />
 			</el-form-item>
-			<el-button @click="cancelEdit">Cancel</el-button>
-			<el-button type="primary" @click="handleSubmit">Save</el-button>
+			<div v-if="viewMode">
+				<el-button  @click="enableEditMode">Edit</el-button>
+			</div>
+			<div v-else>
+				<el-button @click="cancelEdit">Cancel</el-button>
+				<el-button type="primary" @click="handleSubmit">Save</el-button>
+			</div>
 		</el-form>
 	</div>
 </template>
