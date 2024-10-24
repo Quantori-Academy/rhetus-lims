@@ -1,23 +1,15 @@
 <script setup>
-import { ElSelect, ElInput, ElOption, ElInputNumber } from 'element-plus';
+import { ElInput, ElInputNumber } from 'element-plus';
 import RhIcon from '../lib/components/rh-icon.vue';
 import FilterItem from '../lib/components/rh-filters/filter-item.vue';
-import { reactive, watch } from 'vue';
+import { ref, watch } from 'vue';
 
-const props = defineProps({
-	filters: {
-		type: Object,
-		required: true
-	},
-	reagents: {
-		type: Array,
-		required: true
-	}
+const filters = ref({
+	name: '',
+	category: '',
+	quantity: null
 });
-
 const emit = defineEmits(['update:filters']);
-const filters = reactive({ ...props.filters });
-
 watch(
 	filters,
 	newFilters => {
@@ -30,7 +22,7 @@ watch(
 <template>
 	<div class="filters-container">
 		<filter-item>
-			<el-input v-model="filters.name" clearable class="filter" placeholder="Enter name">
+			<el-input v-model="filters.name" clearable placeholder="Enter name">
 				<template #prefix>
 					<rh-icon name="search" />
 				</template>
@@ -38,14 +30,11 @@ watch(
 		</filter-item>
 
 		<filter-item>
-			<el-select v-model="filters.category" clearable placeholder="Select category">
-				<el-option
-					v-for="reagent of reagents"
-					:key="reagent.id"
-					:label="reagent.category"
-					:value="reagent.category"
-				/>
-			</el-select>
+			<el-input v-model="filters.category" clearable placeholder="Enter category">
+				<template #prefix>
+					<rh-icon name="search" />
+				</template>
+			</el-input>
 		</filter-item>
 
 		<filter-item>
@@ -55,16 +44,7 @@ watch(
 </template>
 
 <style scoped>
-.filters-container {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: start;
-	margin: 20px 0 15px 0;
-}
-
-::v-deep .el-input,
-.el-select,
-.el-input-number {
+::v-deep .el-input-number {
 	width: 300px;
 }
 </style>

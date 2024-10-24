@@ -119,7 +119,7 @@ function filterReagents(parsedOptions) {
 		let matchesName = true;
 		let matchesQuantity = true;
 		if (parsedOptions.category) {
-			matchesCategory = reagent.category.includes(parsedOptions.category);
+			matchesCategory = reagent.category.toLowerCase().includes(parsedOptions.category);
 		}
 		if (parsedOptions.name) {
 			matchesName = reagent.name.toLowerCase().includes(parsedOptions.name);

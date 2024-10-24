@@ -6,7 +6,7 @@ export default http => ({
 		return await http('/roles');
 	},
 	async fetchUsers(params) {
-		return await http(`/users`, { query: params });
+		return await http(`/users`, { query: { options: params } });
 	},
 	async addUser(user) {
 		return await http('/users', {

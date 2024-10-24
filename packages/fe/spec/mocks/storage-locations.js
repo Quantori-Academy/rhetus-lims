@@ -31,7 +31,7 @@ function filterStorages(parsedOptions) {
 		return matchesRoom && matchesName;
 	});
 	return HttpResponse.json({
-		items: filteredStorages
+		storages: filteredStorages
 	});
 }
 

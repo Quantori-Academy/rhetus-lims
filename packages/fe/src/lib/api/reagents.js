@@ -1,9 +1,9 @@
 export default http => ({
 	async fetchReagents(params) {
-		return await http(`/reagents`, { query: params });
+		return await http(`/reagents`, { query: { options: params } });
 	},
-	async fetchSubstances(params) {
-		return await http(`/substances`, { query: params });
+	async fetchSortedReagents(params) {
+		return await http(`/substances`, { query: { options: params } });
 	},
 	async deleteReagent(id) {
 		return await http(`/reagents/${id}`, {

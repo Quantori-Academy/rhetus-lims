@@ -2,18 +2,13 @@
 import { ElDatePicker, ElInput } from 'element-plus';
 import RhIcon from '../lib/components/rh-icon.vue';
 import FilterItem from '../lib/components/rh-filters/filter-item.vue';
-import { reactive, watch } from 'vue';
+import { ref, watch } from 'vue';
 
-const props = defineProps({
-	filters: {
-		type: Object,
-		required: true
-	}
+const filters = ref({
+	role: '',
+	date: null
 });
-
 const emit = defineEmits(['update:filters']);
-const filters = reactive({ ...props.filters });
-
 watch(
 	filters,
 	newFilters => {
@@ -26,7 +21,7 @@ watch(
 <template>
 	<div class="filters-container">
 		<filter-item>
-			<el-input v-model="filters.role" clearable class="filter" placeholder="String filter">
+			<el-input v-model="filters.role" clearable placeholder="Enter role">
 				<template #prefix>
 					<rh-icon name="search" />
 				</template>
@@ -36,7 +31,6 @@ watch(
 		<filter-item>
 			<el-date-picker
 				v-model="filters.date"
-				class="filter"
 				type="date"
 				placeholder="Date filter"
 				format="YYYY/MM/DD"
@@ -47,14 +41,7 @@ watch(
 </template>
 
 <style scoped>
-.filters-container {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: start;
-	margin: 20px 0 15px 0;
-}
-
-::v-deep .el-input {
+::v-deep .el-date-editor {
 	width: 300px;
 }
 </style>

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { ElTable, ElTableColumn, ElButton } from 'element-plus';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { $api } from '../../lib/api/index.js';
@@ -63,23 +63,22 @@ const deleteUser = async id => {
 async function setUsers() {
 	isLoading.value = true;
 	try {
-		const params = {
-			options: { role: filters.value.role, date: filters.value.date }
-		};
-		const data = await $api.users.fetchUsers(params);
+		const data = await $api.users.fetchUsers(filters.value);
 		users.value = data.items;
 	} catch (error) {
 		$notifyUserAboutError(error);
+	} finally {
+		isLoading.value = false;
 	}
-
-	isLoading.value = false;
 }
 
-function resetAllFilters() {
-	filters.value.role = '';
-	filters.value.date = null;
-	setUsers();
-}
+watch(
+	filters,
+	() => {
+		setUsers();
+	},
+	{ deep: true }
+);
 
 onMounted(() => {
 	setUsers();
@@ -88,7 +87,7 @@ onMounted(() => {
 
 <template>
 	<div>
-		<rh-filters @reset-filters="resetAllFilters" @set-filters="setUsers">
+		<rh-filters>
 			<template #action-buttons>
 				<el-button class="add-button" type="primary" @click="addNewUser">Add New User</el-button>
 			</template>

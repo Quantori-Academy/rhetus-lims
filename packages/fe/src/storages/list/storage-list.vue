@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { ElTable, ElTableColumn, ElButton } from 'element-plus';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { $api } from '../../lib/api/index.js';
@@ -10,7 +10,6 @@ import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
 import StorageFilters from '../storage-filters.vue';
 
 const storages = ref([]);
-const initialStorages = ref([]);
 const isLoading = ref(false);
 const filters = ref({
 	room: '',
@@ -63,11 +62,8 @@ async function deleteStorageLocation(id) {
 async function setStorages() {
 	isLoading.value = true;
 	try {
-		const params = {
-			options: { room: filters.value.room, name: filters.value.name }
-		};
-		const data = await $api.storages.fetchStorages(params);
-		storages.value = data.items;
+		const data = await $api.storages.fetchStorages(filters.value);
+		storages.value = data.storages;
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
@@ -75,40 +71,22 @@ async function setStorages() {
 	}
 }
 
-async function setInitialStorages() {
-	isLoading.value = true;
-	try {
-		const data = await $api.storages.fetchStorages();
-		console.log(data.storages);
-		const uniqueStorages = data.storages.reduce((acc, storage) => {
-			if (!acc.some(item => item.room === storage.room)) {
-				acc.push(storage);
-			}
-			return acc;
-		}, []);
-		initialStorages.value = uniqueStorages;
-	} catch (error) {
-		$notifyUserAboutError(error);
-	} finally {
-		isLoading.value = false;
-	}
-}
-
-function resetAllFilters() {
-	filters.value.room = '';
-	filters.value.name = '';
-	setStorages();
-}
+watch(
+	filters,
+	() => {
+		setStorages();
+	},
+	{ deep: true }
+);
 
 onMounted(() => {
-	setInitialStorages();
 	setStorages();
 });
 </script>
 
 <template>
 	<div class="wrapper">
-		<rh-filters @reset-filters="resetAllFilters" @set-filters="setStorages">
+		<rh-filters>
 			<template #action-buttons>
 				<el-button type="primary" @click="addNewStorageLocation">
 					Add New Storage Location
@@ -116,7 +94,7 @@ onMounted(() => {
 			</template>
 
 			<template #filters>
-				<storage-filters v-model:filters="filters" :storages="initialStorages" />
+				<storage-filters v-model:filters="filters" />
 			</template>
 		</rh-filters>
 

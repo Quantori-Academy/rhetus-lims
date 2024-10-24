@@ -1,6 +1,6 @@
 <script setup>
 import RhIcon from '../../lib/components/rh-icon.vue';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { ElTable, ElTableColumn, ElButton } from 'element-plus';
 import { $router } from '../../lib/router/router.js';
 import { $api } from '../../lib/api/index.js';
@@ -10,7 +10,6 @@ import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
 import SubstanceFilters from '../substance-filters.vue';
 
 const reagents = ref(null);
-const initialReagents = ref([]);
 const isLoading = ref(false);
 const filters = ref({
 	name: '',
@@ -71,35 +70,13 @@ const deleteSubstance = async row => {
 async function setReagents(event = null) {
 	isLoading.value = true;
 	let query = createQuery(event);
-	const params = {
+	const options = {
 		...query,
-		options: {
-			category: filters.value.category,
-			name: filters.value.name,
-			quantity: filters.value.quantity
-		}
+		...filters.value
 	};
 	try {
-		const data = await $api.reagents.fetchReagents(params);
+		const data = await $api.reagents.fetchReagents(options);
 		reagents.value = data.items;
-	} catch (error) {
-		$notifyUserAboutError(error);
-	} finally {
-		isLoading.value = false;
-	}
-}
-
-async function setInitialReagents() {
-	isLoading.value = true;
-	try {
-		const data = await $api.reagents.fetchReagents();
-		const uniqueCategory = data.reduce((acc, reagent) => {
-			if (!acc.some(item => item.category === reagent.category)) {
-				acc.push(reagent);
-			}
-			return acc;
-		}, []);
-		initialReagents.value = uniqueCategory;
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
@@ -116,29 +93,29 @@ function createQuery(event) {
 	return query;
 }
 
-function resetAllFilters() {
-	filters.value.category = '';
-	filters.value.name = '';
-	filters.value.quantity = null;
-	setReagents();
-}
+watch(
+	filters,
+	() => {
+		setReagents();
+	},
+	{ deep: true }
+);
 
 onMounted(() => {
-	setInitialReagents();
 	setReagents();
 });
 </script>
 
 <template>
 	<div class="reagent-table">
-		<rh-filters @reset-filters="resetAllFilters" @set-filters="setReagents">
+		<rh-filters>
 			<template #action-buttons>
 				<el-button type="primary" @click="addNewReagent">Add New Reagent</el-button>
 				<el-button type="primary" @click="addNewSample">Add New Sample</el-button>
 			</template>
 
 			<template #filters>
-				<substance-filters v-model:filters="filters" :reagents="initialReagents" />
+				<substance-filters v-model:filters="filters" />
 			</template>
 		</rh-filters>
 
