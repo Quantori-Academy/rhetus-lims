@@ -85,7 +85,7 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="wrapper">
+	<div class="storages-table">
 		<rh-filters>
 			<template #action-buttons>
 				<el-button type="primary" @click="addNewStorageLocation">
@@ -124,3 +124,9 @@ onMounted(() => {
 		</el-table>
 	</div>
 </template>
+
+<style scoped>
+.storages-table {
+	margin-top: 20px;
+}
+</style>

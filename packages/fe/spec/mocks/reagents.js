@@ -115,19 +115,15 @@ function findLocationByValue({ shelf, cabinet, room }) {
 }
 function filterReagents(parsedOptions) {
 	const filteredReagents = reagents.filter(reagent => {
-		let matchesCategory = true;
 		let matchesName = true;
 		let matchesQuantity = true;
-		if (parsedOptions.category) {
-			matchesCategory = reagent.category.toLowerCase().includes(parsedOptions.category);
-		}
 		if (parsedOptions.name) {
 			matchesName = reagent.name.toLowerCase().includes(parsedOptions.name);
 		}
 		if (parsedOptions.quantity) {
 			matchesQuantity = parseInt(reagent.quantityLeft) === parsedOptions.quantity;
 		}
-		return matchesCategory && matchesName && matchesQuantity;
+		return matchesName && matchesQuantity;
 	});
 	return HttpResponse.json({
 		items: filteredReagents

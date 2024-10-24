@@ -13,7 +13,6 @@ const reagents = ref(null);
 const isLoading = ref(false);
 const filters = ref({
 	name: '',
-	category: '',
 	quantity: null
 });
 

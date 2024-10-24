@@ -6,7 +6,6 @@ import { ref, watch } from 'vue';
 
 const filters = ref({
 	name: '',
-	category: '',
 	quantity: null
 });
 const emit = defineEmits(['update:filters']);
@@ -23,14 +22,6 @@ watch(
 	<div class="filters-container">
 		<filter-item>
 			<el-input v-model="filters.name" clearable placeholder="Enter name">
-				<template #prefix>
-					<rh-icon name="search" />
-				</template>
-			</el-input>
-		</filter-item>
-
-		<filter-item>
-			<el-input v-model="filters.category" clearable placeholder="Enter category">
 				<template #prefix>
 					<rh-icon name="search" />
 				</template>

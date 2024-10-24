@@ -86,10 +86,10 @@ onMounted(() => {
 </script>
 
 <template>
-	<div>
+	<div class="user-table">
 		<rh-filters>
 			<template #action-buttons>
-				<el-button class="add-button" type="primary" @click="addNewUser">Add New User</el-button>
+				<el-button type="primary" @click="addNewUser">Add New User</el-button>
 			</template>
 
 			<template #filters>
@@ -136,7 +136,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.users-container {
-	margin: 20px 0;
+.user-table {
+	margin-top: 20px;
 }
 </style>
