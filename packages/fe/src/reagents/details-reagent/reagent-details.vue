@@ -182,10 +182,9 @@ const deleteReagent = async () => {
 			</el-form-item>
 			<el-form-item label="Storage location" prop="storageLocationId">
 				<el-select
-					v-model="reagent.storageLocationId"
+					v-model="reagent.storageLocation.id"
 					:disabled="!isEdit"
-					:placeholder="reagent && storageDisplayValue"
-					filterable
+					:placeholder="reagent && reagent.storageLocation.name"
 				>
 					<el-option
 						v-for="storage of storages"

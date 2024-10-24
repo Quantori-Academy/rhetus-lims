@@ -10,7 +10,10 @@ const reagents = [
 		description: 'Common salt used in various chemical reactions and as a preservative.',
 		quantityLeft: 500,
 		quantityUnit: 'g',
-		storageLocation: 'Shelf A1',
+		storageLocation: {
+			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',
+			name: 'Cabinet 1, shelf 3'
+		},
 		structure: 'Cl[Na]'
 	},
 	{
@@ -20,7 +23,10 @@ const reagents = [
 		description: 'Weak acid used in the production of synthetic fibers and food preservation.',
 		quantityLeft: 1,
 		quantityUnit: 'L',
-		storageLocation: 'Cabinet B2',
+		storageLocation: {
+			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',
+			name: 'Cabinet 1, shelf 3'
+		},
 		structure: 'CC(=O)O'
 	},
 	{
@@ -30,12 +36,15 @@ const reagents = [
 		description: 'Used as an oxidant in various organic and inorganic reactions.',
 		quantityLeft: 250,
 		quantityUnit: 'g',
-		storageLocation: 'Shelf C3',
+		storageLocation: {
+			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b93f5g6d6d4g6g',
+			name: 'Cabinet 2, shelf 4'
+		},
 		structure: 'O=[Mn](=O)(=O)=O[O-].[K+]'
 	}
 ];
 
-export const substances = [...reagents, ...samples];
+const substances = [...reagents, ...samples];
 
 const reagentDetails = [
 	{
@@ -51,7 +60,10 @@ const reagentDetails = [
 		quantity: 500,
 		unitPrice: 12.5,
 		quantityLeft: 25.0,
-		storageLocationId: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',
+		storageLocation: {
+			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',
+			name: 'Cabinet 1, shelf 3'
+		},
 		expirationDate: '2025-05-15T00:00:00.000Z'
 	},
 	{
@@ -67,7 +79,10 @@ const reagentDetails = [
 		unitSize: '1 L bottle',
 		unitPrice: 8.99,
 		quantityLeft: 15.0,
-		storageLocationId: 'c7b3d8e0-5e0b-4b0f-8b3a-3b93f5g6d6d4g6g',
+		storageLocation: {
+			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',
+			name: 'Cabinet 1, shelf 3'
+		},
 		expirationDate: '2024-11-30T00:00:00.000Z'
 	},
 	{
@@ -84,7 +99,10 @@ const reagentDetails = [
 		quantity: 1000,
 		unitPrice: 8.99,
 		quantityLeft: 15.0,
-		storageLocationId: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',
+		storageLocation: {
+			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b93f5g6d6d4g6g',
+			name: 'Cabinet 2, shelf 4'
+		},
 		expirationDate: '2024-11-30T00:00:00.000Z'
 	}
 ];
@@ -120,6 +138,19 @@ export const reagentsHandlers = [
 		const url = new URL(requestUrl);
 		const productIds = url.searchParams.get('sort');
 		console.log(productIds);
+
+		const options = url.searchParams.get('options');
+		const parsedOptions = JSON.parse(options);
+		const storageId = parsedOptions?.location;
+		if (storageId) {
+			const filteredSubstances = substances.filter(
+				substance => substance.storageLocation.id === storageId
+			);
+			return HttpResponse.json({
+				substances: filteredSubstances,
+				count: filteredSubstances.length
+			});
+		}
 		return HttpResponse.json({ substances, count: substances.length });
 	}),
 	http.delete(api('/reagents/:id'), async ({ params }) => {
