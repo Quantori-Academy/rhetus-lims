@@ -26,7 +26,7 @@ function generateFilterByValueType(filterData, optionProperty, formatMapping) {
 		return generateArrayFilter(filterData, optionProperty, formatMapping);
 	}
 
-	if (Date.parse(value) && !Number.isInteger(Number(value))) {
+	if (Date.parse(value) && Date.parse(value) > 0 && !Number.isInteger(Number(value))) {
 		return generateDateFilter(filterKey, value);
 	}
 
