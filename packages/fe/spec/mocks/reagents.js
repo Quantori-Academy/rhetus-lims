@@ -10,10 +10,7 @@ const reagents = [
 		description: 'Common salt used in various chemical reactions and as a preservative.',
 		quantityLeft: 500,
 		quantityUnit: 'g',
-		storageLocation: {
-			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',
-			name: 'Cabinet 1, shelf 3'
-		},
+		storageLocationId: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',
 		structure: 'Cl[Na]'
 	},
 	{
@@ -23,10 +20,7 @@ const reagents = [
 		description: 'Weak acid used in the production of synthetic fibers and food preservation.',
 		quantityLeft: 1,
 		quantityUnit: 'L',
-		storageLocation: {
-			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',
-			name: 'Cabinet 1, shelf 3'
-		},
+		storageLocationId: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',
 		structure: 'CC(=O)O'
 	},
 	{
@@ -36,10 +30,7 @@ const reagents = [
 		description: 'Used as an oxidant in various organic and inorganic reactions.',
 		quantityLeft: 250,
 		quantityUnit: 'g',
-		storageLocation: {
-			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b93f5g6d6d4g6g',
-			name: 'Cabinet 2, shelf 4'
-		},
+		storageLocationId: 'c7b3d8e0-5e0b-4b0f-8b3a-3b93f5g6d6d4g6g',
 		structure: 'O=[Mn](=O)(=O)=O[O-].[K+]'
 	}
 ];
@@ -144,7 +135,7 @@ export const reagentsHandlers = [
 		const storageId = parsedOptions?.location;
 		if (storageId) {
 			const filteredSubstances = substances.filter(
-				substance => substance.storageLocation.id === storageId
+				substance => substance.storageLocationId === storageId
 			);
 			return HttpResponse.json({
 				substances: filteredSubstances,

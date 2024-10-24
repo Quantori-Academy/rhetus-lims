@@ -21,8 +21,23 @@ async function setSubstances(id) {
 	isLoading.value = true;
 	try {
 		const query = { options: { location: id } };
-		const data = await $api.reagents.fetchSubstances(query);
-		substances.value = data.substances;
+		const data = await $api.substances.fetchSubstances(query);
+
+		const substancesWithStorageInfo = await Promise.all(
+			data.substances.map(async substance => {
+				if (substance?.storageLocationId) {
+					const storageId = substance.storageLocationId;
+					const storageInfo = await $api.storages.fetchStorage(storageId);
+					return {
+						...substance,
+						storageLocationName: storageInfo.name
+					};
+				}
+				return substance;
+			})
+		);
+
+		substances.value = substancesWithStorageInfo;
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error viewing substances content');
 	} finally {
@@ -84,7 +99,7 @@ onMounted(() => {
 			<el-table-column prop="structure" label="Structure" />
 			<el-table-column prop="description" label="Description" />
 			<el-table-column prop="quantityLeft" label="Quantity Left" />
-			<el-table-column prop="storageLocation.name" label="Storage Location" />
+			<el-table-column prop="storageLocationName" label="Storage Location" />
 			<el-table-column width="80">
 				<template #default="{ row }">
 					<el-button @click.stop="() => editSubstance(row)">
