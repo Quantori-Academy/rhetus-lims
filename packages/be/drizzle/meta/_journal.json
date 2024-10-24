@@ -127,6 +127,20 @@
       "when": 1729441922423,
       "tag": "0017_rich_nightmare",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1729674511093,
+      "tag": "0018_serious_dreadnoughts",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1729674538306,
+      "tag": "0019_yielding_barracuda",
+      "breakpoints": true
     }
   ]
 }
