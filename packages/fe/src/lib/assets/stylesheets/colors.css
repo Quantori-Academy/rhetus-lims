@@ -25,10 +25,19 @@
 
 /* color palette  */
 :root {
-	--rh-color-black: #181818;
+	--rh-color-white: #f5f5f5;
+	--rh-color-black: #151b20;
+	--rh-color-primary-600: #218ec7;
+	--rh-color-primary-400: #0eabe2;
+	--rh-color-primary-700: #1785be;
+	--rh-color-primary-900: #38485b;
+	--rh-color-ghost-white: #fbfafd;
+	--rh-color-argent: #c0bec2;
 }
 
 /* semantic color variables for this project */
 :root {
 	--color-text: var(--rh-color-black);
+	--color-sidebar-bg: var(--rh-color-ghost-white);
+	--color-sidebar-bg-active: var(--rh-color-argent);
 }
