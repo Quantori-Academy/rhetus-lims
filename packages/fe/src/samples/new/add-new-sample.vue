@@ -8,7 +8,8 @@ import {
 	ElFormItem,
 	ElSelect,
 	ElOption,
-	ElInputNumber
+	ElInputNumber,
+	ElOptionGroup
 } from 'element-plus';
 import { quantityUnits } from '../../lib/constants/quantity-units';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
@@ -182,12 +183,14 @@ onMounted(() => {
 
 			<el-form-item label="Storage location" prop="storageId">
 				<el-select v-model="form.storageId" placeholder="Select storage location">
-					<el-option
+					<el-option-group
 						v-for="storage of storages"
 						:key="storage.id"
-						:label="storage.name"
+						:label="storage.room"
 						:value="storage.id"
-					/>
+					>
+						<el-option :key="storage.id" :label="storage.name" :value="storage.id" />
+					</el-option-group>
 				</el-select>
 			</el-form-item>
 

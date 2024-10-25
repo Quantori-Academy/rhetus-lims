@@ -8,7 +8,8 @@ import {
 	ElFormItem,
 	ElInputNumber,
 	ElSelect,
-	ElOption
+	ElOption,
+	ElOptionGroup
 } from 'element-plus';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
 import { $router } from '../../lib/router/router';
@@ -62,7 +63,6 @@ async function submit() {
 			...form.value,
 			quantityLeft: form.value.quantity
 		});
-
 		$notify({ message: response.message, type: 'success' });
 		$router.push({ name: 'reagents-list' });
 	} catch (error) {
@@ -136,12 +136,14 @@ async function setStorages() {
 					placeholder="Select storage location"
 					:loading="isLoading"
 				>
-					<el-option
+					<el-option-group
 						v-for="storage of storages"
 						:key="storage.id"
-						:label="storage.name"
+						:label="storage.room"
 						:value="storage.id"
-					/>
+					>
+						<el-option :key="storage.id" :label="storage.name" :value="storage.id" />
+					</el-option-group>
 				</el-select>
 			</el-form-item>
 			<el-form-item label="Description" prop="description">
