@@ -245,22 +245,10 @@ onMounted(() => {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
-	width: 100%;
 }
 
 :deep(.el-select__wrapper) {
 	width: 350px;
-}
-
-.modal-form {
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-}
-
-.reagent__action-buttons {
-	display: flex;
-	flex-direction: row;
 }
 
 :deep(.el-table__header-wrapper .cell) {
