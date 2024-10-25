@@ -53,20 +53,7 @@ async function storagesService(server) {
 					name: schema.storages.name,
 					room: schema.storages.room,
 					description: schema.storages.description,
-					isEmpty: and(
-						notExists(
-							server.db
-								.select({ id: schema.reagents.id })
-								.from(schema.reagents)
-								.where(eq(schema.reagents.storageId, schema.storages.id))
-						),
-						notExists(
-							server.db
-								.select({ id: schema.samples.id })
-								.from(schema.samples)
-								.where(eq(schema.samples.storageId, schema.storages.id))
-						)
-					).as('isEmpty')
+					isEmpty: server.storagesService.isEmptyQuery().as('isEmpty')
 				})
 				.from(schema.storages)
 				.where(eq(schema.storages.deleted, false));
@@ -94,20 +81,7 @@ async function storagesService(server) {
 					room: schema.storages.room,
 					name: schema.storages.name,
 					description: schema.storages.description,
-					isEmpty: and(
-						notExists(
-							server.db
-								.select({ id: schema.reagents.id })
-								.from(schema.reagents)
-								.where(eq(schema.reagents.storageId, schema.storages.id))
-						),
-						notExists(
-							server.db
-								.select({ id: schema.samples.id })
-								.from(schema.samples)
-								.where(eq(schema.samples.storageId, schema.storages.id))
-						)
-					).as('isEmpty')
+					isEmpty: server.storagesService.isEmptyQuery().as('isEmpty')
 				})
 				.from(schema.storages)
 				.where(and(eq(schema.storages.id, id), eq(schema.storages.deleted, false)));
@@ -167,6 +141,23 @@ async function storagesService(server) {
 			const orderSubqueries = generateOrderSubquery(sort, sortDictionary);
 
 			return query.orderBy(...orderSubqueries);
+		},
+
+		isEmptyQuery: () => {
+			return and(
+				notExists(
+					server.db
+						.select({ id: schema.reagents.id })
+						.from(schema.reagents)
+						.where(eq(schema.reagents.storageId, schema.storages.id))
+				),
+				notExists(
+					server.db
+						.select({ id: schema.samples.id })
+						.from(schema.samples)
+						.where(eq(schema.samples.storageId, schema.storages.id))
+				)
+			);
 		}
 	});
 }
