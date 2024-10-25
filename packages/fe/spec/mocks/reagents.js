@@ -146,7 +146,6 @@ export const reagentsHandlers = [
 	}),
 	http.delete(api('/reagents/:id'), async ({ params }) => {
 		const { id } = params;
-		console.log(id);
 		const reagentIndex = reagents.findIndex(reagent => reagent.id === id);
 		if (reagentIndex === -1) {
 			return HttpResponse.json(
@@ -212,5 +211,25 @@ export const reagentsHandlers = [
 		}
 
 		return HttpResponse.json({ status: 'success', message: 'Updated substance quantity' });
+	}),
+
+	http.patch(api('/substances/:id'), async ({ request, params }) => {
+		const { id } = params;
+		const body = await request.json();
+		const { storageId, category } = body;
+		const substance = substances.find(substance => substance.id === id);
+		if (!substance) return HttpResponse.json({ message: 'Substance not found' }, { status: 404 });
+
+		substance.storageLocationId = storageId;
+
+		if (category.toLowerCase() === 'reagent') {
+			const reagent = reagents.find(x => x.id === id);
+			reagent.storageLocationId = storageId;
+		} else {
+			const sample = samples.find(x => x.id === id);
+			sample.storageLocation = storageId;
+		}
+
+		return HttpResponse.json({ status: 'success', message: 'Updated substance storage' });
 	})
 ];
