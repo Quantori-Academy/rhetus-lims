@@ -71,4 +71,29 @@ const deleteStorage = {
 	}
 };
 
-export { createStorage, getStorages, getStorage, updateStorage, deleteStorage, Storage };
+const getStoragesNames = {
+	security: [{ Session: [] }],
+	response: {
+		200: S.object().prop('names', S.array().items(S.string())),
+		500: statusMessage
+	}
+};
+
+const getStoragesRooms = {
+	security: [{ Session: [] }],
+	response: {
+		200: S.object().prop('rooms', S.array().items(S.string())),
+		500: statusMessage
+	}
+};
+
+export {
+	createStorage,
+	getStorages,
+	getStorage,
+	updateStorage,
+	deleteStorage,
+	Storage,
+	getStoragesNames,
+	getStoragesRooms
+};
