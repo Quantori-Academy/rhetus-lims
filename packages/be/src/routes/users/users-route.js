@@ -175,7 +175,7 @@ async function users(server, options) {
 		method: 'GET',
 		path: options.prefix + 'me',
 		preValidation: [server.authenticate],
-		schema: schema.getUser,
+		schema: schema.getMe,
 		handler: onGetMe
 	});
 

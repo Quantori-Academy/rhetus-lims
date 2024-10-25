@@ -94,4 +94,17 @@ const deleteUser = {
 	}
 };
 
-export { createUser, getUser, getUsers, updateUser, deleteUser };
+const getMe = {
+	security: [{ Session: [] }],
+	response: {
+		200: User.without(['password', 'lastLogin', 'roleId'])
+			.prop('role', Role)
+			.required()
+			.prop('hasPasswordResetRequests', S.boolean().required()),
+		403: statusMessage,
+		404: statusMessage,
+		500: statusMessage
+	}
+};
+
+export { createUser, getUser, getUsers, updateUser, deleteUser, getMe };
