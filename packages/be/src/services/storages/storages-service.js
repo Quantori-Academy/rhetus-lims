@@ -160,22 +160,13 @@ async function storagesService(server) {
 			);
 		},
 
-		getStoragesNames: async () => {
+		getUniqValuesByField: async fieldName => {
 			const result = await server.db
-				.selectDistinct({ name: schema.storages.name })
+				.selectDistinct({ field: schema.storages[fieldName] })
 				.from(schema.storages)
 				.where(eq(schema.storages.deleted, false));
 
-			return result.length ? result.map(({ name }) => name) : [];
-		},
-
-		getStoragesRooms: async () => {
-			const result = await server.db
-				.selectDistinct({ room: schema.storages.room })
-				.from(schema.storages)
-				.where(eq(schema.storages.deleted, false));
-
-			return result.length ? result.map(({ room }) => room) : [];
+			return result.length ? result.map(({ field }) => field) : [];
 		}
 	});
 }

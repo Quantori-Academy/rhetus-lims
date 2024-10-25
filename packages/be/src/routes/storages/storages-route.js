@@ -125,7 +125,7 @@ async function storages(server, options) {
 
 	async function onGetStoragesNames(req, reply) {
 		try {
-			const data = await server.storagesService.getStoragesNames();
+			const data = await server.storagesService.getUniqValuesByField('name');
 			return reply.code(200).send({ names: data });
 		} catch (err) {
 			return reply.code(500).send(err);
@@ -142,7 +142,7 @@ async function storages(server, options) {
 
 	async function onGetStoragesRooms(req, reply) {
 		try {
-			const data = await server.storagesService.getStoragesRooms();
+			const data = await server.storagesService.getUniqValuesByField('room');
 			return reply.code(200).send({ rooms: data });
 		} catch (err) {
 			return reply.code(500).send(err);
