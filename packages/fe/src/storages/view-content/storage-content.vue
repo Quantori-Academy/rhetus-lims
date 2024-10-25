@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import RhIcon from '../../lib/components/rh-icon.vue';
-import { ElTable, ElTableColumn, ElButton } from 'element-plus';
+import { ElTable, ElTableColumn, ElButton, ElDescriptions, ElDescriptionsItem } from 'element-plus';
 import { $api } from '../../lib/api/index';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
@@ -15,6 +15,7 @@ const props = defineProps({
 });
 
 const substances = ref(null);
+const storage = ref(null);
 const isLoading = ref(false);
 
 async function setSubstances(id) {
@@ -23,23 +24,22 @@ async function setSubstances(id) {
 		const query = { options: { location: id } };
 		const data = await $api.substances.fetchSubstances(query);
 
-		const substancesWithStorageInfo = await Promise.all(
-			data.substances.map(async substance => {
-				if (substance?.storageLocationId) {
-					const storageId = substance.storageLocationId;
-					const storageInfo = await $api.storages.fetchStorage(storageId);
-					return {
-						...substance,
-						storageLocationName: storageInfo.name
-					};
-				}
-				return substance;
-			})
-		);
-
-		substances.value = substancesWithStorageInfo;
+		substances.value = data.substances;
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error viewing substances content');
+	} finally {
+		isLoading.value = false;
+	}
+}
+
+async function fetchStorage(id) {
+	isLoading.value = true;
+	try {
+		const data = await $api.storages.fetchStorage(id);
+		console.log(data);
+		storage.value = data;
+	} catch (error) {
+		$notifyUserAboutError(error.message || 'Error getting storage location');
 	} finally {
 		isLoading.value = false;
 	}
@@ -88,18 +88,23 @@ const deleteSubstance = async row => {
 
 onMounted(() => {
 	setSubstances(props.id);
+	fetchStorage(props.id);
 });
 </script>
 
 <template>
-	<div class="substances-table">
+	<div class="storage-content-table">
+		<el-descriptions v-if="storage" column="1" border>
+			<el-descriptions-item label="Room">{{ storage.room }}</el-descriptions-item>
+			<el-descriptions-item label="Name">{{ storage.name }}</el-descriptions-item>
+			<el-descriptions-item label="Description">{{ storage.description }}</el-descriptions-item>
+		</el-descriptions>
 		<el-table v-loading="isLoading" :data="substances" @row-click="viewSubstance">
 			<el-table-column prop="name" label="Name" />
 			<el-table-column prop="category" label="Category" />
 			<el-table-column prop="structure" label="Structure" />
 			<el-table-column prop="description" label="Description" />
 			<el-table-column prop="quantityLeft" label="Quantity Left" />
-			<el-table-column prop="storageLocationName" label="Storage Location" />
 			<el-table-column width="80">
 				<template #default="{ row }">
 					<el-button @click.stop="() => editSubstance(row)">
@@ -119,7 +124,10 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.substances-table {
+.storage-content-table {
+	display: flex;
+	flex-direction: column;
+	gap: 30px;
 	margin-top: 20px;
 }
 
