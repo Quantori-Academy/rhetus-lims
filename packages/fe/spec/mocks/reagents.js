@@ -165,7 +165,6 @@ export const reagentsHandlers = [
 
 	http.post(api('/reagents'), async ({ request }) => {
 		const reagent = await request.json();
-		console.log(reagent);
 		reagentDetails.push(reagent);
 		return HttpResponse.json({
 			status: 'success',

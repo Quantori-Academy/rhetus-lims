@@ -7,8 +7,7 @@ import {
 	ElSelect,
 	ElOption,
 	ElDatePicker,
-	ElInputNumber,
-	ElOptionGroup
+	ElInputNumber
 } from 'element-plus';
 import { $notifyUserAboutError, $notify } from '../../lib/utils/feedback/notify-msg';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg.js/';
@@ -186,10 +185,14 @@ const deleteReagent = async () => {
 					v-model="reagent.storageLocationId"
 					:disabled="!isEdit"
 					:placeholder="reagent && storageDisplayValue"
+					filterable
 				>
-					<el-option-group v-for="storage of storages" :key="storage.id" :label="storage.room">
-						<el-option :key="storage.id" :label="storage.name" :value="storage.id" />
-					</el-option-group>
+					<el-option
+						v-for="storage of storages"
+						:key="storage.id"
+						:label="`${storage.room} - ${storage.name}`"
+						:value="storage.id"
+					/>
 				</el-select>
 			</el-form-item>
 			<el-form-item label="Quantity left" prop="quantityLeft">

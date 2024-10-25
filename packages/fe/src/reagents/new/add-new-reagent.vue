@@ -8,8 +8,7 @@ import {
 	ElFormItem,
 	ElInputNumber,
 	ElSelect,
-	ElOption,
-	ElOptionGroup
+	ElOption
 } from 'element-plus';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
 import { $router } from '../../lib/router/router';
@@ -135,15 +134,14 @@ async function setStorages() {
 					v-model="form.storageLocationId"
 					placeholder="Select storage location"
 					:loading="isLoading"
+					filterable
 				>
-					<el-option-group
+					<el-option
 						v-for="storage of storages"
 						:key="storage.id"
-						:label="storage.room"
+						:label="`${storage.room} - ${storage.name}`"
 						:value="storage.id"
-					>
-						<el-option :key="storage.id" :label="storage.name" :value="storage.id" />
-					</el-option-group>
+					/>
 				</el-select>
 			</el-form-item>
 			<el-form-item label="Description" prop="description">
