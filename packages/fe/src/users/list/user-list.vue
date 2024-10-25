@@ -9,6 +9,7 @@ import { formatDate } from '../../lib/utils/datetime/date-format.js';
 import { $router } from '../../lib/router/router.js';
 import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
 import UsersFilters from '../users-filters.vue';
+import { debounce } from '../../lib/utils/debounce/debounce.js';
 
 const users = ref([]);
 const isLoading = ref(false);
@@ -60,7 +61,7 @@ const deleteUser = async id => {
 	}
 };
 
-async function setUsers() {
+const setUsers = debounce(async () => {
 	isLoading.value = true;
 	try {
 		const data = await $api.users.fetchUsers(filters.value);
@@ -70,7 +71,7 @@ async function setUsers() {
 	} finally {
 		isLoading.value = false;
 	}
-}
+}, 200);
 
 watch(
 	filters,

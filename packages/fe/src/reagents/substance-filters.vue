@@ -2,20 +2,9 @@
 import { ElInput, ElInputNumber } from 'element-plus';
 import RhIcon from '../lib/components/rh-icon.vue';
 import FilterItem from '../lib/components/rh-filters/filter-item.vue';
-import { ref, watch } from 'vue';
+import { defineModel } from 'vue';
 
-const filters = ref({
-	name: '',
-	quantity: null
-});
-const emit = defineEmits(['update:filters']);
-watch(
-	filters,
-	newFilters => {
-		emit('update:filters', newFilters);
-	},
-	{ deep: true }
-);
+const filters = defineModel('filters', { type: Object });
 </script>
 
 <template>

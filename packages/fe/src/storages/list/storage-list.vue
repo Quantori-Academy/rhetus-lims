@@ -8,6 +8,7 @@ import { $router } from '../../lib/router/router.js';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
 import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
 import StorageFilters from '../storage-filters.vue';
+import { debounce } from '../../lib/utils/debounce/debounce.js';
 
 const storages = ref([]);
 const isLoading = ref(false);
@@ -59,7 +60,7 @@ async function deleteStorageLocation(id) {
 	}
 }
 
-async function setStorages() {
+const setStorages = debounce(async () => {
 	isLoading.value = true;
 	try {
 		const data = await $api.storages.fetchStorages(filters.value);
@@ -69,7 +70,7 @@ async function setStorages() {
 	} finally {
 		isLoading.value = false;
 	}
-}
+}, 200);
 
 watch(
 	filters,

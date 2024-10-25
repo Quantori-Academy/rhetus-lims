@@ -8,6 +8,7 @@ import { $confirm } from '../../lib/utils/feedback/confirm-msg';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
 import SubstanceFilters from '../substance-filters.vue';
+import { debounce } from '../../lib/utils/debounce/debounce.js';
 
 const reagents = ref(null);
 const isLoading = ref(false);
@@ -66,22 +67,22 @@ const deleteSubstance = async row => {
 	}
 };
 
-async function setReagents(event = null) {
+const setReagents = debounce(async (event = null) => {
 	isLoading.value = true;
 	let query = createQuery(event);
 	const options = {
-		...query,
+		sort: { name: 'desc' },
 		...filters.value
 	};
 	try {
-		const data = await $api.reagents.fetchReagents(options);
+		const data = await $api.reagents.fetchReagents(query.sort, options);
 		reagents.value = data.items;
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
 		isLoading.value = false;
 	}
-}
+}, 200);
 
 function createQuery(event) {
 	let query = {};
