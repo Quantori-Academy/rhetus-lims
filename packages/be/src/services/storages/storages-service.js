@@ -52,7 +52,21 @@ async function storagesService(server) {
 					id: schema.storages.id,
 					name: schema.storages.name,
 					room: schema.storages.room,
-					description: schema.storages.description
+					description: schema.storages.description,
+					isEmpty: and(
+						notExists(
+							server.db
+								.select({ id: schema.reagents.id })
+								.from(schema.reagents)
+								.where(eq(schema.reagents.storageId, schema.storages.id))
+						),
+						notExists(
+							server.db
+								.select({ id: schema.samples.id })
+								.from(schema.samples)
+								.where(eq(schema.samples.storageId, schema.storages.id))
+						)
+					).as('isEmpty')
 				})
 				.from(schema.storages)
 				.where(eq(schema.storages.deleted, false));

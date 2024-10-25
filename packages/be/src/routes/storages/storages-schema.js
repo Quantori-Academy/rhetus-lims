@@ -24,7 +24,10 @@ const getStorages = {
 	security: [{ Session: [] }],
 	response: {
 		200: S.object()
-			.prop('storages', S.array().items(Storage.without(['createdAt'])))
+			.prop(
+				'storages',
+				S.array().items(Storage.without(['createdAt']).prop('isEmpty', S.boolean().required()))
+			)
 			.prop('count', S.number()),
 		500: statusMessage
 	}
