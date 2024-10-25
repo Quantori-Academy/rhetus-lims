@@ -34,7 +34,7 @@ const getStorage = {
 	security: [{ Session: [] }],
 	params: S.object().prop('id', S.string()),
 	response: {
-		200: Storage.without(['createdAt']),
+		200: Storage.without(['createdAt']).prop('isEmpty', S.boolean().required()),
 		404: statusMessage,
 		500: statusMessage
 	}

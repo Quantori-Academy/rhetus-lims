@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm';
+import { and, eq, notExists } from 'drizzle-orm';
 import { schema } from '../../lib/db/schema/index.js';
 import { generateFilterSubquery } from '../../lib/utils/db/filter-subquery-generator.js';
 import { generateOrderSubquery } from '../../lib/utils/db/order-subquery-generator.js';
@@ -75,7 +75,26 @@ async function storagesService(server) {
 
 		getStorageById: async id => {
 			const result = await server.db
-				.select()
+				.select({
+					id: schema.storages.id,
+					room: schema.storages.room,
+					name: schema.storages.name,
+					description: schema.storages.description,
+					isEmpty: and(
+						notExists(
+							server.db
+								.select({ id: schema.reagents.id })
+								.from(schema.reagents)
+								.where(eq(schema.reagents.storageId, schema.storages.id))
+						),
+						notExists(
+							server.db
+								.select({ id: schema.samples.id })
+								.from(schema.samples)
+								.where(eq(schema.samples.storageId, schema.storages.id))
+						)
+					).as('isEmpty')
+				})
 				.from(schema.storages)
 				.where(and(eq(schema.storages.id, id), eq(schema.storages.deleted, false)));
 			return result[0];
