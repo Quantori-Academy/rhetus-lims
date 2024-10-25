@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { ElTable, ElTableColumn, ElButton } from 'element-plus';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { $api } from '../../lib/api/index.js';
@@ -7,9 +7,16 @@ import { $confirm } from '../../lib/utils/feedback/confirm-msg';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { formatDate } from '../../lib/utils/datetime/date-format.js';
 import { $router } from '../../lib/router/router.js';
+import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
+import UsersFilters from '../users-filters.vue';
+import { debounce } from '../../lib/utils/debounce/debounce.js';
 
 const users = ref([]);
 const isLoading = ref(false);
+const filters = ref({
+	role: '',
+	date: null
+});
 
 function addNewUser() {
 	$router.push({ name: 'new-user' });
@@ -54,17 +61,25 @@ const deleteUser = async id => {
 	}
 };
 
-async function setUsers() {
+const setUsers = debounce(async () => {
 	isLoading.value = true;
 	try {
-		const data = await $api.users.fetchUsers();
-		users.value = data.users;
+		const data = await $api.users.fetchUsers(filters.value);
+		users.value = data.items;
 	} catch (error) {
 		$notifyUserAboutError(error);
+	} finally {
+		isLoading.value = false;
 	}
+}, 200);
 
-	isLoading.value = false;
-}
+watch(
+	filters,
+	() => {
+		setUsers();
+	},
+	{ deep: true }
+);
 
 onMounted(() => {
 	setUsers();
@@ -72,8 +87,16 @@ onMounted(() => {
 </script>
 
 <template>
-	<div>
-		<el-button class="add-button" type="primary" @click="addNewUser">Add New User</el-button>
+	<div class="user-table">
+		<rh-filters>
+			<template #action-buttons>
+				<el-button type="primary" @click="addNewUser">Add New User</el-button>
+			</template>
+
+			<template #filters>
+				<users-filters v-model:filters="filters" />
+			</template>
+		</rh-filters>
 
 		<el-table v-loading="isLoading" :data="users">
 			<el-table-column prop="username" min-width="150" label="User name" />
@@ -114,8 +137,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.add-button {
+.user-table {
 	margin-top: 20px;
-	margin-bottom: 20px;
 }
 </style>

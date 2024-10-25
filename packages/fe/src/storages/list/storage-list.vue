@@ -1,14 +1,21 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { ElTable, ElTableColumn, ElButton } from 'element-plus';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { $api } from '../../lib/api/index.js';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $router } from '../../lib/router/router.js';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
+import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
+import StorageFilters from '../storage-filters.vue';
+import { debounce } from '../../lib/utils/debounce/debounce.js';
 
 const storages = ref([]);
 const isLoading = ref(false);
+const filters = ref({
+	room: '',
+	name: ''
+});
 
 function addNewStorageLocation() {
 	$router.push({ name: 'new-storage' });
@@ -53,17 +60,25 @@ async function deleteStorageLocation(id) {
 	}
 }
 
-async function setStorages() {
+const setStorages = debounce(async () => {
 	isLoading.value = true;
 	try {
-		const data = await $api.storages.fetchStorages();
+		const data = await $api.storages.fetchStorages(filters.value);
 		storages.value = data.storages;
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
 		isLoading.value = false;
 	}
-}
+}, 200);
+
+watch(
+	filters,
+	() => {
+		setStorages();
+	},
+	{ deep: true }
+);
 
 onMounted(() => {
 	setStorages();
@@ -71,10 +86,19 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="wrapper">
-		<el-button class="add-button" type="primary" @click="addNewStorageLocation"
-			>Add New Storage Location</el-button
-		>
+	<div class="storages-table">
+		<rh-filters>
+			<template #action-buttons>
+				<el-button type="primary" @click="addNewStorageLocation">
+					Add New Storage Location
+				</el-button>
+			</template>
+
+			<template #filters>
+				<storage-filters v-model:filters="filters" />
+			</template>
+		</rh-filters>
+
 		<el-table v-loading="isLoading" :data="storages">
 			<el-table-column prop="room" min-width="150" label="Room" />
 			<el-table-column prop="name" min-width="150" label="Name" />
@@ -103,8 +127,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.add-button {
-	margin: 20px 0;
+.storages-table {
 	margin-top: 20px;
 }
 </style>

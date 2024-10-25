@@ -113,9 +113,32 @@ function findLocationByValue({ shelf, cabinet, room }) {
 			location.room.toLowerCase() === room.trim().toLowerCase()
 	);
 }
+function filterReagents(parsedOptions) {
+	const filteredReagents = reagents.filter(reagent => {
+		let matchesName = true;
+		let matchesQuantity = true;
+		if (parsedOptions.name) {
+			matchesName = reagent.name.toLowerCase().includes(parsedOptions.name);
+		}
+		if (parsedOptions.quantity) {
+			matchesQuantity = parseInt(reagent.quantityLeft) === parsedOptions.quantity;
+		}
+		return matchesName && matchesQuantity;
+	});
+	return HttpResponse.json({
+		items: filteredReagents
+	});
+}
 export const reagentsHandlers = [
-	http.get(api('/reagents'), () => {
-		return HttpResponse.json(reagents);
+	http.get(api('/reagents'), req => {
+		const url = new URL(req.request.url);
+		const options = url.searchParams.get('options');
+		const parsedOptions = JSON.parse(options);
+		if (parsedOptions === null) {
+			return HttpResponse.json(reagents);
+		} else {
+			return filterReagents(parsedOptions);
+		}
 	}),
 	http.get(api('/substances'), req => {
 		const requestUrl = req.request.url;

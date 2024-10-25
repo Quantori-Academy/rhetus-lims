@@ -1,14 +1,21 @@
 <script setup>
 import RhIcon from '../../lib/components/rh-icon.vue';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { ElTable, ElTableColumn, ElButton } from 'element-plus';
 import { $router } from '../../lib/router/router.js';
 import { $api } from '../../lib/api/index.js';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
+import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
+import SubstanceFilters from '../substance-filters.vue';
+import { debounce } from '../../lib/utils/debounce/debounce.js';
 
 const reagents = ref(null);
 const isLoading = ref(false);
+const filters = ref({
+	name: '',
+	quantity: null
+});
 
 function addNewReagent() {
 	$router.push({ name: 'new-reagent' });
@@ -60,18 +67,22 @@ const deleteSubstance = async row => {
 	}
 };
 
-async function setReagents(event = null) {
+const setReagents = debounce(async (event = null) => {
 	isLoading.value = true;
 	let query = createQuery(event);
+	const options = {
+		sort: { name: 'desc' },
+		...filters.value
+	};
 	try {
-		const response = await $api.substances.fetchSubstances(query);
-		reagents.value = response.substances;
+		const data = await $api.reagents.fetchReagents(query.sort, options);
+		reagents.value = data.items;
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
 		isLoading.value = false;
 	}
-}
+}, 200);
 
 function createQuery(event) {
 	let query = {};
@@ -82,6 +93,14 @@ function createQuery(event) {
 	return query;
 }
 
+watch(
+	filters,
+	() => {
+		setReagents();
+	},
+	{ deep: true }
+);
+
 onMounted(() => {
 	setReagents();
 });
@@ -89,10 +108,17 @@ onMounted(() => {
 
 <template>
 	<div class="reagent-table">
-		<div class="top-buttons">
-			<el-button type="primary" @click="addNewReagent">Add New Reagent</el-button>
-			<el-button type="primary" @click="addNewSample">Add New Sample</el-button>
-		</div>
+		<rh-filters>
+			<template #action-buttons>
+				<el-button type="primary" @click="addNewReagent">Add New Reagent</el-button>
+				<el-button type="primary" @click="addNewSample">Add New Sample</el-button>
+			</template>
+
+			<template #filters>
+				<substance-filters v-model:filters="filters" />
+			</template>
+		</rh-filters>
+
 		<el-table
 			v-loading="isLoading"
 			:data="reagents"
