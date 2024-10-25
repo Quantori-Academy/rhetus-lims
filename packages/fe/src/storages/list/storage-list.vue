@@ -118,7 +118,7 @@ onMounted(() => {
 			<el-table-column width="80">
 				<template #default="{ row }">
 					<el-tooltip
-						v-if="!row.isEmpty"
+						:disabled="row.isEmpty"
 						content="Can't delete, storage is not empty."
 						placement="top"
 					>
@@ -130,9 +130,6 @@ onMounted(() => {
 							<rh-icon color="white" name="trash" />
 						</el-button>
 					</el-tooltip>
-					<el-button v-else type="danger" @click="() => deleteStorageLocation(row.id)">
-						<rh-icon color="white" name="trash" />
-					</el-button>
 				</template>
 			</el-table-column>
 		</el-table>
