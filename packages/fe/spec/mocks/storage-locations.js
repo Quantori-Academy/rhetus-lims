@@ -7,15 +7,23 @@ const storageInfo = {
 			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',
 			room: 'Building 1, Room 12',
 			name: 'Cabinet 1, shelf 3',
-			description: 'This storage is located near the pool'
+			description: 'This storage is located near the pool',
+			isEmpty: false
 		},
 		{
 			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b93f5g6d6d4g6g',
 			room: 'Building 2, Room 23',
-			name: 'Cabinet 2, shelf 4'
+			name: 'Cabinet 2, shelf 4',
+			isEmpty: false
+		},
+		{
+			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3bunidabistded',
+			room: 'Walk-in freezer',
+			name: 'Cabinet 1, shelf 5',
+			isEmpty: true
 		}
 	],
-	count: 1
+	count: 3
 };
 
 function filterStorages(parsedOptions) {
