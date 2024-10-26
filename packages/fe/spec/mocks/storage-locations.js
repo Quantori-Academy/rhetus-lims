@@ -64,7 +64,6 @@ export const storageLocationHandlers = [
 	}),
 	http.post(api('/storages'), async ({ request }) => {
 		const storage = await request.json();
-		console.log(storage)
 		storageInfo.storages.push(storage);
 		return HttpResponse.json({
 			status: 'success',
