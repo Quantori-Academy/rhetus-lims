@@ -23,8 +23,4 @@ const filters = defineModel('filters', { type: Object });
 	</div>
 </template>
 
-<style scoped>
-::v-deep .el-input-number {
-	width: 300px;
-}
-</style>
+<style scoped></style>
