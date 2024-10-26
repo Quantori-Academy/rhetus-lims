@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw';
 import { api } from './api-url.js';
 import { samples } from './samples.js';
 
-const reagents = [
+export const reagents = [
 	{
 		id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d',
 		name: 'Sodium Chloride',
@@ -124,26 +124,6 @@ export const reagentsHandlers = [
 			return filterReagents(parsedOptions);
 		}
 	}),
-	http.get(api('/substances'), req => {
-		const requestUrl = req.request.url;
-		const url = new URL(requestUrl);
-		const productIds = url.searchParams.get('sort');
-		console.log(productIds);
-
-		const options = url.searchParams.get('options');
-		const parsedOptions = JSON.parse(options);
-		const storageId = parsedOptions?.location;
-		if (storageId) {
-			const filteredSubstances = substances.filter(
-				substance => substance.storageLocationId === storageId
-			);
-			return HttpResponse.json({
-				substances: filteredSubstances,
-				count: filteredSubstances.length
-			});
-		}
-		return HttpResponse.json({ substances, count: substances.length });
-	}),
 	http.delete(api('/reagents/:id'), async ({ params }) => {
 		const { id } = params;
 		const reagentIndex = reagents.findIndex(reagent => reagent.id === id);
@@ -211,25 +191,5 @@ export const reagentsHandlers = [
 		}
 
 		return HttpResponse.json({ status: 'success', message: 'Updated substance quantity' });
-	}),
-
-	http.patch(api('/substances/:id'), async ({ request, params }) => {
-		const { id } = params;
-		const body = await request.json();
-		const { storageId, category } = body;
-		const substance = substances.find(substance => substance.id === id);
-		if (!substance) return HttpResponse.json({ message: 'Substance not found' }, { status: 404 });
-
-		substance.storageLocationId = storageId;
-
-		if (category.toLowerCase() === 'reagent') {
-			const reagent = reagents.find(x => x.id === id);
-			reagent.storageLocationId = storageId;
-		} else {
-			const sample = samples.find(x => x.id === id);
-			sample.storageLocation = storageId;
-		}
-
-		return HttpResponse.json({ status: 'success', message: 'Updated substance storage' });
 	})
 ];
