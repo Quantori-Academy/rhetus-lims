@@ -167,7 +167,10 @@ export const routes = [
 		path: '/storages/:id',
 		name: 'storage-content',
 		component: () => import('../../storages/view-content/storage-content.vue'),
-		props: true
+		props: true,
+		meta: {
+			title: 'Storage content'
+		}
 	},
 	{
 		path: '/storages/edit/:id',
