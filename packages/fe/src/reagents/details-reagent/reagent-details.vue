@@ -185,11 +185,12 @@ const deleteReagent = async () => {
 					v-model="reagent.storageLocationId"
 					:disabled="!isEdit"
 					:placeholder="reagent && storageDisplayValue"
+					filterable
 				>
 					<el-option
 						v-for="storage of storages"
 						:key="storage.id"
-						:label="storage.name"
+						:label="`${storage.room} - ${storage.name}`"
 						:value="storage.id"
 					/>
 				</el-select>

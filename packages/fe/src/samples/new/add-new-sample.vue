@@ -181,11 +181,11 @@ onMounted(() => {
 			</el-form-item>
 
 			<el-form-item label="Storage location" prop="storageId">
-				<el-select v-model="form.storageId" placeholder="Select storage location">
+				<el-select v-model="form.storageId" filterable placeholder="Select storage location">
 					<el-option
 						v-for="storage of storages"
 						:key="storage.id"
-						:label="storage.name"
+						:label="`${storage.room} - ${storage.name}`"
 						:value="storage.id"
 					/>
 				</el-select>

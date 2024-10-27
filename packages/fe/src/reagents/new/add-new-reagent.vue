@@ -62,7 +62,6 @@ async function submit() {
 			...form.value,
 			quantityLeft: form.value.quantity
 		});
-
 		$notify({ message: response.message, type: 'success' });
 		$router.push({ name: 'reagents-list' });
 	} catch (error) {
@@ -135,11 +134,12 @@ async function setStorages() {
 					v-model="form.storageLocationId"
 					placeholder="Select storage location"
 					:loading="isLoading"
+					filterable
 				>
 					<el-option
 						v-for="storage of storages"
 						:key="storage.id"
-						:label="storage.name"
+						:label="`${storage.room} - ${storage.name}`"
 						:value="storage.id"
 					/>
 				</el-select>
