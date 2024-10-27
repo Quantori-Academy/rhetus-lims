@@ -37,35 +37,82 @@ async function passwordResetRequests(server, options) {
 
 	server.route({
 		method: 'PATCH',
-		path: options.prefix + 'confirm-password-reset',
+		path: options.prefix + 'set-temporary-password/:id',
 		preValidation: [server.authenticate, server.administrator],
-		schema: schema.confirmRequest,
-		handler: onConfirmRequest
+		schema: schema.setTemporaryPassword,
+		handler: onSetTemporaryPassword
 	});
 
-	async function onConfirmRequest(req, reply) {
+	async function onSetTemporaryPassword(req, reply) {
 		try {
-			const { username } = req.body;
-			const user = await server.usersService.getUserByUsername(req.body.username);
+			const userId = req.params.id;
+			const user = await server.usersService.getUserById(userId);
 
 			if (!user) {
-				return reply
-					.code(400)
-					.send({ status: 'error', message: `User '${req.body.username}' not found.` });
+				return reply.code(400).send({ status: 'error', message: `User not found.` });
 			}
 
 			if (user.passwordResetStatus !== Status.ACTIVE) {
 				return reply.code(400).send({
 					status: 'error',
-					message: `User '${req.body.username}' does not have an active request.`
+					message: `User '${user.username}' does not have an active request.`
 				});
 			}
 
-			await server.usersService.updateUser(user.id, { passwordResetStatus: Status.CONFIRMED });
+			const { password } = req.body;
+
+			await server.usersService.updateUser(user.id, {
+				passwordResetStatus: Status.CONFIRMED,
+				temporaryPassword: password
+			});
 
 			return reply.code(200).send({
 				status: 'success',
-				message: `Password reset request confirmed for '${username}'.`
+				message: `Temporary password set for ${user.username}.`
+			});
+		} catch (err) {
+			server.log.error(err);
+			return reply
+				.code(500)
+				.send({ status: 'error', message: 'Oops! Something went wrong. Try again later.' });
+		}
+	}
+
+	server.route({
+		method: 'PATCH',
+		path: options.prefix + 'reset-password',
+		preValidation: [server.authenticate],
+		schema: schema.resetPassword,
+		handler: onResetPassword
+	});
+
+	async function onResetPassword(req, reply) {
+		try {
+			const userId = req.session.user.id;
+			const user = await server.usersService.getUserById(userId);
+
+			if (!user) {
+				return reply.code(400).send({ status: 'error', message: `User not found.` });
+			}
+
+			if (user.passwordResetStatus !== Status.CONFIRMED) {
+				return reply.code(400).send({
+					status: 'error',
+					message: `You should request a password reset and have it confirmed by an admin.`
+				});
+			}
+
+			const { password } = req.body;
+
+			await server.usersService.updateUser(user.id, {
+				password,
+				passwordResetStatus: Status.NONE,
+				temporaryPassword: null
+			});
+
+			return reply.code(200).send({
+				status: 'success',
+				message: `Password was reset.`
 			});
 		} catch (err) {
 			server.log.error(err);

@@ -29,5 +29,6 @@ export const users = pgTable('users', {
 	lastLogin: timestamp('last_login'),
 	createdAt: timestamp('created_at').notNull().defaultNow(),
 	passwordResetStatus: passwordResetStatusEnum('password_reset_status').default('none'),
+	temporaryPassword: text('temporary_password'),
 	deleted: boolean('deleted').notNull().default(false)
 });

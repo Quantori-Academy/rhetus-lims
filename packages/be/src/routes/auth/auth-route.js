@@ -10,6 +10,7 @@ async function auth(server, options) {
 		schema: schema.login,
 		handler: onLogin
 	});
+
 	async function onLogin(req, reply) {
 		try {
 			const { username, password } = req.body;
@@ -20,28 +21,29 @@ async function auth(server, options) {
 				return reply.code(400).send({ status: 'success', message: 'User not found.' });
 			}
 
-			const isPasswordValid = await bcrypt.compare(password, user.password);
+			const shouldUseTempPassword = user.passwordResetStatus === Status.CONFIRMED;
+			const isPasswordValid = await bcrypt.compare(
+				password,
+				shouldUseTempPassword ? user.temporaryPassword : user.password
+			);
 
-			// require a valid password only when the user doesn't have a confirmed reset request
-			if (user.passwordResetStatus !== Status.CONFIRMED && !isPasswordValid) {
-				return reply.code(401).send({ status: 'error', message: 'Invalid credentials.' });
+			if (!isPasswordValid) {
+				return reply.code(401).send({
+					status: 'error',
+					message: 'Invalid password.'
+				});
 			}
-
-			let message = 'Successfully logged in.';
-			const dataToUpdate = {};
-
-			if (user.passwordResetStatus === Status.CONFIRMED) {
-				dataToUpdate.password = password;
-				dataToUpdate.passwordResetStatus = Status.NONE;
-
-				message = 'Your password has been reset.';
-			}
-
-			await server.usersService.updateUser(user.id, { ...dataToUpdate, lastLogin: new Date() });
 
 			req.session.user = { id: user.id };
 
-			return reply.code(200).send({ status: 'success', message });
+			await server.usersService.updateUser(user.id, { lastLogin: new Date() });
+
+			return reply.code(200).send({
+				status: 'success',
+				message: shouldUseTempPassword
+					? 'Logged in with temporary password. Please reset it.'
+					: 'Successfully logged in'
+			});
 		} catch (err) {
 			server.log.error(err);
 			return reply
