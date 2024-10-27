@@ -14,12 +14,10 @@ async function passwordResetRequests(server, options) {
 	async function onRequestPasswordReset(req, reply) {
 		try {
 			const { username } = req.body;
-			const user = await server.usersService.getUserByUsername(req.body.username);
+			const user = await server.usersService.getUserByUsername(username);
 
 			if (!user) {
-				return reply
-					.code(400)
-					.send({ status: 'error', message: `User '${req.body.username}' not found.` });
+				return reply.code(400).send({ status: 'error', message: `User '${username}' not found.` });
 			}
 
 			await server.usersService.updateUser(user.id, { passwordResetStatus: Status.ACTIVE });
