@@ -9,7 +9,6 @@ function goHome() {
 function signIn() {
 	$router.push({ name: 'login' });
 }
-
 </script>
 
 <template>
@@ -31,14 +30,14 @@ function signIn() {
 .error-page {
 	display: flex;
 	justify-content: center;
+	padding-top: 30px;
 	height: 100vh;
 	text-align: center;
-	padding-top: 30px;
 }
 
 h1 {
-	font-size: 25px;
 	padding: 2px;
+	font-size: 25px;
 }
 
 .error-content {
@@ -47,8 +46,8 @@ h1 {
 
 p {
 	margin: 10x 0;
-	font-size: 15px;
 	padding: 2px;
+	font-size: 15px;
 }
 
 .logo-container {
