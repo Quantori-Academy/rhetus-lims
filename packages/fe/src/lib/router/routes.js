@@ -165,17 +165,17 @@ export const routes = [
 	},
 	{
 		path: '/storages/:id',
-		name: 'storage-content',
-		component: () => import('../../storages/view-content/storage-content.vue'),
+		name: 'storage-details',
+		component: () => import('../../storages/details/storage-details.vue'),
 		props: true,
 		meta: {
-			title: 'Storage content'
+			title: 'Storage Details'
 		}
 	},
 	{
 		path: '/storages/edit/:id',
 		name: 'edit-storage',
-		component: () => import('../../storages/edit/storage-edit.vue'),
+		component: () => import('../../storages/details/storage-details.vue'),
 		props: true,
 		meta: {
 			roles: [roles.ADMIN],
