@@ -1,5 +1,4 @@
 import LoginLayout from './layout/login-layout.vue';
-import ErrorLayout from './layout/error-layout.vue';
 import { roles } from '../constants/roles.js';
 
 export const routes = [
@@ -237,8 +236,12 @@ export const routes = [
 		name: '404',
 		component: () => import('../../error-page/404-page.vue'),
 		meta: {
-			layout: ErrorLayout,
+			layout: LoginLayout,
 			title: 'Page Not Found'
 		}
+	},
+	{
+		path: '/:catchAll(.*)',
+		redirect: { name: '404' }
 	}
 ];
