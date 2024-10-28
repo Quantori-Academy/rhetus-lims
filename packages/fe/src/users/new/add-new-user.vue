@@ -77,7 +77,7 @@ const cancelHandler = () => {
 </script>
 
 <template>
-	<el-form ref="form-ref" :rules="rules" label-position="top" :model="form">
+	<el-form ref="form-ref" :rules="rules" label-position="top" :model="form" class="form-container">
 		<el-form-item label="Username" prop="username">
 			<el-input v-model="form.username" placeholder="Enter username"></el-input>
 		</el-form-item>
@@ -108,7 +108,25 @@ const cancelHandler = () => {
 				></el-option>
 			</el-select>
 		</el-form-item>
-		<el-button @click="cancelHandler">Cancel Creation </el-button>
-		<el-button :loading="isSaving" type="primary" @click="addUser">Add User</el-button>
+		<div class="align-end">
+			<el-button @click="cancelHandler">Cancel</el-button>
+			<el-button :loading="isSaving" type="primary" @click="addUser">Add User</el-button>
+		</div>
 	</el-form>
 </template>
+
+<style scoped>
+.form-container {
+	margin: 0 15px;
+	margin-top: 20px;
+	width: 500px;
+}
+.align-end {
+	text-align: end;
+}
+@media (max-width: 520px) {
+	.el-form {
+		width: 220px;
+	}
+}
+</style>
