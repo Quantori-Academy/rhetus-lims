@@ -104,7 +104,7 @@ onMounted(() => {
 			<el-table-column prop="description" min-width="200" label="Description" />
 			<el-table-column width="80">
 				<template #default="{ row }">
-					<el-button @click="() => editStorageLocation(row.id)"
+					<el-button @click.stop="() => editStorageLocation(row.id)"
 						><rh-icon name="pencil"
 					/></el-button>
 				</template>
@@ -119,7 +119,7 @@ onMounted(() => {
 						<el-button
 							type="danger"
 							:disabled="!row.isEmpty"
-							@click="() => deleteStorageLocation(row.id)"
+							@click.stop="() => deleteStorageLocation(row.id)"
 						>
 							<rh-icon color="white" name="trash" />
 						</el-button>
