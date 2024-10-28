@@ -128,11 +128,6 @@ onMounted(() => {
 .profile {
 	margin: 0 15px;
 	margin-top: 20px;
-
-	h1 {
-		margin-bottom: 1rem;
-		color: #080808;
-	}
 }
 .el-form {
 	width: 500px;

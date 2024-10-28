@@ -228,9 +228,6 @@ const deleteUser = async () => {
 </template>
 
 <style scoped>
-.wrapper {
-	color: black;
-}
 .el-form-item {
 	margin-bottom: 10px;
 }

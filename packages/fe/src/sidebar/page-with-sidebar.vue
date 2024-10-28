@@ -30,10 +30,10 @@ function handleToggle() {
 .page-with-sidebar {
 	--sidebar-width: 256px;
 	--top-bar-height: 48px;
-	--bg-color: var(--color-sidebar-bg);
+	--bg-color: var(--rh-color-neutral-200);
 	--border-color: #05050614;
-	--bg-color-active: var(--color-sidebar-bg-active);
-	--text-color: #38485b;
+	--bg-color-active: var(--rh-color-neutral-450);
+	--text-color: var(--rh-color-primary-900);
 
 	padding-left: 0;
 
