@@ -1,26 +1,24 @@
 <script setup>
-import { ref, onMounted, useTemplateRef } from 'vue';
+import { ref, computed, onMounted, useTemplateRef } from 'vue';
 import { ElForm, ElInput, ElButton, ElFormItem } from 'element-plus';
 import { $api } from '../../lib/api';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
 import { formRules } from '../constants';
+import { $route, $router } from '../../lib/router/router';
 
 const props = defineProps({
 	id: {
 		type: String,
 		default: null
-	},
-	viewMode: {
-		type: Boolean,
-		default: false
 	}
 });
+
 const storage = ref(null);
 const isLoading = ref(false);
 const formEl = useTemplateRef('form-ref');
 const rules = ref(formRules);
-const isViewMode = ref(props.viewMode);
+const isEdit = computed(() => $route.value.name === 'edit-storage');
 
 const setStorage = async id => {
 	isLoading.value = true;
@@ -34,8 +32,13 @@ const setStorage = async id => {
 };
 
 const cancelEdit = () => {
-	isViewMode.value = true;
-	setStorage(props.id);
+	$router.push({ name: 'storage-details', params: { id: storage.value.id } });
+	$notify({
+		title: 'Canceled',
+		message: 'Storage editing canceled',
+		type: 'info'
+	});
+	formEl.value.resetFields();
 };
 
 const handleSubmit = async () => {
@@ -51,14 +54,14 @@ const handleSubmit = async () => {
 			message: response.message,
 			type: 'success'
 		});
-		isViewMode.value = true;
+		$router.push({ name: 'storage-details', params: { id: storage.value.id } });
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating storage');
 	}
 };
 
-const enableEditMode = () => {
-	isViewMode.value = false;
+const toggleEdit = () => {
+	$router.push({ name: 'edit-storage', params: { id: storage.value.id } });
 };
 
 onMounted(() => {
@@ -77,16 +80,16 @@ onMounted(() => {
 			@submit="handleSubmit"
 		>
 			<el-form-item label="Room" prop="room">
-				<el-input v-model="storage.room" :disabled="isViewMode" />
+				<el-input v-model="storage.room" :disabled="!isEdit" />
 			</el-form-item>
 			<el-form-item label="Name" prop="name">
-				<el-input v-model="storage.name" :disabled="isViewMode" />
+				<el-input v-model="storage.name" :disabled="!isEdit" />
 			</el-form-item>
 			<el-form-item label="Description" prop="description">
-				<el-input v-model="storage.description" :disabled="isViewMode" />
+				<el-input v-model="storage.description" :disabled="!isEdit" />
 			</el-form-item>
-			<div v-if="isViewMode">
-				<el-button @click="enableEditMode">Edit</el-button>
+			<div v-if="!isEdit">
+				<el-button @click="toggleEdit">Edit</el-button>
 			</div>
 			<div v-else>
 				<el-button @click="cancelEdit">Cancel</el-button>

@@ -108,15 +108,22 @@ export const routes = [
 	},
 	{
 		path: '/storages/:id',
-		name: 'edit-storage',
+		name: 'storage-details',
 		component: () => import('../../storages/edit/storage-edit.vue'),
-		props: route => ({
-			id: route.params.id,
-			viewMode: route.query.viewMode === 'true'
-		}),
+		props: true,
 		meta: {
 			roles: [roles.ADMIN],
 			title: 'Storage Details'
+		}
+	},
+	{
+		path: '/storages/edit/:id',
+		name: 'edit-storage',
+		component: () => import('../../storages/edit/storage-edit.vue'),
+		props: true,
+		meta: {
+			roles: [roles.ADMIN],
+			title: 'Edit Storage Details'
 		}
 	},
 	{
