@@ -21,9 +21,8 @@ function addNewStorageLocation() {
 	$router.push({ name: 'new-storage' });
 }
 
-function viewStorageLocation(id) {
-	$router.push({ name: 'edit-storage', params: { id } });
-	console.log('view storage info', id);
+function viewStorageLocation(row) {
+	$router.push({ name: 'edit-storage', params: { id: row.id } });
 }
 function editStorageLocation(id) {
 	$router.push({ name: 'edit-storage', params: { id } });
@@ -99,18 +98,13 @@ onMounted(() => {
 			</template>
 		</rh-filters>
 
-		<el-table v-loading="isLoading" :data="storages">
+		<el-table v-loading="isLoading" :data="storages" @row-click="viewStorageLocation">
 			<el-table-column prop="room" min-width="150" label="Room" />
 			<el-table-column prop="name" min-width="150" label="Name" />
 			<el-table-column prop="description" min-width="200" label="Description" />
 			<el-table-column width="80">
 				<template #default="{ row }">
-					<el-button @click="() => viewStorageLocation(row.id)"><rh-icon name="eye" /></el-button>
-				</template>
-			</el-table-column>
-			<el-table-column width="80">
-				<template #default="{ row }">
-					<el-button @click="() => editStorageLocation(row.id)"
+					<el-button @click.stop="() => editStorageLocation(row.id)"
 						><rh-icon name="pencil"
 					/></el-button>
 				</template>
@@ -125,7 +119,7 @@ onMounted(() => {
 						<el-button
 							type="danger"
 							:disabled="!row.isEmpty"
-							@click="() => deleteStorageLocation(row.id)"
+							@click.stop="() => deleteStorageLocation(row.id)"
 						>
 							<rh-icon color="white" name="trash" />
 						</el-button>
@@ -139,5 +133,9 @@ onMounted(() => {
 <style scoped>
 .storages-table {
 	margin-top: 20px;
+}
+
+:deep(.el-table__row):hover {
+	cursor: pointer;
 }
 </style>

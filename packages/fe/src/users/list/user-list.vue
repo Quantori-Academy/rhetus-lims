@@ -22,8 +22,8 @@ function addNewUser() {
 	$router.push({ name: 'new-user' });
 }
 
-function viewUserDetails(id) {
-	$router.push({ name: 'user-details', params: { id } });
+function viewUserDetails(row) {
+	$router.push({ name: 'user-details', params: { id: row.id } });
 }
 
 function editUser(id) {
@@ -98,7 +98,7 @@ onMounted(() => {
 			</template>
 		</rh-filters>
 
-		<el-table v-loading="isLoading" :data="users">
+		<el-table v-loading="isLoading" :data="users" @row-click="viewUserDetails">
 			<el-table-column prop="username" min-width="150" label="User name" />
 			<el-table-column prop="firstName" min-width="150" label="First Name" />
 			<el-table-column prop="lastName" min-width="150" label="Last Name" />
@@ -117,17 +117,12 @@ onMounted(() => {
 			/>
 			<el-table-column width="80">
 				<template #default="{ row }">
-					<el-button @click="() => viewUserDetails(row.id)"><rh-icon name="eye" /></el-button>
+					<el-button @click.stop="() => editUser(row.id)"><rh-icon name="pencil" /></el-button>
 				</template>
 			</el-table-column>
 			<el-table-column width="80">
 				<template #default="{ row }">
-					<el-button @click="() => editUser(row.id)"><rh-icon name="pencil" /></el-button>
-				</template>
-			</el-table-column>
-			<el-table-column width="80">
-				<template #default="{ row }">
-					<el-button type="danger" @click="() => deleteUser(row.id)">
+					<el-button type="danger" @click.stop="() => deleteUser(row.id)">
 						<rh-icon color="white" name="trash" />
 					</el-button>
 				</template>
@@ -139,5 +134,9 @@ onMounted(() => {
 <style scoped>
 .user-table {
 	margin-top: 20px;
+}
+
+:deep(.el-table__row):hover {
+	cursor: pointer;
 }
 </style>
