@@ -169,7 +169,12 @@ export const routes = [
 		component: () => import('../../storages/details/storage-details.vue'),
 		props: true,
 		meta: {
-			title: 'Storage Details'
+			title: 'Storage Details',
+			breadcrumb: route => [
+				{ name: 'Home', path: '/' },
+				{ name: 'Storages', path: '/storages/list' },
+				{ name: `${route.params.id}`, path: '' }
+			]
 		}
 	},
 	{
