@@ -174,7 +174,7 @@ export const routes = [
 	},
 	{
 		path: '/storages/edit/:id',
-		name: 'edit-storage',
+		name: 'storage-details-edit',
 		component: () => import('../../storages/details/storage-details.vue'),
 		props: true,
 		meta: {
