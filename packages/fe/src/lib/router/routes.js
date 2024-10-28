@@ -16,7 +16,11 @@ export const routes = [
 		component: () => import('../../users/list/user-list.vue'),
 		meta: {
 			roles: [roles.ADMIN],
-			title: 'Users List'
+			title: 'Users List',
+			breadcrumb: [
+				{ name: 'Home', path: '/' },
+				{ name: 'Users', path: '/users/list' }
+			]
 		}
 	},
 	{
@@ -25,7 +29,12 @@ export const routes = [
 		component: () => import('../../users/new/add-new-user.vue'),
 		meta: {
 			roles: [roles.ADMIN],
-			title: 'New User'
+			title: 'New User',
+			breadcrumb: [
+				{ name: 'Home', path: '/' },
+				{ name: 'Users', path: '/users/list' },
+				{ name: 'New User', path: '' }
+			]
 		}
 	},
 	{
@@ -51,9 +60,15 @@ export const routes = [
 		props: true,
 		meta: {
 			roles: [roles.ADMIN],
-			title: 'User Details'
+			title: 'User Details',
+			breadcrumb: route => [
+				{ name: 'Home', path: '/' },
+				{ name: 'Users', path: '/users/list' },
+				{ name: `${route.params.id}`, path: '' }
+			]
 		}
 	},
+
 	{
 		path: '/users/:id/edit',
 		name: 'user-details-edit',
@@ -61,7 +76,12 @@ export const routes = [
 		props: true,
 		meta: {
 			roles: [roles.ADMIN],
-			title: 'User Details'
+			title: 'User Details',
+			breadcrumb: route => [
+				{ name: 'Home', path: '/' },
+				{ name: 'Users', path: '/users/list' },
+				{ name: `${route.params.id}`, path: '' }
+			]
 		}
 	},
 	{
@@ -69,7 +89,11 @@ export const routes = [
 		name: 'user-profile',
 		component: () => import('../../profile/user-profile.vue'),
 		meta: {
-			title: 'User Profile'
+			title: 'User Profile',
+			breadcrumb: [
+				{ name: 'Home', path: '/' },
+				{ name: 'Profile', path: '/profile' }
+			]
 		}
 	},
 	{
@@ -77,7 +101,12 @@ export const routes = [
 		name: 'new-sample',
 		component: () => import('../../samples/new/add-new-sample.vue'),
 		meta: {
-			title: 'New Sample'
+			title: 'New Sample',
+			breadcrumb: [
+				{ name: 'Home', path: '/' },
+				{ name: 'Reagents', path: '/reagents/list' },
+				{ name: 'New Sample', path: '' }
+			]
 		}
 	},
 	{
@@ -86,7 +115,12 @@ export const routes = [
 		component: () => import('../../samples/edit/edit-sample.vue'),
 		props: true,
 		meta: {
-			title: 'Sample Details'
+			title: 'Sample Details',
+			breadcrumb: route => [
+				{ name: 'Home', path: '/' },
+				{ name: 'Reagents', path: '/reagents/list' },
+				{ name: `${route.params.id}`, path: '' }
+			]
 		}
 	},
 	{
@@ -95,7 +129,12 @@ export const routes = [
 		component: () => import('../../samples/edit/edit-sample.vue'),
 		props: true,
 		meta: {
-			title: 'Edit Sample Details'
+			title: 'Edit Sample Details',
+			breadcrumb: route => [
+				{ name: 'Home', path: '/' },
+				{ name: 'Reagents', path: '/reagents/list' },
+				{ name: `${route.params.id}`, path: '' }
+			]
 		}
 	},
 	{
@@ -103,7 +142,11 @@ export const routes = [
 		name: 'storages-list',
 		component: () => import('../../storages/list/storage-list.vue'),
 		meta: {
-			title: 'Storages List'
+			title: 'Storages List',
+			breadcrumb: [
+				{ name: 'Home', path: '/' },
+				{ name: 'Storages', path: '/storages/list' }
+			]
 		}
 	},
 	{
@@ -113,7 +156,12 @@ export const routes = [
 		props: true,
 		meta: {
 			roles: [roles.ADMIN],
-			title: 'Edit Storage Details'
+			title: 'Edit Storage Details',
+			breadcrumb: route => [
+				{ name: 'Home', path: '/' },
+				{ name: 'Storages', path: '/storages/list' },
+				{ name: `${route.params.id}`, path: '' }
+			]
 		}
 	},
 	{
@@ -122,7 +170,12 @@ export const routes = [
 		component: () => import('../../storages/add-new/storage-new.vue'),
 		meta: {
 			roles: [roles.ADMIN],
-			title: 'New Storage'
+			title: 'New Storage',
+			breadcrumb: [
+				{ name: 'Home', path: '/' },
+				{ name: 'Storages', path: '/storages/list' },
+				{ name: 'New Storage', path: '' }
+			]
 		}
 	},
 	{
@@ -130,7 +183,11 @@ export const routes = [
 		name: 'reagents-list',
 		component: () => import('../../reagents/list/reagent-list.vue'),
 		meta: {
-			title: 'Reagents List'
+			title: 'Reagents List',
+			breadcrumb: [
+				{ name: 'Home', path: '/' },
+				{ name: 'Reagents', path: '/reagents/list' }
+			]
 		}
 	},
 	{
@@ -139,7 +196,12 @@ export const routes = [
 		component: () => import('../../reagents/details-reagent/reagent-details.vue'),
 		props: true,
 		meta: {
-			title: 'Reagent Details'
+			title: 'Reagent Details',
+			breadcrumb: route => [
+				{ name: 'Home', path: '/' },
+				{ name: 'Reagents', path: '/reagents/list' },
+				{ name: `${route.params.id}`, path: '' }
+			]
 		}
 	},
 	{
@@ -148,7 +210,12 @@ export const routes = [
 		component: () => import('../../reagents/details-reagent/reagent-details.vue'),
 		props: true,
 		meta: {
-			title: 'Edit Reagent Details'
+			title: 'Edit Reagent Details',
+			breadcrumb: route => [
+				{ name: 'Home', path: '/' },
+				{ name: 'Reagents', path: '/reagents/list' },
+				{ name: `${route.params.id}`, path: '' }
+			]
 		}
 	},
 	{
@@ -156,7 +223,12 @@ export const routes = [
 		name: 'new-reagent',
 		component: () => import('../../reagents/new/add-new-reagent.vue'),
 		meta: {
-			title: 'New Reagent'
+			title: 'New Reagent',
+			breadcrumb: [
+				{ name: 'Home', path: '/' },
+				{ name: 'Reagents', path: '/reagents/list' },
+				{ name: 'New Reagent', path: '' }
+			]
 		}
 	}
 ];

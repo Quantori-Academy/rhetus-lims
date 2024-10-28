@@ -63,33 +63,4 @@ function handleCollapse() {
 	width: 100%;
 	min-height: 48px;
 }
-
-.breadcrumb-links-container {
-	display: flex;
-	flex-grow: 1;
-	flex-basis: 0;
-	justify-items: start;
-	align-items: center;
-}
-
-.breadcrumb-links {
-	ol {
-		padding: 0;
-	}
-
-	li {
-		display: inline;
-		list-style: none;
-
-		&::after {
-			content: '/';
-			padding-right: 4px;
-			padding-left: 4px;
-		}
-	}
-
-	.current-page::after {
-		content: '';
-	}
-}
 </style>
