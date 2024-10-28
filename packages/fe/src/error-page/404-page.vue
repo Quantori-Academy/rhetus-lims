@@ -18,8 +18,11 @@ function signIn() {
 				<img width="130" height="130" src="../lib/assets/images/logo.svg" alt="" />
 			</div>
 			<h1>404: Page not found</h1>
-			<p>Make sure the address is correct and the page is not moved.</p>
-			<p>Please contact your administrator if you think this is a mistake.</p>
+			<div class="text-box">
+				<p>Make sure the address is correct and the page is not moved.</p>
+				<p>Please contact your administrator if you think this is a mistake.</p>
+			</div>
+
 			<el-button type="primary" @click="goHome">Go Home</el-button>
 			<el-button type="primary" @click="signIn">Sign in with different account</el-button>
 		</div>
@@ -36,7 +39,7 @@ function signIn() {
 }
 
 h1 {
-	padding: 2px;
+	padding: 15px;
 	font-size: 25px;
 }
 
@@ -48,6 +51,10 @@ p {
 	margin: 10x 0;
 	padding: 2px;
 	font-size: 15px;
+}
+
+.text-box {
+	padding: 10px;
 }
 
 .logo-container {
