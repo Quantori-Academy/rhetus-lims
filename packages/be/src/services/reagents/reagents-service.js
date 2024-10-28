@@ -157,21 +157,13 @@ async function reagentsService(server) {
 				.where(and(eq(schema.reagents.storageId, id), eq(schema.reagents.deleted, false)));
 		},
 		updateReagent: async (id, data) => {
-			const dataForUpdate = Object.fromEntries(
-				Object.entries(data).map(([key, value]) =>
-					!Object.keys(formatMapping).includes(key)
-						? [key, value]
-						: [key, formatMapping[key](value)]
-				)
-			);
+			const { storageId } = data;
 
 			const result = await server.db
 				.update(schema.reagents)
-				.set(dataForUpdate)
+				.set({ storageLocationId: storageId })
 				.where(eq(schema.reagents.id, id))
-				.returning({
-					reagentName: schema.reagents.name
-				});
+				.returning({ reagentName: schema.reagents.name });
 
 			return {
 				code: 200,

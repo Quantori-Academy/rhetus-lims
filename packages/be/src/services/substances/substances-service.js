@@ -56,7 +56,7 @@ async function substancesService(server) {
 		updateSubstance: async (id, data) => {
 			const { code, status, message } =
 				data.category === Category.REAGENT
-					? await server.reagentsService.updateSubstance(id, data)
+					? await server.reagentsService.updateReagent(id, data)
 					: await server.samplesService.changeSampleQuantity(id, data);
 
 			return { code, status, message };
