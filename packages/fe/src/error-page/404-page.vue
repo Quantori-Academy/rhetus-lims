@@ -5,17 +5,24 @@ import { ElButton } from 'element-plus';
 function goHome() {
 	$router.push({ name: 'dashboard' });
 }
+
+function signIn() {
+	$router.push({ name: 'login' });
+}
+
 </script>
 
 <template>
 	<div class="error-page">
 		<div class="error-content">
 			<div class="logo-container">
-				<img width="100" height="100" src="../lib/assets/images/logo.svg" alt="" />
-				<h1>404</h1>
+				<img width="130" height="130" src="../lib/assets/images/logo.svg" alt="" />
 			</div>
-			<p>Oops! The page you're looking for doesn't exist.</p>
+			<h1>404: Page not found</h1>
+			<p>Make sure the address is correct and the page is not moved.</p>
+			<p>Please contact your administrator if you think this is a mistake.</p>
 			<el-button type="primary" @click="goHome">Go Home</el-button>
+			<el-button type="primary" @click="signIn">Sign in with different account</el-button>
 		</div>
 	</div>
 </template>
@@ -24,24 +31,24 @@ function goHome() {
 .error-page {
 	display: flex;
 	justify-content: center;
-	align-items: center;
 	height: 100vh;
 	text-align: center;
-}
-
-.error-content {
-	max-width: 400px;
+	padding-top: 30px;
 }
 
 h1 {
-	margin: 0;
-	color: #ff4757;
-	font-size: 100px;
+	font-size: 25px;
+	padding: 2px;
+}
+
+.error-content {
+	max-width: 600px;
 }
 
 p {
-	margin: 10px 0;
-	font-size: 20px;
+	margin: 10x 0;
+	font-size: 15px;
+	padding: 2px;
 }
 
 .logo-container {
