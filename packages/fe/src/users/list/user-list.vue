@@ -117,12 +117,12 @@ onMounted(() => {
 			/>
 			<el-table-column width="80">
 				<template #default="{ row }">
-					<el-button @click="() => editUser(row.id)"><rh-icon name="pencil" /></el-button>
+					<el-button @click.stop="() => editUser(row.id)"><rh-icon name="pencil" /></el-button>
 				</template>
 			</el-table-column>
 			<el-table-column width="80">
 				<template #default="{ row }">
-					<el-button type="danger" @click="() => deleteUser(row.id)">
+					<el-button type="danger" @click.stop="() => deleteUser(row.id)">
 						<rh-icon color="white" name="trash" />
 					</el-button>
 				</template>
