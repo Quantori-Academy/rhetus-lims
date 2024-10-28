@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import { ElTable, ElTableColumn, ElButton } from 'element-plus';
+import { ElTable, ElTableColumn, ElButton, ElTooltip } from 'element-plus';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { $api } from '../../lib/api/index.js';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
@@ -117,9 +117,19 @@ onMounted(() => {
 			</el-table-column>
 			<el-table-column width="80">
 				<template #default="{ row }">
-					<el-button type="danger" @click="() => deleteStorageLocation(row.id)">
-						<rh-icon color="white" name="trash" />
-					</el-button>
+					<el-tooltip
+						:disabled="row.isEmpty"
+						content="Can't delete, storage is not empty."
+						placement="top"
+					>
+						<el-button
+							type="danger"
+							:disabled="!row.isEmpty"
+							@click="() => deleteStorageLocation(row.id)"
+						>
+							<rh-icon color="white" name="trash" />
+						</el-button>
+					</el-tooltip>
 				</template>
 			</el-table-column>
 		</el-table>
