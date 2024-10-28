@@ -114,6 +114,40 @@ async function storages(server, options) {
 			return reply.code(500).send(err);
 		}
 	}
+
+	server.route({
+		method: 'GET',
+		path: options.prefix + 'storages/names',
+		preValidation: [server.authenticate],
+		schema: schema.getStoragesNames,
+		handler: onGetStoragesNames
+	});
+
+	async function onGetStoragesNames(req, reply) {
+		try {
+			const data = await server.storagesService.getUniqValuesByField('name');
+			return reply.code(200).send({ names: data });
+		} catch (err) {
+			return reply.code(500).send(err);
+		}
+	}
+
+	server.route({
+		method: 'GET',
+		path: options.prefix + 'storages/rooms',
+		preValidation: [server.authenticate],
+		schema: schema.getStoragesRooms,
+		handler: onGetStoragesRooms
+	});
+
+	async function onGetStoragesRooms(req, reply) {
+		try {
+			const data = await server.storagesService.getUniqValuesByField('room');
+			return reply.code(200).send({ rooms: data });
+		} catch (err) {
+			return reply.code(500).send(err);
+		}
+	}
 }
 
 export default fp(storages);

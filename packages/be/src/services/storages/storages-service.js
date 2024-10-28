@@ -158,6 +158,15 @@ async function storagesService(server) {
 						.where(eq(schema.samples.storageId, schema.storages.id))
 				)
 			);
+		},
+
+		getUniqValuesByField: async fieldName => {
+			const result = await server.db
+				.selectDistinct({ field: schema.storages[fieldName] })
+				.from(schema.storages)
+				.where(eq(schema.storages.deleted, false));
+
+			return result.length ? result.map(({ field }) => field) : [];
 		}
 	});
 }
