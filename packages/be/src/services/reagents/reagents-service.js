@@ -155,6 +155,29 @@ async function reagentsService(server) {
 				})
 				.from(schema.reagents)
 				.where(and(eq(schema.reagents.storageId, id), eq(schema.reagents.deleted, false)));
+		},
+		updateReagent: async (id, data) => {
+			const dataForUpdate = Object.fromEntries(
+				Object.entries(data).map(([key, value]) =>
+					!Object.keys(formatMapping).includes(key)
+						? [key, value]
+						: [key, formatMapping[key](value)]
+				)
+			);
+
+			const result = await server.db
+				.update(schema.reagents)
+				.set(dataForUpdate)
+				.where(eq(schema.reagents.id, id))
+				.returning({
+					reagentName: schema.reagents.name
+				});
+
+			return {
+				code: 200,
+				status: 'success',
+				message: `Reagent '${result[0].reagentName}' was updated`
+			};
 		}
 	});
 }

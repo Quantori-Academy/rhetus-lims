@@ -51,6 +51,15 @@ async function substancesService(server) {
 			const diff = quantityLeft - quantityUsed;
 
 			return diff >= 0 && diff === reqQuantityLeft;
+		},
+
+		updateSubstance: async (id, data) => {
+			const { code, status, message } =
+				data.category === Category.REAGENT
+					? await server.reagentsService.updateSubstance(id, data)
+					: await server.samplesService.changeSampleQuantity(id, data);
+
+			return { code, status, message };
 		}
 	});
 }
