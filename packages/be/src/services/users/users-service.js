@@ -11,6 +11,7 @@ const formatMapping = {
 	firstName: string => `${string.charAt(0).toUpperCase()}${string.slice(1).toLowerCase()}`,
 	lastName: string => `${string.charAt(0).toUpperCase()}${string.slice(1).toLowerCase()}`,
 	password: string => bcrypt.hashSync(string, BCRYPT_SALT),
+	temporaryPassword: string => (string ? bcrypt.hashSync(string, BCRYPT_SALT) : null),
 	email: string => string.toLowerCase(),
 	username: string => string.toLowerCase(),
 	name: string => string.toLowerCase() // for role name
@@ -88,6 +89,7 @@ async function usersService(server) {
 						name: schema.roles.name
 					},
 					createdAt: schema.users.createdAt,
+					passwordResetStatus: schema.users.passwordResetStatus,
 					hasPasswordResetRequests: eq(schema.users.passwordResetStatus, Status.ACTIVE),
 					deleted: schema.users.deleted
 				})
@@ -116,6 +118,7 @@ async function usersService(server) {
 						id: schema.roles.id,
 						name: schema.roles.name
 					},
+					passwordResetStatus: schema.users.passwordResetStatus,
 					hasPasswordResetRequests: eq(schema.users.passwordResetStatus, Status.ACTIVE),
 					lastLogin: schema.users.lastLogin
 				})

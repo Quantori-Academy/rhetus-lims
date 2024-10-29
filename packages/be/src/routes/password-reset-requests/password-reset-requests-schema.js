@@ -13,9 +13,10 @@ const createRequest = {
 	}
 };
 
-const confirmRequest = {
+const setTemporaryPassword = {
 	security: [{ Session: [] }],
-	body: S.object().prop('username', S.string().required()),
+	params: S.object().prop('id', S.string()),
+	body: S.object().prop('password', S.string().required()),
 	response: {
 		200: statusMessage,
 		400: statusMessage,
@@ -24,4 +25,15 @@ const confirmRequest = {
 	}
 };
 
-export { createRequest, confirmRequest };
+const resetPassword = {
+	security: [{ Session: [] }],
+	body: S.object().prop('password', S.string().required()),
+	response: {
+		200: statusMessage,
+		400: statusMessage,
+		403: statusMessage,
+		500: statusMessage
+	}
+};
+
+export { createRequest, setTemporaryPassword, resetPassword };
