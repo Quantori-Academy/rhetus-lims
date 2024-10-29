@@ -7,6 +7,20 @@ export const formRules = {
 	]
 };
 
+const requiredRule = { required: true, message: 'Please enter a value', trigger: 'blur' };
+
+export const passwordFormRules = passwords => ({
+	password: [requiredRule],
+	confirmPassword: [
+		requiredRule,
+		{
+			validator: (_, value) => value === passwords.value.password,
+			message: 'Passwords must match',
+			trigger: ['blur', 'change']
+		}
+	]
+});
+
 export const emptyUser = {
 	id: null,
 	username: '',

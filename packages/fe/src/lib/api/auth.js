@@ -7,7 +7,7 @@ export default http => ({
 	},
 	async requestPasswordReset(username) {
 		return await http('/request-password-reset', {
-			method: 'PATCH',
+			method: 'POST',
 			body: username
 		});
 	},
