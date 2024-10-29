@@ -109,7 +109,7 @@ onMounted(() => {
 				<el-input v-model="profile.role.name" :disabled="true" />
 			</el-form-item>
 			<el-form-item v-if="password" label="Password" prop="password">
-				<el-input v-model="newPassword" type="password" :readonly="!editable" />
+				<el-input v-model="newPassword" type="password" :readonly="!editable" show-password />
 			</el-form-item>
 			<el-form-item>
 				<el-button :type="editable ? 'default' : 'primary'" @click="onProfileEdit">{{
