@@ -39,3 +39,24 @@ html {
 .el-date-editor.el-input {
 	--el-date-editor-width: 100%;
 }
+.el-textarea__inner {
+	height: 100px;
+}
+.wrapper {
+	margin: 50px auto;
+	max-width: 900px;
+}
+.align-horizontal {
+	display: flex;
+	gap: 18px;
+
+	.el-form-item {
+		flex-grow: 1;
+		flex-basis: 0;
+	}
+}
+@media (max-width: 768px) {
+	.align-horizontal {
+		display: block;
+	}
+}

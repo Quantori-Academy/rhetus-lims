@@ -16,14 +16,12 @@ import { $api } from '../../lib/api/index.js';
 import { $route, $router } from '../../lib/router/router';
 import { requiredRule } from './constants.js';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
-
 const props = defineProps({
 	id: {
 		type: String,
 		default: null
 	}
 });
-
 const formEl = useTemplateRef('form-ref');
 const reagent = ref(null);
 const loading = ref(false);
@@ -31,16 +29,13 @@ const storages = ref([]);
 const storageDisplayValue = ref('');
 const isEdit = computed(() => $route.value.name === 'reagent-details-edit');
 const isOutOfStock = computed(() => reagent.value.quantityLeft === 0);
-
 onMounted(() => {
 	setReagent(props.id);
 	setStorages();
 });
-
 const rules = ref({
 	quantityLeft: [requiredRule('Quantity left')]
 });
-
 async function setStorages() {
 	try {
 		const data = await $api.storages.fetchStorages();
@@ -53,7 +48,6 @@ async function setStorages() {
 		$notifyUserAboutError(error);
 	}
 }
-
 const setReagent = async id => {
 	loading.value = true;
 	try {
@@ -64,7 +58,6 @@ const setReagent = async id => {
 		loading.value = false;
 	}
 };
-
 const toggleEdit = () => {
 	$router.push({ name: 'reagent-details-edit', params: { id: reagent.value.id } });
 };
@@ -78,7 +71,6 @@ const cancelEdit = () => {
 	});
 	formEl.value.resetFields();
 };
-
 const handleSubmit = async () => {
 	if (!(await $isFormValid(formEl))) return;
 	try {
@@ -120,7 +112,6 @@ const deleteReagentZero = async () => {
 		});
 	}
 };
-
 const deleteReagent = async () => {
 	try {
 		await $confirm('Do you want to delete this reagent?', 'Warning', {
@@ -146,7 +137,7 @@ const deleteReagent = async () => {
 </script>
 
 <template>
-	<div class="reagent-details">
+	<div class="wrapper">
 		<el-form
 			v-if="reagent"
 			ref="form-ref"
@@ -166,7 +157,7 @@ const deleteReagent = async () => {
 				</el-select>
 			</el-form-item>
 			<el-form-item label="Description" prop="description">
-				<el-input v-model="reagent.description" :disabled="true" />
+				<el-input v-model="reagent.description" type="textarea" :disabled="true" />
 			</el-form-item>
 			<el-form-item label="CAS number" prop="casNumber">
 				<el-input v-model="reagent.casNumber" :disabled="true" />
@@ -174,12 +165,14 @@ const deleteReagent = async () => {
 			<el-form-item label="Producer" prop="producer">
 				<el-input v-model="reagent.producer" :disabled="true" />
 			</el-form-item>
-			<el-form-item label="Catalog ID" prop="catalogId">
-				<el-input v-model="reagent.catalogId" :disabled="true" />
-			</el-form-item>
-			<el-form-item label="Catalog link" prop="catalogLink">
-				<el-input v-model="reagent.catalogLink" :disabled="true" />
-			</el-form-item>
+			<div class="align-horizontal">
+				<el-form-item label="Catalog ID" prop="catalogId">
+					<el-input v-model="reagent.catalogId" :disabled="true" />
+				</el-form-item>
+				<el-form-item label="Catalog link" prop="catalogLink">
+					<el-input v-model="reagent.catalogLink" :disabled="true" />
+				</el-form-item>
+			</div>
 			<el-form-item label="Storage location" prop="storageLocationId">
 				<el-select v-model="reagent.storageLocationId" :disabled="!isEdit" filterable>
 					<el-option
@@ -190,21 +183,23 @@ const deleteReagent = async () => {
 					/>
 				</el-select>
 			</el-form-item>
-			<el-form-item label="Quantity left" prop="quantityLeft">
-				<el-input-number
-					v-model="reagent.quantityLeft"
-					placeholder="Enter amount"
-					:disabled="!isEdit"
-					:min="0"
-				>
-				</el-input-number>
-			</el-form-item>
-			<el-form-item label="Quantity" prop="quantity">
-				<el-input v-model="reagent.quantity" :disabled="true" />
-			</el-form-item>
-			<el-form-item label="Unit" prop="quantityUnit">
-				<el-input v-model="reagent.quantityUnit" :disabled="true" />
-			</el-form-item>
+			<div class="align-horizontal">
+				<el-form-item label="Quantity left" prop="quantityLeft">
+					<el-input-number
+						v-model="reagent.quantityLeft"
+						placeholder="Enter amount"
+						:disabled="!isEdit"
+						:min="0"
+					>
+					</el-input-number>
+				</el-form-item>
+				<el-form-item label="Quantity" prop="quantity">
+					<el-input v-model="reagent.quantity" :disabled="true" />
+				</el-form-item>
+				<el-form-item label="Unit" prop="quantityUnit">
+					<el-input v-model="reagent.quantityUnit" :disabled="true" />
+				</el-form-item>
+			</div>
 			<el-form-item label="Price per unit" prop="unitPrice">
 				<el-input v-model="reagent.unitPrice" :disabled="true" />
 			</el-form-item>
@@ -230,27 +225,10 @@ const deleteReagent = async () => {
 </template>
 
 <style scoped>
-.reagent-details {
-	display: flex;
-	flex-direction: column;
-	gap: 5rem;
-	margin: 20px;
-	max-width: 70vw;
+.el-input-number {
+	width: 100%;
 }
-.reagent-details :deep(.el-input__wrapper),
-.reagent-details :deep(.el-select__wrapper) {
-	background-color: transparent;
-}
-
-.quantity-unit-wrapper {
-	display: flex;
-	flex-direction: row;
-	gap: 10px;
-}
-@media screen and (max-width: 578px) {
-	.el-button {
-		margin: 0;
-		margin-top: 10px;
-	}
+:deep(.el-date-editor) {
+	width: 100%;
 }
 </style>

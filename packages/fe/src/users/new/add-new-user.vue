@@ -80,42 +80,37 @@ const cancelHandler = () => {
 </script>
 
 <template>
-	<el-form ref="form-ref" :rules="rules" label-position="top" :model="form" class="form-container">
-		<el-form-item label="Username" prop="username">
-			<el-input v-model="form.username" placeholder="Enter username"></el-input>
-		</el-form-item>
-		<el-form-item label="First Name" prop="name">
-			<el-input v-model="form.firstName" placeholder="Enter first name"></el-input>
-		</el-form-item>
-		<el-form-item label="Last Name" prop="lastname">
-			<el-input v-model="form.lastName" placeholder="Enter last name"></el-input>
-		</el-form-item>
-		<el-form-item label="Email" prop="email">
-			<el-input v-model="form.email" placeholder="Enter email"></el-input>
-		</el-form-item>
-		<el-form-item label="Password" prop="password">
-			<el-input
-				v-model="form.password"
-				placeholder="Enter password"
-				type="password"
-				show-password
-			></el-input>
-		</el-form-item>
-		<el-form-item label="Role" prop="role">
-			<el-select v-model="form.roleId" placeholder="Select role">
-				<el-option
-					v-for="role of roles"
-					:key="role.id"
-					:label="role.name"
-					:value="role.id"
-				></el-option>
-			</el-select>
-		</el-form-item>
-		<div class="align-end">
-			<el-button @click="cancelHandler">Cancel</el-button>
+	<div class="wrapper">
+		<el-form ref="form-ref" :rules="rules" label-position="top" :model="form">
+			<el-form-item label="Username" prop="username">
+				<el-input v-model="form.username" placeholder="Enter username"></el-input>
+			</el-form-item>
+			<el-form-item label="First Name" prop="name">
+				<el-input v-model="form.firstName" placeholder="Enter first name"></el-input>
+			</el-form-item>
+			<el-form-item label="Last Name" prop="lastname">
+				<el-input v-model="form.lastName" placeholder="Enter last name"></el-input>
+			</el-form-item>
+			<el-form-item label="Email" prop="email">
+				<el-input v-model="form.email" placeholder="Enter email"></el-input>
+			</el-form-item>
+			<el-form-item label="Password" prop="password">
+				<el-input v-model="form.password" placeholder="Enter password" type="password"></el-input>
+			</el-form-item>
+			<el-form-item label="Role" prop="role">
+				<el-select v-model="form.roleId" placeholder="Select role">
+					<el-option
+						v-for="role of roles"
+						:key="role.id"
+						:label="role.name"
+						:value="role.id"
+					></el-option>
+				</el-select>
+			</el-form-item>
+			<el-button @click="cancelHandler">Cancel Creation </el-button>
 			<el-button :loading="isSaving" type="primary" @click="addUser">Add User</el-button>
-		</div>
-	</el-form>
+		</el-form>
+	</div>
 </template>
 
 <style scoped>

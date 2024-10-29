@@ -89,7 +89,7 @@ async function setStorages() {
 </script>
 
 <template>
-	<div class="container">
+	<div class="wrapper">
 		<el-form ref="form-el" :model="form" :rules="rules" label-width="auto" label-position="top">
 			<el-form-item label="Name" prop="name">
 				<el-input v-model="form.name" placeholder="Enter reagent name" />
@@ -156,31 +156,15 @@ async function setStorages() {
 </template>
 
 <style>
-.container {
-	margin-top: 20px;
-	padding-bottom: 3rem;
-	max-width: 60vw;
-}
-.align-horizontal {
-	display: flex;
-	gap: 18px;
-
-	.el-form-item {
-		flex-grow: 1;
-		flex-basis: 0;
-	}
-}
 .btn-container {
 	display: flex;
-	justify-content: end;
+	justify-content: start;
 }
-
-@media (max-width: 768px) {
-	.container {
-		padding-bottom: 24px;
-	}
-	.align-horizontal {
-		display: block;
-	}
+.el-input-number {
+	width: 100%;
+}
+.el-date-editor.el-input,
+.el-date-editor.el-input__wrapper {
+	width: 100%;
 }
 </style>

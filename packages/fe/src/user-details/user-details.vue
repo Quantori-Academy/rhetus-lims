@@ -245,21 +245,20 @@ const deleteUser = async () => {
 </template>
 
 <style scoped>
-.form-container {
-	margin: 20px 15px 0px 15px;
-	width: 500px;
+:deep(.el-date-editor) {
+	width: 100%;
 }
-.section-header {
-	margin-bottom: 12px;
-	font-weight: 500;
-	font-size: large;
+.el-form-item {
+	margin-bottom: 10px;
 }
-.align-end {
-	text-align: end;
+.el-form-item:last-of-type {
+	margin-bottom: 20px;
 }
-@media screen and (max-width: 750px) {
-	.form-container {
-		width: 80vw;
-	}
+.el-form-item .el-input.is-disabled .el-input__wrapper,
+.el-form-item .el-select .el-select__wrapper.is-disabled {
+	background-color: transparent;
+}
+.el-button {
+	margin: 0 12px 12px 0;
 }
 </style>

@@ -78,7 +78,7 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="form-container">
+	<div class="wrapper">
 		<div class="btn-container">
 			<div class="section-header">My Profile</div>
 			<el-button :type="editable ? 'default' : 'primary'" @click="toggleEdit">
