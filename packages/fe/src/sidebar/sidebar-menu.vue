@@ -69,7 +69,7 @@ function handleCollapse() {
 	border-right: 1px solid var(--border-color);
 	background-color: var(--bg-color);
 
-	color: var(--text-color);
+	color: var(--color-text-regular);
 	transform: translate3d(0, 0, 0);
 
 	transition-property: transform;
@@ -79,8 +79,8 @@ function handleCollapse() {
 	:focus,
 	:focus-visible {
 		box-shadow:
-			0 0 0 1px #fff,
-			0 0 0 3px #218ec7;
+			0 0 0 1px var(--rh-color-page-white),
+			0 0 0 3px var(--rh-color-primary-600);
 		outline: none;
 	}
 }
@@ -88,9 +88,9 @@ function handleCollapse() {
 .user-bar-container {
 	padding: 8px;
 	min-height: var(--top-bar-height);
-	border-bottom: 1px solid #eeecf0;
+	border-bottom: 1px solid var(--rh-color-neutral-250);
 
-	background-color: #eeecf0;
+	background-color: var(--rh-color-neutral-250);
 
 	.user-bar {
 		display: flex;
@@ -113,7 +113,7 @@ function handleCollapse() {
 		text-decoration: none;
 
 		&:hover {
-			background-color: #d6d5d9;
+			background-color: var(--rh-color-neutral-350);
 		}
 
 		&:active {
@@ -153,7 +153,7 @@ function handleCollapse() {
 			}
 
 			a {
-				background-color: #e1e0e4;
+				background-color: var(--rh-color-neutral-300);
 			}
 		}
 
@@ -175,15 +175,15 @@ function handleCollapse() {
 				text-decoration: none;
 
 				&:focus {
-					background-color: #e1e0e4;
+					background-color: var(--rh-color-neutral-300);
 				}
 
 				&:hover {
-					background-color: #e1e0e4;
+					background-color: var(--rh-color-neutral-300);
 				}
 
 				&:active {
-					background-color: #cac9cb;
+					background-color: var(--rh-color-neutral-400);
 				}
 			}
 
@@ -196,7 +196,7 @@ function handleCollapse() {
 				margin-right: 4px;
 				width: 3px;
 				border-radius: 3px;
-				background-color: #0eabe2;
+				background-color: var(--rh-color-primary-400);
 			}
 
 			.route-name {

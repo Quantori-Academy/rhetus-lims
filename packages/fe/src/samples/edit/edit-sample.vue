@@ -228,7 +228,7 @@ watch(
 	display: flex;
 	justify-content: space-between;
 	margin-bottom: 12px;
-	color: black;
+	color: var(--color-text);
 	font-weight: 500;
 	font-size: large;
 }

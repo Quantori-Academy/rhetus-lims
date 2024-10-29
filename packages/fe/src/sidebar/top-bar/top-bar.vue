@@ -40,7 +40,7 @@ function handleCollapse() {
 	width: 100%;
 
 	border-bottom: 1px solid var(--border-color);
-	background-color: white;
+	background-color: var(--rh-color-page-white);
 
 	transition-property: width, left, right;
 	transition-duration: 200ms;
@@ -49,8 +49,8 @@ function handleCollapse() {
 	:focus,
 	:focus-visible {
 		box-shadow:
-			0 0 0 1px #fff,
-			0 0 0 3px #218ec7;
+			0 0 0 1px var(--rh-color-page-white),
+			0 0 0 3px var(--rh-color-primary-600);
 		outline: none;
 	}
 }

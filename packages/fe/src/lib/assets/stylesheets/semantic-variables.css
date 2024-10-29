@@ -1,0 +1,7 @@
+:root {
+	--color-text: var(--rh-color-black);
+	--color-text-regular: var(--rh-color-primary-900);
+	--bg-color: var(--rh-color-neutral-200);
+	--border-color: #05050614;
+	--bg-color-active: var(--rh-color-neutral-450);
+}

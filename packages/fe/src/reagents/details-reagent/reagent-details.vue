@@ -241,7 +241,6 @@ const deleteReagent = async () => {
 	gap: 5rem;
 	margin: 20px;
 	max-width: 70vw;
-	color: black;
 }
 .reagent-details :deep(.el-input__wrapper),
 .reagent-details :deep(.el-select__wrapper) {

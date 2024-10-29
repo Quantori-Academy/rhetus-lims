@@ -22,14 +22,13 @@ button {
 	height: auto;
 	border: none;
 	background: transparent;
-	color: red;
 
 	&:focus-visible {
 		outline: none;
 	}
 
 	&:hover {
-		background-color: #d6d5d9;
+		background-color: var(--rh-color-neutral-350);
 	}
 
 	&:active {
