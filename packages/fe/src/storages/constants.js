@@ -13,4 +13,4 @@ export const emptyStorage = {
 	name: '',
 	room: '',
 	description: ''
-}
+};
