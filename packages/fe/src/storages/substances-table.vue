@@ -73,33 +73,35 @@ const viewSubstance = row => {
 	$router.push({ name: 'reagent-details', params: { id: row.id } });
 };
 
-const showNotification = (title, message, type) => {
-	$notify({ title, message, type });
-};
-const confirmDeleteReagent = async () => {
+const deleteSubstance = async row => {
 	try {
-		return await $confirm('Do you want to delete this item?', 'Warning', {
+		await $confirm('Do you want to delete this item?', 'Warning', {
 			confirmButtonText: 'OK',
 			cancelButtonText: 'Cancel',
 			type: 'warning'
 		});
-	} catch {
-		showNotification('Canceled', 'Item deletion canceled', 'info');
-		return false;
-	}
-};
-const deleteSubstance = async row => {
-	if (!(await confirmDeleteReagent())) return;
-	try {
+
 		if (row.category.toLowerCase() === 'reagent') {
 			await $api.reagents.deleteReagent(row.id);
 		} else {
 			await $api.samples.deleteSample(row.id);
 		}
-		showNotification('Success', 'Item is deleted', 'success');
+		$notify({
+			title: 'Success',
+			message: 'Item is deleted',
+			type: 'success'
+		});
 		await setSubstances(props.id);
 	} catch (error) {
-		showNotification('Error', error.message || 'Item update canceled', 'error');
+		if (['cancel', 'close'].includes(error)) {
+			$notify({
+				title: 'Canceled',
+				message: 'Deletion canceled',
+				type: 'info'
+			});
+		} else {
+			$notifyUserAboutError(error.message || 'Substance delete canceled');
+		}
 	}
 };
 
@@ -114,19 +116,23 @@ const changeStorage = async row => {
 			storageId: row.storageLocationId,
 			category: row.category
 		});
-		setSubstances(props.id);
 		$notify({
 			title: 'Success',
 			message: response.message,
 			type: 'success'
 		});
-	} catch {
+	} catch (error) {
+		if (['cancel', 'close'].includes(error)) {
+			$notify({
+				title: 'Canceled',
+				message: 'Storage update was canceled',
+				type: 'info'
+			});
+		} else {
+			$notifyUserAboutError(error.message || 'Storage update canceled');
+		}
+	} finally {
 		setSubstances(props.id);
-		$notify({
-			title: 'Canceled',
-			message: 'Reagent deletion was canceled',
-			type: 'info'
-		});
 	}
 };
 
