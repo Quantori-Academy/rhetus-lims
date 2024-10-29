@@ -69,7 +69,7 @@ function handleCollapse() {
 	border-right: 1px solid var(--border-color);
 	background-color: var(--bg-color);
 
-	color: var(--text-color);
+	color: var(--color-text-regular);
 	transform: translate3d(0, 0, 0);
 
 	transition-property: transform;
