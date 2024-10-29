@@ -1,14 +1,5 @@
 <script setup>
-import { $router } from '../lib/router/router.js';
 import { ElButton } from 'element-plus';
-
-function goHome() {
-	$router.push({ name: 'dashboard' });
-}
-
-function signIn() {
-	$router.push({ name: 'login' });
-}
 </script>
 
 <template>
@@ -23,8 +14,12 @@ function signIn() {
 				<p>Please contact your administrator if you think this is a mistake.</p>
 			</div>
 
-			<el-button type="primary" @click="goHome">Go Home</el-button>
-			<el-button type="primary" @click="signIn">Sign in with different account</el-button>
+			<router-link to="/">
+				<el-button type="primary">Go Home</el-button>
+			</router-link>
+			<router-link to="/login">
+				<el-button type="primary">Sign in with different account</el-button>
+			</router-link>
 		</div>
 	</div>
 </template>
@@ -33,7 +28,8 @@ function signIn() {
 .error-page {
 	display: flex;
 	justify-content: center;
-	padding-top: 30px;
+	align-items: flex-start;
+	padding-top: 160px;
 	height: 100vh;
 	text-align: center;
 }
@@ -62,11 +58,10 @@ p {
 	justify-content: center;
 	align-items: center;
 	gap: 10px;
+}
 
-	.logo-title {
-		margin-top: 20px;
-		font-weight: 700;
-		font-size: 20px;
-	}
+.el-button {
+	margin: 5px;
+	width: 45%;
 }
 </style>
