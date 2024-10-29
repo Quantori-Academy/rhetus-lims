@@ -74,4 +74,5 @@
 /* semantic color variables for this project */
 :root {
 	--color-text: var(--rh-color-black);
+	--color-text-regular: var(--rh-color-primary-900);
 }

@@ -33,7 +33,7 @@ function handleToggle() {
 	--bg-color: var(--rh-color-neutral-200);
 	--border-color: #05050614;
 	--bg-color-active: var(--rh-color-neutral-450);
-	--text-color: var(--rh-color-primary-900);
+	--text-color: var(--color-text-regular);
 
 	padding-left: 0;
 
