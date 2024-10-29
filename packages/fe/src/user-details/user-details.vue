@@ -140,7 +140,7 @@ const changePassword = async () => {
 		});
 		resetPassForm.value.resetFields();
 	} catch (error) {
-		if (err !== 'cancel' && err !== 'close') {
+		if (error !== 'cancel' && error !== 'close') {
 			$notifyUserAboutError(error.message || 'Error requesting password change');
 		}
 	}
