@@ -93,13 +93,6 @@ async function passwordResetRequests(server, options) {
 				return reply.code(400).send({ status: 'error', message: `User not found.` });
 			}
 
-			if (user.passwordResetStatus !== Status.CONFIRMED) {
-				return reply.code(400).send({
-					status: 'error',
-					message: `You should request a password reset and have it confirmed by an admin.`
-				});
-			}
-
 			const { password } = req.body;
 
 			await server.usersService.updateUser(user.id, {
