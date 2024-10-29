@@ -17,7 +17,6 @@ const toggleFilterView = () => {
 		</el-button>
 		<slot name="action-buttons" />
 	</div>
-
 	<div class="filters-container">
 		<slot v-if="visible" name="filters" />
 	</div>

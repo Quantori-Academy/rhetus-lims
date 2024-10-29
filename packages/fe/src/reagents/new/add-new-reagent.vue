@@ -174,13 +174,6 @@ async function setStorages() {
 	display: flex;
 	justify-content: end;
 }
-.el-input-number {
-	width: 100%;
-}
-.el-date-editor.el-input,
-.el-date-editor.el-input__wrapper {
-	width: 100%;
-}
 
 @media (max-width: 768px) {
 	.container {

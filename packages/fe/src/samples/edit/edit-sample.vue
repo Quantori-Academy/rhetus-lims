@@ -154,8 +154,8 @@ watch(
 			</el-form-item>
 			<el-form-item label="Reagents/Samples used" prop="components">
 				<el-table :data="componentTableData" :border="true" @row-click="redirect">
-					<el-table-column prop="name" label="Name" width="200" />
-					<el-table-column prop="category" label="Category" width="200" />
+					<el-table-column prop="name" label="Name" />
+					<el-table-column prop="category" label="Category" />
 					<el-table-column prop="quantityUsed" label="Quantiy Used" />
 				</el-table>
 			</el-form-item>
@@ -243,14 +243,6 @@ watch(
 .btn-container {
 	display: flex;
 	justify-content: space-between;
-}
-.el-input-number {
-	width: 100%;
-	height: 32px;
-}
-.el-date-editor.el-input,
-.el-date-editor.el-input__wrapper {
-	width: 100%;
 }
 @media (max-width: 768px) {
 	.container {

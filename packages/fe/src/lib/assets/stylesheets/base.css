@@ -22,3 +22,20 @@ html {
 .el-form-item__label {
 	font-weight: 700;
 }
+.el-input,
+.el-textarea,
+.el-select,
+.el-radio,
+.el-checkbox,
+.el-input-number,
+.align-horizontal .el-input-number,
+.filter-item .el-input-number,
+.filter-item .el-input__wrapper,
+.filters-container > * {
+	box-sizing: border-box;
+	width: 100%;
+	max-width: 320px;
+}
+.el-date-editor.el-input {
+	--el-date-editor-width: 100%;
+}

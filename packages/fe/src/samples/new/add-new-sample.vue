@@ -228,14 +228,7 @@ onMounted(() => {
 	display: flex;
 	justify-content: end;
 }
-.el-input-number {
-	width: 100%;
-	height: 32px;
-}
-.el-date-editor.el-input,
-.el-date-editor.el-input__wrapper {
-	width: 100%;
-}
+
 .add-btn {
 	margin-top: -12px;
 	margin-bottom: 12px;

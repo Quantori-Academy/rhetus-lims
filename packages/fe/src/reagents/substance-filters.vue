@@ -8,23 +8,17 @@ const filters = defineModel('filters', { type: Object });
 </script>
 
 <template>
-	<div class="filters-container">
-		<filter-item>
-			<el-input v-model="filters.name" clearable placeholder="Enter name">
-				<template #prefix>
-					<rh-icon name="search" />
-				</template>
-			</el-input>
-		</filter-item>
+	<filter-item>
+		<el-input v-model="filters.name" clearable placeholder="Enter name">
+			<template #prefix>
+				<rh-icon name="search" />
+			</template>
+		</el-input>
+	</filter-item>
 
-		<filter-item>
-			<el-input-number v-model="filters.quantity" placeholder="Enter amount" :min="1" />
-		</filter-item>
-	</div>
+	<filter-item>
+		<el-input-number v-model="filters.quantity" placeholder="Enter amount" :min="1" />
+	</filter-item>
 </template>
 
-<style scoped>
-::v-deep .el-input-number {
-	width: 300px;
-}
-</style>
+<style scoped></style>
