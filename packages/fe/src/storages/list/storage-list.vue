@@ -53,7 +53,7 @@ async function deleteStorageLocation(id) {
 			$notifyUserAboutError(err);
 		}
 	} catch (error) {
-		if (err !== 'cancel' && err !== 'close') {
+		if (error !== 'cancel' && error !== 'close') {
 			$notify({
 				title: 'Canceled',
 				message: 'Deletion canceled',

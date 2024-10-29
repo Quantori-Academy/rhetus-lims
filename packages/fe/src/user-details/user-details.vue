@@ -114,7 +114,7 @@ const confirmRoleChange = async () => {
 		);
 		return confirmed;
 	} catch (error) {
-		if (err !== 'cancel' && err !== 'close') {
+		if (error !== 'cancel' && error !== 'close') {
 			$notifyUserAboutError(error.message || 'Role update canceled');
 		}
 		user.value.roleId = originalUser.value.roleId;
@@ -164,7 +164,7 @@ const deleteUser = async () => {
 			$notifyUserAboutError(error);
 		}
 	} catch (error) {
-		if (err !== 'cancel' && err !== 'close') {
+		if (error !== 'cancel' && error !== 'close') {
 			$notify({
 				title: 'Canceled',
 				message: 'User deletion canceled',
