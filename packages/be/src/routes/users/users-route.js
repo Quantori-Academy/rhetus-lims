@@ -74,7 +74,7 @@ async function users(server, options) {
 	server.route({
 		method: 'GET',
 		path: options.prefix + 'users',
-		preValidation: [server.authenticate, server.administrator],
+		// preValidation: [server.authenticate, server.administrator],
 		schema: schema.getUsers,
 		handler: onGetUsers
 	});

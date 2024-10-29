@@ -25,7 +25,7 @@ async function storages(server, options) {
 	server.route({
 		method: 'GET',
 		path: options.prefix + 'storages',
-		preValidation: [server.authenticate],
+		// preValidation: [server.authenticate],
 		schema: schema.getStorages,
 		handler: onGetStorages
 	});

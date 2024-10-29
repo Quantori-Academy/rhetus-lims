@@ -1,30 +1,30 @@
 import { sql } from 'drizzle-orm';
 import { schema } from '../../db/schema/index.js';
-import { generateFilterByValueType } from './filter-by-value-type-generator.js';
-import { trimValue } from './trim-value.js';
-import { isDefine } from './check-value-define.js';
+import { generateFilterByOperator } from './filter-by-operator-generator.js';
+import { helpers } from '../common/helpers.js';
+import { isDefine } from '../common/check-value-define.js';
+import { servicesMapping } from './services/services-filter-sort-map.js';
 
-function generateFilterSubquery(data, formatMapping, optionsDictionary) {
-	const parsedData = JSON.parse(data);
-
-	return Object.entries(parsedData)
+function generateFilterSubquery(data, entityType) {
+	return Object.entries(data)
 		.map(([key, value]) => {
-			const optionProperty = optionsDictionary[key.toLowerCase()]?.property;
-			const schemaName = optionsDictionary[key.toLowerCase()]?.schema;
-			const trimmedValue = trimValue(value);
+			const {
+				property: filterProperty,
+				schema: schemaName,
+				operator = null,
+				value: formatValue
+			} = servicesMapping[entityType].filter[key.toLowerCase()] ?? {};
 
-			if (!optionProperty || !isDefine(trimmedValue)) {
+			const trimmedValue = helpers.trim(value);
+
+			if (!filterProperty || !isDefine(trimmedValue)) {
 				return;
 			}
 
 			const filterKey =
-				schemaName === 'union' ? sql.raw(`${optionProperty}`) : schema[schemaName][optionProperty];
+				schemaName === 'union' ? sql.raw(`${filterProperty}`) : schema[schemaName][filterProperty];
 
-			return generateFilterByValueType(
-				{ filterKey, value: trimmedValue },
-				optionProperty,
-				formatMapping
-			);
+			return generateFilterByOperator({ filterKey, value: trimmedValue, operator, formatValue });
 		})
 		.filter(Boolean);
 }

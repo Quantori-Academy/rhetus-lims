@@ -1,27 +1,14 @@
 import { and, eq, notExists } from 'drizzle-orm';
 import { schema } from '../../lib/db/schema/index.js';
-import { generateFilterSubquery } from '../../lib/utils/db/filter-subquery-generator.js';
-import { generateOrderSubquery } from '../../lib/utils/db/order-subquery-generator.js';
 import fp from 'fastify-plugin';
+import { getClarifyParams } from '../../lib/utils/common/parse-params.js';
+import { applyFilters } from '../../lib/utils/db/apply-filters.js';
+import { applySorting } from '../../lib/utils/db/apply-sorting.js';
+import { helpers } from '../../lib/utils/common/helpers.js';
 
 const formatMapping = {
-	name: string => `${string.charAt(0).toUpperCase()}${string.slice(1).toLowerCase()}`,
-	room: string => `${string.charAt(0).toUpperCase()}${string.slice(1).toLowerCase()}`
-};
-
-const optionsDictionary = {
-	name: {
-		property: 'name',
-		schema: 'storages'
-	},
-	room: {
-		property: 'room',
-		schema: 'storages'
-	}
-};
-
-const sortDictionary = {
-	creationdate: 'created_at'
+	name: string => helpers.capitalize(string),
+	room: string => helpers.capitalize(string)
 };
 
 async function storagesService(server) {
@@ -40,12 +27,7 @@ async function storagesService(server) {
 		},
 
 		getStorages: async queryParams => {
-			const limit = Number(queryParams.limit) || 10;
-			const page = Number(queryParams.page) || 1;
-			const options = queryParams.options || null;
-			const sort = queryParams.sort || null;
-
-			const offset = page === 1 ? 0 : (page - 1) * limit;
+			const { options, sort, limit, offset } = getClarifyParams(queryParams);
 
 			let query = server.db
 				.select({
@@ -59,13 +41,9 @@ async function storagesService(server) {
 				.from(schema.storages)
 				.where(eq(schema.storages.deleted, false));
 
-			query = server.storagesService.applyFilters(query, {
-				options,
-				formatMapping,
-				optionsDictionary
-			});
+			query = applyFilters(query, options, 'storages');
 
-			query = server.storagesService.applySorting(query, { sort, sortDictionary });
+			query = applySorting(query, sort, 'storages');
 
 			const count = await query;
 			const storages = await query.limit(limit).offset(offset);
@@ -119,30 +97,6 @@ async function storagesService(server) {
 			}
 
 			return true;
-		},
-
-		applyFilters: (query, filterData) => {
-			const { options, formatMapping, optionsDictionary } = filterData;
-
-			if (!options) {
-				return query;
-			}
-
-			const filterSubQueries = generateFilterSubquery(options, formatMapping, optionsDictionary);
-
-			return query.where(and(...filterSubQueries));
-		},
-
-		applySorting: (query, sortData) => {
-			const { sort, sortDictionary } = sortData;
-
-			if (!sort) {
-				return query;
-			}
-
-			const orderSubqueries = generateOrderSubquery(sort, sortDictionary);
-
-			return query.orderBy(...orderSubqueries);
 		},
 
 		isEmptyQuery: () => {

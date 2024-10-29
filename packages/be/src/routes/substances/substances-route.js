@@ -9,7 +9,7 @@ async function substances(server, options) {
 	server.route({
 		method: 'GET',
 		path: options.prefix + 'substances',
-		preValidation: [server.authenticate],
+		// preValidation: [server.authenticate],
 		schema: schema.getSubstances,
 		handler: onGetSubstances
 	});

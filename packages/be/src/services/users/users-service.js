@@ -1,47 +1,19 @@
 import { eq, and } from 'drizzle-orm';
 import fp from 'fastify-plugin';
-import bcrypt from 'bcrypt';
 import { schema } from '../../lib/db/schema/index.js';
-import { generateFilterSubquery } from '../../lib/utils/db/filter-subquery-generator.js';
 import { Status } from '../../lib/db/schema/users.js';
-
-const BCRYPT_SALT = 10;
+import { getClarifyParams } from '../../lib/utils/common/parse-params.js';
+import { applyFilters } from '../../lib/utils/db/apply-filters.js';
+import { helpers } from '../../lib/utils/common/helpers.js';
 
 const formatMapping = {
-	firstName: string => `${string.charAt(0).toUpperCase()}${string.slice(1).toLowerCase()}`,
-	lastName: string => `${string.charAt(0).toUpperCase()}${string.slice(1).toLowerCase()}`,
-	password: string => bcrypt.hashSync(string, BCRYPT_SALT),
-	temporaryPassword: string => (string ? bcrypt.hashSync(string, BCRYPT_SALT) : null),
-	email: string => string.toLowerCase(),
-	username: string => string.toLowerCase(),
-	name: string => string.toLowerCase() // for role name
-};
-
-const optionsDictionary = {
-	role: {
-		property: 'name',
-		schema: 'roles'
-	},
-	lastlogin: {
-		property: 'lastLogin',
-		schema: 'users'
-	},
-	firstname: {
-		property: 'firstName',
-		schema: 'users'
-	},
-	lastname: {
-		property: 'lastName',
-		schema: 'users'
-	},
-	username: {
-		property: 'username',
-		schema: 'users'
-	},
-	email: {
-		property: 'email',
-		schema: 'users'
-	}
+	firstName: string => helpers.capitalize(string),
+	lastName: string => helpers.capitalize(string),
+	password: string => helpers.hash(string),
+	temporaryPassword: string => (string ? helpers.hash(string) : null),
+	email: string => helpers.lowercase(string),
+	username: string => helpers.lowercase(string),
+	name: string => helpers.lowercase(string) // for role name
 };
 
 async function usersService(server) {
@@ -101,11 +73,7 @@ async function usersService(server) {
 		},
 
 		getUsers: async queryParams => {
-			const limit = Number(queryParams.limit) || 10;
-			const page = Number(queryParams.page) || 1;
-			const options = queryParams.options || null;
-
-			const offset = page === 1 ? 0 : (page - 1) * limit;
+			const { options, limit, offset } = getClarifyParams(queryParams);
 
 			let query = server.db
 				.select({
@@ -125,11 +93,7 @@ async function usersService(server) {
 				.from(schema.users)
 				.innerJoin(schema.roles, eq(schema.users.roleId, schema.roles.id));
 
-			query = server.usersService.applyFilters(query, {
-				options,
-				formatMapping,
-				optionsDictionary
-			});
+			query = applyFilters(query, { ...options, deleted: 'false' }, 'users');
 
 			const count = await query;
 			const users = await query.limit(limit).offset(offset);
@@ -233,18 +197,6 @@ async function usersService(server) {
 				.where(eq(schema.users.username, username.toLowerCase()));
 
 			return result.length === 0;
-		},
-
-		applyFilters: (query, filterData) => {
-			const { options, formatMapping, optionsDictionary } = filterData;
-
-			if (!options) {
-				return query.where(eq(schema.users.deleted, false));
-			}
-
-			const filterSubQueries = generateFilterSubquery(options, formatMapping, optionsDictionary);
-
-			return query.where(and(...filterSubQueries, eq(schema.users.deleted, false)));
 		}
 	});
 }
