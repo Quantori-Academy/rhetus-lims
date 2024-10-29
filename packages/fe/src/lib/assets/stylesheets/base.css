@@ -30,9 +30,11 @@ html {
 .el-input-number,
 .align-horizontal .el-input-number,
 .filter-item .el-input-number,
-.filter-item .el-input__wrapper,
-.filters-container > * {
+.filter-item .el-input__wrapper {
 	box-sizing: border-box;
+	width: 100%;
+}
+.filters-container > * {
 	width: 100%;
 	max-width: 320px;
 }
