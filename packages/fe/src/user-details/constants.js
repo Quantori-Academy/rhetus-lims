@@ -10,7 +10,10 @@ export const formRules = {
 const requiredRule = { required: true, message: 'Please enter a value', trigger: 'blur' };
 
 export const passwordFormRules = passwords => ({
-	password: [requiredRule],
+	password: [
+		requiredRule,
+		{ min: 8, message: 'Password must be at least 8 characters long', trigger: ['blur', 'change'] }
+	],
 	confirmPassword: [
 		requiredRule,
 		{

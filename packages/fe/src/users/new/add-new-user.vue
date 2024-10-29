@@ -22,7 +22,10 @@ const requiredRule = { required: true, message: 'Required field', trigger: ['blu
 const rules = ref({
 	username: [requiredRule],
 	email: [{ required: true, type: 'email', message: 'Required field' }],
-	password: [requiredRule],
+	password: [
+		requiredRule,
+		{ min: 8, message: 'Password must be at least 8 characters long', trigger: ['blur', 'change'] }
+	],
 	roleId: [requiredRule]
 });
 async function addUser() {
