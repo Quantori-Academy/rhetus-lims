@@ -37,7 +37,7 @@ const users = {
 		// inner system field
 		deleted: {
 			property: 'deleted',
-			value: string => (string ? false : false),
+			value: string => string === 'true',
 			schema: 'users',
 			operator: 'equal'
 		}

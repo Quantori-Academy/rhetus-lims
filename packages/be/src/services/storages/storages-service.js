@@ -38,10 +38,9 @@ async function storagesService(server) {
 					creationDate: schema.storages.createdAt,
 					isEmpty: server.storagesService.isEmptyQuery().as('isEmpty')
 				})
-				.from(schema.storages)
-				.where(eq(schema.storages.deleted, false));
+				.from(schema.storages);
 
-			query = applyFilters(query, options, 'storages');
+			query = applyFilters(query, { ...options, deleted: 'false' }, 'storages');
 
 			query = applySorting(query, sort, 'storages');
 
