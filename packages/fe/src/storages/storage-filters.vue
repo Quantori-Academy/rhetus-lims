@@ -8,21 +8,19 @@ const filters = defineModel('filters', { type: Object });
 </script>
 
 <template>
-	<div class="filters-container">
-		<filter-item>
-			<el-input v-model="filters.room" clearable placeholder="Enter room">
-				<template #prefix>
-					<rh-icon name="search" />
-				</template>
-			</el-input>
-		</filter-item>
+	<filter-item>
+		<el-input v-model="filters.room" clearable placeholder="Enter room">
+			<template #prefix>
+				<rh-icon name="search" />
+			</template>
+		</el-input>
+	</filter-item>
 
-		<filter-item>
-			<el-input v-model="filters.name" clearable placeholder="Enter name">
-				<template #prefix>
-					<rh-icon name="search" />
-				</template>
-			</el-input>
-		</filter-item>
-	</div>
+	<filter-item>
+		<el-input v-model="filters.name" clearable placeholder="Enter name">
+			<template #prefix>
+				<rh-icon name="search" />
+			</template>
+		</el-input>
+	</filter-item>
 </template>
