@@ -28,9 +28,10 @@ html {
 .el-radio,
 .el-checkbox,
 .el-input-number,
-.el-date-editor,
 .align-horizontal .el-input-number,
-.filter-item .el-input-number {
+.filter-item .el-input-number,
+.filter-item .el-input__wrapper,
+.filters-container > * {
 	box-sizing: border-box;
 	width: 100%;
 	max-width: 320px;

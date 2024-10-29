@@ -18,9 +18,7 @@ const toggleFilterView = () => {
 		<slot name="action-buttons" />
 	</div>
 
-	<div class="filters-container">
-		<slot v-if="visible" name="filters" />
-	</div>
+	<slot v-if="visible" name="filters" />
 </template>
 
 <style>
