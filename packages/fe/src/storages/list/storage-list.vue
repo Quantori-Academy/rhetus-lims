@@ -52,12 +52,14 @@ async function deleteStorageLocation(id) {
 		} catch (err) {
 			$notifyUserAboutError(err);
 		}
-	} catch {
-		$notify({
-			title: 'Canceled',
-			message: 'Deletion canceled',
-			type: 'info'
-		});
+	} catch (error) {
+		if (err !== 'cancel' && err !== 'close') {
+			$notify({
+				title: 'Canceled',
+				message: 'Deletion canceled',
+				type: 'info'
+			});
+		}
 	}
 }
 

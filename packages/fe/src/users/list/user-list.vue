@@ -52,12 +52,13 @@ const deleteUser = async id => {
 			$notifyUserAboutError(error);
 		}
 	} catch (error) {
-		console.log(error);
-		$notify({
-			title: 'Canceled',
-			message: 'User deletion canceled',
-			type: 'info'
-		});
+		if (err !== 'cancel' && err !== 'close') {
+			$notify({
+				title: 'Canceled',
+				message: 'User deletion canceled',
+				type: 'info'
+			});
+		}
 	}
 };
 

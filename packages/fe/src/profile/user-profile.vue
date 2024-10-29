@@ -68,7 +68,9 @@ const passwordChangeHandler = async () => {
 		});
 		resetPassForm.value.resetFields();
 	} catch (err) {
-		$notifyUserAboutError(err);
+		if (err !== 'cancel' && err !== 'close') {
+				$notifyUserAboutError(err);
+			}
 	}
 };
 

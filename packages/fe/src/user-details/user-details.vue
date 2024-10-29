@@ -114,7 +114,9 @@ const confirmRoleChange = async () => {
 		);
 		return confirmed;
 	} catch (error) {
-		$notifyUserAboutError(error.message || 'Role update canceled');
+		if (err !== 'cancel' && err !== 'close') {
+			$notifyUserAboutError(error.message || 'Role update canceled');
+		}
 		user.value.roleId = originalUser.value.roleId;
 		return false;
 	}
@@ -138,7 +140,9 @@ const changePassword = async () => {
 		});
 		resetPassForm.value.resetFields();
 	} catch (error) {
-		$notifyUserAboutError(error.message || 'Error requesting password change');
+		if (err !== 'cancel' && err !== 'close') {
+			$notifyUserAboutError(error.message || 'Error requesting password change');
+		}
 	}
 };
 
@@ -159,12 +163,14 @@ const deleteUser = async () => {
 		} catch (error) {
 			$notifyUserAboutError(error);
 		}
-	} catch {
-		$notify({
-			title: 'Canceled',
-			message: 'User deletion canceled',
-			type: 'info'
-		});
+	} catch (error) {
+		if (err !== 'cancel' && err !== 'close') {
+			$notify({
+				title: 'Canceled',
+				message: 'User deletion canceled',
+				type: 'info'
+			});
+		}
 	}
 };
 </script>

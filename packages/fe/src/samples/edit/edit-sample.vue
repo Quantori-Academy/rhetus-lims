@@ -50,11 +50,13 @@ async function deleteSample() {
 			$notifyUserAboutError(error);
 		}
 	} catch (error) {
-		$notify({
-			title: 'Canceled',
-			message: error.message || 'Sample deletion canceled',
-			type: 'info'
-		});
+		if (error !== 'cancel' && error !== 'close') {
+			$notify({
+				title: 'Canceled',
+				message: error.message || 'Sample deletion canceled',
+				type: 'info'
+			});
+		}
 	}
 }
 

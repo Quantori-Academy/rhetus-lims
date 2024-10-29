@@ -66,7 +66,7 @@ const cancelEdit = () => {
 	$router.push({ name: 'reagent-details', params: { id: reagent.value.id } });
 	$notify({
 		title: 'Canceled',
-		message: 'Reagent deletion canceled',
+		message: 'Reagent editing canceled',
 		type: 'info'
 	});
 	formEl.value.resetFields();
@@ -104,12 +104,14 @@ const deleteReagentZero = async () => {
 			type: 'success'
 		});
 		await $router.push({ name: 'reagents-list' });
-	} catch {
-		$notify({
-			title: 'Canceled',
-			message: 'Reagent deletion was canceled',
-			type: 'info'
-		});
+	} catch (error) {
+		if (error !== 'cancel' && error !== 'close') {
+			$notify({
+				title: 'Canceled',
+				message: 'Reagent deletion was canceled',
+				type: 'info'
+			});
+		}
 	}
 };
 const deleteReagent = async () => {
@@ -126,12 +128,14 @@ const deleteReagent = async () => {
 			type: 'success'
 		});
 		await $router.push({ name: 'reagents-list' });
-	} catch {
-		$notify({
-			title: 'Canceled',
-			message: 'Reagent deletion was canceled',
-			type: 'info'
-		});
+	} catch (error) {
+		if (error !== 'cancel' && error !== 'close') {
+			$notify({
+				title: 'Canceled',
+				message: 'Reagent deletion was canceled',
+				type: 'info'
+			});
+		}
 	}
 };
 </script>
