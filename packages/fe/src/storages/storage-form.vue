@@ -35,9 +35,15 @@ async function fetchStorage(id) {
 
 const cancelEdit = () => {
 	$router.push({ name: 'storage-details' });
+	$notify({
+		title: 'Canceled',
+		message: 'Storage editing canceled',
+		type: 'info'
+	});
+	fetchStorage(props.id);
 };
 
-const handleSubmit = async () => {
+const updateStorage = async () => {
 	try {
 		if (!(await $isFormValid(formEl))) {
 			$notifyUserAboutError('Error submitting form');
@@ -76,14 +82,14 @@ async function deleteStorage() {
 		});
 		$router.push({ name: 'storages-list' });
 	} catch (error) {
-		if (error.includes(['cancel', 'close'])) {
+		if (['cancel', 'close'].includes(error)) {
 			$notify({
 				title: 'Canceled',
 				message: 'Deletion canceled',
 				type: 'info'
 			});
 		} else {
-			$notifyUserAboutError(error);
+			$notifyUserAboutError(error.message);
 		}
 	}
 }
@@ -104,7 +110,7 @@ onMounted(() => {
 		label-position="top"
 		:model="storage"
 		:rules="rules"
-		@submit="handleSubmit"
+		@submit="updateStorage"
 	>
 		<el-form-item label="Room" prop="room">
 			<el-input v-model="storage.room" :disabled="!isEdit" />
@@ -117,7 +123,7 @@ onMounted(() => {
 		</el-form-item>
 		<template v-if="isEdit">
 			<el-button @click="cancelEdit">Cancel</el-button>
-			<el-button type="primary" @click="handleSubmit">Save</el-button>
+			<el-button type="primary" @click="updateStorage">Save</el-button>
 		</template>
 		<template v-else>
 			<el-button type="primary" @click="toggleEdit">{{ 'Edit storage' }}</el-button>
