@@ -51,7 +51,7 @@ function onSubmit() {
 						<el-input v-model="form.username" class="input" />
 					</el-form-item>
 					<el-form-item label="Password">
-						<el-input v-model="form.password" type="password" class="input" />
+						<el-input v-model="form.password" type="password" class="input" show-password />
 					</el-form-item>
 					<el-form-item>
 						<div class="forgot-password">
