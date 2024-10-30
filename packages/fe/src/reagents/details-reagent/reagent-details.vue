@@ -105,12 +105,8 @@ const deleteReagentZero = async () => {
 		});
 		await $router.push({ name: 'reagents-list' });
 	} catch (error) {
-		if (error !== 'cancel' && error !== 'close') {
-			$notify({
-				title: 'Canceled',
-				message: 'Reagent deletion was canceled',
-				type: 'info'
-			});
+		if (!['cancel', 'close'].includes(error)) {
+			this.$notifyUserAboutError(error);
 		}
 	}
 };
@@ -129,12 +125,8 @@ const deleteReagent = async () => {
 		});
 		await $router.push({ name: 'reagents-list' });
 	} catch (error) {
-		if (error !== 'cancel' && error !== 'close') {
-			$notify({
-				title: 'Canceled',
-				message: 'Reagent deletion was canceled',
-				type: 'info'
-			});
+		if (!['cancel', 'close'].includes(error)) {
+			this.$notifyUserAboutError(error);
 		}
 	}
 };

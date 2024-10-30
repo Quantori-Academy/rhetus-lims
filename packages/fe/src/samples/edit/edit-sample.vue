@@ -50,12 +50,8 @@ async function deleteSample() {
 			$notifyUserAboutError(error);
 		}
 	} catch (error) {
-		if (error !== 'cancel' && error !== 'close') {
-			$notify({
-				title: 'Canceled',
-				message: error.message || 'Sample deletion canceled',
-				type: 'info'
-			});
+		if (!['cancel', 'close'].includes(error)) {
+			this.$notifyUserAboutError(error);
 		}
 	}
 }

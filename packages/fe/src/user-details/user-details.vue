@@ -114,8 +114,8 @@ const confirmRoleChange = async () => {
 		);
 		return confirmed;
 	} catch (error) {
-		if (error !== 'cancel' && error !== 'close') {
-			$notifyUserAboutError(error.message || 'Role update canceled');
+		if (!['cancel', 'close'].includes(error)) {
+			this.$notifyUserAboutError(error);
 		}
 		user.value.roleId = originalUser.value.roleId;
 		return false;
@@ -140,8 +140,8 @@ const changePassword = async () => {
 		});
 		resetPassForm.value.resetFields();
 	} catch (error) {
-		if (error !== 'cancel' && error !== 'close') {
-			$notifyUserAboutError(error.message || 'Error requesting password change');
+		if (!['cancel', 'close'].includes(error)) {
+			this.$notifyUserAboutError(error);
 		}
 	}
 };
@@ -164,12 +164,8 @@ const deleteUser = async () => {
 			$notifyUserAboutError(error);
 		}
 	} catch (error) {
-		if (error !== 'cancel' && error !== 'close') {
-			$notify({
-				title: 'Canceled',
-				message: 'User deletion canceled',
-				type: 'info'
-			});
+		if (!['cancel', 'close'].includes(error)) {
+			this.$notifyUserAboutError(error);
 		}
 	}
 };

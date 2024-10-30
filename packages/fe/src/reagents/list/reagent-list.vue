@@ -48,8 +48,8 @@ const confirmDeleteReagent = async () => {
 			type: 'warning'
 		});
 	} catch (error) {
-		if (error !== 'cancel' && error !== 'close') {
-			showNotification('Canceled', 'Item deletion canceled', 'info');
+		if (!['cancel', 'close'].includes(error)) {
+			this.$notifyUserAboutError(error);
 		}
 		return false;
 	}
