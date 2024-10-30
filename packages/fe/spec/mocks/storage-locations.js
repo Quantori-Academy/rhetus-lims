@@ -42,16 +42,27 @@ function filterStorages(parsedOptions) {
 		storages: filteredStorages
 	});
 }
-
+function paginateStorages(items, page, limit) {
+	const start = (page - 1) * limit;
+	return items.slice(start, start + limit);
+}
 export const storageLocationHandlers = [
 	http.get(api('/storages'), req => {
 		const url = new URL(req.request.url);
 		const options = url.searchParams.get('options');
 		const parsedOptions = JSON.parse(options);
+		const page = parseInt(url.searchParams.get('page')) || 1;
+		const limit = parseInt(url.searchParams.get('limit')) || 10;
+		const paginatedStorages = paginateStorages(storageInfo.storages, page, limit);
+		console.log(paginatedStorages);
 		if (parsedOptions === null) {
 			return HttpResponse.json(storageInfo);
 		} else {
 			return filterStorages(parsedOptions);
+			// return HttpResponse.json({
+			// 	storages: paginatedStorages,
+			// 	count: storageInfo.storages.length
+			// });
 		}
 	}),
 	http.get(api('/storages/:id'), req => {
