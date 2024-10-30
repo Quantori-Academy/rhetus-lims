@@ -230,5 +230,18 @@ export const routes = [
 				{ name: 'New Reagent', path: '' }
 			]
 		}
+	},
+	{
+		path: '/404',
+		name: '404',
+		component: () => import('../../error-page/404-page.vue'),
+		meta: {
+			layout: LoginLayout,
+			title: 'Page Not Found'
+		}
+	},
+	{
+		path: '/:pathMatch(.*)*',
+		redirect: { name: '404' }
 	}
 ];
