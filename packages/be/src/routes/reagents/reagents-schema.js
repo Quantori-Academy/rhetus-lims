@@ -18,6 +18,7 @@ const Reagent = S.object()
 	.prop('quantityLeft', S.number().required())
 	.prop('expirationDate', S.string().format(S.FORMATS.DATE_TIME).required())
 	.prop('description', S.string().required())
+	.prop('structure', S.string())
 	.prop('storageLocationId', S.string().format(S.FORMATS.UUID).required())
 	.prop('category', S.string().required());
 

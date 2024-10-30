@@ -24,7 +24,8 @@ async function reagentsService(server) {
 				quantityLeft,
 				expirationDate,
 				storageLocationId,
-				description
+				description,
+				structure
 			} = data;
 
 			const result = await server.db
@@ -41,11 +42,17 @@ async function reagentsService(server) {
 					quantityLeft,
 					expirationDate: new Date(expirationDate),
 					storageId: storageLocationId,
-					description
+					description,
+					...(structure && { structure: sql`mol_from_smiles(${structure}::cstring)` })
 				})
 				.returning({ name: schema.reagents.name });
 
 			return result.length ? result[0].name : null;
+		},
+
+		isStructureValid: async smiles => {
+			const result = await server.db.execute(sql`SELECT is_valid_smiles(${smiles})`);
+			return result.rows[0].is_valid_smiles;
 		},
 
 		getReagentById: async id => {
@@ -63,6 +70,7 @@ async function reagentsService(server) {
 					quantityLeft: schema.reagents.quantityLeft,
 					expirationDate: schema.reagents.expirationDate,
 					description: schema.reagents.description,
+					structure: schema.reagents.structure,
 					storageLocation: {
 						id: schema.storages.id,
 						room: schema.storages.room,
