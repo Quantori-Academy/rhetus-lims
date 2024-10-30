@@ -17,7 +17,7 @@ const filters = ref({
 	room: '',
 	name: ''
 });
-const selectedOrder = ref('asc');
+const selectedOrder = ref(null);
 const sortOptions = ref([
 	{ label: 'Sort by Ascending', value: 'asc' },
 	{ label: 'Sort by Descending', value: 'desc' }
@@ -119,7 +119,11 @@ onMounted(() => {
 	<div class="storages-table">
 		<rh-filters>
 			<template #action-buttons>
-				<el-select v-model="selectedOrder" placeholder="Sort by" @change="setStorages">
+				<el-select
+					v-model="selectedOrder"
+					placeholder="Sort by creation date"
+					@change="setStorages"
+				>
 					<el-option
 						v-for="option of sortOptions"
 						:key="option.value"
@@ -176,7 +180,7 @@ onMounted(() => {
 }
 :deep(.el-select) {
 	padding: 8px 15px;
-	max-width: 200px;
+	max-width: 220px;
 }
 :deep(.el-table__row):hover {
 	cursor: pointer;
