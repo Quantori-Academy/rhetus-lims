@@ -15,10 +15,10 @@ import { ElButton } from 'element-plus';
 			</div>
 
 			<router-link to="/">
-				<el-button type="primary">Go Home</el-button>
+				<el-button type="primary" link>Go Home</el-button>
 			</router-link>
 			<router-link to="/login">
-				<el-button type="primary">Sign in with different account</el-button>
+				<el-button type="primary" link>Sign in with different account</el-button>
 			</router-link>
 		</div>
 	</div>

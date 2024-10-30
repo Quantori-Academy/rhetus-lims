@@ -241,7 +241,7 @@ export const routes = [
 		}
 	},
 	{
-		path: '/:catchAll(.*)',
+		path: '/:pathMatch(.*)*',
 		redirect: { name: '404' }
 	}
 ];
