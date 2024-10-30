@@ -183,6 +183,20 @@
       "when": 1731586344453,
       "tag": "0025_curvy_edwin_jarvis",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1731737907123,
+      "tag": "0026_cynical_luminals",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1731738043670,
+      "tag": "0027_military_proteus",
+      "breakpoints": true
     }
   ]
 }
