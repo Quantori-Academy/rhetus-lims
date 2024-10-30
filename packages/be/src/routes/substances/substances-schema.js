@@ -49,4 +49,17 @@ const changeQuantity = {
 	}
 };
 
-export { getSubstances, changeQuantity, Substance, Category };
+const updateSubstanceSchema = {
+	security: [{ Session: [] }],
+	params: S.object().prop('id', S.string()),
+	body: S.object()
+		.prop('category', S.string().enum(Object.values(Category)).required())
+		.prop('storageId', S.string().format(S.FORMATS.UUID)),
+	response: {
+		200: statusMessage,
+		404: statusMessage,
+		500: statusMessage
+	}
+};
+
+export { getSubstances, changeQuantity, Substance, Category, updateSubstanceSchema };

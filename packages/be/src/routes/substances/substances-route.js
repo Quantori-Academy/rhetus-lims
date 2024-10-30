@@ -78,7 +78,7 @@ async function substances(server, options) {
 		method: 'PATCH',
 		path: options.prefix + 'substances/:id',
 		preValidation: [server.authenticate],
-		// schema: schema.changeQuantity,
+		schema: schema.updateSubstanceSchema,
 		handler: onSubstanceUpdate
 	});
 
@@ -88,7 +88,7 @@ async function substances(server, options) {
 
 			const substanceId = req.params.id;
 			const substance = await server.substancesService.getSubstanceById(substanceId, category);
-
+			console.log("substance", substance)
 			if (!substance) {
 				return reply.code(404).send({ status: 'error', message: `No such ${category}` });
 			}
