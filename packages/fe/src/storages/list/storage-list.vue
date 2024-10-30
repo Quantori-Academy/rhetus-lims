@@ -59,10 +59,15 @@ async function deleteStorageLocation(id) {
 	}
 }
 
-const setStorages = debounce(async () => {
+const setStorages = debounce(async (event = null) => {
 	isLoading.value = true;
+	let query = createQuery(event);
+	const options = {
+		sort: { name: 'desc' },
+		...filters.value
+	};
 	try {
-		const data = await $api.storages.fetchStorages(filters.value);
+		const data = await $api.storages.fetchStorages(query.sort, options);
 		storages.value = data.storages;
 	} catch (error) {
 		$notifyUserAboutError(error);
@@ -70,6 +75,15 @@ const setStorages = debounce(async () => {
 		isLoading.value = false;
 	}
 }, 200);
+
+function createQuery(event) {
+	let query = {};
+	if (event && event.prop && event.order) {
+		const order = event.order === 'ascending' ? 'desc' : 'asc';
+		query.sort = { [event.prop]: order };
+	}
+	return query;
+}
 
 watch(
 	filters,
@@ -99,8 +113,8 @@ onMounted(() => {
 		</rh-filters>
 
 		<el-table v-loading="isLoading" :data="storages" @row-click="viewStorageLocation">
-			<el-table-column prop="room" min-width="150" label="Room" />
-			<el-table-column prop="name" min-width="150" label="Name" />
+			<el-table-column prop="room" min-width="150" label="Room" sortable />
+			<el-table-column prop="name" min-width="150" label="Name" sortable />
 			<el-table-column prop="description" min-width="200" label="Description" />
 			<el-table-column width="80">
 				<template #default="{ row }">
