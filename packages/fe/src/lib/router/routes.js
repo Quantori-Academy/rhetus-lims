@@ -260,12 +260,6 @@ export const routes = [
 		}
 	},
 	{
-		path: '/storages/content/:id',
-		name: 'storage-content',
-		component: () => import('../../storages/view-content/storage-content.vue'),
-		props: true
-	},
-	{
 		path: '/404',
 		name: '404',
 		component: () => import('../../error-page/404-page.vue'),
