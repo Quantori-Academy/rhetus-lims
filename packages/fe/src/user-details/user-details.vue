@@ -170,8 +170,11 @@ const deleteUser = async () => {
 </script>
 
 <template>
-	<div class="form-container">
-		<div class="section-header">Profile</div>
+	<div class="wrapper">
+		<div class="editing-header">
+			Profile
+			<el-button v-if="!isEdit" type="primary" @click="toggleEdit">{{ 'Edit profile' }}</el-button>
+		</div>
 		<el-form
 			ref="form-ref"
 			v-loading="loading"
@@ -257,8 +260,5 @@ const deleteUser = async () => {
 .el-form-item .el-input.is-disabled .el-input__wrapper,
 .el-form-item .el-select .el-select__wrapper.is-disabled {
 	background-color: transparent;
-}
-.el-button {
-	margin: 0 0 12px 12px;
 }
 </style>

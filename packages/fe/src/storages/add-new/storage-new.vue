@@ -61,7 +61,7 @@ const addStorage = async () => {
 			</el-form-item>
 			<div class="btn-container">
 				<el-button @click="cancelHandler">Cancel</el-button>
-				<el-button type="primary" @click="addStorage">Save</el-button>
+				<el-button type="primary" @click="addStorage">Add Storage</el-button>
 			</div>
 		</el-form>
 	</div>

@@ -108,7 +108,7 @@ const cancelHandler = () => {
 				</el-select>
 			</el-form-item>
 			<div class="btn-container">
-				<el-button @click="cancelHandler">Cancel Creation </el-button>
+				<el-button @click="cancelHandler">Cancel</el-button>
 				<el-button :loading="isSaving" type="primary" @click="addUser">Add User</el-button>
 			</div>
 		</el-form>

@@ -79,11 +79,11 @@ onMounted(() => {
 
 <template>
 	<div class="wrapper">
-		<div class="btn-container">
-			<div class="section-header">My Profile</div>
-			<el-button :type="editable ? 'default' : 'primary'" @click="toggleEdit">
-				{{ editable ? 'Cancel' : 'Edit' }}
-			</el-button>
+		<div class="editing-header">
+			My Profile
+			<el-button :type="editable ? 'default' : 'primary'" @click="toggleEdit">{{
+				editable ? 'Cancel' : 'Edit'
+			}}</el-button>
 		</div>
 		<el-form
 			v-if="profile"
