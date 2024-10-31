@@ -38,9 +38,7 @@ function filterStorages(parsedOptions) {
 		}
 		return matchesRoom && matchesName;
 	});
-	return HttpResponse.json({
-		storages: filteredStorages
-	});
+	return filteredStorages;
 }
 function paginateStorages(items, page, limit) {
 	const start = (page - 1) * limit;
@@ -50,15 +48,25 @@ export const storageLocationHandlers = [
 	http.get(api('/storages'), req => {
 		const url = new URL(req.request.url);
 		const options = url.searchParams.get('options');
+		const sort = JSON.parse(url.searchParams.get('sort')).creationDate;
+		console.log(`Sort order: ${sort}`);
 		const parsedOptions = JSON.parse(options);
 		const page = parseInt(url.searchParams.get('page')) || 1;
 		const limit = parseInt(url.searchParams.get('limit')) || 10;
-		const paginatedStorages = paginateStorages(storageInfo.storages, page, limit);
-		console.log(paginatedStorages);
-		if (parsedOptions === null) {
-			return HttpResponse.json(storageInfo);
+		const hasValidOptions = options => {
+			return Object.values(options).some(value => value !== '');
+		};
+		if (!hasValidOptions(parsedOptions)) {
+			return HttpResponse.json({
+				storages: paginateStorages(storageInfo.storages, page, limit),
+				count: storageInfo.storages.length
+			});
 		} else {
-			return filterStorages(parsedOptions);
+			const filtered = filterStorages(parsedOptions);
+			return HttpResponse.json({
+				storages: paginateStorages(filtered, page, limit),
+				count: filtered.length
+			});
 		}
 	}),
 	http.get(api('/storages/:id'), req => {

@@ -67,19 +67,14 @@ async function deleteStorageLocation(id) {
 const setStorages = debounce(async () => {
 	isLoading.value = true;
 	const sortQuery = createQuery();
-	const options = {
+	const params = {
 		page: paginationData.value.page,
 		limit: paginationData.value.size,
 		sort: sortQuery,
-		...filters.value
+		options: { ...filters.value }
 	};
 	try {
-		const data = await $api.storages.fetchStorages(
-			options.page,
-			options.limit,
-			options.sort,
-			options
-		);
+		const data = await $api.storages.fetchStorages(params);
 		storages.value = data.storages;
 		paginationData.value.totalElements = data.count;
 	} catch (error) {

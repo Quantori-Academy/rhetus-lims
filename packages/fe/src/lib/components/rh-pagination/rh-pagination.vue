@@ -39,7 +39,7 @@ const handlePageChange = newPage => {
 	<div class="pagination-container">
 		<el-pagination
 			v-if="needPagination"
-			:current-page="page + 1"
+			:current-page="page"
 			:page-size="pagination.size"
 			:total="pagination.totalElements"
 			:layout="layout"
