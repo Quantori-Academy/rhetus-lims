@@ -59,10 +59,6 @@ export const storageLocationHandlers = [
 			return HttpResponse.json(storageInfo);
 		} else {
 			return filterStorages(parsedOptions);
-			// return HttpResponse.json({
-			// 	storages: paginatedStorages,
-			// 	count: storageInfo.storages.length
-			// });
 		}
 	}),
 	http.get(api('/storages/:id'), req => {
