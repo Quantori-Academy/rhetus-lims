@@ -107,24 +107,16 @@ const cancelHandler = () => {
 					></el-option>
 				</el-select>
 			</el-form-item>
-			<el-button @click="cancelHandler">Cancel Creation </el-button>
-			<el-button :loading="isSaving" type="primary" @click="addUser">Add User</el-button>
+			<div class="btn-container">
+				<el-button @click="cancelHandler">Cancel Creation </el-button>
+				<el-button :loading="isSaving" type="primary" @click="addUser">Add User</el-button>
+			</div>
 		</el-form>
 	</div>
 </template>
 
 <style scoped>
-.form-container {
-	margin: 0 15px;
-	margin-top: 20px;
-	width: 500px;
-}
-.align-end {
-	text-align: end;
-}
-@media (max-width: 520px) {
-	.el-form {
-		width: 220px;
-	}
+.el-button {
+	margin: 0 0 12px 12px;
 }
 </style>

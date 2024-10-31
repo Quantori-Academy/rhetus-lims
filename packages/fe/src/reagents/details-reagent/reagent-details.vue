@@ -24,7 +24,7 @@ const props = defineProps({
 });
 const formEl = useTemplateRef('form-ref');
 const reagent = ref(null);
-const loading = ref(false);
+const loading = ref(true);
 const storages = ref([]);
 const storageDisplayValue = ref('');
 const isEdit = computed(() => $route.value.name === 'reagent-details-edit');
@@ -137,9 +137,12 @@ const deleteReagent = async () => {
 </script>
 
 <template>
-	<div class="wrapper">
+	<div v-if="reagent" v-loading="loading" class="wrapper">
+		<div v-if="reagent" class="editing-header">
+			<div>{{ `${isEdit ? 'Editing ' : ''}${reagent.name}` }}</div>
+			<el-button v-if="!isEdit" @click="toggleEdit">{{ 'Edit' }}</el-button>
+		</div>
 		<el-form
-			v-if="reagent"
 			ref="form-ref"
 			v-loading="loading || !reagent"
 			label-position="top"
@@ -150,21 +153,14 @@ const deleteReagent = async () => {
 			<el-form-item label="Name" prop="name">
 				<el-input v-model="reagent.name" :disabled="true" />
 			</el-form-item>
-			<el-form-item label="Category">
-				<el-select v-model="reagent.category" :disabled="true" :placeholder="reagent.category">
-					<el-option label="Reagent" value="reagent" />
-					<el-option label="Sample" value="sample" />
-				</el-select>
-			</el-form-item>
-			<el-form-item label="Description" prop="description">
-				<el-input v-model="reagent.description" type="textarea" :disabled="true" />
-			</el-form-item>
-			<el-form-item label="CAS number" prop="casNumber">
-				<el-input v-model="reagent.casNumber" :disabled="true" />
-			</el-form-item>
-			<el-form-item label="Producer" prop="producer">
-				<el-input v-model="reagent.producer" :disabled="true" />
-			</el-form-item>
+			<div class="align-horizontal">
+				<el-form-item label="CAS number" prop="casNumber">
+					<el-input v-model="reagent.casNumber" :disabled="true" />
+				</el-form-item>
+				<el-form-item label="Producer" prop="producer">
+					<el-input v-model="reagent.producer" :disabled="true" />
+				</el-form-item>
+			</div>
 			<div class="align-horizontal">
 				<el-form-item label="Catalog ID" prop="catalogId">
 					<el-input v-model="reagent.catalogId" :disabled="true" />
@@ -173,17 +169,13 @@ const deleteReagent = async () => {
 					<el-input v-model="reagent.catalogLink" :disabled="true" />
 				</el-form-item>
 			</div>
-			<el-form-item label="Storage location" prop="storageLocationId">
-				<el-select v-model="reagent.storageLocationId" :disabled="!isEdit" filterable>
-					<el-option
-						v-for="storage of storages"
-						:key="storage.id"
-						:label="`${storage.room} - ${storage.name}`"
-						:value="storage.id"
-					/>
-				</el-select>
-			</el-form-item>
 			<div class="align-horizontal">
+				<el-form-item label="Quantity unit" prop="quantityUnit">
+					<el-input v-model="reagent.quantityUnit" :disabled="true" />
+				</el-form-item>
+				<el-form-item label="Quantity" prop="quantity">
+					<el-input-number v-model="reagent.quantity" :disabled="true" />
+				</el-form-item>
 				<el-form-item label="Quantity left" prop="quantityLeft">
 					<el-input-number
 						v-model="reagent.quantityLeft"
@@ -192,12 +184,6 @@ const deleteReagent = async () => {
 						:min="0"
 					>
 					</el-input-number>
-				</el-form-item>
-				<el-form-item label="Quantity" prop="quantity">
-					<el-input v-model="reagent.quantity" :disabled="true" />
-				</el-form-item>
-				<el-form-item label="Unit" prop="quantityUnit">
-					<el-input v-model="reagent.quantityUnit" :disabled="true" />
 				</el-form-item>
 			</div>
 			<el-form-item label="Price per unit" prop="unitPrice">
@@ -212,14 +198,26 @@ const deleteReagent = async () => {
 					disabled
 				/>
 			</el-form-item>
-			<template v-if="isEdit">
-				<el-button type="primary" @click="handleSubmit">{{ 'Save' }}</el-button>
-				<el-button @click="cancelEdit">Cancel</el-button>
-			</template>
-			<template v-else>
-				<el-button type="primary" @click="toggleEdit">{{ 'Edit reagent' }}</el-button>
+			<el-form-item label="Storage location" prop="storageLocationId">
+				<el-select v-model="reagent.storageLocationId" :disabled="!isEdit" filterable>
+					<el-option
+						v-for="storage of storages"
+						:key="storage.id"
+						:label="`${storage.room} - ${storage.name}`"
+						:value="storage.id"
+					/>
+				</el-select>
+			</el-form-item>
+			<el-form-item label="Description" prop="description">
+				<el-input v-model="reagent.description" type="textarea" :disabled="true" />
+			</el-form-item>
+			<div v-if="isEdit" class="btn-container">
 				<el-button type="danger" @click="deleteReagent">{{ 'Delete reagent' }}</el-button>
-			</template>
+				<div>
+					<el-button @click="cancelEdit">Cancel</el-button>
+					<el-button type="primary" @click="handleSubmit">{{ 'Save' }}</el-button>
+				</div>
+			</div>
 		</el-form>
 	</div>
 </template>
@@ -230,5 +228,9 @@ const deleteReagent = async () => {
 }
 :deep(.el-date-editor) {
 	width: 100%;
+}
+.btn-container {
+	display: flex;
+	justify-content: space-between;
 }
 </style>

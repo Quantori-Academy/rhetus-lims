@@ -259,6 +259,6 @@ const deleteUser = async () => {
 	background-color: transparent;
 }
 .el-button {
-	margin: 0 12px 12px 0;
+	margin: 0 0 12px 12px;
 }
 </style>

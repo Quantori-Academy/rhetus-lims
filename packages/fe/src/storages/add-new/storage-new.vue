@@ -59,8 +59,10 @@ const addStorage = async () => {
 					placeholder="Enter description"
 				></el-input>
 			</el-form-item>
-			<el-button @click="cancelHandler">Cancel</el-button>
-			<el-button type="primary" @click="addStorage">Save</el-button>
+			<div class="btn-container">
+				<el-button @click="cancelHandler">Cancel</el-button>
+				<el-button type="primary" @click="addStorage">Save</el-button>
+			</div>
 		</el-form>
 	</div>
 </template>

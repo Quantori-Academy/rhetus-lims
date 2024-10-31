@@ -76,8 +76,10 @@ onMounted(() => {
 			<el-form-item label="Description" prop="description">
 				<el-input v-model="storage.description" type="textarea" />
 			</el-form-item>
-			<el-button @click="cancelEdit">Cancel</el-button>
-			<el-button type="primary" @click="handleSubmit">Save</el-button>
+			<div class="btn-container">
+				<el-button @click="cancelEdit">Cancel</el-button>
+				<el-button type="primary" @click="handleSubmit">Save</el-button>
+			</div>
 		</el-form>
 	</div>
 </template>

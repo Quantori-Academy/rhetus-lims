@@ -48,6 +48,19 @@ html {
 	margin: 50px auto;
 	max-width: 900px;
 }
+.btn-container {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: end;
+}
+.editing-header {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 12px;
+	color: var(--color-text);
+	font-weight: 500;
+	font-size: large;
+}
 .align-horizontal {
 	display: flex;
 	gap: 18px;

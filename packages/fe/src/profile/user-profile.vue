@@ -142,6 +142,11 @@ onMounted(() => {
 			</el-form-item>
 			<div v-if="editable" class="align-end">
 				<el-button type="primary" @click="passwordChangeHandler"> Reset password </el-button>
+
+				<el-button v-if="editable" type="primary" @click="editHandler">Save</el-button>
+				<el-button v-if="editable" type="warning" @click="passwordChangeHandler">
+					Change password
+				</el-button>
 			</div>
 		</el-form>
 	</div>

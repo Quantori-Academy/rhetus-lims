@@ -115,7 +115,7 @@ onMounted(() => {
 				<el-input v-model="form.name" placeholder="Enter sample name" />
 			</el-form-item>
 
-			<el-form-item label="Reagents/Samples used" prop="components">
+			<el-form-item label="Substances used" prop="components">
 				<div
 					v-for="(component, index) of form.components"
 					:key="component.id + index"
@@ -126,7 +126,7 @@ onMounted(() => {
 						v-model="form.components[index]"
 						value-key="id"
 						filterable
-						placeholder="Select reagent/sample"
+						placeholder="Select substances"
 					>
 						<el-option
 							v-for="item of componentOptions"
@@ -211,11 +211,6 @@ onMounted(() => {
 	opacity: 0.6;
 	font-size: small;
 }
-.btn-container {
-	display: flex;
-	justify-content: start;
-}
-
 .add-btn {
 	margin-top: -12px;
 	margin-bottom: 12px;
