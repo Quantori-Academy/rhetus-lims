@@ -7,5 +7,11 @@ export default http => ({
 			method: 'PATCH',
 			body: item
 		});
+	},
+	async changeSubstanceQuantity(id, body) {
+		return await http(`/substances/quantity-change/${id}`, {
+			method: 'PUT',
+			body
+		});
 	}
 });
