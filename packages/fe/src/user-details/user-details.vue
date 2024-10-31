@@ -77,7 +77,7 @@ const cancelEdit = () => {
 	$router.push({ name: 'user-details', params: { id: user.value.id } });
 	$notify({
 		title: 'Canceled',
-		message: 'User deletion canceled',
+		message: 'User editing canceled',
 		type: 'info'
 	});
 	user.value = { ...originalUser.value };
