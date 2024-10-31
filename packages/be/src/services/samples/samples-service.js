@@ -208,6 +208,31 @@ async function samplesService(server) {
 				})
 				.from(schema.samples)
 				.where(and(eq(schema.samples.storageId, id), eq(schema.samples.deleted, false)));
+		},
+
+		updateSample: async (id, data) => {
+			const { storageId } = data;
+			const sample = await server.samplesService.getSampleById(id);
+
+			if (storageId) {
+				await server.db.insert(schema.substancesStorageChanges).values({
+					sampleId: id,
+					previousStorageId: sample.storageLocation.id,
+					targetStorageId: storageId
+				});
+			}
+
+			const result = await server.db
+				.update(schema.samples)
+				.set({ storageId: storageId })
+				.where(eq(schema.samples.id, id))
+				.returning({ sampleName: schema.samples.name });
+
+			return {
+				code: 200,
+				status: 'success',
+				message: `Sample '${result[0].sampleName}' was updated`
+			};
 		}
 	});
 }

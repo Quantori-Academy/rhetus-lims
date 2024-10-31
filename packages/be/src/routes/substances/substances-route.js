@@ -88,17 +88,21 @@ async function substances(server, options) {
 
 			const substanceId = req.params.id;
 			const substance = await server.substancesService.getSubstanceById(substanceId, category);
-			console.log("substance", substance)
 			if (!substance) {
 				return reply.code(404).send({ status: 'error', message: `No such ${category}` });
 			}
 
+			if (storageId && !(await server.storagesService.getStorageById(storageId))) {
+				return reply.code(404).send({ status: 'error', message: `No such storage` });
+			}
+
+			const updateData = { category };
+
+			if (storageId) updateData.storageId = storageId;
+			//TODO: add checks for name, description
 			const { code, status, message } = await server.substancesService.updateSubstance(
 				substanceId,
-				{
-					category,
-					storageId
-				}
+				updateData
 			);
 
 			return reply.code(code).send({

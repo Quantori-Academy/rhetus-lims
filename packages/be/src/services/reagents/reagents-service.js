@@ -158,10 +158,19 @@ async function reagentsService(server) {
 		},
 		updateReagent: async (id, data) => {
 			const { storageId } = data;
+			const reagent = await server.reagentsService.getReagentById(id);
+
+			if (storageId) {
+				await server.db.insert(schema.substancesStorageChanges).values({
+					reagentId: id,
+					previousStorageId: reagent.storageLocation.id,
+					targetStorageId: storageId
+				});
+			}
 
 			const result = await server.db
 				.update(schema.reagents)
-				.set({ storageLocationId: storageId })
+				.set({ storageId: storageId })
 				.where(eq(schema.reagents.id, id))
 				.returning({ reagentName: schema.reagents.name });
 
