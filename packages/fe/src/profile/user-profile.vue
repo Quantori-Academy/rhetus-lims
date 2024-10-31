@@ -1,13 +1,14 @@
 <script setup>
-import { onMounted, ref, useTemplateRef } from 'vue';
+import { onMounted, ref, useTemplateRef, computed } from 'vue';
 import { $api } from '../lib/api';
 import { ElForm, ElFormItem, ElInput, ElButton } from 'element-plus';
 import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg';
 import { $confirm } from '../lib/utils/feedback/confirm-msg';
 import { $isFormValid } from '../lib/utils/form-validation/is-form-valid';
 import { passwordFormRules, profileFormRules } from './constants';
+import { $route, $router } from '../lib/router/router';
 
-const editable = ref(false);
+const editable = computed(() => $route.value.name === 'edit-user-profile');
 const profile = ref(null);
 const form = useTemplateRef('form');
 
@@ -25,22 +26,14 @@ const setProfile = async () => {
 	}
 };
 
-const cancelEdit = () => {
-	setProfile();
-	resetPassForm.value.resetFields();
-	editable.value = false;
-};
-
-const ifEdit = () => {
-	editable.value = !editable.value;
-};
-
-const onProfileEdit = () => {
+const toggleEdit = async () => {
 	if (editable.value) {
-		cancelEdit();
-	} else {
-		ifEdit();
+		resetPassForm.value.resetFields();
+		setProfile();
 	}
+	$router.push({
+		name: editable.value ? 'user-profile' : 'edit-user-profile'
+	});
 };
 
 const editHandler = async () => {
@@ -88,7 +81,7 @@ onMounted(() => {
 	<div class="form-container">
 		<div class="btn-container">
 			<div class="section-header">My Profile</div>
-			<el-button :type="editable ? 'default' : 'primary'" @click="onProfileEdit">
+			<el-button :type="editable ? 'default' : 'primary'" @click="toggleEdit">
 				{{ editable ? 'Cancel' : 'Edit' }}
 			</el-button>
 		</div>
