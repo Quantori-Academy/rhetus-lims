@@ -15,7 +15,11 @@ export const substancesStorageChanges = pgTable('substances_storage_changes', {
 	sampleId: uuid('sample_id')
 		.references(() => samples.id)
 		.default(null),
-	previousStorageId: uuid('previous_storage_id').references(() => storages.id).notNull(),
-	targetStorageId: uuid('target_storage_id').references(() => storages.id).notNull(),
+	previousStorageId: uuid('previous_storage_id')
+		.references(() => storages.id)
+		.notNull(),
+	targetStorageId: uuid('target_storage_id')
+		.references(() => storages.id)
+		.notNull(),
 	createdAt: timestamp('created_at').notNull().defaultNow()
 });
