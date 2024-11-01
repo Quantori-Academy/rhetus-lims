@@ -12,7 +12,7 @@ const toggleFilterView = () => {
 <template>
 	<div class="action-buttons">
 		<el-button @click="toggleFilterView">
-			<rh-icon color="#409eff" name="sliders-h" />
+			<rh-icon color="#1785be" name="sliders-h" />
 			{{ visible ? 'Hide filters' : 'Show filters' }}
 		</el-button>
 		<slot name="action-buttons" />
