@@ -53,6 +53,7 @@ async function storagesService(server) {
 					name: schema.storages.name,
 					room: schema.storages.room,
 					description: schema.storages.description,
+					creationDate: schema.storages.createdAt,
 					isEmpty: server.storagesService.isEmptyQuery().as('isEmpty')
 				})
 				.from(schema.storages)
@@ -81,6 +82,7 @@ async function storagesService(server) {
 					room: schema.storages.room,
 					name: schema.storages.name,
 					description: schema.storages.description,
+					creationDate: schema.storages.createdAt,
 					isEmpty: server.storagesService.isEmptyQuery().as('isEmpty')
 				})
 				.from(schema.storages)
