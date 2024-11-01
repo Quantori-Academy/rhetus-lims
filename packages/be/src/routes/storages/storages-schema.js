@@ -9,26 +9,23 @@ const Storage = S.object()
 	.prop('room', S.string().required().maxLength(300))
 	.prop('name', S.string().required().maxLength(300))
 	.prop('description', S.string())
-	.prop('createdAt', S.string().format(S.FORMATS.DATE_TIME).required());
+	.prop('creationDate', S.string().format(S.FORMATS.DATE_TIME).required());
 
 const createStorage = {
 	security: [{ Session: [] }],
-	body: Storage.without(['id', 'createdAt']),
+	body: Storage.without(['id', 'creationDate']),
 	response: {
 		201: statusMessage,
 		500: statusMessage
 	}
 };
 
+const StorageWithIsEmpty = Storage.prop('isEmpty', S.boolean().required());
+
 const getStorages = {
 	security: [{ Session: [] }],
 	response: {
-		200: S.object()
-			.prop(
-				'storages',
-				S.array().items(Storage.without(['createdAt']).prop('isEmpty', S.boolean().required()))
-			)
-			.prop('count', S.number()),
+		200: S.object().prop('storages', S.array().items(StorageWithIsEmpty)).prop('count', S.number()),
 		500: statusMessage
 	}
 };
@@ -37,7 +34,7 @@ const getStorage = {
 	security: [{ Session: [] }],
 	params: S.object().prop('id', S.string()),
 	response: {
-		200: Storage.without(['createdAt']).prop('isEmpty', S.boolean().required()),
+		200: StorageWithIsEmpty,
 		404: statusMessage,
 		500: statusMessage
 	}
