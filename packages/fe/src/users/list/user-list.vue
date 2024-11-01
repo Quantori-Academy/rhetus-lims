@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
-import { ElTable, ElTableColumn, ElButton } from 'element-plus';
+import { ElTable, ElTableColumn, ElButton, ElTooltip } from 'element-plus';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { $api } from '../../lib/api/index.js';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg';
@@ -99,6 +99,16 @@ onMounted(() => {
 		</rh-filters>
 
 		<el-table v-loading="isLoading" :data="users" @row-click="viewUserDetails">
+			<el-table-column width="50">
+				<template #default="{ row }">
+					<el-tooltip
+						v-if="row.hasPasswordResetRequests"
+						:content="`${row.username} has a password reset request`"
+					>
+						<rh-icon name="lock" color="#4c8fd2" size="18" class="password-icon" />
+					</el-tooltip>
+				</template>
+			</el-table-column>
 			<el-table-column prop="username" min-width="150" label="User name" />
 			<el-table-column prop="firstName" min-width="150" label="First Name" />
 			<el-table-column prop="lastName" min-width="150" label="Last Name" />
@@ -138,5 +148,8 @@ onMounted(() => {
 
 :deep(.el-table__row):hover {
 	cursor: pointer;
+}
+.password-icon {
+	margin-top: 4px;
 }
 </style>

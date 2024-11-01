@@ -17,7 +17,7 @@ async function resetPassword(form) {
 	isLoading.value = true;
 
 	try {
-		const response = await $api.auth.resetUserPassword(form.username);
+		const response = await $api.auth.requestPasswordReset(form);
 		$notify({
 			title: 'Success',
 			message: response.message,

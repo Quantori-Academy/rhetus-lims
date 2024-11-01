@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import LoginLayout from './layout/login-layout.vue';
 import { roles } from '../constants/roles.js';
 
@@ -93,6 +94,19 @@ export const routes = [
 			breadcrumb: [
 				{ name: 'Home', path: '/' },
 				{ name: 'Profile', path: '/profile' }
+			]
+		}
+	},
+	{
+		path: '/profile/edit',
+		name: 'edit-user-profile',
+		component: () => import('../../profile/user-profile.vue'),
+		meta: {
+			title: 'Edit User Profile',
+			breadcrumb: [
+				{ name: 'Home', path: '/' },
+				{ name: 'Profile', path: '/profile' },
+				{ name: 'Edit', path: '' }
 			]
 		}
 	},

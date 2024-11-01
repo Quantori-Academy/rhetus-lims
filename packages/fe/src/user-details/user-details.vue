@@ -14,14 +14,9 @@ import { $confirm } from '../lib/utils/feedback/confirm-msg.js/';
 import { $api } from '../lib/api/index.js';
 import { $route, $router } from '../lib/router/router';
 import { $isFormValid } from '../lib/utils/form-validation/is-form-valid.js';
-import { formRules, emptyUser } from './constants';
+import { formRules, emptyUser, passwordFormRules } from './constants';
 
-const props = defineProps({
-	id: {
-		type: String,
-		default: null
-	}
-});
+const props = defineProps({ id: { type: String, default: null } });
 
 const formEl = useTemplateRef('form-ref');
 const user = ref(emptyUser);
@@ -29,10 +24,13 @@ const loading = ref(false);
 const originalUser = ref(null);
 const roles = ref([]);
 const rules = ref(formRules);
-const roleName = computed(() => {
-	return roles.value.find(role => role.id === user.value.roleId).name;
-});
+const roleName = computed(() => roles.value.find(role => role.id === user.value.roleId).name);
 const isEdit = computed(() => $route.value.name === 'user-details-edit');
+
+const resetPassForm = useTemplateRef('reset-pass-form');
+const passwords = ref({ password: '', confirmPassword: '' });
+
+const passwordRules = ref(passwordFormRules(passwords));
 
 onMounted(() => {
 	setUser(props.id);
@@ -50,6 +48,7 @@ async function setRoles() {
 		loading.value = false;
 	}
 }
+
 const setUser = async id => {
 	loading.value = true;
 	try {
@@ -73,6 +72,7 @@ const setUser = async id => {
 const toggleEdit = () => {
 	$router.push({ name: 'user-details-edit', params: { id: user.value.id } });
 };
+
 const cancelEdit = () => {
 	$router.push({ name: 'user-details', params: { id: user.value.id } });
 	$notify({
@@ -82,6 +82,7 @@ const cancelEdit = () => {
 	});
 	user.value = { ...originalUser.value };
 	formEl.value.resetFields();
+	resetPassForm.value.resetFields();
 };
 
 const handleSubmit = async () => {
@@ -120,25 +121,22 @@ const confirmRoleChange = async () => {
 };
 
 const changePassword = async () => {
+	if (!(await $isFormValid(resetPassForm))) return;
 	try {
-		const confirmed = await $confirm(
-			'Are you sure you want to change your password?',
-			'Confirm Password Change',
-			{
-				confirmButtonText: 'Yes',
-				cancelButtonText: 'No',
-				type: 'warning'
-			}
+		await $confirm(
+			'This will set a temporary password that the user can log in with.',
+			'Password Change?',
+			{ type: 'warning' }
 		);
-		if (confirmed) {
-			const response = await $api.users.changePassword(user.value.id, true);
-			console.log(response);
-			$notify({
-				title: 'Success',
-				message: 'Password change request has been sent',
-				type: 'success'
-			});
-		}
+		const res = await $api.auth.setTemporaryPassword(user.value.id, {
+			password: passwords.value.password
+		});
+		$notify({
+			title: 'Success',
+			message: res.message,
+			type: 'success'
+		});
+		resetPassForm.value.resetFields();
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error requesting password change');
 	}
@@ -148,7 +146,6 @@ const deleteUser = async () => {
 	try {
 		await $confirm('Do you want to delete this user?', 'Warning', {
 			confirmButtonText: 'OK',
-			cancelButtonText: 'Cancel',
 			type: 'warning'
 		});
 		try {
@@ -162,8 +159,7 @@ const deleteUser = async () => {
 		} catch (error) {
 			$notifyUserAboutError(error);
 		}
-	} catch (error) {
-		console.log(error);
+	} catch {
 		$notify({
 			title: 'Canceled',
 			message: 'User deletion canceled',
@@ -174,7 +170,8 @@ const deleteUser = async () => {
 </script>
 
 <template>
-	<div class="wrapper">
+	<div class="form-container">
+		<div class="section-header">Profile</div>
 		<el-form
 			ref="form-ref"
 			v-loading="loading"
@@ -197,52 +194,71 @@ const deleteUser = async () => {
 			</el-form-item>
 			<el-form-item label="Role" prop="role">
 				<el-select v-model="user.roleId" :disabled="!isEdit" @change="confirmRoleChange">
-					<el-option
-						v-for="role of roles"
-						:key="role.id"
-						:label="role.name"
-						:value="role.id"
-					></el-option>
+					<el-option v-for="role of roles" :key="role.id" :label="role.name" :value="role.id" />
 				</el-select>
 			</el-form-item>
-			<el-form-item class="last-input" label="Creation date" prop="creationDate">
-				<el-date-picker
-					v-model="user.createdAt"
-					type="date"
-					format="YYYY-MM-DD"
-					value-format="YYYY-MM-DD"
-					:disabled="true"
+			<el-form-item label="Creation date" prop="creationDate">
+				<el-date-picker v-model="user.createdAt" type="date" format="YYYY-MM-DD" :disabled="true" />
+			</el-form-item>
+			<div v-if="isEdit" class="align-end">
+				<el-button type="primary" @click="handleSubmit">Save</el-button>
+				<el-button @click="cancelEdit">Cancel</el-button>
+			</div>
+			<div v-else class="align-end">
+				<el-button type="danger" @click="deleteUser">Delete user</el-button>
+				<el-button type="primary" @click="toggleEdit">Edit profile</el-button>
+			</div>
+		</el-form>
+	</div>
+	<div class="form-container">
+		<div class="section-header">Manage password</div>
+		<el-form
+			ref="reset-pass-form"
+			:model="passwords"
+			label-position="top"
+			:rules="passwordRules"
+			@submit="changePassword"
+		>
+			<el-form-item label="New password" prop="password">
+				<el-input
+					v-model="passwords.password"
+					:disabled="!isEdit"
+					placeholder="Input password"
+					type="password"
+					show-password
 				/>
 			</el-form-item>
-			<template v-if="isEdit">
-				<el-button type="primary" @click="handleSubmit">{{ '		Save' }}</el-button>
-				<el-button @click="cancelEdit">Cancel</el-button>
-			</template>
-			<template v-else>
-				<el-button type="primary" @click="toggleEdit">{{ 'Edit profile' }}</el-button>
-				<el-button type="warning" @click="changePassword">Change password</el-button>
-				<el-button type="danger" @click="deleteUser">{{ 'Delete user' }}</el-button>
-			</template>
+			<el-form-item label="Confirm password" prop="confirmPassword">
+				<el-input
+					v-model="passwords.confirmPassword"
+					:disabled="!isEdit"
+					placeholder="Confirm password"
+					type="password"
+					show-password
+				/>
+			</el-form-item>
+			<div v-if="isEdit" class="align-end">
+				<el-button type="primary" @click="changePassword">Reset password</el-button>
+			</div>
 		</el-form>
 	</div>
 </template>
 
 <style scoped>
-.el-form-item {
-	margin-bottom: 10px;
+.form-container {
+	margin: 20px 15px 0px 15px;
+	width: 500px;
 }
-.el-form {
-	width: 50vw;
+.section-header {
+	margin-bottom: 12px;
+	font-weight: 500;
+	font-size: large;
 }
-.el-form-item:last-of-type {
-	margin-bottom: 20px;
-}
-.el-form-item .el-input.is-disabled .el-input__wrapper,
-.el-form-item .el-select .el-select__wrapper.is-disabled {
-	background-color: transparent;
+.align-end {
+	text-align: end;
 }
 @media screen and (max-width: 750px) {
-	.el-form {
+	.form-container {
 		width: 80vw;
 	}
 }

@@ -14,7 +14,8 @@ export let userInfo = {
 				name: 'administrator'
 			},
 			lastLogin: '2024-09-26T10:15:06.720Z',
-			createdAt: '2024-09-27T21:47:47.481Z'
+			createdAt: '2024-09-27T21:47:47.481Z',
+			hasPasswordResetRequests: true
 		},
 		{
 			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d',
@@ -27,7 +28,8 @@ export let userInfo = {
 				name: 'administrator'
 			},
 			lastLogin: '2024-09-27T10:15:06.720Z',
-			createdAt: '2024-09-27T21:47:47.481Z'
+			createdAt: '2024-09-27T21:47:47.481Z',
+			hasPasswordResetRequests: false
 		},
 		{
 			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b322',
@@ -40,7 +42,8 @@ export let userInfo = {
 				name: 'procurement officer'
 			},
 			lastLogin: '2024-10-05T10:15:06.720Z',
-			createdAt: '2024-09-28T21:47:47.481Z'
+			createdAt: '2024-09-28T21:47:47.481Z',
+			hasPasswordResetRequests: true
 		},
 		{
 			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b999',
@@ -53,7 +56,8 @@ export let userInfo = {
 				name: 'researcher'
 			},
 			lastLogin: '2024-10-06T10:15:06.720Z',
-			createdAt: '2024-09-20T21:47:47.481Z'
+			createdAt: '2024-09-20T21:47:47.481Z',
+			hasPasswordResetRequests: false
 		}
 	],
 	counts: 1
