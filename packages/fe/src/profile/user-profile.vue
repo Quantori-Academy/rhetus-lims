@@ -108,12 +108,12 @@ onMounted(() => {
 			<el-form-item label="Role" prop="role">
 				<el-input v-model="profile.role.name" :disabled="true" />
 			</el-form-item>
-			<div v-if="editable" class="align-end">
+			<div v-if="editable" class="btn-container">
 				<el-button v-if="editable" type="primary" @click="editHandler">Update</el-button>
 			</div>
 		</el-form>
 	</div>
-	<div class="form-container">
+	<div class="wrapper">
 		<div class="section-header">Reset password</div>
 		<el-form
 			ref="reset-pass-form"
@@ -140,31 +140,14 @@ onMounted(() => {
 					show-password
 				/>
 			</el-form-item>
-			<div v-if="editable" class="align-end">
+			<div v-if="editable" class="btn-container">
 				<el-button type="primary" @click="passwordChangeHandler"> Reset password </el-button>
-
-				<el-button v-if="editable" type="primary" @click="editHandler">Save</el-button>
-				<el-button v-if="editable" type="warning" @click="passwordChangeHandler">
-					Change password
-				</el-button>
 			</div>
 		</el-form>
 	</div>
 </template>
 
 <style scoped>
-.form-container {
-	margin: 0 15px;
-	margin-top: 20px;
-	width: 500px;
-}
-.btn-container {
-	display: flex;
-	justify-content: space-between;
-}
-.align-end {
-	text-align: end;
-}
 .section-header {
 	margin-bottom: 12px;
 	font-weight: 500;

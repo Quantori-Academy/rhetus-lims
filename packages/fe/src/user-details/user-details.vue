@@ -203,17 +203,16 @@ const deleteUser = async () => {
 			<el-form-item label="Creation date" prop="creationDate">
 				<el-date-picker v-model="user.createdAt" type="date" format="YYYY-MM-DD" :disabled="true" />
 			</el-form-item>
-			<div v-if="isEdit" class="align-end">
+			<div v-if="isEdit" class="btn-container">
 				<el-button type="primary" @click="handleSubmit">Save</el-button>
 				<el-button @click="cancelEdit">Cancel</el-button>
 			</div>
-			<div v-else class="align-end">
+			<div v-else class="btn-container">
 				<el-button type="danger" @click="deleteUser">Delete user</el-button>
-				<el-button type="primary" @click="toggleEdit">Edit profile</el-button>
 			</div>
 		</el-form>
 	</div>
-	<div class="form-container">
+	<div class="wrapper">
 		<div class="section-header">Manage password</div>
 		<el-form
 			ref="reset-pass-form"
@@ -240,7 +239,7 @@ const deleteUser = async () => {
 					show-password
 				/>
 			</el-form-item>
-			<div v-if="isEdit" class="align-end">
+			<div v-if="isEdit" class="btn-container">
 				<el-button type="primary" @click="changePassword">Reset password</el-button>
 			</div>
 		</el-form>
@@ -248,8 +247,10 @@ const deleteUser = async () => {
 </template>
 
 <style scoped>
-:deep(.el-date-editor) {
-	width: 100%;
+.section-header {
+	margin-bottom: 12px;
+	font-weight: 500;
+	font-size: large;
 }
 .el-form-item {
 	margin-bottom: 10px;
