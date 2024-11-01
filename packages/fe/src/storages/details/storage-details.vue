@@ -19,9 +19,6 @@ const props = defineProps({
 
 <style scoped>
 .storage-content-table {
-	display: flex;
-	flex-direction: column;
-	gap: 30px;
 	margin-top: 20px;
 }
 </style>
