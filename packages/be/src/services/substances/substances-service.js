@@ -54,12 +54,25 @@ async function substancesService(server) {
 		},
 
 		updateSubstance: async (id, data) => {
-			const { code, status, message } =
-				data.category === Category.REAGENT
-					? await server.reagentsService.updateReagent(id, data)
-					: await server.samplesService.updateSample(id, data);
+			const { category, storageId, quantityUsed, reason } = data;
 
-			return { code, status, message };
+			const service = category === Category.REAGENT
+				? server.reagentsService : server.samplesService;
+
+			let substanceName = '';
+			if(storageId) {
+				substanceName = await service.updateStorage(id, { storageId })
+			}
+
+			if(quantityUsed) {
+				substanceName= await service.updateQuantity(id, { quantityUsed, reason })
+			}
+
+			return {
+				code: 200,
+				status: 'success',
+				message: `${category.charAt(0).toUpperCase()} '${substanceName}' was updated`
+			};
 		}
 	});
 }
