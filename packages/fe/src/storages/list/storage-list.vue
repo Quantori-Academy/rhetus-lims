@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import { ElTable, ElTableColumn, ElButton, ElTooltip, ElSelect, ElOption } from 'element-plus';
+import { ElTable, ElTableColumn, ElButton, ElTooltip } from 'element-plus';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { $api } from '../../lib/api/index.js';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
@@ -8,6 +8,7 @@ import { $router } from '../../lib/router/router.js';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
 import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
 import StorageFilters from '../storage-filters.vue';
+import { formatDate } from '../../lib/utils/datetime/date-format.js';
 import { debounce } from '../../lib/utils/debounce/debounce.js';
 import RhPagination from '../../lib/components/rh-pagination/rh-pagination.vue';
 
@@ -17,11 +18,6 @@ const filters = ref({
 	room: '',
 	name: ''
 });
-const selectedOrder = ref(null);
-const sortOptions = ref([
-	{ label: 'Sort by Ascending', value: 'asc' },
-	{ label: 'Sort by Descending', value: 'desc' }
-]);
 function addNewStorageLocation() {
 	$router.push({ name: 'new-storage' });
 }
@@ -64,9 +60,9 @@ async function deleteStorageLocation(id) {
 	}
 }
 
-const setStorages = debounce(async () => {
+const setStorages = debounce(async (event = null) => {
 	isLoading.value = true;
-	const sortQuery = createQuery();
+	const sortQuery = createQuery(event);
 	const params = {
 		page: paginationData.value.page,
 		limit: paginationData.value.size,
@@ -84,9 +80,15 @@ const setStorages = debounce(async () => {
 	}
 }, 200);
 
-const createQuery = () => {
-	return { creationDate: selectedOrder.value };
-};
+function createQuery(event) {
+	let query = {};
+	if (event && event.prop && event.order) {
+		console.log(event.order);
+		const order = event.order === 'ascending' ? 'asc' : 'desc';
+		query = { [event.prop]: order };
+	}
+	return query;
+}
 const paginationData = ref({
 	page: 1,
 	size: 10,
@@ -114,18 +116,6 @@ onMounted(() => {
 	<div class="storages-table">
 		<rh-filters>
 			<template #action-buttons>
-				<el-select
-					v-model="selectedOrder"
-					placeholder="Sort by creation date"
-					@change="setStorages"
-				>
-					<el-option
-						v-for="option of sortOptions"
-						:key="option.value"
-						:label="option.label"
-						:value="option.value"
-					/>
-				</el-select>
 				<el-button type="primary" @click="addNewStorageLocation">
 					Add New Storage Location
 				</el-button>
@@ -136,10 +126,23 @@ onMounted(() => {
 			</template>
 		</rh-filters>
 
-		<el-table v-loading="isLoading" :data="storages" @row-click="viewStorageLocation">
+		<el-table
+			v-loading="isLoading"
+			:data="storages"
+			@row-click="viewStorageLocation"
+			@sort-change="setStorages"
+		>
 			<el-table-column prop="room" min-width="150" label="Room" />
 			<el-table-column prop="name" min-width="150" label="Name" />
 			<el-table-column prop="description" min-width="200" label="Description" />
+			<el-table-column
+				prop="creationDate"
+				min-width="200"
+				label="Creation Date"
+				width="140"
+				:formatter="data => formatDate(data.creationDate)"
+				sortable
+			/>
 			<el-table-column width="80">
 				<template #default="{ row }">
 					<el-button @click.stop="() => editStorageLocation(row.id)"
