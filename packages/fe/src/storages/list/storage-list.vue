@@ -98,8 +98,10 @@ const handlePageChange = newPage => {
 	paginationData.value.page = newPage;
 };
 
+watch(paginationData.value, () => setStorages());
+
 watch(
-	[filters, () => paginationData.value.page],
+	filters,
 	() => {
 		setStorages();
 	},
