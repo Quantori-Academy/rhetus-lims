@@ -2,9 +2,10 @@ import fp from 'fastify-plugin';
 import { schema } from '../../lib/db/schema/index.js';
 import { and, eq, sql } from 'drizzle-orm';
 import { Category } from '../../routes/substances/substances-schema.js';
+import { helpers } from '../../lib/utils/common/helpers.js';
 
 const formatMapping = {
-	name: string => `${string.charAt(0).toUpperCase()}${string.slice(1).toLowerCase()}`
+	name: string => helpers.capitalize(string)
 };
 
 async function samplesService(server) {

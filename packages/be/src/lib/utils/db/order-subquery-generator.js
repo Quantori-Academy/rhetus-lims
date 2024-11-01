@@ -1,24 +1,28 @@
 import { asc, desc, sql } from 'drizzle-orm';
+import { servicesMapping } from './services/services-filter-sort-map.js';
 
-function generateOrderSubquery(data, sortDictionary) {
-	const parsedData = JSON.parse(data);
-
-	return Object.entries(parsedData)
+function generateOrderSubquery(sortData, entityType) {
+	return Object.entries(sortData)
 		.map(([property, order]) => {
-			const sortProperty = sortDictionary[property.toLowerCase()];
-			const lowerCasedOrder = order.toLowerCase();
+			const { property: sortProperty } =
+				servicesMapping[entityType].sort[property.toLowerCase()] ?? {};
+			const lowerCasedOrder = order ? order.toLowerCase() : null;
 
 			if (!sortProperty || !['asc', 'desc'].includes(lowerCasedOrder)) {
 				return;
 			}
 
-			if (typeof sortProperty === 'object') {
-				return lowerCasedOrder === 'asc' ? asc(sortProperty) : desc(sortProperty);
-			}
-
-			return sql.raw(`${sortProperty} ${lowerCasedOrder}`);
+			return generateSubquery(sortProperty, lowerCasedOrder);
 		})
 		.filter(Boolean);
+}
+
+function generateSubquery(sortProperty, order) {
+	if (typeof sortProperty === 'object') {
+		return order === 'asc' ? asc(sortProperty) : desc(sortProperty);
+	}
+
+	return sql.raw(`${sortProperty} ${order}`);
 }
 
 export { generateOrderSubquery };
