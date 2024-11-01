@@ -83,7 +83,6 @@ const setStorages = debounce(async (event = null) => {
 function createQuery(event) {
 	let query = {};
 	if (event && event.prop && event.order) {
-		console.log(event.order);
 		const order = event.order === 'ascending' ? 'asc' : 'desc';
 		query = { [event.prop]: order };
 	}
@@ -97,10 +96,10 @@ const paginationData = ref({
 
 const handlePageChange = newPage => {
 	paginationData.value.page = newPage;
-	setStorages();
 };
+
 watch(
-	filters,
+	[filters, () => paginationData.value.page],
 	() => {
 		setStorages();
 	},
