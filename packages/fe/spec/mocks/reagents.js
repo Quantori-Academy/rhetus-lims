@@ -1,8 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import { api } from './api-url.js';
-import { samples } from './samples.js';
 
-const reagents = [
+export const reagents = [
 	{
 		id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d',
 		name: 'Sodium Chloride',
@@ -10,7 +9,7 @@ const reagents = [
 		description: 'Common salt used in various chemical reactions and as a preservative.',
 		quantityLeft: 500,
 		quantityUnit: 'g',
-		storageLocation: 'Shelf A1',
+		storageLocationId: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',
 		structure: 'Cl[Na]'
 	},
 	{
@@ -20,7 +19,7 @@ const reagents = [
 		description: 'Weak acid used in the production of synthetic fibers and food preservation.',
 		quantityLeft: 1,
 		quantityUnit: 'L',
-		storageLocation: 'Cabinet B2',
+		storageLocationId: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',
 		structure: 'CC(=O)O'
 	},
 	{
@@ -30,12 +29,10 @@ const reagents = [
 		description: 'Used as an oxidant in various organic and inorganic reactions.',
 		quantityLeft: 250,
 		quantityUnit: 'g',
-		storageLocation: 'Shelf C3',
+		storageLocationId: 'c7b3d8e0-5e0b-4b0f-8b3a-3b93f5g6d6d4g6g',
 		structure: 'O=[Mn](=O)(=O)=O[O-].[K+]'
 	}
 ];
-
-export const substances = [...reagents, ...samples];
 
 const reagentDetails = [
 	{
@@ -51,7 +48,10 @@ const reagentDetails = [
 		quantity: 500,
 		unitPrice: 12.5,
 		quantityLeft: 25.0,
-		storageLocationId: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',
+		storageLocation: {
+			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',
+			name: 'Cabinet 1, shelf 3'
+		},
 		expirationDate: '2025-05-15T00:00:00.000Z'
 	},
 	{
@@ -67,7 +67,10 @@ const reagentDetails = [
 		unitSize: '1 L bottle',
 		unitPrice: 8.99,
 		quantityLeft: 15.0,
-		storageLocationId: 'c7b3d8e0-5e0b-4b0f-8b3a-3b93f5g6d6d4g6g',
+		storageLocation: {
+			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',
+			name: 'Cabinet 1, shelf 3'
+		},
 		expirationDate: '2024-11-30T00:00:00.000Z'
 	},
 	{
@@ -84,7 +87,10 @@ const reagentDetails = [
 		quantity: 1000,
 		unitPrice: 8.99,
 		quantityLeft: 15.0,
-		storageLocationId: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',
+		storageLocation: {
+			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b93f5g6d6d4g6g',
+			name: 'Cabinet 2, shelf 4'
+		},
 		expirationDate: '2024-11-30T00:00:00.000Z'
 	}
 ];
@@ -115,16 +121,8 @@ export const reagentsHandlers = [
 			return filterReagents(parsedOptions);
 		}
 	}),
-	http.get(api('/substances'), req => {
-		const requestUrl = req.request.url;
-		const url = new URL(requestUrl);
-		const productIds = url.searchParams.get('sort');
-		console.log(productIds);
-		return HttpResponse.json({ substances, count: substances.length });
-	}),
 	http.delete(api('/reagents/:id'), async ({ params }) => {
 		const { id } = params;
-		console.log(id);
 		const reagentIndex = reagents.findIndex(reagent => reagent.id === id);
 		if (reagentIndex === -1) {
 			return HttpResponse.json(
@@ -170,25 +168,5 @@ export const reagentsHandlers = [
 			status: 'success',
 			message: `New reagent was created`
 		});
-	}),
-
-	http.put(api('/substances/quantity-change/:id'), async ({ request, params }) => {
-		const body = await request.json();
-		const { id } = params;
-		const { quantityUsed, category } = body;
-		const substance = substances.find(sample => sample.id === id);
-		if (!substance) return HttpResponse.json({ message: 'Sample not found' }, { status: 404 });
-
-		substance.quantityLeft -= quantityUsed;
-
-		if (category.toLowerCase() === 'reagent') {
-			const reagent = reagents.find(x => x.id === id);
-			reagent.quantityLeft -= quantityUsed;
-		} else {
-			const sample = samples.find(x => x.id === id);
-			sample.quantityLeft -= quantityUsed;
-		}
-
-		return HttpResponse.json({ status: 'success', message: 'Updated substance quantity' });
 	})
 ];

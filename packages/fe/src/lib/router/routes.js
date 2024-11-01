@@ -165,8 +165,22 @@ export const routes = [
 	},
 	{
 		path: '/storages/:id',
-		name: 'edit-storage',
-		component: () => import('../../storages/edit/storage-edit.vue'),
+		name: 'storage-details',
+		component: () => import('../../storages/details/storage-details.vue'),
+		props: true,
+		meta: {
+			title: 'Storage Details',
+			breadcrumb: route => [
+				{ name: 'Home', path: '/' },
+				{ name: 'Storages', path: '/storages/list' },
+				{ name: `${route.params.id}`, path: '' }
+			]
+		}
+	},
+	{
+		path: '/storages/edit/:id',
+		name: 'storage-details-edit',
+		component: () => import('../../storages/details/storage-details.vue'),
 		props: true,
 		meta: {
 			roles: [roles.ADMIN],

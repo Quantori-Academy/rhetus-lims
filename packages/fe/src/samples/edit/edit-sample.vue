@@ -73,7 +73,7 @@ async function submit() {
 	try {
 		const originalSample = await $api.samples.fetchSample(props.id);
 		if (originalSample.quantityLeft != sample.value.quantityLeft) {
-			const response = await $api.reagents.changeSubstanceQuantity(props.id, {
+			const response = await $api.substances.changeSubstanceQuantity(props.id, {
 				category: 'sample',
 				quantityLeft: sample.value.quantityLeft,
 				quantityUsed: originalSample.quantityLeft - sample.value.quantityLeft,

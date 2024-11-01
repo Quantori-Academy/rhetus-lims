@@ -8,3 +8,9 @@ export const formRules = {
 		{ max: 300, message: "Name can't exceed 300 characters" }
 	]
 };
+
+export const emptyStorage = {
+	name: '',
+	room: '',
+	description: ''
+};
