@@ -1,10 +1,10 @@
 <script setup>
-import { inject } from 'vue';
+import { inject, computed } from 'vue';
 import RhIcon from '../lib/components/rh-icon.vue';
 import { $route } from '../lib/router/router.js';
 import { navigationLink } from './constants.js';
 import SidebarButton from './sidebar-button.vue';
-
+import { routes } from '../lib/router/routes.js';
 const { user } = inject('user');
 
 const emit = defineEmits(['toggle-collapse']);
@@ -12,6 +12,18 @@ const emit = defineEmits(['toggle-collapse']);
 function handleCollapse() {
 	emit('toggle-collapse');
 }
+
+function hasPermissions(link) {
+	const route = routes.find(route => route.path === link.path);
+	if (!route || !route.meta.roles) {
+		return true;
+	}
+	return route.meta.roles.includes(user.value?.role?.name);
+}
+
+const filteredNavigationLinks = computed(() => {
+	return navigationLink.filter(link => hasPermissions(link));
+});
 </script>
 
 <template>
@@ -37,7 +49,7 @@ function handleCollapse() {
 			<div class="project-name">Rhetus</div>
 			<ul class="navigation-list">
 				<li
-					v-for="link of navigationLink"
+					v-for="link of filteredNavigationLinks"
 					:key="link.name"
 					:class="{ 'active-route': $route.path === link.path }"
 				>
