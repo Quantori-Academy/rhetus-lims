@@ -132,10 +132,10 @@ async function usersService(server) {
 			return result.length ? result[0].username : null;
 		},
 
-		isAdmin: async id => {
+		isRoleByRoleName: async (id, roleName) => {
 			const result = await server.usersService.getUserById(id);
 
-			return result?.role?.name === 'administrator';
+			return result?.role?.name === roleName;
 		},
 
 		isLastAdmin: async id => {

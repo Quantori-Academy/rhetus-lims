@@ -49,7 +49,10 @@ async function users(server, options) {
 	async function onGetUser(req, reply) {
 		try {
 			const authenticatedUserId = req.session.user.id;
-			const isAdmin = await server.usersService.isAdmin(authenticatedUserId);
+			const isAdmin = await server.usersService.isRoleByRoleName(
+				authenticatedUserId,
+				'administrator'
+			);
 			const userId = Number(req.params.id);
 			const isOwner = authenticatedUserId === userId;
 
@@ -100,7 +103,10 @@ async function users(server, options) {
 	async function onUpdateUser(req, reply) {
 		try {
 			const authenticatedUserId = req.session.user.id;
-			const isAdmin = await server.usersService.isAdmin(authenticatedUserId);
+			const isAdmin = await server.usersService.isRoleByRoleName(
+				authenticatedUserId,
+				'administrator'
+			);
 			const userId = Number(req.params.id);
 			const isOwner = authenticatedUserId === userId;
 
