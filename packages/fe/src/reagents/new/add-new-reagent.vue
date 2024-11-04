@@ -27,8 +27,8 @@ const form = ref({
 	producer: '',
 	catalogId: '',
 	catalogLink: '',
-	quantity: 1,
 	quantityUnit: '',
+	quantity: 1,
 	unitPrice: 0,
 	expirationDate: '',
 	storageLocationId: '',
@@ -40,11 +40,11 @@ const rules = ref({
 	producer: [requiredRule('Producer')],
 	catalogId: [requiredRule('Catalog ID')],
 	catalogLink: [requiredRule('Catalog link')],
+	quantityUnit: [requiredRule('Quantity unit')],
 	quantity: [
 		requiredRule('Quantity'),
 		{ type: 'number', min: 1, message: 'Quantity cannot be zero', trigger: ['blur', 'change'] }
 	],
-	quantityUnit: [requiredRule('Unit')],
 	unitPrice: [requiredRule('Price')],
 	expirationDate: [requiredRule('Expiration date')],
 	storageLocationId: [requiredRule('Storage location')]
@@ -89,17 +89,19 @@ async function setStorages() {
 </script>
 
 <template>
-	<div class="container">
+	<div class="wrapper">
 		<el-form ref="form-el" :model="form" :rules="rules" label-width="auto" label-position="top">
 			<el-form-item label="Name" prop="name">
 				<el-input v-model="form.name" placeholder="Enter reagent name" />
 			</el-form-item>
-			<el-form-item label="CAS number" prop="casNumber">
-				<el-input v-model="form.casNumber" placeholder="Indicate CAS number" />
-			</el-form-item>
-			<el-form-item label="Producer" prop="producer">
-				<el-input v-model="form.producer" placeholder="Add producer" />
-			</el-form-item>
+			<div class="align-horizontal">
+				<el-form-item label="CAS number" prop="casNumber">
+					<el-input v-model="form.casNumber" placeholder="Indicate CAS number" />
+				</el-form-item>
+				<el-form-item label="Producer" prop="producer">
+					<el-input v-model="form.producer" placeholder="Add producer" />
+				</el-form-item>
+			</div>
 			<div class="align-horizontal">
 				<el-form-item label="Catalog ID" prop="catalogId">
 					<el-input v-model="form.catalogId" placeholder="Add catalog id" />
@@ -109,13 +111,13 @@ async function setStorages() {
 				</el-form-item>
 			</div>
 			<div class="align-horizontal">
-				<el-form-item label="Quantity" prop="quantity">
-					<el-input-number v-model="form.quantity" placeholder="Enter amount" :min="1" />
-				</el-form-item>
-				<el-form-item label="Unit" prop="quantityUnit">
+				<el-form-item label="Quantity unit" prop="quantityUnit">
 					<el-select v-model="form.quantityUnit" filterable placeholder="Select a unit">
 						<el-option v-for="unit of quantityUnits" :key="unit" :label="unit" :value="unit" />
 					</el-select>
+				</el-form-item>
+				<el-form-item label="Quantity" prop="quantity">
+					<el-input-number v-model="form.quantity" placeholder="Enter amount" :min="1" />
 				</el-form-item>
 			</div>
 			<el-form-item label="Price per unit" prop="unitPrice">
@@ -156,31 +158,11 @@ async function setStorages() {
 </template>
 
 <style>
-.container {
-	margin-top: 20px;
-	padding-bottom: 3rem;
-	max-width: 60vw;
+.el-input-number {
+	width: 100%;
 }
-.align-horizontal {
-	display: flex;
-	gap: 18px;
-
-	.el-form-item {
-		flex-grow: 1;
-		flex-basis: 0;
-	}
-}
-.btn-container {
-	display: flex;
-	justify-content: end;
-}
-
-@media (max-width: 768px) {
-	.container {
-		padding-bottom: 24px;
-	}
-	.align-horizontal {
-		display: block;
-	}
+.el-date-editor.el-input,
+.el-date-editor.el-input__wrapper {
+	width: 100%;
 }
 </style>

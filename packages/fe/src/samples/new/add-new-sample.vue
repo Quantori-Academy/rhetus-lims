@@ -109,13 +109,13 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="container">
+	<div class="wrapper">
 		<el-form ref="form-el" :model="form" :rules="rules" label-width="auto" label-position="top">
 			<el-form-item label="Name" prop="name">
 				<el-input v-model="form.name" placeholder="Enter sample name" />
 			</el-form-item>
 
-			<el-form-item label="Reagents/Samples used" prop="components">
+			<el-form-item label="Substances used" prop="components">
 				<div
 					v-for="(component, index) of form.components"
 					:key="component.id + index"
@@ -126,7 +126,7 @@ onMounted(() => {
 						v-model="form.components[index]"
 						value-key="id"
 						filterable
-						placeholder="Select reagent/sample"
+						placeholder="Select substances"
 					>
 						<el-option
 							v-for="item of componentOptions"
@@ -204,44 +204,21 @@ onMounted(() => {
 </template>
 
 <style>
-.container {
-	margin-top: 20px;
-	max-width: 48vw;
-}
 .w-full {
 	width: 100%;
-}
-.align-horizontal {
-	display: flex;
-	gap: 18px;
-
-	.el-form-item {
-		flex-grow: 1;
-		flex-basis: 0;
-	}
 }
 .subscript {
 	opacity: 0.6;
 	font-size: small;
 }
-.btn-container {
-	display: flex;
-	justify-content: end;
-}
-
 .add-btn {
 	margin-top: -12px;
 	margin-bottom: 12px;
 	text-align: end;
 }
-
 @media (max-width: 768px) {
-	.container {
-		padding-bottom: 24px;
-		width: 80vw;
-	}
-	.align-horizontal {
-		display: block;
+	.w-full {
+		margin-bottom: 12px;
 	}
 }
 </style>

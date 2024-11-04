@@ -170,8 +170,11 @@ const deleteUser = async () => {
 </script>
 
 <template>
-	<div class="form-container">
-		<div class="section-header">Profile</div>
+	<div class="wrapper">
+		<div class="editing-header">
+			Profile
+			<el-button v-if="!isEdit" type="primary" @click="toggleEdit">{{ 'Edit profile' }}</el-button>
+		</div>
 		<el-form
 			ref="form-ref"
 			v-loading="loading"
@@ -200,17 +203,16 @@ const deleteUser = async () => {
 			<el-form-item label="Creation date" prop="creationDate">
 				<el-date-picker v-model="user.createdAt" type="date" format="YYYY-MM-DD" :disabled="true" />
 			</el-form-item>
-			<div v-if="isEdit" class="align-end">
+			<div v-if="isEdit" class="btn-container">
 				<el-button type="primary" @click="handleSubmit">Save</el-button>
 				<el-button @click="cancelEdit">Cancel</el-button>
 			</div>
-			<div v-else class="align-end">
+			<div v-else class="btn-container">
 				<el-button type="danger" @click="deleteUser">Delete user</el-button>
-				<el-button type="primary" @click="toggleEdit">Edit profile</el-button>
 			</div>
 		</el-form>
 	</div>
-	<div class="form-container">
+	<div class="wrapper">
 		<div class="section-header">Manage password</div>
 		<el-form
 			ref="reset-pass-form"
@@ -237,7 +239,7 @@ const deleteUser = async () => {
 					show-password
 				/>
 			</el-form-item>
-			<div v-if="isEdit" class="align-end">
+			<div v-if="isEdit" class="btn-container">
 				<el-button type="primary" @click="changePassword">Reset password</el-button>
 			</div>
 		</el-form>
@@ -245,21 +247,19 @@ const deleteUser = async () => {
 </template>
 
 <style scoped>
-.form-container {
-	margin: 20px 15px 0px 15px;
-	width: 500px;
-}
 .section-header {
 	margin-bottom: 12px;
 	font-weight: 500;
 	font-size: large;
 }
-.align-end {
-	text-align: end;
+.el-form-item {
+	margin-bottom: 10px;
 }
-@media screen and (max-width: 750px) {
-	.form-container {
-		width: 80vw;
-	}
+.el-form-item:last-of-type {
+	margin-bottom: 20px;
+}
+.el-form-item .el-input.is-disabled .el-input__wrapper,
+.el-form-item .el-select .el-select__wrapper.is-disabled {
+	background-color: transparent;
 }
 </style>

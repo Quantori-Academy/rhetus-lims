@@ -27,4 +27,8 @@ const filters = defineModel('filters', { type: Object });
 	</filter-item>
 </template>
 
-<style scoped></style>
+<style scoped>
+:deep(.el-date-editor) {
+	width: 300px;
+}
+</style>

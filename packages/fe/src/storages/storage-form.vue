@@ -104,46 +104,58 @@ onMounted(() => {
 </script>
 
 <template>
-	<el-form
-		ref="form-ref"
-		v-loading="isLoading"
-		label-position="top"
-		:model="storage"
-		:rules="rules"
-		@submit="updateStorage"
-	>
-		<el-form-item label="Room" prop="room">
-			<el-input v-model="storage.room" :disabled="!isEdit" />
-		</el-form-item>
-		<el-form-item label="Name" prop="name">
-			<el-input v-model="storage.name" :disabled="!isEdit" />
-		</el-form-item>
-		<el-form-item label="Description" prop="description">
-			<el-input v-model="storage.description" :disabled="!isEdit" />
-		</el-form-item>
-		<template v-if="isEdit">
-			<el-button @click="cancelEdit">Cancel</el-button>
-			<el-button type="primary" @click="updateStorage">Save</el-button>
-		</template>
-		<template v-else>
-			<el-button type="primary" @click="toggleEdit">{{ 'Edit storage' }}</el-button>
-			<el-tooltip
-				:disabled="storage.isEmpty"
-				content="Can't delete, storage is not empty."
-				placement="top"
-			>
-				<el-button type="danger" :disabled="!storage.isEmpty" @click="deleteStorage">
-					{{ 'Delete storage' }}
-				</el-button>
-			</el-tooltip>
-		</template>
-	</el-form>
+	<div class="wrapper">
+		<div class="editing-header">
+			Storage
+			<el-button v-if="!isEdit" type="primary" @click="toggleEdit">{{ 'Edit storage' }}</el-button>
+		</div>
+		<el-form
+			ref="form-ref"
+			v-loading="isLoading"
+			label-position="top"
+			:model="storage"
+			:rules="rules"
+			@submit="updateStorage"
+		>
+			<el-form-item label="Room" prop="room">
+				<el-input v-model="storage.room" :disabled="!isEdit" />
+			</el-form-item>
+			<el-form-item label="Name" prop="name">
+				<el-input v-model="storage.name" :disabled="!isEdit" />
+			</el-form-item>
+			<el-form-item label="Description" prop="description">
+				<el-input
+					v-model="storage.description"
+					type="textarea"
+					placeholder="Enter description"
+					:disabled="!isEdit"
+				/>
+			</el-form-item>
+			<template v-if="isEdit">
+				<div class="btn-container">
+					<el-button @click="cancelEdit">Cancel</el-button>
+					<el-button type="primary" @click="updateStorage">Save</el-button>
+				</div>
+			</template>
+			<template v-else>
+				<div class="btn-container">
+					<el-tooltip
+						:disabled="storage.isEmpty"
+						content="Can't delete, storage is not empty."
+						placement="top"
+					>
+						<el-button type="danger" :disabled="!storage.isEmpty" @click="deleteStorage">
+							{{ 'Delete storage' }}
+						</el-button>
+					</el-tooltip>
+				</div>
+			</template>
+		</el-form>
+	</div>
 </template>
 
-<style scoped>
-:deep(.el-form-item) {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
+<style>
+.wrapper {
+	margin: 50px 0;
 }
 </style>

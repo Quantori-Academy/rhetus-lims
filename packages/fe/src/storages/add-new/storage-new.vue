@@ -47,22 +47,22 @@ const addStorage = async () => {
 	<div class="wrapper">
 		<el-form ref="form-ref" label-position="top" :model="storage" :rules="rules">
 			<el-form-item label="Room" prop="room">
-				<el-input v-model="storage.room"></el-input>
+				<el-input v-model="storage.room" placeholder="Enter room"></el-input>
 			</el-form-item>
 			<el-form-item label="Name" prop="name">
-				<el-input v-model="storage.name"></el-input>
+				<el-input v-model="storage.name" placeholder="Enter name"></el-input>
 			</el-form-item>
 			<el-form-item label="Description" prop="description">
-				<el-input v-model="storage.description"></el-input>
+				<el-input
+					v-model="storage.description"
+					type="textarea"
+					placeholder="Enter description"
+				></el-input>
 			</el-form-item>
-			<el-button @click="cancelHandler">Cancel</el-button>
-			<el-button type="primary" @click="addStorage">Save</el-button>
+			<div class="btn-container">
+				<el-button @click="cancelHandler">Cancel</el-button>
+				<el-button type="primary" @click="addStorage">Add Storage</el-button>
+			</div>
 		</el-form>
 	</div>
 </template>
-
-<style scoped>
-.wrapper {
-	margin-top: 20px;
-}
-</style>

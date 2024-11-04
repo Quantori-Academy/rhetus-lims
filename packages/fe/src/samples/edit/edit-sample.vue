@@ -143,8 +143,8 @@ watch(
 </script>
 
 <template>
-	<div v-loading="isLoading" class="container">
-		<div class="header">
+	<div v-loading="isLoading" class="wrapper">
+		<div class="editing-header">
 			<div>{{ `${isEditing ? 'Editing ' : ''}${sample.name}` }}</div>
 			<el-button v-if="!isEditing" @click="toggleEditing">Edit</el-button>
 		</div>
@@ -152,7 +152,7 @@ watch(
 			<el-form-item label="Name" prop="name">
 				<el-input v-model="sample.name" disabled />
 			</el-form-item>
-			<el-form-item label="Reagents/Samples used" prop="components">
+			<el-form-item label="Substances used" prop="components">
 				<el-table :data="componentTableData" :border="true" @row-click="redirect">
 					<el-table-column prop="name" label="Name" />
 					<el-table-column prop="category" label="Category" />
@@ -195,7 +195,7 @@ watch(
 					<el-option
 						v-for="storage of storages"
 						:key="storage.id"
-						:label="storage.name"
+						:label="`${storage.room} - ${storage.name}`"
 						:value="storage.id"
 					/>
 				</el-select>
@@ -220,37 +220,8 @@ watch(
 </template>
 
 <style>
-.container {
-	margin-top: 20px;
-	max-width: 48vw;
-}
-.header {
-	display: flex;
-	justify-content: space-between;
-	margin-bottom: 12px;
-	color: var(--color-text);
-	font-weight: 500;
-	font-size: large;
-}
-.align-horizontal {
-	display: flex;
-	gap: 18px;
-	.el-form-item {
-		flex-grow: 1;
-		flex-basis: 0;
-	}
-}
 .btn-container {
 	display: flex;
 	justify-content: space-between;
-}
-@media (max-width: 768px) {
-	.container {
-		padding-bottom: 24px;
-		width: 80vw;
-	}
-	.align-horizontal {
-		display: block;
-	}
 }
 </style>
