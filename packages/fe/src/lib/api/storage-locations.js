@@ -21,5 +21,11 @@ export default http => ({
 		return await http(`/storages/${id}`, {
 			method: 'DELETE'
 		});
+	},
+	async fetchStoragesRooms() {
+		return await http('/storages/rooms');
+	},
+	async fetchStoragesNames() {
+		return await http('/storages/names');
 	}
 });

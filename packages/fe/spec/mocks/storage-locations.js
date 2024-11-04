@@ -119,5 +119,13 @@ export const storageLocationHandlers = [
 			status: 'success',
 			message: 'Storage location was deleted'
 		});
+	}),
+	http.get(api('/storages/rooms'), () => {
+		const uniqueRooms = [...new Set(storageInfo.storages.map(storage => storage.room))];
+		return HttpResponse.json(uniqueRooms);
+	}),
+	http.get(api('/storages/names'), () => {
+		const uniqueNames = [...new Set(storageInfo.storages.map(storage => storage.name))];
+		return HttpResponse.json(uniqueNames);
 	})
 ];
