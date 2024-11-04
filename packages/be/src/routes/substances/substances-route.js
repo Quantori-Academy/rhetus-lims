@@ -102,7 +102,7 @@ async function substances(server, options) {
 			if (!isValid) {
 				return reply.code(codeStatus).send({ status: 'error', message: errorMessage });
 			}
-			
+
 			const { code, status, message } = await server.substancesService.updateSubstance(
 				substanceId,
 				updatedData
