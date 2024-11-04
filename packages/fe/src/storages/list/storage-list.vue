@@ -8,7 +8,9 @@ import { $router } from '../../lib/router/router.js';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
 import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
 import StorageFilters from '../storage-filters.vue';
+import { formatDate } from '../../lib/utils/datetime/date-format.js';
 import { debounce } from '../../lib/utils/debounce/debounce.js';
+import RhPagination from '../../lib/components/rh-pagination/rh-pagination.vue';
 
 const storages = ref([]);
 const isLoading = ref(false);
@@ -16,7 +18,6 @@ const filters = ref({
 	room: '',
 	name: ''
 });
-
 function addNewStorageLocation() {
 	$router.push({ name: 'new-storage' });
 }
@@ -59,17 +60,45 @@ async function deleteStorageLocation(id) {
 	}
 }
 
-const setStorages = debounce(async () => {
+const setStorages = debounce(async (event = null) => {
 	isLoading.value = true;
+	const sortQuery = createQuery(event);
+	const params = {
+		page: paginationData.value.page,
+		limit: paginationData.value.size,
+		sort: sortQuery,
+		options: { ...filters.value }
+	};
 	try {
-		const data = await $api.storages.fetchStorages(filters.value);
+		const data = await $api.storages.fetchStorages(params);
 		storages.value = data.storages;
+		paginationData.value.totalElements = data.count;
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
 		isLoading.value = false;
 	}
 }, 200);
+
+function createQuery(event) {
+	let query = {};
+	if (event && event.prop && event.order) {
+		const order = event.order === 'ascending' ? 'asc' : 'desc';
+		query = { [event.prop]: order };
+	}
+	return query;
+}
+const paginationData = ref({
+	page: 1,
+	size: 10,
+	totalElements: 0
+});
+
+const handlePageChange = newPage => {
+	paginationData.value.page = newPage;
+};
+
+watch(paginationData.value, () => setStorages());
 
 watch(
 	filters,
@@ -98,10 +127,23 @@ onMounted(() => {
 			</template>
 		</rh-filters>
 
-		<el-table v-loading="isLoading" :data="storages" @row-click="viewStorageLocation">
+		<el-table
+			v-loading="isLoading"
+			:data="storages"
+			@row-click="viewStorageLocation"
+			@sort-change="setStorages"
+		>
 			<el-table-column prop="room" min-width="150" label="Room" />
 			<el-table-column prop="name" min-width="150" label="Name" />
 			<el-table-column prop="description" min-width="200" label="Description" />
+			<el-table-column
+				prop="creationDate"
+				min-width="200"
+				label="Creation Date"
+				width="140"
+				:formatter="data => formatDate(data.creationDate)"
+				sortable
+			/>
 			<el-table-column width="80">
 				<template #default="{ row }">
 					<el-button @click.stop="() => editStorageLocation(row.id)"
@@ -127,6 +169,7 @@ onMounted(() => {
 				</template>
 			</el-table-column>
 		</el-table>
+		<rh-pagination :pagination="paginationData" @change-page="handlePageChange" />
 	</div>
 </template>
 
@@ -134,7 +177,10 @@ onMounted(() => {
 .storages-table {
 	margin-top: 20px;
 }
-
+:deep(.el-select) {
+	padding: 8px 15px;
+	max-width: 220px;
+}
 :deep(.el-table__row):hover {
 	cursor: pointer;
 }

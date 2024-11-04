@@ -8,19 +8,22 @@ const storageInfo = {
 			room: 'Building 1, Room 12',
 			name: 'Cabinet 1, shelf 3',
 			description: 'This storage is located near the pool',
-			isEmpty: false
+			isEmpty: false,
+			creationDate: '2024-11-22T00:00:00.000Z'
 		},
 		{
 			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b93f5g6d6d4g6g',
 			room: 'Building 2, Room 23',
 			name: 'Cabinet 2, shelf 4',
-			isEmpty: false
+			isEmpty: false,
+			creationDate: '2024-10-30T00:00:00.000Z'
 		},
 		{
 			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3bunidabistded',
 			room: 'Walk-in freezer',
 			name: 'Cabinet 1, shelf 5',
-			isEmpty: true
+			isEmpty: true,
+			creationDate: '2024-11-25T00:00:00.000Z'
 		}
 	],
 	count: 3
@@ -38,20 +41,35 @@ function filterStorages(parsedOptions) {
 		}
 		return matchesRoom && matchesName;
 	});
-	return HttpResponse.json({
-		storages: filteredStorages
-	});
+	return filteredStorages;
 }
-
+function paginateStorages(items, page, limit) {
+	const start = (page - 1) * limit;
+	return items.slice(start, start + limit);
+}
 export const storageLocationHandlers = [
 	http.get(api('/storages'), req => {
 		const url = new URL(req.request.url);
 		const options = url.searchParams.get('options');
+		const sort = JSON.parse(url.searchParams.get('sort')).creationDate;
+		console.log(`Sort order: ${sort}`);
 		const parsedOptions = JSON.parse(options);
-		if (parsedOptions === null) {
-			return HttpResponse.json(storageInfo);
+		const page = parseInt(url.searchParams.get('page')) || 1;
+		const limit = parseInt(url.searchParams.get('limit')) || 10;
+		const hasValidOptions = options => {
+			return Object.values(options).some(value => value !== '');
+		};
+		if (!hasValidOptions(parsedOptions)) {
+			return HttpResponse.json({
+				storages: paginateStorages(storageInfo.storages, page, limit),
+				count: storageInfo.storages.length
+			});
 		} else {
-			return filterStorages(parsedOptions);
+			const filtered = filterStorages(parsedOptions);
+			return HttpResponse.json({
+				storages: paginateStorages(filtered, page, limit),
+				count: filtered.length
+			});
 		}
 	}),
 	http.get(api('/storages/:id'), req => {
