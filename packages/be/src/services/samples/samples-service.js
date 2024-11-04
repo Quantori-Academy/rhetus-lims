@@ -141,7 +141,7 @@ async function samplesService(server) {
 			return result.length ? result[0].name : null;
 		},
 
-		changeSampleQuantity: async (id, data) => {
+		changeQuantity: async (id, data) => {
 			const { userId, quantityUsed, reason } = data;
 
 			const { quantityLeft } = await server.samplesService.getSampleById(id);
@@ -210,28 +210,28 @@ async function samplesService(server) {
 				.where(and(eq(schema.samples.storageId, id), eq(schema.samples.deleted, false)));
 		},
 
-		updateSample: async (id, data) => {
-			const { storageId } = data;
+		changeStorage: async (id, data) => {
+			const { storageId, userId } = data;
+
 			const sample = await server.samplesService.getSampleById(id);
 
-			if (storageId) {
-				await server.db.insert(schema.substancesStorageChanges).values({
-					sampleId: id,
-					previousStorageId: sample.storageLocation.id,
-					targetStorageId: storageId
-				});
-			}
+			await server.db.insert(schema.substancesStorageChanges).values({
+				sampleId: id,
+				userId,
+				previousStorageId: sample.storageLocation.id,
+				targetStorageId: storageId
+			});
 
 			const result = await server.db
 				.update(schema.samples)
-				.set({ storageId: storageId })
+				.set({ storageId })
 				.where(eq(schema.samples.id, id))
 				.returning({ sampleName: schema.samples.name });
 
 			return {
 				code: 200,
 				status: 'success',
-				message: `Sample '${result[0].sampleName}' was updated`
+				message: `Storage location of sample '${result[0].sampleName}' was changed`
 			};
 		}
 	});

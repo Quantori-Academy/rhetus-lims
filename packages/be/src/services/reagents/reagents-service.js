@@ -106,7 +106,7 @@ async function reagentsService(server) {
 				.where(eq(schema.reagents.deleted, false));
 		},
 
-		changeReagentQuantity: async (id, data) => {
+		changeQuantity: async (id, data) => {
 			const { userId, quantityUsed, reason } = data;
 
 			const { quantityLeft } = await server.reagentsService.getReagentById(id);
@@ -156,13 +156,14 @@ async function reagentsService(server) {
 				.from(schema.reagents)
 				.where(and(eq(schema.reagents.storageId, id), eq(schema.reagents.deleted, false)));
 		},
-		updateReagent: async (id, data) => {
-			const { storageId } = data;
+		changeStorage: async (id, data) => {
+			const { storageId, userId } = data;
 
 			const reagent = await server.reagentsService.getReagentById(id);
 
 			await server.db.insert(schema.substancesStorageChanges).values({
 				reagentId: id,
+				userId,
 				previousStorageId: reagent.storageLocation.id,
 				targetStorageId: storageId
 			});
@@ -173,7 +174,11 @@ async function reagentsService(server) {
 				.where(eq(schema.reagents.id, id))
 				.returning({ reagentName: schema.reagents.name });
 
-			return result.length ? result[0].reagentName : null;
+			return {
+				code: 200,
+				status: 'success',
+				message: `Storage location of reagent '${result[0].reagentName}' was changed`
+			};
 		}
 	});
 }
