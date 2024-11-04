@@ -6,16 +6,10 @@ import {
 	uuid,
 	real,
 	boolean,
-	customType
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { storages } from './storages.js';
-
-const mol = customType({
-	dataType() {
-		return 'mol';
-	}
-});
+import { mol } from '../structure/types/mol.js';
 
 export const reagents = pgTable('reagents', {
 	id: uuid('id')

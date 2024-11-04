@@ -2,6 +2,8 @@ import { eq, and, sql } from 'drizzle-orm';
 import fp from 'fastify-plugin';
 import { schema } from '../../lib/db/schema/index.js';
 import { helpers } from '../../lib/utils/common/helpers.js';
+import { smilesToMol } from '../../lib/db/structure/utils/smiles-to-mol.js';
+import { isValidSmilesQuery } from '../../lib/db/structure/utils/is-valid-smiles.js';
 
 const formatMapping = {
 	name: string => helpers.capitalize(string),
@@ -43,7 +45,7 @@ async function reagentsService(server) {
 					expirationDate: new Date(expirationDate),
 					storageId: storageLocationId,
 					description,
-					...(structure && { structure: sql`mol_from_smiles(${structure}::cstring)` })
+					...(structure && { structure: smilesToMol(structure) })
 				})
 				.returning({ name: schema.reagents.name });
 
@@ -51,8 +53,8 @@ async function reagentsService(server) {
 		},
 
 		isStructureValid: async smiles => {
-			const result = await server.db.execute(sql`SELECT is_valid_smiles(${smiles})`);
-			return result.rows[0].is_valid_smiles;
+			const result = await server.db.execute(isValidSmilesQuery(smiles));
+			return result.rows[0].is_valid;
 		},
 
 		getReagentById: async id => {
