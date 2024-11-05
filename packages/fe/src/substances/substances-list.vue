@@ -81,7 +81,7 @@ const setSubstances = debounce(async (event = null) => {
 	isLoading.value = true;
 	const params = {
 		...createQuery(event),
-		...filters.value,
+		options: { ...filters.value },
 		...paginationData.value
 	};
 	try {
