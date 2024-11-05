@@ -1,5 +1,5 @@
 <script setup>
-import UserProfile from './profile.vue';
+import UserProfile from './profile-details.vue';
 import ManagePassword from './manage-password.vue';
 
 const props = defineProps({ id: { type: String, default: null } });
