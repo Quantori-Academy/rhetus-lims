@@ -18,6 +18,7 @@ const filters = ref({
 	room: '',
 	name: ''
 });
+const sort = ref(null);
 function addNewStorageLocation() {
 	$router.push({ name: 'new-storage' });
 }
@@ -62,11 +63,14 @@ async function deleteStorageLocation(id) {
 
 const setStorages = debounce(async (event = null) => {
 	isLoading.value = true;
-	const sortQuery = createQuery(event);
+	if (event) {
+		const sortQuery = createQuery(event);
+		sort.value = sortQuery;
+	}
 	const params = {
 		page: paginationData.value.page,
 		limit: paginationData.value.size,
-		sort: sortQuery,
+		sort: sort.value,
 		options: { ...filters.value }
 	};
 	try {
