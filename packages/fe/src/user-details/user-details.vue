@@ -1,5 +1,5 @@
 <script setup>
-import UserProfile from './profile-details.vue';
+import ProfileDetails from './profile-details.vue';
 import ManagePassword from './manage-password.vue';
 
 const props = defineProps({ id: { type: String, default: null } });
@@ -7,10 +7,10 @@ const props = defineProps({ id: { type: String, default: null } });
 
 <template>
 	<div class="wrapper">
-		<UserProfile :id="props.id" />
+		<profile-details :id="props.id" />
 	</div>
 	<div class="wrapper">
-		<ManagePassword id="props.id" />
+		<manage-password id="props.id" />
 	</div>
 </template>
 
