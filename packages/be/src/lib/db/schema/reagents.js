@@ -1,12 +1,4 @@
-import {
-	pgTable,
-	timestamp,
-	varchar,
-	text,
-	uuid,
-	real,
-	boolean,
-} from 'drizzle-orm/pg-core';
+import { pgTable, timestamp, varchar, text, uuid, real, boolean } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { storages } from './storages.js';
 import { mol } from '../structure/types/mol.js';

@@ -1,11 +1,10 @@
-import { and, eq, sql } from 'drizzle-orm';
 import { unionAll } from 'drizzle-orm/pg-core';
 import fp from 'fastify-plugin';
 import { Category } from '../../routes/substances/substances-schema.js';
-import { schema } from '../../lib/db/schema/index.js';
 import { getClarifyParams } from '../../lib/utils/common/parse-params.js';
 import { applyFilters } from '../../lib/utils/db/apply-filters.js';
 import { applySorting } from '../../lib/utils/db/apply-sorting.js';
+import { hasSubstructure } from '../../lib/db/structure/utils/has-substructure.js';
 
 async function substancesService(server) {
 	server.decorate('substancesService', {
@@ -145,21 +144,21 @@ async function substancesService(server) {
 		},
 
 		searchReagents: async queryParams => {
-			const result = await server.db
-				.select({
-					id: schema.reagents.id,
-					name: schema.reagents.name,
-					quantityUnit: schema.reagents.quantityUnit,
-					quantity: schema.reagents.quantity,
-					quantityLeft: schema.reagents.quantityLeft,
-					expirationDate: schema.reagents.expirationDate,
-					storageLocationId: schema.reagents.storageId,
-					description: schema.reagents.description,
-					category: sql`'reagent'`.as('category')
-				})
-				.from(schema.reagents)
-				.where(and(eq(schema.reagents.deleted, false), sql`structure@>${queryParams.q}`));
-			return { substances: result, count: result.length };
+			const { sort, limit, offset } = getClarifyParams(queryParams);
+
+			const reagentsQuery = server.reagentsService.getReagentsQuery(['structure']).as('substances');
+			let query = server.db.select().from(reagentsQuery);
+
+			query = query.where(hasSubstructure('structure', queryParams.q));
+			query = applySorting(query, sort, 'substances');
+
+			const count = await query;
+			const substances = await query.limit(limit).offset(offset);
+
+			return {
+				substances,
+				count: count.length
+			};
 		}
 	});
 }

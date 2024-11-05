@@ -99,7 +99,7 @@ async function reagentsService(server) {
 			return result.length ? result[0].name : null;
 		},
 
-		getReagentsQuery: () => {
+		getReagentsQuery: (extras = []) => {
 			return server.db
 				.select({
 					id: schema.reagents.id,
@@ -115,7 +115,8 @@ async function reagentsService(server) {
 						description: sql`${schema.storages.description}`.as('storageDescription')
 					},
 					description: schema.reagents.description,
-					category: sql`'reagent'`.as('category')
+					category: sql`'reagent'`.as('category'),
+					...Object.fromEntries(extras.map(col => [col, schema.reagents[col]]))
 				})
 				.from(schema.reagents)
 				.innerJoin(schema.storages, eq(schema.storages.id, schema.reagents.storageId))
