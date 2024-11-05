@@ -7,13 +7,17 @@ import { $router } from '../router.js';
 import { $notify } from '../../utils/feedback/notify-msg.js';
 
 const user = ref(null);
+const isLoading = ref(true);
 const isAuthorized = computed(() => !!user.value);
 
 async function setUser() {
+	isLoading.value = true;
 	try {
 		user.value = await $api.users.fetchCurrentUserInfo();
 	} catch {
 		$router.push({ name: 'login' });
+	} finally {
+		isLoading.value = false;
 	}
 }
 
@@ -51,6 +55,10 @@ function handleRoleCheck(routeRoles, userRole, next) {
 }
 
 $router.beforeEach((to, from, next) => {
+	if (isLoading.value) {
+		next();
+		return;
+	}
 	const routeRoles = to.meta.roles || [];
 	const userRole = user.value?.role?.name;
 
