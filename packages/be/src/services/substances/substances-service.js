@@ -53,41 +53,62 @@ async function substancesService(server) {
 			return diff >= 0 && diff === reqQuantityLeft;
 		},
 
+		validateStorageUpdateInput: async data => {
+			const { storageId } = data;
+			const storage = await server.storagesService.getStorageById(storageId);
+			if (!storage) {
+				const error = new Error(`No such storage with id: ${storageId}`);
+				error.codeStatus = 404;
+				throw error;
+			}
+			return { storageId };
+		},
+
+		validateQuantityUpdateInput: async (id, data) => {
+			const { category, quantityUsed, quantityLeft, reason } = data;
+
+			const canQuantityChange = await server.substancesService.canQuantityChange(id, {
+				quantityUsed,
+				quantityLeft,
+				reason,
+				category
+			});
+			if (!canQuantityChange) {
+				const error = new Error(`Quantity of ${category} cannot be changed. Check sending values`);
+				error.codeStatus = 409;
+				throw error;
+			}
+			return {
+				quantityUsed,
+				quantityLeft,
+				reason
+			};
+		},
+
 		validateSubstanceUpdateInput: async (id, data, userId) => {
 			const { category, storageId, quantityUsed, quantityLeft, reason } = data;
 			const updatedData = { category, userId };
 
-			if (storageId) {
-				const storage = await server.storagesService.getStorageById(storageId);
-				if (!storage) {
-					return {
-						isValid: false,
-						codeStatus: 404,
-						errorMessage: 'No such storage',
-						updatedData: null
-					};
+			try {
+				if (storageId) {
+					Object.assign(
+						updatedData,
+						await server.substancesService.validateStorageUpdateInput(data)
+					);
 				}
-				updatedData.storageId = storageId;
-			}
-
-			if (quantityUsed && reason) {
-				const canQuantityChange = await server.substancesService.canQuantityChange(id, {
-					quantityUsed,
-					quantityLeft,
-					reason,
-					category
-				});
-				if (!canQuantityChange) {
-					return {
-						isValid: false,
-						codeStatus: 409,
-						errorMessage: `Quantity of ${category} cannot be changed. Check sending values`,
-						updatedData: null
-					};
+				if (quantityUsed && reason && quantityLeft) {
+					Object.assign(
+						updatedData,
+						await server.substancesService.validateQuantityUpdateInput(id, data)
+					);
 				}
-				updatedData.quantityUsed = quantityUsed;
-				updatedData.reason = reason;
-				updatedData.quantityLeft = quantityLeft;
+			} catch (err) {
+				return {
+					isValid: false,
+					codeStatus: err.codeStatus,
+					errorMessage: err.message,
+					updatedData: null
+				};
 			}
 			return { isValid: true, codeStatus: 200, errorMessage: null, updatedData };
 		},
