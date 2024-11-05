@@ -16,7 +16,7 @@ const Substance = S.object()
 	.prop('category', S.string().required())
 	.prop('description', S.string().required())
 	.prop('quantityLeft', S.number().required())
-	.prop('storageLocation', Storage.without(['createdAt', 'isEmpty', 'creationDate']))
+	.prop('storageLocation', Storage.without(['isEmpty', 'creationDate']))
 	.prop('quantityUnit', S.string().minLength(1).required())
 	.prop('quantity', S.number().required())
 	.prop('expirationDate', S.string().format(S.FORMATS.DATE_TIME).required());
