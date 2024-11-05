@@ -103,7 +103,7 @@ const deleteReagentZero = async () => {
 			message: 'Reagent deletion was requested',
 			type: 'success'
 		});
-		await $router.push({ name: 'reagents-list' });
+		await $router.push({ name: 'substances' });
 	} catch {
 		$notify({
 			title: 'Canceled',
@@ -125,7 +125,7 @@ const deleteReagent = async () => {
 			message: response.message,
 			type: 'success'
 		});
-		await $router.push({ name: 'reagents-list' });
+		await $router.push({ name: 'substances' });
 	} catch {
 		$notify({
 			title: 'Canceled',

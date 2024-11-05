@@ -1,7 +1,4 @@
 export default http => ({
-	async fetchReagents(sort, params) {
-		return await http(`/reagents`, { query: { options: params, sort } });
-	},
 	async deleteReagent(id) {
 		return await http(`/reagents/${id}`, {
 			method: 'DELETE'

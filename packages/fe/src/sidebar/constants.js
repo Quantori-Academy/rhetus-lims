@@ -10,9 +10,9 @@ export const navigationLink = [
 	// 	name: 'Orders',
 	// },
 	{
-		path: '/reagents/list',
+		path: '/substances',
 		icon: 'asterisk',
-		name: 'Reagents'
+		name: 'Substances'
 	},
 	{
 		path: '/storages/list',

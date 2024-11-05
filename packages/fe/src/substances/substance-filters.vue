@@ -20,5 +20,3 @@ const filters = defineModel('filters', { type: Object });
 		<el-input-number v-model="filters.quantity" placeholder="Enter amount" :min="1" />
 	</filter-item>
 </template>
-
-<style scoped></style>

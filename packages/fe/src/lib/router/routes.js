@@ -118,7 +118,7 @@ export const routes = [
 			title: 'New Sample',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },
-				{ name: 'Reagents', path: '/reagents/list' },
+				{ name: 'Reagents', path: '/substances' },
 				{ name: 'New Sample', path: '' }
 			]
 		}
@@ -132,7 +132,7 @@ export const routes = [
 			title: 'Sample Details',
 			breadcrumb: route => [
 				{ name: 'Home', path: '/' },
-				{ name: 'Reagents', path: '/reagents/list' },
+				{ name: 'Reagents', path: '/substances' },
 				{ name: `${route.params.id}`, path: '' }
 			]
 		}
@@ -146,7 +146,7 @@ export const routes = [
 			title: 'Edit Sample Details',
 			breadcrumb: route => [
 				{ name: 'Home', path: '/' },
-				{ name: 'Reagents', path: '/reagents/list' },
+				{ name: 'Reagents', path: '/substances' },
 				{ name: `${route.params.id}`, path: '' }
 			]
 		}
@@ -207,14 +207,14 @@ export const routes = [
 		}
 	},
 	{
-		path: '/reagents/list',
-		name: 'reagents-list',
-		component: () => import('../../reagents/list/reagent-list.vue'),
+		path: '/substances',
+		name: 'substances',
+		component: () => import('../../substances/substances-list.vue'),
 		meta: {
-			title: 'Reagents List',
+			title: 'Substances List',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },
-				{ name: 'Reagents', path: '/reagents/list' }
+				{ name: 'Substances', path: '/substances' }
 			]
 		}
 	},
@@ -227,7 +227,7 @@ export const routes = [
 			title: 'Reagent Details',
 			breadcrumb: route => [
 				{ name: 'Home', path: '/' },
-				{ name: 'Reagents', path: '/reagents/list' },
+				{ name: 'Reagents', path: '/substances' },
 				{ name: `${route.params.id}`, path: '' }
 			]
 		}
@@ -241,7 +241,7 @@ export const routes = [
 			title: 'Edit Reagent Details',
 			breadcrumb: route => [
 				{ name: 'Home', path: '/' },
-				{ name: 'Reagents', path: '/reagents/list' },
+				{ name: 'Reagents', path: '/substances' },
 				{ name: `${route.params.id}`, path: '' }
 			]
 		}
@@ -254,7 +254,7 @@ export const routes = [
 			title: 'New Reagent',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },
-				{ name: 'Reagents', path: '/reagents/list' },
+				{ name: 'Reagents', path: '/substances' },
 				{ name: 'New Reagent', path: '' }
 			]
 		}
