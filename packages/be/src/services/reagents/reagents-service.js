@@ -98,11 +98,17 @@ async function reagentsService(server) {
 					quantity: schema.reagents.quantity,
 					quantityLeft: schema.reagents.quantityLeft,
 					expirationDate: schema.reagents.expirationDate,
-					storageLocationId: schema.reagents.storageId,
+					storageLocation: {
+						id: sql`${schema.storages.id}`.as('storageId'),
+						name: sql`${schema.storages.name}`.as('storageName'),
+						room: sql`${schema.storages.room}`.as('storageRoom'),
+						description: sql`${schema.storages.description}`.as('storageDescription')
+					},
 					description: schema.reagents.description,
 					category: sql`'reagent'`.as('category')
 				})
 				.from(schema.reagents)
+				.innerJoin(schema.storages, eq(schema.storages.id, schema.reagents.storageId))
 				.where(eq(schema.reagents.deleted, false));
 		},
 
