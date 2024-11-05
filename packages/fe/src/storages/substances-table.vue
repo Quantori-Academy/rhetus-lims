@@ -8,7 +8,7 @@ import { $notify, $notifyUserAboutError } from '../lib/utils/feedback/notify-msg
 import { $router } from '../lib/router/router.js';
 import RhFilters from '../lib/components/rh-filters/rh-filters.vue';
 import RhPagination from '../lib/components/rh-pagination/rh-pagination.vue';
-import SubstanceFilters from '../reagents/substance-filters.vue';
+import SubstanceFilters from '../substances/substance-filters.vue';
 
 const props = defineProps({
 	id: {
