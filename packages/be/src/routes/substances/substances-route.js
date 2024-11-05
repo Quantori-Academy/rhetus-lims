@@ -73,6 +73,49 @@ async function substances(server, options) {
 			return reply.code(500).send(err);
 		}
 	}
+
+	server.route({
+		method: 'PATCH',
+		path: options.prefix + 'substances/:id',
+		preValidation: [server.authenticate],
+		schema: schema.updateSubstanceSchema,
+		handler: onSubstanceUpdate
+	});
+
+	async function onSubstanceUpdate(req, reply) {
+		try {
+			const { category } = req.body;
+
+			const substanceId = req.params.id;
+			const substance = await server.substancesService.getSubstanceById(substanceId, category);
+			if (!substance) {
+				return reply.code(404).send({ status: 'error', message: `No such ${category}` });
+			}
+
+			const { isValid, codeStatus, errorMessage, updatedData } =
+				await server.substancesService.validateSubstanceUpdateInput(
+					substanceId,
+					req.body,
+					req.session.user.id
+				);
+
+			if (!isValid) {
+				return reply.code(codeStatus).send({ status: 'error', message: errorMessage });
+			}
+
+			const { code, status, message } = await server.substancesService.updateSubstance(
+				substanceId,
+				updatedData
+			);
+
+			return reply.code(code).send({
+				status,
+				message
+			});
+		} catch (err) {
+			return reply.code(500).send(err);
+		}
+	}
 }
 
 export default fp(substances);

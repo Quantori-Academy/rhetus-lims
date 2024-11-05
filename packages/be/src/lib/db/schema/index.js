@@ -5,6 +5,7 @@ import { substancesQuantityChanges } from './substances-quantity-changes.js';
 import { storages } from './storages.js';
 import { samples } from './samples.js';
 import { components } from './components.js';
+import { substancesStorageChanges } from './substances-storage-changes.js';
 
 export const schema = {
 	users,
@@ -13,7 +14,8 @@ export const schema = {
 	substancesQuantityChanges,
 	storages,
 	samples,
-	components
+	components,
+	substancesStorageChanges
 };
 
 export const relations = {};
