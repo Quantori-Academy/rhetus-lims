@@ -32,17 +32,17 @@ function editOrder(id) {
 	$router.push({ name: 'order-details-edit', params: { id } });
 }
 async function deleteOrder(id) {
-	await $confirm('Are you sure you want to delete this order?', 'Please, confirm your action', {
-		confirmButtonText: 'Delete',
-		cancelButtonText: 'Cancel',
-		type: 'warning'
-	});
 	try {
+		await $confirm('Are you sure you want to delete this order?', 'Please, confirm your action', {
+			confirmButtonText: 'Delete',
+			cancelButtonText: 'Cancel',
+			type: 'warning'
+		});
 		await $api.orders.deleteOrder(id);
-		await setOrders();
+		setOrders();
 	} catch (err) {
 		if (!['cancel', 'close'].includes(err)) {
-			this.$notifyUserAboutError(err);
+			$notifyUserAboutError(err);
 		}
 	}
 }
