@@ -96,7 +96,7 @@ async function requestsService(server) {
 			// TODO: add order join after implementation
 			// .innerJoin(schema.orders, eq(schema.requests.orderId, schema.orders.id))
 
-			const isOfficer = await server.usersService.isRoleByRoleName(userId, 'procurement officer');
+			const isOfficer = await server.usersService.isOfficer(userId);
 
 			query = isOfficer
 				? applyFilters(query, { ...options, deleted: 'false' }, 'requests')
@@ -138,14 +138,14 @@ async function requestsService(server) {
 
 			const isOwner = ownerId === userId;
 
-			const isOfficer = await server.usersService.isRoleByRoleName(userId, 'procurement officer');
+			const isOfficer = await server.usersService.isOfficer(userId);
 
 			return isOfficer || isOwner;
 		},
 
 		handleRequestUpdate: async (requestData, updateData, userId) => {
 			const { requestId, requestStatus, ownerId } = requestData;
-			const isOfficer = await server.usersService.isRoleByRoleName(userId, 'procurement officer');
+			const isOfficer = await server.usersService.isOfficer(userId);
 			const isOwner = ownerId === userId;
 
 			if (isOfficer) {

@@ -197,6 +197,12 @@ async function usersService(server) {
 				.where(eq(schema.users.username, username.toLowerCase()));
 
 			return result.length === 0;
+		},
+
+		isOfficer: async id => {
+			const result = await server.usersService.getUserById(id);
+
+			return result?.role?.name === 'procurement officer';
 		}
 	});
 }
