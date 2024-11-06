@@ -271,5 +271,17 @@ export const routes = [
 	{
 		path: '/:pathMatch(.*)*',
 		redirect: { name: '404' }
+	},
+	{
+		path: '/orders/list',
+		name: 'orders-list',
+		component: () => import('../../orders/list/order-list.vue'),
+		meta: {
+			title: 'Orders List',
+			breadcrumb: [
+				{ name: 'Home', path: '/' },
+				{ name: 'Orders', path: '/orders/list' }
+			]
+		}
 	}
 ];
