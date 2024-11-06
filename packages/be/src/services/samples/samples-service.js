@@ -186,11 +186,17 @@ async function samplesService(server) {
 					quantity: schema.samples.quantity,
 					quantityLeft: schema.samples.quantityLeft,
 					expirationDate: schema.samples.expirationDate,
-					storageLocationId: schema.samples.storageId,
+					storageLocation: {
+						id: sql`${schema.storages.id}`.as('storageId'),
+						name: sql`${schema.storages.name}`.as('storageName'),
+						room: sql`${schema.storages.room}`.as('storageRoom'),
+						description: sql`${schema.storages.description}`.as('storageDescription')
+					},
 					description: schema.samples.description,
 					category: sql`'sample'`.as('category')
 				})
 				.from(schema.samples)
+				.innerJoin(schema.storages, eq(schema.storages.id, schema.samples.storageId))
 				.where(eq(schema.samples.deleted, false));
 		},
 
