@@ -3,7 +3,7 @@ import { ref, onMounted, watch } from 'vue';
 import { ElTable, ElTableColumn, ElButton } from 'element-plus';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { $api } from '../../lib/api/index.js';
-import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
+import { $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $router } from '../../lib/router/router.js';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
 import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
@@ -32,29 +32,18 @@ function editOrder(id) {
 	$router.push({ name: 'order-details-edit', params: { id } });
 }
 async function deleteOrder(id) {
+	await $confirm('Are you sure you want to delete this order?', 'Please, confirm your action', {
+		confirmButtonText: 'Delete',
+		cancelButtonText: 'Cancel',
+		type: 'warning'
+	});
 	try {
-		await $confirm('Are you sure you want to delete this order?', 'Please, confirm your action', {
-			confirmButtonText: 'Delete',
-			cancelButtonText: 'Cancel',
-			type: 'warning'
-		});
-		try {
-			const response = await $api.orders.deleteOrder(id);
-			$notify({
-				title: 'Success',
-				message: response.message,
-				type: 'success'
-			});
-			await setOrders();
-		} catch (err) {
-			$notifyUserAboutError(err);
+		await $api.orders.deleteOrder(id);
+		await setOrders();
+	} catch (err) {
+		if (!['cancel', 'close'].includes(err)) {
+			this.$notifyUserAboutError(err);
 		}
-	} catch {
-		$notify({
-			title: 'Canceled',
-			message: 'Deletion canceled',
-			type: 'info'
-		});
 	}
 }
 
