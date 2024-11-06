@@ -1,8 +1,20 @@
 function trimValue(value) {
 	if (Array.isArray(value)) {
-		return value.map(item => (item ? item.trim() : '')).filter(Boolean);
+		return value.map(getTrimmedValue).filter(Boolean);
 	}
-	return value ? (Number.isInteger(value) ? value : value.trim()) : '';
+	return getTrimmedValue(value);
+}
+
+function getTrimmedValue(value) {
+	if (!value) {
+		return '';
+	}
+
+	if (typeof value === 'number') {
+		return value;
+	}
+
+	return value.trim();
 }
 
 export { trimValue };
