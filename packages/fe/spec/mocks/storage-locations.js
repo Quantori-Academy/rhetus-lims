@@ -51,8 +51,10 @@ export const storageLocationHandlers = [
 	http.get(api('/storages'), req => {
 		const url = new URL(req.request.url);
 		const options = url.searchParams.get('options');
-		const sort = JSON.parse(url.searchParams.get('sort')).creationDate;
-		console.log(`Sort order: ${sort}`);
+		const sort = url.searchParams.get('sort');
+		if (sort) {
+			console.log(`Sort order: ${sort}`);
+		}
 		const parsedOptions = JSON.parse(options);
 		const page = parseInt(url.searchParams.get('page')) || 1;
 		const limit = parseInt(url.searchParams.get('limit')) || 10;
@@ -71,6 +73,14 @@ export const storageLocationHandlers = [
 				count: filtered.length
 			});
 		}
+	}),
+	http.get(api('/storages/rooms'), () => {
+		const uniqueRooms = { rooms: [...new Set(storageInfo.storages.map(storage => storage.room))] };
+		return HttpResponse.json(uniqueRooms);
+	}),
+	http.get(api('/storages/names'), () => {
+		const uniqueNames = { names: [...new Set(storageInfo.storages.map(storage => storage.name))] };
+		return HttpResponse.json(uniqueNames);
 	}),
 	http.get(api('/storages/:id'), req => {
 		const { id } = req.params;
@@ -119,13 +129,5 @@ export const storageLocationHandlers = [
 			status: 'success',
 			message: 'Storage location was deleted'
 		});
-	}),
-	http.get(api('/storages/rooms'), () => {
-		const uniqueRooms = [...new Set(storageInfo.storages.map(storage => storage.room))];
-		return HttpResponse.json(uniqueRooms);
-	}),
-	http.get(api('/storages/names'), () => {
-		const uniqueNames = [...new Set(storageInfo.storages.map(storage => storage.name))];
-		return HttpResponse.json(uniqueNames);
 	})
 ];
