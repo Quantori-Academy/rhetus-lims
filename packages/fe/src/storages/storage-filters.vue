@@ -4,7 +4,6 @@ import { ElSelect, ElOption } from 'element-plus';
 import RhIcon from '../lib/components/rh-icon.vue';
 import FilterItem from '../lib/components/rh-filters/filter-item.vue';
 import { defineModel } from 'vue';
-import { debounce } from '../lib/utils/debounce/debounce';
 import { $notifyUserAboutError } from '../lib/utils/feedback/notify-msg';
 import { $api } from '../lib/api';
 
@@ -14,7 +13,7 @@ const names = ref([]);
 const objectNames = ref([]);
 const objectRooms = ref([]);
 
-const setNames = debounce(async () => {
+const setNames = async () => {
 	try {
 		const data = await $api.storages.fetchStoragesNames();
 		names.value = data.names;
@@ -25,9 +24,9 @@ const setNames = debounce(async () => {
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
-}, 200);
+};
 
-const setRooms = debounce(async () => {
+const setRooms = async () => {
 	try {
 		const data = await $api.storages.fetchStoragesRooms();
 		rooms.value = data.rooms;
@@ -38,7 +37,7 @@ const setRooms = debounce(async () => {
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
-}, 200);
+};
 
 onMounted(() => {
 	setNames();
