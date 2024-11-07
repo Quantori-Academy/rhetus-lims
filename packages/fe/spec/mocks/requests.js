@@ -62,7 +62,7 @@ const requestInfo = {
 			},
 			reagentName: 'Na Chlorid',
 			quantity: 10,
-			status: 'pending',
+			status: 'fulfilled',
 			userComment: 'we need it asap',
 			poComment: 'we have no enough money',
 			createdAt: '2024-09-20T13:16:35.744Z',

@@ -97,7 +97,13 @@ onMounted(() => {
 			<el-table-column prop="status" min-width="100" label="Status" />
 			<el-table-column width="100">
 				<template #default="{ row }">
-					<el-button type="danger" @click.stop="() => cancelRequest(row.id)">Cancel</el-button>
+					<el-button
+						type="danger"
+						:disabled="row.status !== 'pending'"
+						@click.stop="() => cancelRequest(row.id)"
+					>
+						Cancel
+					</el-button>
 				</template>
 			</el-table-column>
 		</el-table>
