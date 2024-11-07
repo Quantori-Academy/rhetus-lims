@@ -20,7 +20,7 @@ export const navigationLink = [
 		name: 'Orders'
 	},
 	{
-		path: '/requests',
+		path: '/requests/list',
 		icon: 'book',
 		name: 'Reagent Requests'
 	}
