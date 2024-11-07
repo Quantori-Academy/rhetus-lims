@@ -55,7 +55,7 @@ export const storageLocationHandlers = [
 		if (sort) {
 			console.log(`Sort order: ${sort}`);
 		}
-		const parsedOptions = JSON.parse(options);
+		const parsedOptions = JSON.parse(options) || {};
 		const page = parseInt(url.searchParams.get('page')) || 1;
 		const limit = parseInt(url.searchParams.get('limit')) || 10;
 		const hasValidOptions = options => {
