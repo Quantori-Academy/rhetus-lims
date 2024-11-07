@@ -21,7 +21,7 @@ const requestInfo = {
 			orderId: '22a5974b-cb37-4ebd-9060-8cc131945517'
 		},
 		{
-			id: '22a5974b-cb37-4ebd-9060-8cc131945517',
+			id: '22a5974b-cb37-4ebd-9060-8cc131943344',
 			author: {
 				id: 1,
 				username: 'username3'
@@ -102,5 +102,23 @@ export const requestHandlers = [
 		} else {
 			return filterRequests(parsedOptions);
 		}
+	}),
+	http.delete(api('/requests/:id'), async ({ params }) => {
+		const { id } = params;
+		const requestIndex = requestInfo.requests.findIndex(request => request.id === id);
+		if (requestIndex === -1) {
+			return HttpResponse.json(
+				{
+					status: 'error',
+					message: `Request not found`
+				},
+				{ status: 404 }
+			);
+		}
+		requestInfo.requests.splice(requestIndex, 1);
+		return HttpResponse.json({
+			status: 'success',
+			message: 'Request was canceled'
+		});
 	})
 ];
