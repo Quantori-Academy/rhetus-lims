@@ -282,5 +282,17 @@ export const routes = [
 				{ name: 'Orders', path: '/orders/list' }
 			]
 		}
+	},
+	{
+		path: '/requests',
+		name: 'requests-list',
+		component: () => import('../../requests/list/request-list.vue'),
+		meta: {
+			title: 'Reagent Requests List',
+			breadcrumb: [
+				{ name: 'Home', path: '/' },
+				{ name: 'Requests', path: '/requests' }
+			]
+		}
 	}
 ];

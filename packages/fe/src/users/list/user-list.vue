@@ -84,7 +84,7 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="user-table">
+	<div class="margin-table">
 		<rh-filters>
 			<template #action-buttons>
 				<el-button type="primary" @click="addNewUser">Add New User</el-button>
@@ -139,10 +139,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.user-table {
-	margin-top: 20px;
-}
-
 :deep(.el-table__row):hover {
 	cursor: pointer;
 }

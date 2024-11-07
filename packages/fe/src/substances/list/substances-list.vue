@@ -128,7 +128,7 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="substance-table">
+	<div class="margin-table">
 		<rh-filters>
 			<template #action-buttons>
 				<el-button type="primary" @click="addNewReagent">Add New Reagent</el-button>
@@ -171,10 +171,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.substance-table {
-	margin-top: 20px;
-}
-
 .top-buttons {
 	margin-bottom: 10px;
 }

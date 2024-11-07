@@ -18,5 +18,10 @@ export const navigationLink = [
 		path: '/orders/list',
 		icon: 'shopping-cart',
 		name: 'Orders'
+	},
+	{
+		path: '/requests',
+		icon: 'book',
+		name: 'Reagent Requests'
 	}
 ];
