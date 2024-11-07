@@ -3,7 +3,7 @@ import { ref, onMounted, watch } from 'vue';
 import { ElTable, ElTableColumn, ElButton } from 'element-plus';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { $api } from '../../lib/api/index.js';
-import { $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
+import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $router } from '../../lib/router/router.js';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
 import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
@@ -38,7 +38,12 @@ async function deleteOrder(id) {
 			cancelButtonText: 'Cancel',
 			type: 'warning'
 		});
-		await $api.orders.deleteOrder(id);
+		const response = await $api.orders.deleteOrder(id);
+		$notify({
+			title: 'Success',
+			message: response.message,
+			type: 'success'
+		});
 		setOrders();
 	} catch (err) {
 		if (!['cancel', 'close'].includes(err)) {
