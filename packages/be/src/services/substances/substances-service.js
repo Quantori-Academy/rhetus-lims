@@ -144,12 +144,19 @@ async function substancesService(server) {
 		},
 
 		searchReagents: async queryParams => {
+			const { q } = queryParams;
+			const isSmiles = await server.reagentsService.isStructureValid(q || '');
+
+			if (!isSmiles) {
+				return { substances: [], count: 0 };
+			}
+
 			const { sort, limit, offset } = getClarifyParams(queryParams);
 
 			const reagentsQuery = server.reagentsService.getReagentsQuery(['structure']).as('substances');
 			let query = server.db.select().from(reagentsQuery);
 
-			query = query.where(hasSubstructure('structure', queryParams.q));
+			query = query.where(hasSubstructure('structure', q));
 			query = applySorting(query, sort, 'substances');
 
 			const count = await query;
