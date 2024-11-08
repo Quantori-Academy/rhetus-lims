@@ -18,8 +18,8 @@ const sort = ref(null);
 const filters = ref({
 	title: '',
 	status: '',
-	createdAt: '',
-	updatedAt: ''
+	createdAt: null,
+	updatedAt: null
 });
 
 function addNewOrder() {

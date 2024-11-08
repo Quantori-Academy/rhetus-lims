@@ -9,8 +9,8 @@ const orderInfo = {
 				username: 'username2'
 			},
 			title: 'Order for Sodium Chloride',
-			createdAt: '2024-09-27T21:47:47.481Z',
-			updatedAt: '2024-09-27T21:47:47.481Z',
+			createdAt: '2024-09-20T21:47:47.481Z',
+			updatedAt: '2024-10-05T10:15:06.720Z',
 			seller: 'LabChem',
 			status: 'pending',
 			requests: [
@@ -58,8 +58,8 @@ const orderInfo = {
 				username: 'username4'
 			},
 			title: 'Order for Acetic Acid Solution',
-			createdAt: '2024-09-25T13:30:21.127Z',
-			updatedAt: '2024-09-26T08:21:15.372Z',
+			createdAt: '2024-09-22T21:47:47.481Z',
+			updatedAt: '2024-10-02T10:15:06.720Z',
 			seller: 'BBR',
 			status: 'ordered',
 			requests: [
@@ -91,7 +91,7 @@ const orderInfo = {
 					status: 'ordered',
 					userComment: 'we need it asap',
 					poComment: "let's do it",
-					createdAt: '2024-09-27T13:16:35.744Z',
+					createdAt: '2024-09-20T21:47:47.481Z',
 					updatedAt: '2024-09-27T13:16:35.744Z',
 					structure: 'H2SO4',
 					casNumber: '2222222-22-2',
@@ -108,7 +108,7 @@ const orderInfo = {
 			},
 			title: 'Order for Ethanol (99%)',
 			createdAt: '2024-09-20T10:05:45.311Z',
-			updatedAt: '2024-09-28T15:42:00.228Z',
+			updatedAt: '2024-10-05T10:15:06.720Z',
 			seller: 'ChemLab Central',
 			status: 'completed',
 			requests: [
@@ -130,7 +130,7 @@ const orderInfo = {
 					orderId: null
 				},
 				{
-					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
+					id: '22a5974b-cb37-4ebd-9060-8cc131945516',
 					author: {
 						id: 1,
 						username: 'username3'
@@ -158,19 +158,19 @@ function matchesTitle(order, title) {
 function matchesStatus(order, status) {
 	return status ? order.status.includes(status) : true;
 }
-function matchesCreationDate(order, creationDate) {
-	return creationDate ? order.creationDate.includes(creationDate) : true;
+function matchesCreationDate(order, createdAt) {
+	return createdAt ? order.createdAt.includes(createdAt) : true;
 }
-function matchesModificationDate(order, modificationDate) {
-	return modificationDate ? order.modificationDate.includes(modificationDate) : true;
+function matchesUpdateDate(order, updatedAt) {
+	return updatedAt ? order.updatedAt.includes(updatedAt) : true;
 }
 function filterOrders(parsedOptions) {
 	const filteredOrders = orderInfo.orders.filter(order => {
 		return (
 			matchesTitle(order, parsedOptions.title) &&
 			matchesStatus(order, parsedOptions.status) &&
-			matchesCreationDate(order, parsedOptions.creationDate) &&
-			matchesModificationDate(order, parsedOptions.modificationDate)
+			matchesCreationDate(order, parsedOptions.createdAt) &&
+			matchesUpdateDate(order, parsedOptions.updatedAt)
 		);
 	});
 
@@ -189,7 +189,7 @@ export const orderHandlers = [
 		if (sort) {
 			console.log(`Sort order: ${sort}`);
 		}
-		const parsedOptions = JSON.parse(options) || {};
+		const parsedOptions = options ? JSON.parse(options) : null;
 		const page = parseInt(url.searchParams.get('page')) || 1;
 		const limit = parseInt(url.searchParams.get('limit')) || 10;
 		const hasValidOptions = options => {
