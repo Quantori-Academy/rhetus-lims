@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "./static/css/main.e770f74b.css",
+    "main.js": "./static/js/main.612ac7f5.js",
+    "static/js/58.d4158b49.chunk.js": "./static/js/58.d4158b49.chunk.js",
+    "indigo-ketcher-1.24.0.wasm": "./indigo-ketcher-1.24.0.wasm",
+    "indigo-ketcher-norender-1.24.0.wasm": "./indigo-ketcher-norender-1.24.0.wasm",
+    "index.html": "./index.html"
+  },
+  "entrypoints": [
+    "static/css/main.e770f74b.css",
+    "static/js/main.612ac7f5.js"
+  ]
+}
