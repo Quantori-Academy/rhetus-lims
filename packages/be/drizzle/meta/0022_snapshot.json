@@ -1,6 +1,6 @@
 {
-  "id": "ce196907-eaea-4785-9cbb-534c91f4049b",
-  "prevId": "214d6b54-51d3-4ece-8cf7-036caa0071a8",
+  "id": "0d42df35-f961-4ba4-b427-04c79f72c6cf",
+  "prevId": "ce196907-eaea-4785-9cbb-534c91f4049b",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -186,6 +186,119 @@
           "tableTo": "storages",
           "columnsFrom": [
             "storage_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.requests": {
+      "name": "requests",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuid_generate_v4()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_comment": {
+          "name": "user_comment",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": null
+        },
+        "po_comment": {
+          "name": "po_comment",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": null
+        },
+        "request_status": {
+          "name": "request_status",
+          "type": "reagent_request_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'pending'"
+        },
+        "reagent_name": {
+          "name": "reagent_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "structure": {
+          "name": "structure",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": null
+        },
+        "cas_number": {
+          "name": "cas_number",
+          "type": "varchar(12)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": null
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "order_id": {
+          "name": "order_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false,
+          "default": null
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted": {
+          "name": "deleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "requests_user_id_users_id_fk": {
+          "name": "requests_user_id_users_id_fk",
+          "tableFrom": "requests",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
           ],
           "columnsTo": [
             "id"
@@ -684,6 +797,16 @@
     }
   },
   "enums": {
+    "public.reagent_request_status": {
+      "name": "reagent_request_status",
+      "schema": "public",
+      "values": [
+        "pending",
+        "ordered",
+        "fulfilled",
+        "declined"
+      ]
+    },
     "public.name": {
       "name": "name",
       "schema": "public",
