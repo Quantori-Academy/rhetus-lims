@@ -19,7 +19,7 @@ const filters = ref({
 	title: '',
 	status: '',
 	createdAt: '',
-	modifiedAt: ''
+	updatedAt: ''
 });
 
 function addNewOrder() {
@@ -129,11 +129,11 @@ onMounted(() => {
 				sortable
 			/>
 			<el-table-column
-				prop="modifiedAt"
+				prop="updatedAt"
 				min-width="200"
-				label="Modified at"
+				label="Updated at"
 				width="140"
-				:formatter="data => formatDate(data.modifiedAt)"
+				:formatter="data => formatDate(data.updatedAt)"
 				sortable
 			/>
 			<el-table-column prop="seller" min-width="150" label="Seller" sortable />
