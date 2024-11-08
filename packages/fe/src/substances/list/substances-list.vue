@@ -10,6 +10,7 @@ import RhPagination from '../../lib/components/rh-pagination/rh-pagination.vue';
 import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
 import SubstanceFilters from '../substance-filters.vue';
 import { debounce } from '../../lib/utils/debounce/debounce.js';
+import KetcherEditor from '../../ketcher-editor/ketcher-editor.vue';
 
 const substances = ref(null);
 const isLoading = ref(false);
@@ -28,7 +29,7 @@ const paginationData = ref({
 const handlePageChange = newPage => {
 	paginationData.value.page = newPage;
 };
-
+const smiles = ref('');
 function addNewReagent() {
 	$router.push({ name: 'new-reagent' });
 }
@@ -125,6 +126,11 @@ const setSubstances = debounce(async (event = null) => {
 	}
 }, 200);
 
+const exportSmiles = val => {
+	smiles.value = val;
+	console.log('smiles', smiles.value);
+};
+
 function createQuery(event) {
 	let query = {};
 	if (event && event.prop && event.order) {
@@ -147,6 +153,7 @@ onMounted(() => {
 	<div class="margin-table">
 		<rh-filters>
 			<template #action-buttons>
+				<ketcher-editor @export-smiles="exportSmiles" />
 				<el-button type="primary" @click="addNewReagent">Add New Reagent</el-button>
 				<el-button type="primary" @click="addNewSample">Add New Sample</el-button>
 			</template>
