@@ -5,6 +5,7 @@ import samples from './samples.js';
 import storageLocations from './storage-locations.js';
 import reagents from './reagents.js';
 import substances from './substances.js';
+import orders from './orders.js';
 
 export const $api = {
 	users: users(http),
@@ -12,5 +13,6 @@ export const $api = {
 	samples: samples(http),
 	storages: storageLocations(http),
 	reagents: reagents(http),
-	substances: substances(http)
+	substances: substances(http),
+	orders: orders(http)
 };

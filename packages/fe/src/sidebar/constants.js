@@ -1,14 +1,4 @@
 export const navigationLink = [
-	// {
-	// 	path: '/',
-	// 	icon: 'microsoft',
-	// 	name: 'Reagent Requests',
-	// },
-	// {
-	// 	path: '/',
-	// 	icon: 'microsoft',
-	// 	name: 'Orders',
-	// },
 	{
 		path: '/reagents/list',
 		icon: 'asterisk',
@@ -23,5 +13,10 @@ export const navigationLink = [
 		path: '/users/list',
 		icon: 'user',
 		name: 'Users'
+	},
+	{
+		path: '/orders/list',
+		icon: 'shopping-cart',
+		name: 'Orders'
 	}
 ];
