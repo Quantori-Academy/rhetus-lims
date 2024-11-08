@@ -5,6 +5,8 @@ import { getClarifyParams } from '../../lib/utils/common/parse-params.js';
 import { applyFilters } from '../../lib/utils/db/apply-filters.js';
 import { applySorting } from '../../lib/utils/db/apply-sorting.js';
 import { hasSubstructure } from '../../lib/db/structure/utils/has-substructure.js';
+import { or } from 'drizzle-orm';
+import { isSimilar } from '../../lib/db/structure/utils/is-similar.js';
 
 async function substancesService(server) {
 	server.decorate('substancesService', {
@@ -156,7 +158,7 @@ async function substancesService(server) {
 			const reagentsQuery = server.reagentsService.getReagentsQuery(['structure']).as('substances');
 			let query = server.db.select().from(reagentsQuery);
 
-			query = query.where(hasSubstructure('structure', q));
+			query = query.where(or(hasSubstructure('structure', q), isSimilar('structure', q)));
 			query = applySorting(query, sort, 'substances');
 
 			const count = await query;
