@@ -5,8 +5,10 @@ import { getClarifyParams } from '../../lib/utils/common/parse-params.js';
 import { applyFilters } from '../../lib/utils/db/apply-filters.js';
 import { applySorting } from '../../lib/utils/db/apply-sorting.js';
 import { hasSubstructure } from '../../lib/db/structure/utils/has-substructure.js';
-import { or } from 'drizzle-orm';
+import { or, sql } from 'drizzle-orm';
 import { isSimilar } from '../../lib/db/structure/utils/is-similar.js';
+import { isExactStructure } from '../../lib/db/structure/utils/is-exact-structure.js';
+import { getRelevanceScore } from '../../lib/db/structure/utils/get-relevance-score.js';
 
 async function substancesService(server) {
 	server.decorate('substancesService', {
@@ -153,16 +155,29 @@ async function substancesService(server) {
 				return { substances: [], count: 0 };
 			}
 
-			const { sort, limit, offset } = getClarifyParams(queryParams);
+			const { limit, offset } = getClarifyParams(queryParams);
 
-			const reagentsQuery = server.reagentsService.getReagentsQuery(['structure']).as('substances');
+			const reagentsQuery = server.reagentsService
+				.getReagentsQuery({
+					structure: 'schema',
+					relevance: getRelevanceScore('structure', q).as('relevance')
+				})
+				.as('substances');
+
 			let query = server.db.select().from(reagentsQuery);
-
-			query = query.where(or(hasSubstructure('structure', q), isSimilar('structure', q)));
-			query = applySorting(query, sort, 'substances');
+			query = query.where(
+				or(
+					isExactStructure('structure', q),
+					hasSubstructure('structure', q),
+					isSimilar('structure', q)
+				)
+			);
 
 			const count = await query;
-			const substances = await query.limit(limit).offset(offset);
+			const substances = await query
+				.orderBy(sql`relevance`)
+				.limit(limit)
+				.offset(offset);
 
 			return {
 				substances,
