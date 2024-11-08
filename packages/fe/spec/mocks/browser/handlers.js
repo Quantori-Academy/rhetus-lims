@@ -4,8 +4,8 @@ import { storageLocationHandlers } from '../storage-locations.js';
 import { reagentsHandlers } from '../reagents.js';
 import { authHandlers } from '../auth.js';
 import { substancesHandler } from '../substances.js';
-import { orderLocationHandlers } from '../orders.js';
 import { requestHandlers } from '../requests.js';
+import { orderHandlers } from '../orders.js';
 
 export const handlers = [
 	...authHandlers,
@@ -14,6 +14,6 @@ export const handlers = [
 	...storageLocationHandlers,
 	...reagentsHandlers,
 	...substancesHandler,
-	...orderLocationHandlers,
-	...requestHandlers
+	...requestHandlers,
+	...orderHandlers
 ];
