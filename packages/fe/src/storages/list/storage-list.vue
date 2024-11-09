@@ -181,10 +181,6 @@ onMounted(() => {
 .storages-table {
 	margin-top: 20px;
 }
-:deep(.el-select) {
-	padding: 8px 15px;
-	max-width: 220px;
-}
 :deep(.el-table__row):hover {
 	cursor: pointer;
 }
