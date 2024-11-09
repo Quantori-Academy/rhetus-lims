@@ -75,17 +75,25 @@ const requestInfo = {
 	count: 4
 };
 
+function createdDateFilter(parsedOptions, request) {
+	let [createdStartDate, createdEndDate] = parsedOptions.creationRange.map(date => new Date(date));
+	const createdAt = new Date(request.createdAt);
+	return createdAt >= createdStartDate && createdAt <= createdEndDate;
+}
+
 function filterRequests(parsedOptions) {
 	const filteredRequests = requestInfo.requests.filter(request => {
-		let matchesName = true;
-		let matchesStatus = true;
-		if (parsedOptions.reagentName) {
-			matchesName = request.reagentName.toLowerCase().includes(parsedOptions.reagentName);
-		}
-		if (parsedOptions.status) {
-			matchesStatus = request.status.includes(parsedOptions.status);
-		}
-		return matchesName && matchesStatus;
+		const matchesName = parsedOptions.reagentName
+			? request.reagentName.toLowerCase().includes(parsedOptions.reagentName)
+			: true;
+		const matchesStatus = parsedOptions.status
+			? request.status.includes(parsedOptions.status)
+			: true;
+		const matchesCreationDate = parsedOptions.creationRange
+			? createdDateFilter(parsedOptions, request)
+			: true;
+
+		return matchesName && matchesStatus && matchesCreationDate;
 	});
 	return HttpResponse.json({
 		requests: filteredRequests
@@ -94,9 +102,8 @@ function filterRequests(parsedOptions) {
 
 export const requestHandlers = [
 	http.get(api('/requests'), req => {
-		const url = new URL(req.request.url);
-		const options = url.searchParams.get('options');
-		const parsedOptions = JSON.parse(options);
+		const options = new URL(req.request.url).searchParams.get('options');
+		const parsedOptions = options ? JSON.parse(options) : null;
 		if (parsedOptions === null) {
 			return HttpResponse.json(requestInfo);
 		} else {

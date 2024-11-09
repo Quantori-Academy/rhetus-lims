@@ -13,7 +13,9 @@ const isLoading = ref(false);
 const requests = ref([]);
 const filters = ref({
 	reagentName: '',
-	status: ''
+	status: '',
+	creationRange: '',
+	updateRange: ''
 });
 
 const setRequests = debounce(async () => {
@@ -35,17 +37,14 @@ const cancelRequest = async id => {
 			cancelButtonText: 'Cancel',
 			type: 'warning'
 		});
-		try {
-			const response = await $api.requests.cancelRequest(id);
-			$notify({
-				title: 'Success',
-				message: response.message,
-				type: 'success'
-			});
-			setRequests();
-		} catch (error) {
-			$notifyUserAboutError(error);
-		}
+
+		const response = await $api.requests.cancelRequest(id);
+		$notify({
+			title: 'Success',
+			message: response.message,
+			type: 'success'
+		});
+		setRequests();
 	} catch (error) {
 		if (!['cancel', 'close'].includes(error)) {
 			this.$notifyUserAboutError(error);
