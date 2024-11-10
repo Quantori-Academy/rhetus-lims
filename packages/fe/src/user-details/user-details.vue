@@ -10,7 +10,7 @@ const props = defineProps({ id: { type: String, default: null } });
 		<profile-details :id="props.id" />
 	</div>
 	<div class="wrapper">
-		<manage-password id="props.id" />
+		<manage-password :id="props.id" />
 	</div>
 </template>
 
