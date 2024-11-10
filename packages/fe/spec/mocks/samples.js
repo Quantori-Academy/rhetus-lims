@@ -69,10 +69,6 @@ const samplesDetails = [
 ];
 
 export const samplesHandlers = [
-	http.get(api('/samples'), () => {
-		return HttpResponse.json({ samples, count: samples.length });
-	}),
-
 	http.post(api('/samples'), async ({ request }) => {
 		const sample = await request.json();
 		samples.push({ ...sample, category: 'sample' });

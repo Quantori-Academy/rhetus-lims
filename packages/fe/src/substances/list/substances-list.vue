@@ -1,21 +1,32 @@
 <script setup>
 import RhIcon from '../../lib/components/rh-icon.vue';
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { ElTable, ElTableColumn, ElButton } from 'element-plus';
 import { $router } from '../../lib/router/router.js';
 import { $api } from '../../lib/api/index.js';
-import { $confirm } from '../../lib/utils/feedback/confirm-msg';
+import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
+import RhPagination from '../../lib/components/rh-pagination/rh-pagination.vue';
 import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
 import SubstanceFilters from '../substance-filters.vue';
 import { debounce } from '../../lib/utils/debounce/debounce.js';
 
-const reagents = ref(null);
+const substances = ref(null);
 const isLoading = ref(false);
 const filters = ref({
 	name: '',
 	quantity: null
 });
+
+const paginationData = ref({
+	page: 1,
+	size: 10,
+	totalElements: 0
+});
+
+const handlePageChange = newPage => {
+	paginationData.value.page = newPage;
+};
 
 function addNewReagent() {
 	$router.push({ name: 'new-reagent' });
@@ -63,22 +74,34 @@ const deleteSubstance = async row => {
 			await $api.samples.deleteSample(row.id);
 		}
 		showNotification('Success', 'Item is deleted', 'success');
-		await setReagents();
+		await setSubstances();
 	} catch (error) {
 		showNotification('Error', error.message || 'Item update canceled', 'error');
 	}
 };
 
-const setReagents = debounce(async (event = null) => {
+const formattedSubstances = computed(
+	() =>
+		substances.value?.map(substance => ({
+			...substance,
+			quantityLeft: `${substance.quantityLeft} ${substance.quantityUnit}`,
+			storageLocation: `${substance.storageLocation.name}, ${substance.storageLocation.room}`
+		})) || []
+);
+
+const setSubstances = debounce(async (event = null) => {
 	isLoading.value = true;
-	let query = createQuery(event);
-	const options = {
-		sort: { name: 'desc' },
-		...filters.value
+	const sortQuery = createQuery(event);
+	const params = {
+		page: paginationData.value.page,
+		limit: paginationData.value.size,
+		sort: { ...sortQuery.sort },
+		options: { ...filters.value }
 	};
 	try {
-		const data = await $api.reagents.fetchReagents(query.sort, options);
-		reagents.value = data.items;
+		const data = await $api.substances.fetchSubstances(params);
+		substances.value = data.substances;
+		paginationData.value.totalElements = data.count;
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
@@ -95,21 +118,17 @@ function createQuery(event) {
 	return query;
 }
 
-watch(
-	filters,
-	() => {
-		setReagents();
-	},
-	{ deep: true }
-);
+watch(paginationData.value, () => setSubstances());
+
+watch(filters.value, () => setSubstances(), { deep: true });
 
 onMounted(() => {
-	setReagents();
+	setSubstances();
 });
 </script>
 
 <template>
-	<div class="reagent-table">
+	<div class="substance-table">
 		<rh-filters>
 			<template #action-buttons>
 				<el-button type="primary" @click="addNewReagent">Add New Reagent</el-button>
@@ -123,16 +142,15 @@ onMounted(() => {
 
 		<el-table
 			v-loading="isLoading"
-			:data="reagents"
+			:data="formattedSubstances"
 			@row-click="viewSubstance"
-			@sort-change="setReagents"
+			@sort-change="setSubstances"
 		>
 			<el-table-column prop="name" min-width="150" label="Name" sortable />
-			<el-table-column prop="category" min-width="150" label="Category" sortable />
-			<el-table-column prop="structure" min-width="200" label="Structure" />
-			<el-table-column prop="description" min-width="200" label="Description" />
-			<el-table-column prop="quantityLeft" min-width="80" label="Quantity Left" />
-			<el-table-column prop="storageLocationId" min-width="80" label="Storage Location" />
+			<el-table-column prop="category" min-width="120" label="Category" sortable />
+			<el-table-column prop="description" min-width="160" label="Description" />
+			<el-table-column prop="quantityLeft" min-width="120" label="Quantity Left" />
+			<el-table-column prop="storageLocation" min-width="140" label="Storage Location" />
 			<el-table-column width="80">
 				<template #default="{ row }">
 					<el-button @click.stop="() => editSubstance(row)">
@@ -149,10 +167,11 @@ onMounted(() => {
 			</el-table-column>
 		</el-table>
 	</div>
+	<rh-pagination :pagination="paginationData" @change-page="handlePageChange" />
 </template>
 
 <style scoped>
-.reagent-table {
+.substance-table {
 	margin-top: 20px;
 }
 

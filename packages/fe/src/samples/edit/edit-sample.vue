@@ -45,7 +45,7 @@ async function deleteSample() {
 				message: response.message,
 				type: 'success'
 			});
-			$router.push({ name: 'reagents-list' });
+			$router.push({ name: 'substances-list' });
 		} catch (error) {
 			$notifyUserAboutError(error);
 		}
