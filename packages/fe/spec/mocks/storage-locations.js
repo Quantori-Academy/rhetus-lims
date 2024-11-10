@@ -1,7 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import { api } from './api-url.js';
 
-const storageInfo = {
+export const storageInfo = {
 	storages: [
 		{
 			id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',

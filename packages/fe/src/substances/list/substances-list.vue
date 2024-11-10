@@ -85,7 +85,7 @@ const formattedSubstances = computed(
 		substances.value?.map(substance => ({
 			...substance,
 			quantityLeft: `${substance.quantityLeft} ${substance.quantityUnit}`,
-			storageLocation: `${substance.storageLocation.name}, ${substance.storageLocation.room}`
+			storageLocation: `${substance.storageLocation?.name}, ${substance.storageLocation?.room}`
 		})) || []
 );
 
