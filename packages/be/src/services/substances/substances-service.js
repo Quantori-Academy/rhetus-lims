@@ -4,19 +4,15 @@ import { Category } from '../../routes/substances/substances-schema.js';
 import { getClarifyParams } from '../../lib/utils/common/parse-params.js';
 import { applyFilters } from '../../lib/utils/db/apply-filters.js';
 import { applySorting } from '../../lib/utils/db/apply-sorting.js';
-import { hasSubstructure } from '../../lib/db/structure/utils/has-substructure.js';
-import { or, sql } from 'drizzle-orm';
-import { isSimilar } from '../../lib/db/structure/utils/is-similar.js';
-import { isExactStructure } from '../../lib/db/structure/utils/is-exact-structure.js';
-import { getRelevanceScore } from '../../lib/db/structure/utils/get-relevance-score.js';
+import { sql } from 'drizzle-orm';
 
 async function substancesService(server) {
 	server.decorate('substancesService', {
 		getSubstances: async queryParams => {
 			const { options, sort, limit, offset } = getClarifyParams(queryParams);
 
-			const reagentsQuery = server.reagentsService.getReagentsQuery();
-			const samplesQuery = server.samplesService.getSamplesQuery();
+			const reagentsQuery = server.reagentsService.getReagentsQuery({ structure: 'schema' });
+			const samplesQuery = server.samplesService.getSamplesQuery({ structure: sql`${null}` });
 
 			const unionQuery = unionAll(reagentsQuery, samplesQuery);
 			let query = server.db.select().from(unionQuery.as('substances'));
@@ -144,44 +140,6 @@ async function substancesService(server) {
 				code: 200,
 				status: 'success',
 				message: `${updateMessages.join('; ')}`
-			};
-		},
-
-		searchReagents: async queryParams => {
-			const { q } = queryParams;
-			const isSmiles = await server.reagentsService.isStructureValid(q || '');
-
-			if (!isSmiles) {
-				return { substances: [], count: 0 };
-			}
-
-			const { limit, offset } = getClarifyParams(queryParams);
-
-			const reagentsQuery = server.reagentsService
-				.getReagentsQuery({
-					structure: 'schema',
-					relevance: getRelevanceScore('structure', q).as('relevance')
-				})
-				.as('substances');
-
-			let query = server.db.select().from(reagentsQuery);
-			query = query.where(
-				or(
-					isExactStructure('structure', q),
-					hasSubstructure('structure', q),
-					isSimilar('structure', q)
-				)
-			);
-
-			const count = await query;
-			const substances = await query
-				.orderBy(sql`relevance`)
-				.limit(limit)
-				.offset(offset);
-
-			return {
-				substances,
-				count: count.length
 			};
 		}
 	});

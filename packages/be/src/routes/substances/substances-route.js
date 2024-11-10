@@ -116,24 +116,6 @@ async function substances(server, options) {
 			return reply.code(500).send(err);
 		}
 	}
-
-	server.route({
-		method: 'GET',
-		path: options.prefix + 'substances/search',
-		preValidation: [server.authenticate],
-		schema: schema.getSubstances,
-		handler: onSearch
-	});
-
-	async function onSearch(req, reply) {
-		try {
-			const data = await server.substancesService.searchReagents(req.query);
-
-			return reply.code(200).send(data);
-		} catch (err) {
-			return reply.code(500).send(err);
-		}
-	}
 }
 
 export default fp(substances);

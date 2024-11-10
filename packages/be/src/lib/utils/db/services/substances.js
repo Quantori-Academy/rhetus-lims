@@ -23,6 +23,11 @@ const substances = {
 			value: string => helpers.toDate(string),
 			schema: 'union',
 			operator: 'between'
+		},
+		structure: {
+			property: 'structure',
+			schema: 'union',
+			operator: 'structure-search'
 		}
 	},
 	sort: {
