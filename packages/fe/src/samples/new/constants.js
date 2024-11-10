@@ -6,7 +6,6 @@ const requiredRule = {
 
 export const formRules = {
 	name: [requiredRule],
-	components: [requiredRule],
 	quantityUnit: [requiredRule],
 	quantity: [
 		requiredRule,
@@ -21,7 +20,6 @@ export const formRules = {
 			trigger: ['blur', 'change']
 		}
 	],
-	expirationDate: [requiredRule],
 	storageId: [requiredRule]
 };
 
