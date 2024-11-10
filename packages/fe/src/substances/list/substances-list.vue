@@ -1,7 +1,7 @@
 <script setup>
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { ref, onMounted, watch, computed } from 'vue';
-import { ElTable, ElTableColumn, ElButton } from 'element-plus';
+import { ElTable, ElTableColumn, ElButton, ElTooltip } from 'element-plus';
 import { $router } from '../../lib/router/router.js';
 import { $api } from '../../lib/api/index.js';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
@@ -15,7 +15,8 @@ const substances = ref(null);
 const isLoading = ref(false);
 const filters = ref({
 	name: '',
-	quantity: null
+	quantity: null,
+	expirationDate: { label: 'All', value: [] }
 });
 
 const paginationData = ref({
@@ -65,16 +66,47 @@ const confirmDeleteReagent = async () => {
 		return false;
 	}
 };
-const deleteSubstance = async row => {
+
+const confirmDeleteAll = async () => {
+	try {
+		return await $confirm('Are you sure you want to delete all selected items?', 'Delete all?', {
+			confirmButtonText: 'Delete',
+			cancelButtonText: 'Cancel',
+			type: 'warning'
+		});
+	} catch {
+		showNotification('Canceled', 'Deletion canceled', 'info');
+		return false;
+	}
+};
+
+const deleteSubstance = async (id, category) => {
+	if (category.toLowerCase() === 'reagent') {
+		await $api.reagents.deleteReagent(id);
+	} else {
+		await $api.samples.deleteSample(id);
+	}
+};
+
+const deleteSingleSubstance = async row => {
 	if (!(await confirmDeleteReagent())) return;
 	try {
-		if (row.category.toLowerCase() === 'reagent') {
-			await $api.reagents.deleteReagent(row.id);
-		} else {
-			await $api.samples.deleteSample(row.id);
-		}
+		await deleteSubstance(row.id, row.category);
 		showNotification('Success', 'Item is deleted', 'success');
 		await setSubstances();
+	} catch (error) {
+		showNotification('Error', error.message || 'Item update canceled', 'error');
+	}
+};
+
+const deleteAllSubstances = async () => {
+	if (!(await confirmDeleteAll())) return;
+	try {
+		await Promise.all(
+			substances.value.map(element => deleteSubstance(element.id, element.category))
+		);
+		await setSubstances();
+		showNotification('Success', 'Items deleted', 'success');
 	} catch (error) {
 		showNotification('Error', error.message || 'Item update canceled', 'error');
 	}
@@ -96,7 +128,7 @@ const setSubstances = debounce(async (event = null) => {
 		page: paginationData.value.page,
 		limit: paginationData.value.size,
 		sort: { ...sortQuery.sort },
-		options: { ...filters.value }
+		options: { ...filters.value, expirationDate: filters.value.expirationDate.value }
 	};
 	try {
 		const data = await $api.substances.fetchSubstances(params);
@@ -133,6 +165,15 @@ onMounted(() => {
 			<template #action-buttons>
 				<el-button type="primary" @click="addNewReagent">Add New Reagent</el-button>
 				<el-button type="primary" @click="addNewSample">Add New Sample</el-button>
+				<el-tooltip content="Delete all">
+					<el-button
+						type="danger"
+						:disabled="filters.expirationDate.label === 'All' || substances.length === 0"
+						@click="deleteAllSubstances"
+					>
+						<rh-icon color="white" name="trash" />
+					</el-button>
+				</el-tooltip>
 			</template>
 
 			<template #filters>
@@ -160,7 +201,7 @@ onMounted(() => {
 			</el-table-column>
 			<el-table-column width="80">
 				<template #default="{ row }">
-					<el-button type="danger" @click.stop="() => deleteSubstance(row)">
+					<el-button type="danger" @click.stop="() => deleteSingleSubstance(row)">
 						<rh-icon color="white" name="trash" />
 					</el-button>
 				</template>
