@@ -84,13 +84,13 @@ async function orders(server, options) {
 		try {
 			const orderId = req.params.id;
 
-			const { status: orderStatus } = await server.ordersService.getOrderById(orderId);
+			const order = await server.ordersService.getOrderById(orderId);
 
-			if (!orderStatus) {
+			if (!order) {
 				return reply.code(404).send({ status: 'error', message: `No such order` });
 			}
 
-			if (orderStatus !== OrderStatus.PENDING) {
+			if (order.status !== OrderStatus.PENDING) {
 				return reply
 					.code(403)
 					.send({ status: 'error', message: `Sorry. You cannot update order while processing` });
@@ -116,13 +116,13 @@ async function orders(server, options) {
 	async function onDeleteOrder(req, reply) {
 		try {
 			const orderId = req.params.id;
-			const { status: orderStatus } = await server.ordersService.getOrderById(orderId);
+			const order = await server.ordersService.getOrderById(orderId);
 
-			if (!orderStatus) {
+			if (!order) {
 				return reply.code(404).send({ status: 'error', message: `No such order` });
 			}
 
-			if (orderStatus !== OrderStatus.PENDING) {
+			if (order.status !== OrderStatus.PENDING) {
 				return reply
 					.code(403)
 					.send({ status: 'error', message: `Sorry. You cannot delete order while processing` });

@@ -6,45 +6,157 @@ import { getClarifyParams } from '../../lib/utils/common/parse-params.js';
 import { applyFilters } from '../../lib/utils/db/apply-filters.js';
 import { applySorting } from '../../lib/utils/db/apply-sorting.js';
 import { RequestStatus } from '../../lib/db/schema/requests.js';
+import { ItemTypes } from '../../lib/db/schema/orders-items.js';
 
 const formatMapping = {
 	title: string => helpers.capitalize(string),
 	seller: string => helpers.capitalize(string),
-	name: string => helpers.capitalize(string),
 	casNumber: string => helpers.lowercase(string),
 	quantityUnit: string => helpers.lowercase(string)
 };
 
 async function ordersService(server) {
 	server.decorate('ordersService', {
+		getFormattedOrderItemsFromRequests: async requests => {
+			if (!requests.length) {
+				return [];
+			}
+
+			const formattedRequests = await Promise.all(
+				requests.map(async ({ id, amount, quantityUnit, quantity }) => {
+					const request = await server.requestsService.getRequestById(id);
+
+					if (!request) {
+						throw new Error('No such request');
+					}
+
+					const {
+						status,
+						reagentName,
+						structure,
+						casNumber,
+						producer,
+						catalogId,
+						catalogLink,
+						unitPrice
+					} = request ?? {};
+
+					if (status !== RequestStatus.PENDING) {
+						throw new Error('Request is already processing in another one order');
+					}
+
+					return {
+						requestId: id,
+						reagentName,
+						structure,
+						casNumber,
+						producer,
+						catalogId,
+						catalogLink,
+						unitPrice,
+						quantity,
+						quantityUnit: formatMapping.quantityUnit(quantityUnit),
+						amount,
+						itemType: ItemTypes.REQUEST
+					};
+				})
+			);
+
+			return formattedRequests;
+		},
+
+		getFormattedOrderItemsFromReagents: async reagents => {
+			if (!reagents.length) {
+				return [];
+			}
+
+			const formattedReagents = await Promise.all(
+				reagents.map(async ({ id, amount, quantityUnit, quantity }) => {
+					const reagent = await server.reagentsService.getReagentById(id);
+
+					if (!reagent) {
+						throw new Error('No such reagent');
+					}
+
+					const { name, structure, casNumber, producer, catalogId, catalogLink, unitPrice } =
+						reagent ?? {};
+
+					return {
+						reagentName: name,
+						structure,
+						casNumber,
+						producer,
+						catalogId,
+						catalogLink,
+						unitPrice,
+						quantity,
+						quantityUnit: formatMapping.quantityUnit(quantityUnit),
+						amount,
+						itemType: ItemTypes.REAGENT
+					};
+				})
+			);
+
+			return formattedReagents;
+		},
+
+		orderItemsInsert: async (tx, orderItems, orderId) => {
+			return Promise.all(
+				orderItems.map(async orderItem => {
+					const {
+						requestId,
+						reagentName,
+						structure,
+						casNumber,
+						producer,
+						catalogId,
+						catalogLink,
+						unitPrice,
+						quantity,
+						quantityUnit,
+						amount,
+						itemType
+					} = orderItem ?? {};
+
+					if (itemType === ItemTypes.REQUEST) {
+						await tx
+							.update(schema.requests)
+							.set({
+								// TODO: change status after requests implementation will be updated
+								requestStatus: 'ordered',
+								orderId
+							})
+							.where(eq(schema.requests.id, requestId));
+					}
+
+					await tx.insert(schema.ordersItems).values({
+						orderId,
+						requestId,
+						itemType,
+						reagentName,
+						structure,
+						casNumber,
+						producer,
+						catalogId,
+						catalogLink,
+						unitPrice,
+						quantityUnit,
+						quantity,
+						amount
+					});
+				})
+			);
+		},
+
 		createOrder: async data => {
 			const { title, seller, reagents, reagentRequests, userId } = data;
 
-			const formattedRequests = reagentRequests.map(async request => {
-				const { id, quantityUnit, ...restInfo } = request;
-				const { reagentName, structure, casNumber } =
-					await server.requestsService.getRequestById(id);
+			const [formattedRequests, formattedReagents] = await Promise.all([
+				server.ordersService.getFormattedOrderItemsFromRequests(reagentRequests),
+				server.ordersService.getFormattedOrderItemsFromReagents(reagents)
+			]);
 
-				return {
-					...restInfo,
-					id,
-					name: reagentName,
-					structure,
-					casNumber,
-					quantityUnit: formatMapping.quantityUnit(quantityUnit),
-					itemType: 'request'
-				};
-			});
-
-			const formattedReagents = reagents.map(reagent => {
-				const formattedReagent = Object.fromEntries(
-					Object.entries(reagent).map(([key, value]) => {
-						return key in formatMapping ? [key, formatMapping[key](value)] : [key, value];
-					})
-				);
-
-				return { ...formattedReagent, itemType: 'reagent' };
-			});
+			const formattedOrderItems = [...formattedRequests, ...formattedReagents];
 
 			const createdOrderTitle = await server.db.transaction(async tx => {
 				const [{ orderId, orderTitle }] = await tx
@@ -56,48 +168,7 @@ async function ordersService(server) {
 					})
 					.returning({ orderId: schema.orders.id, orderTitle: schema.orders.title });
 
-				for await (const item of [...formattedRequests, ...formattedReagents]) {
-					const {
-						id: requestId,
-						itemType,
-						name: reagentName,
-						structure,
-						casNumber,
-						producer,
-						catalogId,
-						catalogLink,
-						unitPrice,
-						quantityUnit,
-						quantity,
-						amount
-					} = item ?? {};
-
-					if (itemType === 'request') {
-						await tx
-							.update(schema.requests)
-							.set({
-								requestStatus: 'ordered',
-								orderId
-							})
-							.where(eq(schema.requests.id, item.id));
-					}
-
-					await tx.insert(schema.ordersItems).values({
-						orderId,
-						requestId,
-						itemType,
-						reagentName: formatMapping.name(reagentName),
-						structure,
-						casNumber,
-						producer,
-						catalogId,
-						catalogLink,
-						unitPrice,
-						quantityUnit,
-						quantity,
-						amount
-					});
-				}
+				await server.ordersService.orderItemsInsert(tx, formattedOrderItems, orderId);
 
 				return orderTitle;
 			});
@@ -123,20 +194,34 @@ async function ordersService(server) {
 				.innerJoin(schema.users, eq(schema.orders.userId, schema.users.id))
 				.where(and(eq(schema.orders.id, reqOrderId), eq(schema.orders.deleted, false)));
 
+			if (!order) {
+				return null;
+			}
+
 			// eslint-disable-next-line no-unused-vars
 			const { requestId, orderId, itemType, createdAt, updatedAt, deleted, ...restColumns } =
 				getTableColumns(schema.ordersItems);
 
-			const reagents = await server.db
-				.select({ ...restColumns })
-				.from(schema.ordersItems)
-				.innerJoin(schema.orders, eq(schema.orders.id, schema.ordersItems.orderId))
-				.where(eq(schema.ordersItems.itemType, 'reagent'));
-			const reagentRequests = await server.db
-				.select({ ...restColumns })
-				.from(schema.ordersItems)
-				.innerJoin(schema.orders, eq(schema.orders.id, schema.ordersItems.orderId))
-				.where(eq(schema.ordersItems.itemType, 'request'));
+			const [reagents, reagentRequests] = await Promise.all([
+				server.db
+					.select({ ...restColumns })
+					.from(schema.ordersItems)
+					.where(
+						and(
+							eq(schema.ordersItems.orderId, reqOrderId),
+							eq(schema.ordersItems.itemType, ItemTypes.REAGENT)
+						)
+					),
+				server.db
+					.select({ ...restColumns })
+					.from(schema.ordersItems)
+					.where(
+						and(
+							eq(schema.ordersItems.orderId, reqOrderId),
+							eq(schema.ordersItems.itemType, ItemTypes.REQUEST)
+						)
+					)
+			]);
 
 			return { ...order, reagents, reagentRequests };
 		},
@@ -212,7 +297,10 @@ async function ordersService(server) {
 			const requestsIds = await tx
 				.delete(schema.ordersItems)
 				.where(
-					and(eq(schema.ordersItems.orderId, orderId), eq(schema.ordersItems.itemType, 'request'))
+					and(
+						eq(schema.ordersItems.orderId, orderId),
+						eq(schema.ordersItems.itemType, ItemTypes.REQUEST)
+					)
 				)
 				.returning({ requestId: schema.ordersItems.requestId });
 
