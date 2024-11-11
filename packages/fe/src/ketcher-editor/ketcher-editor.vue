@@ -7,6 +7,7 @@ const isPopoverVisible = ref(false);
 const ketcherFrame = ref(null);
 
 const smiles = defineModel('smiles', { type: String });
+const buttonRef = ref();
 
 const searchByStructure = async () => {
 	let ketcher = ketcherFrame.value.contentWindow.ketcher;
@@ -24,12 +25,16 @@ const searchByStructure = async () => {
 <template>
 	<el-input v-model="smiles" clearable placeholder="Search structure">
 		<template #append>
-			<el-popover v-model:visible="isPopoverVisible" trigger="click" :width="600">
-				<template #reference>
-					<el-button class="icon-button">
-						<rh-icon name="search" />
-					</el-button>
-				</template>
+			<el-button ref="buttonRef" :class="['icon-button', { 'custom-border': isPopoverVisible }]">
+				<rh-icon name="search" />
+			</el-button>
+			<el-popover
+				:virtual-ref="buttonRef"
+				v-model:visible="isPopoverVisible"
+				trigger="click"
+				:width="600"
+				virtual-triggering
+			>
 				<div class="popover-content">
 					<div class="ketcher-container">
 						<div class="ketcher-editor">
@@ -76,5 +81,10 @@ const searchByStructure = async () => {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+}
+
+.el-button.custom-border {
+	outline: none;
+	border: 1px solid #1785be;
 }
 </style>
