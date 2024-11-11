@@ -2,6 +2,7 @@
 import { ElInput, ElInputNumber, ElSwitch } from 'element-plus';
 import RhIcon from '../lib/components/rh-icon.vue';
 import FilterItem from '../lib/components/rh-filters/filter-item.vue';
+import KetcherEditor from '../ketcher-editor/ketcher-editor.vue';
 import { defineModel } from 'vue';
 
 const filters = defineModel('filters', { type: Object });
@@ -22,6 +23,10 @@ const filters = defineModel('filters', { type: Object });
 
 	<filter-item>
 		<el-switch v-model="filters.expired" active-text="Expired" inactive-text="All" />
+	</filter-item>
+
+	<filter-item>
+		<ketcher-editor :smiles="filters.smiles" />
 	</filter-item>
 </template>
 
