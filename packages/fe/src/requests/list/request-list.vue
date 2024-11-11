@@ -14,8 +14,7 @@ const requests = ref([]);
 const filters = ref({
 	reagentName: '',
 	status: '',
-	creationRange: '',
-	updateRange: ''
+	creationRange: ''
 });
 
 const setRequests = debounce(async () => {
@@ -76,11 +75,12 @@ onMounted(() => {
 			</template>
 		</rh-filters>
 		<el-table v-loading="isLoading" :data="requests">
+			<el-table-column prop="status" min-width="100" label="Status" />
 			<el-table-column prop="reagentName" min-width="120" label="Reagent Name" />
-			<el-table-column prop="casNumber" min-width="120" label="CAS Number" />
+			<el-table-column prop="quantityUnit" min-width="120" label="Quantity Unit" />
 			<el-table-column prop="quantity" label="Quantity" />
+			<el-table-column prop="amount" label="Amount" />
 			<el-table-column prop="userComment" min-width="120" label="User comment" />
-			<el-table-column prop="poComment" min-width="120" label="Procurement comment" />
 			<el-table-column
 				prop="createdAt"
 				label="Creation Date"
@@ -93,7 +93,6 @@ onMounted(() => {
 				min-width="120"
 				:formatter="data => formatDate(data.updatedAt)"
 			/>
-			<el-table-column prop="status" min-width="100" label="Status" />
 			<el-table-column width="100">
 				<template #default="{ row }">
 					<el-button

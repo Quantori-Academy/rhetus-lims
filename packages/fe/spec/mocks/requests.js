@@ -10,7 +10,9 @@ const requestInfo = {
 				username: 'username3'
 			},
 			reagentName: 'good acid',
-			quantity: 15.5,
+			quantityUnit: 'l, bottle',
+			quantity: 2,
+			amount: 1,
 			status: 'pending',
 			userComment: 'we need it asap',
 			poComment: 'we have no enough money',
@@ -27,7 +29,9 @@ const requestInfo = {
 				username: 'username3'
 			},
 			reagentName: 'better acid',
-			quantity: 17,
+			quantityUnit: 'l, bottle',
+			quantity: 2,
+			amount: 1,
 			status: 'ordered',
 			userComment: 'we need it asap',
 			poComment: "let's do it",
@@ -44,7 +48,9 @@ const requestInfo = {
 				username: 'username3'
 			},
 			reagentName: 'Water',
-			quantity: 20,
+			quantityUnit: 'l, bottle',
+			quantity: 2,
+			amount: 1,
 			status: 'pending',
 			userComment: 'we need it asap',
 			poComment: "let's do it",
@@ -61,7 +67,9 @@ const requestInfo = {
 				username: 'username3'
 			},
 			reagentName: 'Na Chlorid',
-			quantity: 10,
+			quantityUnit: 'mg, bottle',
+			quantity: 30,
+			amount: 4,
 			status: 'fulfilled',
 			userComment: 'we need it asap',
 			poComment: 'we have no enough money',
