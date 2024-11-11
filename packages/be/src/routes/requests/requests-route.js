@@ -42,6 +42,12 @@ async function requests(server, options) {
 		try {
 			const authenticatedUserId = req.session.user.id;
 			const requestId = req.params.id;
+			const request = await server.requestsService.getRequestById(requestId);
+
+			if (!request) {
+				return reply.code(404).send({ status: 'error', message: `No such reagent request` });
+			}
+
 			const isOwnerOrOfficer = await server.requestsService.isOwnerOrOfficer(
 				requestId,
 				authenticatedUserId
@@ -52,12 +58,6 @@ async function requests(server, options) {
 					status: 'error',
 					message: `Sorry. You have no permissions to view this reagent request`
 				});
-			}
-
-			const request = await server.requestsService.getRequestById(requestId);
-
-			if (!request) {
-				return reply.code(404).send({ status: 'error', message: `No such reagent request` });
 			}
 
 			return reply.code(200).send(request);
@@ -97,6 +97,12 @@ async function requests(server, options) {
 		try {
 			const authenticatedUserId = req.session.user.id;
 			const requestId = req.params.id;
+			const request = await server.requestsService.getRequestById(requestId);
+
+			if (!request) {
+				return reply.code(404).send({ status: 'error', message: `No such reagent request` });
+			}
+
 			const isOwnerOrOfficer = await server.requestsService.isOwnerOrOfficer(
 				requestId,
 				authenticatedUserId
@@ -107,12 +113,6 @@ async function requests(server, options) {
 					status: 'error',
 					message: `Sorry. You have no permissions to change this reagent request`
 				});
-			}
-
-			const request = await server.requestsService.getRequestById(requestId);
-
-			if (!request) {
-				return reply.code(404).send({ status: 'error', message: `No such reagent request` });
 			}
 
 			const { code, status, message } = await server.requestsService.handleRequestUpdate(
