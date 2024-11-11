@@ -14,7 +14,6 @@ const storage = ref({
 	description: ''
 });
 const rules = ref(formRules);
-const isLoading = ref(false);
 const rooms = ref([]);
 
 const resetForm = () => {
@@ -45,20 +44,19 @@ const addStorage = async () => {
 };
 
 const setRooms = async () => {
-	isLoading.value = true;
 	try {
 		const { storages } = await $api.storages.fetchStorages();
-		rooms.value = [...new Set(storages.map(({ room }) => room))].map(room => ({
-			value: room,
-			label: room
-		}));
+		rooms.value = getRooms(storages);
 	} catch (error) {
 		$notifyUserAboutError(error);
-	} finally {
-		isLoading.value = false;
 	}
 };
-
+const getRooms = storages => {
+	return storages.map(storage => ({
+		value: storage.room,
+		label: storage.room
+	}));
+};
 const filteredRooms = computed(() => {
 	return rooms.value.filter(room =>
 		room.value.toLowerCase().includes(storage.value.room.toLowerCase())
