@@ -36,14 +36,12 @@ function structureSearchQuery(filterKey, value) {
 	const match = value.match || 'exact';
 
 	switch (match) {
-		case 'exact':
-			return isExactStructure(filterKey, value.smiles);
 		case 'substructure':
 			return hasSubstructure(filterKey, value.smiles);
 		case 'similar':
 			return isSimilar(filterKey, value.smiles);
 		default:
-			return;
+			return isExactStructure(filterKey, value.smiles);
 	}
 }
 
