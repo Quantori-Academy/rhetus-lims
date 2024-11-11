@@ -109,4 +109,4 @@ const deleteOrder = {
 	}
 };
 
-export { createOrder, getOrder, getOrders, updateOrder, deleteOrder };
+export { createOrder, getOrder, getOrders, updateOrder, deleteOrder, getOrderSchema };
