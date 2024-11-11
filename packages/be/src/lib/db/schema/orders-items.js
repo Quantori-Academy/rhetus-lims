@@ -12,7 +12,12 @@ import { sql } from 'drizzle-orm';
 import { orders } from './orders.js';
 import { requests } from './requests.js';
 
-export const itemTypesEnum = pgEnum('order_item_type', ['reagent', 'request']);
+export const ItemTypes = {
+	REAGENT: 'reagent',
+	REQUEST: 'request'
+};
+
+export const itemTypesEnum = pgEnum('order_item_type', Object.values(ItemTypes));
 
 export const ordersItems = pgTable('orders_items', {
 	tempId: uuid('temp_id')

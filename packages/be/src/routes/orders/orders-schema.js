@@ -9,31 +9,36 @@ const Author = S.object()
 	.prop('id', S.number().minimum(1).required())
 	.prop('username', S.string().minLength(1).required());
 
-const createOrderRequestSchema = S.object()
+const createOrderItemSchema = S.object()
 	.prop('id', S.string().format(S.FORMATS.UUID).required())
 	.prop('amount', S.number().minimum(1).required())
 	.prop('quantity', S.number().minimum(0).required())
 	.prop('quantityUnit', S.string().minLength(1).required());
 
-const createOrderReagentSchema = S.object()
-	.prop('name', S.string().minLength(1).required())
-	.prop('casNumber', S.string().maxLength(12))
-	.prop('producer', S.string())
-	.prop('catalogId', S.string())
-	.prop('catalogLink', S.string())
-	.prop('unitPrice', S.number().minimum(0))
-	.prop('quantityUnit', S.string().minLength(1).required())
-	.prop('quantity', S.number().minimum(0).required())
-	.prop('amount', S.number().minimum(1).required())
-	.prop('structure', S.string());
-
 const createOrderSchema = S.object()
 	.prop('title', S.string().minLength(1).maxLength(200).required())
 	.prop('seller', S.string().maxLength(200))
-	.prop('reagentRequests', S.array().items(createOrderRequestSchema).required())
-	.prop('reagents', S.array().items(createOrderReagentSchema).required());
+	.prop('reagentRequests', S.array().items(createOrderItemSchema).required())
+	.prop('reagents', S.array().items(createOrderItemSchema).required());
 
-const getOrderSchema = createOrderSchema
+const getOrderItemSchema = S.object()
+	.prop('tempId', S.string().format(S.FORMATS.UUID).required())
+	.prop('amount', S.number().minimum(1).required())
+	.prop('quantity', S.number().minimum(0).required())
+	.prop('quantityUnit', S.string().minLength(1).required())
+	.prop('reagentName', S.string().minLength(1).required())
+	.prop('structure', S.string().minLength(0).required())
+	.prop('casNumber', S.string().minLength(0).required())
+	.prop('producer', S.string().minLength(0).required())
+	.prop('catalogId', S.string().minLength(0).required())
+	.prop('catalogLink', S.string().minLength(0).required())
+	.prop('unitPrice', S.number().minimum(0).required());
+
+const getOrderSchema = S.object()
+	.prop('title', S.string().minLength(1).maxLength(200).required())
+	.prop('seller', S.string().maxLength(200))
+	.prop('reagentRequests', S.array().items(getOrderItemSchema).required())
+	.prop('reagents', S.array().items(getOrderItemSchema).required())
 	.prop('id', S.string().format(S.FORMATS.UUID).required())
 	.prop('createdAt', S.string().format(S.FORMATS.DATE_TIME).required())
 	.prop('updatedAt', S.string().format(S.FORMATS.DATE_TIME).required())
@@ -43,11 +48,6 @@ const getOrderSchema = createOrderSchema
 const updateOrderSchema = S.object()
 	.prop('title', S.string().minLength(1).maxLength(200))
 	.prop('seller', S.string().minLength(1).maxLength(200));
-
-const orderItemSchema = createOrderReagentSchema
-	.without(['name'])
-	.prop('tempId', S.string().format(S.FORMATS.UUID).required())
-	.prop('reagentName', S.string().minLength(1).required());
 
 const createOrder = {
 	security: [{ Session: [] }],
@@ -74,13 +74,12 @@ const getOrders = {
 		500: statusMessage
 	}
 };
+
 const getOrder = {
 	security: [{ Session: [] }],
 	params: S.object().prop('id', S.string().format(S.FORMATS.UUID).required()),
 	response: {
-		200: getOrderSchema
-			.prop('reagents', S.array().items(orderItemSchema))
-			.prop('reagentRequests', S.array().items(orderItemSchema)),
+		200: getOrderSchema,
 		403: statusMessage,
 		404: statusMessage,
 		500: statusMessage
