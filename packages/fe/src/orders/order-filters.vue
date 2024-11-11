@@ -29,8 +29,10 @@ const filters = defineModel('filters', { type: Object });
 		<filter-item>
 			<el-date-picker
 				v-model="filters.createdAt"
-				type="date"
-				placeholder="Creation date"
+				type="daterange"
+				range-separator="-"
+				start-placeholder="Created from"
+				end-placeholder="to"
 				format="YYYY/MM/DD"
 				value-format="YYYY-MM-DD"
 			/>
@@ -38,8 +40,10 @@ const filters = defineModel('filters', { type: Object });
 		<filter-item>
 			<el-date-picker
 				v-model="filters.updatedAt"
-				type="date"
-				placeholder="Update date"
+				type="daterange"
+				range-separator="-"
+				start-placeholder="Updated from"
+				end-placeholder="to"
 				format="YYYY/MM/DD"
 				value-format="YYYY-MM-DD"
 			/>

@@ -18,8 +18,8 @@ const sort = ref(null);
 const filters = ref({
 	title: '',
 	status: '',
-	createdAt: null,
-	updatedAt: null
+	createdAt: [],
+	updatedAt: []
 });
 
 function addNewOrder() {
@@ -62,7 +62,11 @@ const setOrders = debounce(async (event = null) => {
 		page: paginationData.value.page,
 		limit: paginationData.value.size,
 		sort: sort.value,
-		options: { ...filters.value }
+		options: {
+			...filters.value,
+			createdAt: filters.value.createdAt,
+			updatedAt: filters.value.updatedAt
+		}
 	};
 	try {
 		const data = await $api.orders.fetchOrders(params);
