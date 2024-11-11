@@ -79,7 +79,7 @@ async function submit() {
 			});
 			$notify({ message: response.message, type: 'success' });
 		}
-		toggleEditing();
+		$router.push({ name: 'sample-details', params: { id: props.id } });
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
@@ -87,11 +87,18 @@ async function submit() {
 	}
 }
 
-function toggleEditing() {
-	$router.push({
-		name: isEditing.value ? 'sample-details' : 'edit-sample',
-		params: { id: props.id }
+function toggleEdit() {
+	$router.push({ name: 'edit-sample', params: { id: props.id } });
+}
+
+function cancelEdit() {
+	$router.push({ name: 'sample-details', params: { id: props.id } });
+	$notify({
+		title: 'Canceled',
+		message: 'Sample editing canceled',
+		type: 'info'
 	});
+	formEl.value.resetFields();
 }
 
 function redirect(row) {
@@ -144,7 +151,7 @@ watch(
 	<div v-loading="isLoading" class="wrapper">
 		<div class="editing-header">
 			<div>{{ `${isEditing ? 'Editing ' : ''}${sample.name}` }}</div>
-			<el-button v-if="!isEditing" @click="toggleEditing">Edit</el-button>
+			<el-button v-if="!isEditing" @click="toggleEdit">Edit</el-button>
 		</div>
 		<el-form ref="form-el" :model="sample" :rules="rules" label-position="top">
 			<el-form-item label="Name" prop="name">
@@ -209,7 +216,7 @@ watch(
 			<div v-if="isEditing" class="btn-container">
 				<el-button type="danger" @click="deleteSample">Delete</el-button>
 				<div>
-					<el-button @click="toggleEditing">Cancel</el-button>
+					<el-button @click="cancelEdit">Cancel</el-button>
 					<el-button :loading="isSaving" type="primary" @click="submit">Update</el-button>
 				</div>
 			</div>
