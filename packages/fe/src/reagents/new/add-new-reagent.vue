@@ -37,16 +37,11 @@ const form = ref({
 
 const rules = ref({
 	name: [requiredRule('Name')],
-	producer: [requiredRule('Producer')],
-	catalogId: [requiredRule('Catalog ID')],
-	catalogLink: [requiredRule('Catalog link')],
 	quantityUnit: [requiredRule('Quantity unit')],
 	quantity: [
 		requiredRule('Quantity'),
 		{ type: 'number', min: 1, message: 'Quantity cannot be zero', trigger: ['blur', 'change'] }
 	],
-	unitPrice: [requiredRule('Price')],
-	expirationDate: [requiredRule('Expiration date')],
 	storageLocationId: [requiredRule('Storage location')]
 });
 
@@ -131,7 +126,7 @@ async function setStorages() {
 					format="YYYY-MM-DD"
 				/>
 			</el-form-item>
-			<el-form-item label="Storage location" prop="storageLocation">
+			<el-form-item label="Storage location" prop="storageLocationId">
 				<el-select
 					v-model="form.storageLocationId"
 					placeholder="Select storage location"
