@@ -6,6 +6,7 @@ const requiredRule = {
 
 export const formRules = {
 	name: [requiredRule],
+	components: [requiredRule],
 	quantityUnit: [requiredRule],
 	quantity: [
 		requiredRule,
