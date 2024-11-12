@@ -24,7 +24,7 @@ const substances = {
 			schema: 'union',
 			operator: 'between'
 		},
-		structure: {
+		smiles: {
 			property: 'structure',
 			schema: 'union',
 			operator: 'structure-search'

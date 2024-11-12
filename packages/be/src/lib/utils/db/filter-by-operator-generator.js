@@ -1,4 +1,4 @@
-import { eq, inArray, ilike, between } from 'drizzle-orm';
+import { eq, inArray, ilike, between, or } from 'drizzle-orm';
 import { isExactStructure } from '../../db/structure/utils/is-exact-structure.js';
 import { hasSubstructure } from '../../db/structure/utils/has-substructure.js';
 import { isSimilar } from '../../db/structure/utils/is-similar.js';
@@ -32,29 +32,12 @@ function generateBetweenFilter(filterKey, value, formatValue) {
 	return between(filterKey, formatValue(startValue), formatValue(endValue));
 }
 
-function structureSearchQuery(filterKey, value) {
-	const match = value.match || 'exact';
-
-	switch (match) {
-		case 'substructure':
-			return hasSubstructure(filterKey, value.smiles);
-		case 'similar':
-			return isSimilar(filterKey, value.smiles);
-		default:
-			return isExactStructure(filterKey, value.smiles);
-	}
-}
-
 function generateStructureSearchFilter(filterKey, value) {
-	if (!(value !== null && typeof value === 'object' && !Array.isArray(value))) {
-		throw new Error('Structure filter should be a valid object.');
-	}
-
-	if (!value.smiles) {
-		throw new Error('Structure filter should contain a smiles string.');
-	}
-
-	return structureSearchQuery(filterKey, value);
+	return or(
+		isExactStructure(filterKey, value),
+		hasSubstructure(filterKey, value),
+		isSimilar(filterKey, value)
+	);
 }
 
 function generateFilterByOperator(filterData) {

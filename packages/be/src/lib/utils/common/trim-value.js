@@ -14,10 +14,6 @@ function getTrimmedValue(value) {
 		return value;
 	}
 
-	if (value !== null && typeof value === 'object') {
-		return value;
-	}
-
 	return value.trim();
 }
 
