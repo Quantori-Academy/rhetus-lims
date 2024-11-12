@@ -18,9 +18,6 @@ function filterSubstances(parsedOptions) {
 		if (parsedOptions.quantity) {
 			matchesQuantity = parseInt(reagent.quantityLeft) === parsedOptions.quantity;
 		}
-		if (parsedOptions.location) {
-			matchesLocation = reagent.storageLocationId === parsedOptions.location;
-		}
 		return matchesName && matchesQuantity && matchesLocation;
 	});
 	return filteredSubstances;
@@ -34,8 +31,6 @@ export const substancesHandler = [
 	http.get(api('/substances'), req => {
 		const requestUrl = req.request.url;
 		const url = new URL(requestUrl);
-		const productIds = url.searchParams.get('sort');
-		console.log(productIds);
 
 		const page = parseInt(url.searchParams.get('page')) || 1;
 		const limit = parseInt(url.searchParams.get('limit')) || 10;
@@ -56,7 +51,6 @@ export const substancesHandler = [
 			});
 		} else {
 			const filteredSubstances = filterSubstances(parsedOptions);
-			console.log(filteredSubstances);
 			const paginatedSubstances = filteredSubstances.slice(start, end);
 			return HttpResponse.json({
 				substances: paginatedSubstances.map(x => ({
