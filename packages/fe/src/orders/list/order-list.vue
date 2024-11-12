@@ -123,6 +123,7 @@ onMounted(() => {
 			</template>
 		</rh-filters>
 		<el-table v-loading="isLoading" :data="orders" @row-click="viewOrder" @sort-change="setOrders">
+			<el-table-column prop="status" min-width="150" label="Status" sortable />
 			<el-table-column prop="title" min-width="150" label="Title" sortable />
 			<el-table-column
 				prop="createdAt"
@@ -141,7 +142,6 @@ onMounted(() => {
 				sortable
 			/>
 			<el-table-column prop="seller" min-width="150" label="Seller" sortable />
-			<el-table-column prop="status" min-width="150" label="Status" sortable />
 			<el-table-column width="80">
 				<template #default="{ row }">
 					<el-button @click.stop="() => editOrder(row.id)"><rh-icon name="pencil" /></el-button>
