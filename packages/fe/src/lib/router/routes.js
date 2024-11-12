@@ -325,6 +325,19 @@ export const routes = [
 		}
 	},
 	{
+		path: '/orders/new',
+		name: 'new-order-request',
+		component: () => import('../../orders/new/add-new-order.vue'),
+		meta: {
+			title: 'New Order',
+			breadcrumb: [
+				{ name: 'Home', path: '/' },
+				{ name: 'Orders', path: '/orders/list' },
+				{ name: 'New Order', path: '' }
+			]
+		}
+	},
+	{
 		path: '/orders/:id/edit',
 		name: 'order-details-edit',
 		component: () => import('../../orders/details/order-details.vue'),
@@ -335,6 +348,19 @@ export const routes = [
 				{ name: 'Home', path: '/' },
 				{ name: 'Orders', path: '/orders/list' },
 				{ name: `${route.params.id}`, path: '' }
+			]
+		}
+	},
+	{
+		path: '/orders/new',
+		name: 'new-order-reagent',
+		component: () => import('../../orders/new/add-new-order.vue'),
+		meta: {
+			title: 'New Order',
+			breadcrumb: [
+				{ name: 'Home', path: '/' },
+				{ name: 'Orders', path: '/orders/list' },
+				{ name: 'New Order', path: '' }
 			]
 		}
 	}

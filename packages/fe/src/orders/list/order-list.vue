@@ -23,7 +23,10 @@ const filters = ref({
 });
 
 function addNewOrder() {
-	$router.push({ name: 'new-order' });
+	$router.push({ name: 'new-order-request' });
+}
+function addNewOrderReagent() {
+	$router.push({ name: 'new-order-reagent' });
 }
 function viewOrder(row) {
 	$router.push({ name: 'order-details', params: { id: row.id } });
@@ -115,6 +118,7 @@ onMounted(() => {
 		<rh-filters>
 			<template #action-buttons>
 				<el-button type="primary" @click="addNewOrder">Add New Order </el-button>
+				<el-button type="primary" @click="addNewOrderReagent">Add New Order Reagent</el-button>
 			</template>
 			<template #filters>
 				<order-filters v-model:filters="filters" />
