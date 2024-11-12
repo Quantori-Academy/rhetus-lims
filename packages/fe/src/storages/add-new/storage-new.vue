@@ -1,6 +1,6 @@
 <script setup>
-import { ref, useTemplateRef } from 'vue';
-import { ElForm, ElFormItem, ElInput, ElButton } from 'element-plus';
+import { computed, onMounted, ref, useTemplateRef } from 'vue';
+import { ElForm, ElFormItem, ElInput, ElButton, ElAutocomplete } from 'element-plus';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $router } from '../../lib/router/router.js';
 import { $api } from '../../lib/api/index.js';
@@ -14,6 +14,7 @@ const storage = ref({
 	description: ''
 });
 const rules = ref(formRules);
+const rooms = ref([]);
 
 const resetForm = () => {
 	storage.value = {
@@ -41,23 +42,46 @@ const addStorage = async () => {
 		$notifyUserAboutError(error);
 	}
 };
+
+const setRooms = async () => {
+	try {
+		const { storages } = await $api.storages.fetchStorages();
+		rooms.value = getRooms(storages);
+	} catch (error) {
+		$notifyUserAboutError(error);
+	}
+};
+const getRooms = storages => {
+	return storages.map(storage => ({
+		value: storage.room,
+		label: storage.room
+	}));
+};
+const filteredRooms = computed(() => {
+	return rooms.value.filter(room =>
+		room.value.toLowerCase().includes(storage.value.room.toLowerCase())
+	);
+});
+onMounted(() => {
+	setRooms();
+});
 </script>
 
 <template>
 	<div class="wrapper">
 		<el-form ref="form-ref" label-position="top" :model="storage" :rules="rules">
 			<el-form-item label="Room" prop="room">
-				<el-input v-model="storage.room" placeholder="Enter room"></el-input>
+				<el-autocomplete
+					v-model="storage.room"
+					:fetch-suggestions="filteredRooms"
+					placeholder="Enter room"
+				/>
 			</el-form-item>
 			<el-form-item label="Name" prop="name">
-				<el-input v-model="storage.name" placeholder="Enter name"></el-input>
+				<el-input v-model="storage.name" placeholder="Enter name" />
 			</el-form-item>
 			<el-form-item label="Description" prop="description">
-				<el-input
-					v-model="storage.description"
-					type="textarea"
-					placeholder="Enter description"
-				></el-input>
+				<el-input v-model="storage.description" type="textarea" placeholder="Enter description" />
 			</el-form-item>
 			<div class="btn-container">
 				<el-button @click="cancelHandler">Cancel</el-button>
