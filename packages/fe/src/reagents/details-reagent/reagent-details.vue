@@ -11,10 +11,10 @@ import {
 } from 'element-plus';
 import { $notifyUserAboutError, $notify } from '../../lib/utils/feedback/notify-msg';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg.js/';
-import { computed, onMounted, useTemplateRef, ref } from 'vue';
+import { computed, onMounted, useTemplateRef, ref, watch } from 'vue';
 import { $api } from '../../lib/api/index.js';
 import { $route, $router } from '../../lib/router/router';
-import { requiredRule } from './constants.js';
+import { requiredRule, emptyReagent, checkEditedFields } from './constants.js';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 const props = defineProps({
 	id: {
@@ -23,19 +23,35 @@ const props = defineProps({
 	}
 });
 const formEl = useTemplateRef('form-ref');
-const reagent = ref(null);
+const reagent = ref(emptyReagent);
 const loading = ref(true);
 const storages = ref([]);
 const storageDisplayValue = ref('');
 const isEdit = computed(() => $route.value.name === 'reagent-details-edit');
 const isOutOfStock = computed(() => reagent.value.quantityLeft === 0);
+const originalReagent = ref({});
+const rules = ref({
+	quantityLeft: [requiredRule('Quantity left')]
+});
+const updatedReagentValues = ref({ category: 'reagent' });
+
 onMounted(() => {
 	setReagent(props.id);
 	setStorages();
 });
-const rules = ref({
-	quantityLeft: [requiredRule('Quantity left')]
-});
+
+watch(
+	reagent,
+	reagentFields => {
+		updatedReagentValues.value = checkEditedFields(
+			reagentFields,
+			originalReagent,
+			updatedReagentValues
+		);
+	},
+	{ deep: true }
+);
+
 async function setStorages() {
 	try {
 		const data = await $api.storages.fetchStorages();
@@ -52,6 +68,10 @@ const setReagent = async id => {
 	loading.value = true;
 	try {
 		reagent.value = await $api.reagents.fetchReagent(id);
+		originalReagent.value = {
+			...reagent.value,
+			storageLocation: { ...reagent.value.storageLocation }
+		};
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating reagent');
 	} finally {
@@ -77,8 +97,7 @@ const handleSubmit = async () => {
 		if (isOutOfStock.value) {
 			await deleteReagentZero();
 		} else {
-			const updatedReagent = await $api.reagents.updateReagent(reagent.value.id, reagent.value);
-			reagent.value = updatedReagent;
+			await $api.substances.updateSubstance(reagent.value.id, updatedReagentValues.value);
 			$notify({
 				title: 'Success',
 				message: 'Reagent has been updated',
@@ -97,7 +116,7 @@ const deleteReagentZero = async () => {
 			cancelButtonText: 'Cancel',
 			type: 'warning'
 		});
-		await $api.reagents.updateReagent(reagent.value.id, reagent.value);
+		await $api.substances.updateSubstance(reagent.value.id, updatedReagentValues.value);
 		$notify({
 			title: 'Success',
 			message: 'Reagent deletion was requested',
@@ -147,7 +166,7 @@ const deleteReagent = async () => {
 			@submit="handleSubmit"
 		>
 			<el-form-item label="Name" prop="name">
-				<el-input v-model="reagent.name" :disabled="true" />
+				<el-input v-model="reagent.name" :disabled="!isEdit" />
 			</el-form-item>
 			<div class="align-horizontal">
 				<el-form-item label="CAS number" prop="casNumber">
@@ -194,8 +213,8 @@ const deleteReagent = async () => {
 					disabled
 				/>
 			</el-form-item>
-			<el-form-item label="Storage location" prop="storageLocationId">
-				<el-select v-model="reagent.storageLocationId" :disabled="!isEdit" filterable>
+			<el-form-item label="Storage location" prop="storageLocation.name">
+				<el-select v-model="reagent.storageLocation.id" :disabled="!isEdit" filterable>
 					<el-option
 						v-for="storage of storages"
 						:key="storage.id"
@@ -205,7 +224,7 @@ const deleteReagent = async () => {
 				</el-select>
 			</el-form-item>
 			<el-form-item label="Description" prop="description">
-				<el-input v-model="reagent.description" type="textarea" :disabled="true" />
+				<el-input v-model="reagent.description" type="textarea" :disabled="!isEdit" />
 			</el-form-item>
 			<div v-if="isEdit" class="btn-container">
 				<el-button type="danger" @click="deleteReagent">{{ 'Delete reagent' }}</el-button>
