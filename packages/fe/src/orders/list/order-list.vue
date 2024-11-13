@@ -63,9 +63,7 @@ const setOrders = debounce(async (event = null) => {
 		limit: paginationData.value.size,
 		sort: sort.value,
 		options: {
-			...filters.value,
-			createdAt: filters.value.createdAt,
-			updatedAt: filters.value.updatedAt
+			...filters.value
 		}
 	};
 	try {
