@@ -14,7 +14,8 @@ import { $confirm } from '../../lib/utils/feedback/confirm-msg.js/';
 import { computed, onMounted, useTemplateRef, ref, watch } from 'vue';
 import { $api } from '../../lib/api/index.js';
 import { $route, $router } from '../../lib/router/router';
-import { requiredRule, emptyReagent, checkEditedFields } from './constants.js';
+import { requiredRule, emptyReagent } from './constants.js';
+import { checkEditedFields } from '../../substances/constants';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 const props = defineProps({
 	id: {
@@ -90,6 +91,7 @@ const cancelEdit = () => {
 		type: 'info'
 	});
 	formEl.value.resetFields();
+	reagent.value = originalReagent.value;
 };
 const handleSubmit = async () => {
 	if (!(await $isFormValid(formEl))) return;
@@ -97,10 +99,13 @@ const handleSubmit = async () => {
 		if (isOutOfStock.value) {
 			await deleteReagentZero();
 		} else {
-			await $api.substances.updateSubstance(reagent.value.id, updatedReagentValues.value);
+			const response = await $api.substances.updateSubstance(
+				reagent.value.id,
+				updatedReagentValues.value
+			);
 			$notify({
 				title: 'Success',
-				message: 'Reagent has been updated',
+				message: response.message || 'Reagent has been updated',
 				type: 'success'
 			});
 			$router.push({ name: 'reagent-details', params: { id: reagent.value.id } });
@@ -122,7 +127,7 @@ const deleteReagentZero = async () => {
 			message: 'Reagent deletion was requested',
 			type: 'success'
 		});
-		await $router.push({ name: 'substances-list' });
+		$router.push({ name: 'substances-list' });
 	} catch (error) {
 		if (!['cancel', 'close'].includes(error)) {
 			this.$notifyUserAboutError(error);

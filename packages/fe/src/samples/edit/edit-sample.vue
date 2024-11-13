@@ -18,7 +18,7 @@ import { $api } from '../../lib/api';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg';
 import { $route, $router } from '../../lib/router/router';
 import { emptySample, formRules } from './constants';
-
+import { checkEditedFields } from '../../substances/constants';
 const props = defineProps({ id: { type: String, default: null } });
 
 const storages = ref([]);
@@ -31,7 +31,20 @@ const rules = ref(formRules);
 const isEditing = computed(() => $route.value.name === 'edit-sample');
 const isLoading = ref(true);
 const isSaving = ref(false);
+const originalSample = ref({});
+const updatedSampleValues = ref({ category: 'sample' });
 
+watch(
+	sample,
+	sampleFields => {
+		updatedSampleValues.value = checkEditedFields(
+			sampleFields,
+			originalSample,
+			updatedSampleValues
+		);
+	},
+	{ deep: true }
+);
 async function deleteSample() {
 	try {
 		await $confirm('Are you sure you want to delete this sample?', 'Delete Sample?', {
@@ -59,33 +72,46 @@ async function deleteSample() {
 async function submit() {
 	if (!(await $isFormValid(formEl))) return;
 
-	if (sample.value.quantityLeft <= 0) {
-		await $confirm('Updating quantity left to 0 will delete this sample', 'Delete Sample?', {
-			confirmButtonText: 'Delete',
-			type: 'warning'
-		});
-	}
-
 	isSaving.value = true;
-
 	try {
-		const originalSample = await $api.samples.fetchSample(props.id);
-		if (originalSample.quantityLeft != sample.value.quantityLeft) {
-			const response = await $api.substances.changeSubstanceQuantity(props.id, {
-				category: 'sample',
-				quantityLeft: sample.value.quantityLeft,
-				quantityUsed: originalSample.quantityLeft - sample.value.quantityLeft,
-				reason: 'Experiment'
+		if (sample.value.quantityLeft <= 0) {
+			await deleteSampleZero();
+		} else {
+			const response = await $api.substances.updateSubstance(props.id, updatedSampleValues.value);
+			$notify({
+				title: 'Success',
+				message: response.message || 'Sample has been updated',
+				type: 'success'
 			});
-			$notify({ message: response.message, type: 'success' });
+			$router.push({ name: 'sample-details', params: { id: props.id } });
 		}
-		$router.push({ name: 'sample-details', params: { id: props.id } });
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
 		isSaving.value = false;
 	}
 }
+
+const deleteSampleZero = async () => {
+	try {
+		await $confirm('Quantity reached 0. Do you want to delete this sample?', 'Warning', {
+			confirmButtonText: 'OK',
+			cancelButtonText: 'Cancel',
+			type: 'warning'
+		});
+		await $api.substances.updateSubstance(sample.value.id, updatedSampleValues.value);
+		$notify({
+			title: 'Success',
+			message: 'Sample deletion was requested',
+			type: 'success'
+		});
+		$router.push({ name: 'substances-list' });
+	} catch (error) {
+		if (!['cancel', 'close'].includes(error)) {
+			this.$notifyUserAboutError(error);
+		}
+	}
+};
 
 function toggleEdit() {
 	$router.push({ name: 'edit-sample', params: { id: props.id } });
@@ -99,6 +125,7 @@ function cancelEdit() {
 		type: 'info'
 	});
 	formEl.value.resetFields();
+	sample.value = originalSample.value;
 }
 
 function redirect(row) {
@@ -122,6 +149,10 @@ async function setSample(id) {
 	try {
 		const res = await $api.samples.fetchSample(id);
 		sample.value = res;
+		originalSample.value = {
+			...sample.value,
+			storageLocation: { ...sample.value.storageLocation }
+		};
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
@@ -155,7 +186,7 @@ watch(
 		</div>
 		<el-form ref="form-el" :model="sample" :rules="rules" label-position="top">
 			<el-form-item label="Name" prop="name">
-				<el-input v-model="sample.name" disabled />
+				<el-input v-model="sample.name" :disabled="!isEditing" />
 			</el-form-item>
 			<el-form-item label="Substances used" prop="components">
 				<el-table :data="componentTableData" :border="true" @row-click="redirect">
@@ -210,7 +241,7 @@ watch(
 					v-model="sample.description"
 					type="textarea"
 					placeholder="Enter description"
-					disabled
+					:disabled="!isEditing"
 				/>
 			</el-form-item>
 			<div v-if="isEditing" class="btn-container">
