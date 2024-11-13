@@ -42,6 +42,9 @@ const substances = {
 		},
 		expirationdate: {
 			property: 'expiration_date'
+		},
+		relevance: {
+			property: 'relevance'
 		}
 	}
 };
