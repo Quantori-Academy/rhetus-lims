@@ -38,7 +38,7 @@ const getReagent = {
 	response: {
 		200: Reagent.without(['storageLocationId']).prop(
 			'storageLocation',
-			Storage.without(['createdAt'])
+			Storage.without(['creationDate', 'isEmpty'])
 		),
 		404: statusMessage,
 		500: statusMessage

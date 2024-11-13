@@ -45,8 +45,8 @@ async function substancesService(server) {
 		changeSubstanceQuantity: async (id, data) => {
 			const { code, status, message } =
 				data.category === Category.REAGENT
-					? await server.reagentsService.changeReagentQuantity(id, data)
-					: await server.samplesService.changeSampleQuantity(id, data);
+					? await server.reagentsService.changeQuantity(id, data)
+					: await server.samplesService.changeQuantity(id, data);
 
 			return { code, status, message };
 		},
@@ -59,6 +59,13 @@ async function substancesService(server) {
 			const diff = quantityLeft - quantityUsed;
 
 			return diff >= 0 && diff === reqQuantityLeft;
+		},
+
+		checkQuantityZero: async data => {
+			const { id, quantityUsed, quantityLeft: reqQuantityLeft, category } = data;
+			const { quantityLeft } = await server.substancesService.getSubstanceById(id, category);
+			const diff = quantityLeft - quantityUsed;
+			return diff === 0 && diff === reqQuantityLeft;
 		},
 
 		validateStorageUpdateInput: async data => {
@@ -74,7 +81,6 @@ async function substancesService(server) {
 
 		validateQuantityUpdateInput: async (id, data) => {
 			const { category, quantityUsed, quantityLeft, reason } = data;
-
 			const canQuantityChange = await server.substancesService.canQuantityChange(id, {
 				quantityUsed,
 				quantityLeft,
@@ -93,6 +99,18 @@ async function substancesService(server) {
 			};
 		},
 
+		validateNameDescriptionUpdateInput: data => {
+			const { name, description } = data;
+			const updatedData = {};
+			if (name) {
+				Object.assign(updatedData, { name });
+			}
+			if (description) {
+				Object.assign(updatedData, { description });
+			}
+			return updatedData;
+		},
+
 		validateSubstanceUpdateInput: async (id, data, userId) => {
 			const { category, storageId, quantityUsed, quantityLeft, reason } = data;
 			const updatedData = { category, userId };
@@ -104,12 +122,17 @@ async function substancesService(server) {
 						await server.substancesService.validateStorageUpdateInput(data)
 					);
 				}
-				if (quantityUsed && reason && quantityLeft) {
+				if (quantityUsed && reason && quantityLeft >= 0) {
 					Object.assign(
 						updatedData,
 						await server.substancesService.validateQuantityUpdateInput(id, data)
 					);
 				}
+
+				const updateNameDescription =
+					await server.substancesService.validateNameDescriptionUpdateInput(data, updatedData);
+
+				Object.assign(updatedData, updateNameDescription);
 			} catch (err) {
 				return {
 					isValid: false,
@@ -121,27 +144,71 @@ async function substancesService(server) {
 			return { isValid: true, codeStatus: 200, errorMessage: null, updatedData };
 		},
 
-		updateSubstance: async (id, data) => {
-			const { category, storageId, quantityUsed, userId, reason } = data;
+		updateStorage: async (data, updateMessages, service) => {
+			if (data.storageId) {
+				const storageUpdateResult = await service.changeStorage(data.id, {
+					storageId: data.storageId,
+					userId: data.userId
+				});
+				updateMessages.push(storageUpdateResult.message);
+			}
+			return updateMessages;
+		},
 
+		updateQuantity: async (data, updateMessages, service) => {
+			if (data.quantityUsed && data.reason) {
+				const isQuantityZero = await server.substancesService.checkQuantityZero(data);
+				if (isQuantityZero) {
+					await service.softDeleteReagent(data.id);
+				} else {
+					const quantityUpdateResult = await service.changeQuantity(data.id, {
+						quantityUsed: data.quantityUsed,
+						reason: data.reason,
+						userId: data.userId
+					});
+					updateMessages.push(quantityUpdateResult.message);
+				}
+			}
+			return updateMessages;
+		},
+
+		updateNameDescription: async (data, updateMessages, service) => {
+			if (data.name) {
+				const nameUpdateResult = await service.changeName(data.id, { name: data.name });
+				updateMessages.push(nameUpdateResult.message);
+			}
+
+			if (data.description) {
+				const descriptionUpdateResult = await service.changeDescription(data.id, {
+					description: data.description
+				});
+				updateMessages.push(descriptionUpdateResult.message);
+			}
+			return updateMessages;
+		},
+
+		updateSubstance: async (id, data) => {
+			const { category, storageId, quantityUsed, userId, reason, name, description } = data;
 			const service =
 				category === Category.REAGENT ? server.reagentsService : server.samplesService;
 
 			let updateMessages = [];
 
-			if (storageId) {
-				const storageUpdateResult = await service.changeStorage(id, { storageId, userId });
-				updateMessages.push(storageUpdateResult.message);
-			}
-
-			if (quantityUsed && reason) {
-				const quantityUpdateResult = await service.changeQuantity(id, {
-					quantityUsed,
-					reason,
-					userId
-				});
-				updateMessages.push(quantityUpdateResult.message);
-			}
+			updateMessages = await server.substancesService.updateStorage(
+				{ id, storageId, userId },
+				updateMessages,
+				service
+			);
+			updateMessages = await server.substancesService.updateQuantity(
+				{ id, quantityUsed, reason, userId, category },
+				updateMessages,
+				service
+			);
+			updateMessages = await server.substancesService.updateNameDescription(
+				{ id, name, description },
+				updateMessages,
+				service
+			);
 
 			return {
 				code: 200,
