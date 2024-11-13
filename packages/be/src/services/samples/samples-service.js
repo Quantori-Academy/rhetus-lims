@@ -245,6 +245,37 @@ async function samplesService(server) {
 				status: 'success',
 				message: `Storage location of sample '${result[0].sampleName}' was changed`
 			};
+		},
+
+		changeName: async (id, data) => {
+			const { name } = data;
+
+			const result = await server.db
+				.update(schema.samples)
+				.set({ name })
+				.where(eq(schema.samples.id, id))
+				.returning({ sampleName: schema.samples.name });
+
+			return {
+				code: 200,
+				status: 'success',
+				message: `Name of the sample was changed to '${result[0].sampleName}'`
+			};
+		},
+		changeDescription: async (id, data) => {
+			const { description } = data;
+
+			const result = await server.db
+				.update(schema.samples)
+				.set({ description })
+				.where(eq(schema.samples.id, id))
+				.returning({ sampleName: schema.samples.name });
+
+			return {
+				code: 200,
+				status: 'success',
+				message: `Description of sample '${result[0].sampleName}' was changed`
+			};
 		}
 	});
 }
