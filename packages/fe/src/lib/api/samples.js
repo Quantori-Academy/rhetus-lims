@@ -1,7 +1,4 @@
 export default http => ({
-	async fetchSamples() {
-		return await http(`/samples`);
-	},
 	async fetchSample(id) {
 		return await http(`/samples/${id}`);
 	},

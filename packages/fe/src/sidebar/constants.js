@@ -1,8 +1,8 @@
 export const navigationLink = [
 	{
-		path: '/reagents/list',
+		path: '/substances/list',
 		icon: 'asterisk',
-		name: 'Reagents'
+		name: 'Substances'
 	},
 	{
 		path: '/storages/list',

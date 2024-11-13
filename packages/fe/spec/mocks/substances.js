@@ -2,6 +2,7 @@ import { http, HttpResponse } from 'msw';
 import { api } from './api-url.js';
 import { samples } from './samples.js';
 import { reagents } from './reagents.js';
+import { storageInfo } from './storage-locations.js';
 
 const substances = [...reagents, ...samples];
 
@@ -17,20 +18,19 @@ function filterSubstances(parsedOptions) {
 		if (parsedOptions.quantity) {
 			matchesQuantity = parseInt(reagent.quantityLeft) === parsedOptions.quantity;
 		}
-		if (parsedOptions.location) {
-			matchesLocation = reagent.storageLocationId === parsedOptions.location;
-		}
 		return matchesName && matchesQuantity && matchesLocation;
 	});
 	return filteredSubstances;
+}
+
+function findStorgeById(id) {
+	return storageInfo.storages.find(s => s.id === id);
 }
 
 export const substancesHandler = [
 	http.get(api('/substances'), req => {
 		const requestUrl = req.request.url;
 		const url = new URL(requestUrl);
-		const productIds = url.searchParams.get('sort');
-		console.log(productIds);
 
 		const page = parseInt(url.searchParams.get('page')) || 1;
 		const limit = parseInt(url.searchParams.get('limit')) || 10;
@@ -42,13 +42,21 @@ export const substancesHandler = [
 
 		if (parsedOptions === null) {
 			const paginatedSubstances = substances.slice(start, end);
-			return HttpResponse.json({ paginatedSubstances, count: substances.length });
+			return HttpResponse.json({
+				substances: paginatedSubstances.map(x => ({
+					...x,
+					storageLocation: findStorgeById(x.storageLocationId)
+				})),
+				count: substances.length
+			});
 		} else {
 			const filteredSubstances = filterSubstances(parsedOptions);
-			console.log(filteredSubstances);
 			const paginatedSubstances = filteredSubstances.slice(start, end);
 			return HttpResponse.json({
-				substances: paginatedSubstances,
+				substances: paginatedSubstances.map(x => ({
+					...x,
+					storageLocation: findStorgeById(x.storageLocationId)
+				})),
 				count: filteredSubstances.length
 			});
 		}

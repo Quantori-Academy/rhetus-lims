@@ -51,7 +51,7 @@ async function submit() {
 			}))
 		});
 		$notify({ message: response.message, type: 'success' });
-		$router.push({ name: 'reagents-list' });
+		$router.push({ name: 'substances-list' });
 	} catch (error) {
 		$notifyUserAboutError(error.statusText);
 	} finally {
@@ -61,7 +61,7 @@ async function submit() {
 
 function cancel() {
 	formEl.value.resetFields();
-	$router.push({ name: 'reagents-list' });
+	$router.push({ name: 'substances-list' });
 }
 
 const removeComponent = index => {
@@ -79,7 +79,7 @@ const isOptionChosen = option =>
 
 async function setComponents() {
 	try {
-		const res = await $api.reagents.fetchSubstances();
+		const res = await $api.substances.fetchSubstances();
 		componentOptions.value = res.substances.map(x => ({
 			id: x.id,
 			label: x.name,

@@ -94,33 +94,8 @@ const reagentDetails = [
 		expirationDate: '2024-11-30T00:00:00.000Z'
 	}
 ];
-function filterReagents(parsedOptions) {
-	const filteredReagents = reagents.filter(reagent => {
-		let matchesName = true;
-		let matchesQuantity = true;
-		if (parsedOptions.name) {
-			matchesName = reagent.name.toLowerCase().includes(parsedOptions.name);
-		}
-		if (parsedOptions.quantity) {
-			matchesQuantity = parseInt(reagent.quantityLeft) === parsedOptions.quantity;
-		}
-		return matchesName && matchesQuantity;
-	});
-	return HttpResponse.json({
-		items: filteredReagents
-	});
-}
+
 export const reagentsHandlers = [
-	http.get(api('/reagents'), req => {
-		const url = new URL(req.request.url);
-		const options = url.searchParams.get('options');
-		const parsedOptions = JSON.parse(options);
-		if (parsedOptions === null) {
-			return HttpResponse.json(reagents);
-		} else {
-			return filterReagents(parsedOptions);
-		}
-	}),
 	http.delete(api('/reagents/:id'), async ({ params }) => {
 		const { id } = params;
 		const reagentIndex = reagents.findIndex(reagent => reagent.id === id);
