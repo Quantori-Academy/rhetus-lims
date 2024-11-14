@@ -7,12 +7,12 @@ import { $router } from '../../lib/router/router.js';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $api } from '../../lib/api/index.js';
 import { formRef, formRules, newReagentRef, reagentRules } from './constants.js';
-import { requestInfo } from './test-data.js';
 
 const formEl = useTemplateRef('form-el');
 const newReagentFormEl = useTemplateRef('new-reagent-form-el');
 const isSaving = ref(false);
 const searchQuery = ref('');
+const incomingRequests = ref([]);
 const linkedRequests = ref([]);
 const requestsToLink = ref([]);
 const loading = ref(false);
@@ -49,7 +49,7 @@ const setRequests = async () => {
 	loading.value = true;
 	try {
 		const data = await $api.requests.fetchRequests();
-		requestInfo.value = {
+		incomingRequests.value = {
 			...data,
 			requests: data.requests.filter(request => request.status === 'pending')
 		};
@@ -61,11 +61,11 @@ const setRequests = async () => {
 };
 const fetchRequestSuggestions = async (queryString, callback) => {
 	if (!queryString) {
-		callback(requestInfo.value.requests);
+		callback(incomingRequests.value.requests);
 	} else {
 		const data = await $api.requests.fetchRequests();
 		console.log(data);
-		const filteredRequests = requestInfo.value.requests.filter(request =>
+		const filteredRequests = incomingRequests.value.requests.filter(request =>
 			request.reagentName.toLowerCase().includes(queryString.toLowerCase())
 		);
 		return callback(filteredRequests);
