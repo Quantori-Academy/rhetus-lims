@@ -84,6 +84,17 @@ const getStoragesRooms = {
 	}
 };
 
+const getStoragesRoomsNames = {
+	security: [{ Session: [] }],
+	response: {
+		200: S.object().prop(
+			'roomsNames',
+			S.array().items(S.object().prop('room', S.string()).prop('name', S.string()))
+		),
+		500: statusMessage
+	}
+};
+
 export {
 	createStorage,
 	getStorages,
@@ -92,5 +103,6 @@ export {
 	deleteStorage,
 	Storage,
 	getStoragesNames,
-	getStoragesRooms
+	getStoragesRooms,
+	getStoragesRoomsNames
 };

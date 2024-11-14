@@ -176,6 +176,13 @@
       "when": 1731318482883,
       "tag": "0024_massive_expediter",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1731586344453,
+      "tag": "0025_curvy_edwin_jarvis",
+      "breakpoints": true
     }
   ]
 }

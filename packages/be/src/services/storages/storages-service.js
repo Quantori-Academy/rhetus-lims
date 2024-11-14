@@ -122,6 +122,15 @@ async function storagesService(server) {
 				.where(eq(schema.storages.deleted, false));
 
 			return result.length ? result.map(({ field }) => field) : [];
+		},
+
+		getUniqPairsOfNamesAndRooms: async () => {
+			const result = await server.db
+				.selectDistinct({ room: schema.storages.room, name: schema.storages.name })
+				.from(schema.storages)
+				.where(eq(schema.storages.deleted, false));
+
+			return result.length ? result : [];
 		}
 	});
 }

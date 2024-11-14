@@ -148,6 +148,23 @@ async function storages(server, options) {
 			return reply.code(500).send(err);
 		}
 	}
+
+	server.route({
+		method: 'GET',
+		path: options.prefix + 'storages/rooms-names',
+		preValidation: [server.authenticate],
+		schema: schema.getStoragesRoomsNames,
+		handler: onGetStoragesRoomsNames
+	});
+
+	async function onGetStoragesRoomsNames(req, reply) {
+		try {
+			const data = await server.storagesService.getUniqPairsOfNamesAndRooms();
+			return reply.code(200).send({ roomsNames: data });
+		} catch (err) {
+			return reply.code(500).send(err);
+		}
+	}
 }
 
 export default fp(storages);
