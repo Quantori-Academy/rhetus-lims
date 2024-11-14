@@ -214,6 +214,13 @@ async function requestsService(server) {
 				status: 'success',
 				message: `Request for reagent '${reagentName}' was deleted`
 			};
+		},
+
+		updateRequestStatusByOrder: async (orderId, newStatus, tx) => {
+			return tx
+				.update(schema.requests)
+				.set({ requestStatus: newStatus })
+				.where(eq(schema.requests.orderId, orderId));
 		}
 	});
 }

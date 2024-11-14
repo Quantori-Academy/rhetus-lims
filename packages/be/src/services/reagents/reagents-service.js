@@ -217,6 +217,7 @@ async function reagentsService(server) {
 				message: `Name of the reagent was changed to '${result[0].reagentName}'`
 			};
 		},
+
 		changeDescription: async (id, data) => {
 			const { description } = data;
 
@@ -231,6 +232,75 @@ async function reagentsService(server) {
 				status: 'success',
 				message: `Description of reagent '${result[0].reagentName}' was changed`
 			};
+		},
+
+		createReagentsFromOrder: async (orderId, tx) => {
+			const orderItems = await tx
+				.select()
+				.from(schema.ordersItems)
+				.where(eq(schema.ordersItems.orderId, orderId));
+
+			if (!orderItems.length) {
+				return null;
+			}
+
+			const promises = [];
+
+			orderItems.forEach(item => {
+				const {
+					reagentName,
+					// TODO: uncomment after structure will be implemented
+					// structure,
+					casNumber,
+					producer,
+					catalogId,
+					catalogLink,
+					unitPrice,
+					quantityUnit,
+					quantity,
+					amount
+				} = item;
+
+				for (let count = 0; count < amount; count += 1) {
+					promises.push(
+						tx
+							.insert(schema.reagents)
+							.values({
+								name: reagentName,
+								// TODO: uncomment after structure will be implemented
+								// structure
+								casNumber,
+								producer,
+								catalogId,
+								catalogLink,
+								unitPrice: unitPrice || 0,
+								quantityUnit,
+								quantity,
+								quantityLeft: quantity,
+								storageId: null
+							})
+							.returning({ reagentId: schema.reagents.id })
+					);
+				}
+			});
+
+			const reagentsWithIds = await Promise.all(promises);
+
+			return reagentsWithIds.map(([{ reagentId }]) => reagentId);
+		},
+
+		getReagentsFromOrder: async orderId => {
+			const reagents = await server.db
+				.select({
+					reagentId: schema.reagents.id,
+					storageId: schema.reagents.storageId
+				})
+				.from(schema.reagents)
+				.leftJoin(schema.ordersReagents, eq(schema.ordersReagents.reagentId, schema.reagents.id))
+				.leftJoin(schema.orders, eq(schema.orders.id, schema.ordersReagents.orderId))
+				.where(eq(schema.ordersReagents.orderId, orderId));
+
+			return reagents.length ? reagents : null;
 		}
 	});
 }

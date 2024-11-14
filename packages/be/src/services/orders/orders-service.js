@@ -1,4 +1,4 @@
-import { eq, and, getTableColumns, inArray } from 'drizzle-orm';
+import { eq, and, getTableColumns, inArray, sql } from 'drizzle-orm';
 import fp from 'fastify-plugin';
 import { schema } from '../../lib/db/schema/index.js';
 import { helpers } from '../../lib/utils/common/helpers.js';
@@ -7,153 +7,26 @@ import { applyFilters } from '../../lib/utils/db/apply-filters.js';
 import { applySorting } from '../../lib/utils/db/apply-sorting.js';
 import { RequestStatus } from '../../lib/db/schema/requests.js';
 import { ItemTypes } from '../../lib/db/schema/orders-items.js';
+import { OrderStatus } from '../../lib/db/schema/orders.js';
 
 const formatMapping = {
 	title: string => helpers.capitalize(string),
-	seller: string => helpers.capitalize(string),
-	casNumber: string => helpers.lowercase(string),
-	quantityUnit: string => helpers.lowercase(string)
+	seller: string => helpers.capitalize(string)
+};
+
+const OrderStatusActions = {
+	NEXT: 'next',
+	CANCEL: 'cancel'
 };
 
 async function ordersService(server) {
 	server.decorate('ordersService', {
-		getFormattedOrderItemsFromRequests: async requests => {
-			if (!requests.length) {
-				return [];
-			}
-
-			const formattedRequests = await Promise.all(
-				requests.map(async ({ id, amount, quantityUnit, quantity }) => {
-					const request = await server.requestsService.getRequestById(id);
-
-					if (!request) {
-						throw new Error('No such request');
-					}
-
-					const {
-						status,
-						reagentName,
-						structure,
-						casNumber,
-						producer,
-						catalogId,
-						catalogLink,
-						unitPrice
-					} = request ?? {};
-
-					if (status !== RequestStatus.PENDING) {
-						throw new Error('Request is already processing in another one order');
-					}
-
-					return {
-						requestId: id,
-						reagentName,
-						structure,
-						casNumber,
-						producer,
-						catalogId,
-						catalogLink,
-						unitPrice,
-						quantity,
-						quantityUnit: formatMapping.quantityUnit(quantityUnit),
-						amount,
-						itemType: ItemTypes.REQUEST
-					};
-				})
-			);
-
-			return formattedRequests;
-		},
-
-		getFormattedOrderItemsFromReagents: async reagents => {
-			if (!reagents.length) {
-				return [];
-			}
-
-			const formattedReagents = await Promise.all(
-				reagents.map(async ({ id, amount, quantityUnit, quantity }) => {
-					const reagent = await server.reagentsService.getReagentById(id);
-
-					if (!reagent) {
-						throw new Error('No such reagent');
-					}
-
-					const { name, structure, casNumber, producer, catalogId, catalogLink, unitPrice } =
-						reagent ?? {};
-
-					return {
-						reagentName: name,
-						structure,
-						casNumber,
-						producer,
-						catalogId,
-						catalogLink,
-						unitPrice,
-						quantity,
-						quantityUnit: formatMapping.quantityUnit(quantityUnit),
-						amount,
-						itemType: ItemTypes.REAGENT
-					};
-				})
-			);
-
-			return formattedReagents;
-		},
-
-		orderItemsInsert: async (tx, orderItems, orderId) => {
-			return Promise.all(
-				orderItems.map(async orderItem => {
-					const {
-						requestId,
-						reagentName,
-						structure,
-						casNumber,
-						producer,
-						catalogId,
-						catalogLink,
-						unitPrice,
-						quantity,
-						quantityUnit,
-						amount,
-						itemType
-					} = orderItem ?? {};
-
-					if (itemType === ItemTypes.REQUEST) {
-						await tx
-							.update(schema.requests)
-							.set({
-								// TODO: change status after requests implementation will be updated
-								requestStatus: 'ordered',
-								orderId
-							})
-							.where(eq(schema.requests.id, requestId));
-					}
-
-					await tx.insert(schema.ordersItems).values({
-						orderId,
-						requestId,
-						itemType,
-						reagentName,
-						structure,
-						casNumber,
-						producer,
-						catalogId,
-						catalogLink,
-						unitPrice,
-						quantityUnit,
-						quantity,
-						amount
-					});
-				})
-			);
-		},
-
 		createOrder: async data => {
 			const { title, seller, reagents, reagentRequests, userId } = data;
 
 			const [formattedRequests, formattedReagents] = await Promise.all([
-				server.ordersService.getFormattedOrderItemsFromRequests(reagentRequests),
-				server.ordersService.getFormattedOrderItemsFromReagents(reagents)
+				server.orderItemsService.getFormattedOrderItemsFromRequests(reagentRequests),
+				server.orderItemsService.getFormattedOrderItemsFromReagents(reagents)
 			]);
 
 			const formattedOrderItems = [...formattedRequests, ...formattedReagents];
@@ -168,7 +41,7 @@ async function ordersService(server) {
 					})
 					.returning({ orderId: schema.orders.id, orderTitle: schema.orders.title });
 
-				await server.ordersService.orderItemsInsert(tx, formattedOrderItems, orderId);
+				await server.orderItemsService.orderItemsInsert(orderId, formattedOrderItems, tx);
 
 				return orderTitle;
 			});
@@ -285,7 +158,7 @@ async function ordersService(server) {
 					.where(eq(schema.orders.id, id))
 					.returning({ orderTitle: schema.orders.title });
 
-				await server.ordersService.resetOrdersItems(tx, id);
+				await server.ordersService.resetOrdersItems(id, tx);
 
 				return orderTitle;
 			});
@@ -293,7 +166,149 @@ async function ordersService(server) {
 			return deletedOrderTitle;
 		},
 
-		resetOrdersItems: async (tx, orderId) => {
+		updateOrderStatus: async (orderId, nextStatus, tx = null) => {
+			if (!tx) {
+				const [{ orderTitle }] = await server.db
+					.update(schema.orders)
+					.set({
+						orderStatus: nextStatus
+					})
+					.where(eq(schema.orders.id, orderId))
+					.returning({ orderTitle: schema.orders.title });
+
+				return orderTitle;
+			} else {
+				const [{ orderTitle }] = await tx
+					.update(schema.orders)
+					.set({
+						orderStatus: nextStatus
+					})
+					.where(eq(schema.orders.id, orderId))
+					.returning({ orderTitle: schema.orders.title });
+
+				return orderTitle;
+			}
+		},
+
+		bindOrderToReagents: async (orderId, reagentIds, tx) => {
+			return tx.insert(schema.ordersReagents).values({
+				orderId,
+				reagentId: sql.raw(`unnest(ARRAY['${reagentIds.join("','")}']::UUID[])`)
+			});
+		},
+
+		orderStatusChange: async (orderId, statusData) => {
+			const { action, orderStatus: currentStatus } = statusData;
+
+			const nextStatus = server.ordersService.getNextOrderStatus(currentStatus);
+			if (!nextStatus) {
+				throw new Error('Sorry. The status for this order cannot be changed further');
+			}
+
+			let orderTitle;
+
+			if (action === OrderStatusActions.NEXT) {
+				orderTitle = await server.ordersService.handleNextStatus(orderId, nextStatus);
+			}
+
+			if (action === OrderStatusActions.CANCEL) {
+				if (currentStatus === OrderStatus.FULFILLED) {
+					throw new Error('Sorry. You cannot cancel fulfilled order');
+				}
+				orderTitle = await server.ordersService.handleCancelOrder(orderId, OrderStatus.CANCELED);
+			}
+
+			return orderTitle;
+		},
+
+		handleNextStatus: async (orderId, nextStatus) => {
+			let updatedOrderTitle;
+			let orderedReagents;
+
+			switch (nextStatus) {
+				case OrderStatus.ORDERED:
+					updatedOrderTitle = await server.ordersService.updateOrderStatus(orderId, nextStatus);
+					return updatedOrderTitle;
+				case OrderStatus.FULFILLED:
+					updatedOrderTitle = await server.db.transaction(async tx => {
+						const [{ orderTitle }] = await server.ordersService.updateOrderStatus(
+							orderId,
+							nextStatus,
+							tx
+						);
+
+						const createdReagentIds = await server.reagentsService.createReagentsFromOrder(
+							orderId,
+							tx
+						);
+
+						await server.ordersService.bindOrderToReagents(orderId, createdReagentIds, tx);
+
+						await server.requestsService.updateRequestStatusByOrder(
+							orderId,
+							RequestStatus.FULFILLED,
+							tx
+						);
+
+						await server.orderItemsService.disableOrderItems(orderId, tx);
+
+						return orderTitle;
+					});
+
+					return updatedOrderTitle;
+				case OrderStatus.COMPLETED:
+					orderedReagents = await server.reagentsService.getReagentsFromOrder(orderId);
+
+					if (orderedReagents.some(({ storageId }) => !storageId)) {
+						throw new Error(
+							'You cannot mark this order as completed. There is no storage information in some reagents from this order. Please add storage info.'
+						);
+					}
+
+					updatedOrderTitle = await server.db.transaction(async tx => {
+						const [{ orderTitle }] = await server.ordersService.updateOrderStatus(
+							orderId,
+							nextStatus,
+							tx
+						);
+
+						await server.requestsService.updateRequestStatusByOrder(
+							orderId,
+							RequestStatus.COMPLETED,
+							tx
+						);
+
+						return orderTitle;
+					});
+
+					return updatedOrderTitle;
+			}
+		},
+
+		handleCancelOrder: async (orderId, nextStatus) => {
+			const canceledOrderTitle = await server.db.transaction(async tx => {
+				const orderTitle = await server.ordersService.updateOrderStatus(orderId, nextStatus, tx);
+				await server.ordersService.resetOrdersItems(orderId, tx);
+				return orderTitle;
+			});
+
+			return canceledOrderTitle;
+		},
+
+		getNextOrderStatus: currentStatus => {
+			switch (currentStatus) {
+				case OrderStatus.PENDING:
+					return OrderStatus.ORDERED;
+				case OrderStatus.ORDERED:
+					return OrderStatus.FULFILLED;
+				case OrderStatus.FULFILLED:
+					return OrderStatus.COMPLETED;
+				default:
+					return null;
+			}
+		},
+
+		resetOrdersItems: async (orderId, tx) => {
 			const requestsIds = await tx
 				.delete(schema.ordersItems)
 				.where(
