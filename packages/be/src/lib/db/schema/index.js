@@ -7,6 +7,9 @@ import { samples } from './samples.js';
 import { components } from './components.js';
 import { substancesStorageChanges } from './substances-storage-changes.js';
 import { requests } from './requests.js';
+import { orders } from './orders.js';
+import { ordersReagents } from './orders-reagents.js';
+import { ordersItems } from './orders-items.js';
 
 export const schema = {
 	users,
@@ -17,7 +20,10 @@ export const schema = {
 	samples,
 	components,
 	substancesStorageChanges,
-	requests
+	requests,
+	orders,
+	ordersReagents,
+	ordersItems
 };
 
 export const relations = {};

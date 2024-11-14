@@ -7,6 +7,13 @@ async function roleCheckingPlugin(fastify) {
 			return reply.code(403).send({ status: 'error', message: 'Sorry. You have no permissions' });
 		}
 	});
+
+	fastify.decorate('officer', async (req, reply) => {
+		const isOfficer = await fastify.usersService.isOfficer(req.session.user.id);
+		if (!isOfficer) {
+			return reply.code(403).send({ status: 'error', message: 'Sorry. You have no permissions' });
+		}
+	});
 }
 
 export default fp(roleCheckingPlugin);
