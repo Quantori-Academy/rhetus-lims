@@ -79,9 +79,9 @@ async function submit() {
 		} else {
 			const response = await $api.substances.updateSubstance(props.id, updatedSampleValues.value);
 			$notify({
-				title: 'Success',
+				title: response.status.charAt(0).toUpperCase() + response.status.slice(1),
 				message: response.message || 'Sample has been updated',
-				type: 'success'
+				type: response.status
 			});
 			$router.push({ name: 'sample-details', params: { id: props.id } });
 			setSample(props.id);

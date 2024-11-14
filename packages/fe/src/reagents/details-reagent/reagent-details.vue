@@ -100,9 +100,9 @@ const handleSubmit = async () => {
 				updatedReagentValues.value
 			);
 			$notify({
-				title: 'Success',
+				title: response.status.charAt(0).toUpperCase() + response.status.slice(1),
 				message: response.message || 'Reagent has been updated',
-				type: 'success'
+				type: response.status
 			});
 			$router.push({ name: 'reagent-details', params: { id: reagent.value.id } });
 			setReagent(props.id);

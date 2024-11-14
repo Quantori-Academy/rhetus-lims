@@ -201,9 +201,7 @@ async function substancesService(server) {
 				message:
 					updateMessages.length > 1
 						? `${category === 'reagent' ? 'Reagent' : 'Sample'} was updated`
-						: updateMessages.length === 1
-							? updateMessages[0]
-							: 'Nothing to update'
+						: updateMessages[0]
 			};
 		}
 	});

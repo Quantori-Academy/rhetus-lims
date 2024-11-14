@@ -84,7 +84,11 @@ async function substances(server, options) {
 
 	async function onSubstanceUpdate(req, reply) {
 		try {
-			const { category } = req.body;
+			const { category, ...updates } = req.body;
+
+			if (Object.keys(updates).length === 0) {
+				return reply.code(200).send({ status: 'info', message: 'Nothing to update' });
+			}
 			const substanceId = req.params.id;
 			const substance = await server.substancesService.getSubstanceById(substanceId, category);
 			if (!substance) {
