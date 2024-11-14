@@ -1,4 +1,4 @@
-import { eq, and } from 'drizzle-orm';
+import { eq, and, aliasedTable } from 'drizzle-orm';
 import fp from 'fastify-plugin';
 import { schema } from '../../lib/db/schema/index.js';
 import { RequestStatus } from '../../lib/db/schema/requests.js';
@@ -9,13 +9,23 @@ import { helpers } from '../../lib/utils/common/helpers.js';
 
 const formatMapping = {
 	reagentName: string => helpers.capitalize(string),
-	casNumber: string => helpers.lowercase(string)
+	casNumber: string => helpers.lowercase(string),
+	quantityUnit: string => helpers.lowercase(string)
 };
 
 async function requestsService(server) {
 	server.decorate('requestsService', {
 		createRequest: async data => {
-			const { reagentName, structure, casNumber, quantity, userComment, userId } = data;
+			const {
+				reagentName,
+				structure,
+				casNumber,
+				quantity,
+				userComment,
+				userId,
+				quantityUnit,
+				amount
+			} = data;
 
 			const result = await server.db
 				.insert(schema.requests)
@@ -25,15 +35,19 @@ async function requestsService(server) {
 					casNumber: formatMapping.casNumber(casNumber),
 					quantity,
 					userComment,
-					userId
+					userId,
+					quantityUnit: formatMapping.quantityUnit(quantityUnit),
+					amount
 				})
 				.returning({ reagentName: schema.requests.reagentName });
 
 			return result.length ? result[0].reagentName : null;
 		},
 
-		getRequestById: async id => {
-			const result = await server.db
+		getRequestsQuery: () => {
+			const orderAuthor = aliasedTable(schema.users, 'orderAuthor');
+
+			return server.db
 				.select({
 					id: schema.requests.id,
 					author: {
@@ -49,18 +63,33 @@ async function requestsService(server) {
 					updatedAt: schema.requests.updatedAt,
 					structure: schema.requests.structure,
 					casNumber: schema.requests.casNumber,
-					orderId: schema.requests.orderId
-					// TODO: add order info after implementation
-					// order: {
-					// 	id: schema.orders.id,
-					// 	...
-					// }
+					quantityUnit: schema.requests.quantityUnit,
+					amount: schema.requests.amount,
+					order: {
+						id: schema.orders.id,
+						title: schema.orders.title,
+						seller: schema.orders.seller,
+						createdAt: schema.orders.createdAt,
+						updatedAt: schema.orders.updatedAt,
+						status: schema.orders.orderStatus,
+						author: {
+							id: orderAuthor.id,
+							username: orderAuthor.username
+						}
+					}
 				})
 				.from(schema.requests)
-				.innerJoin(schema.users, eq(schema.requests.userId, schema.users.id))
-				// TODO: add order join after implementation
-				// .innerJoin(schema.orders, eq(schema.requests.orderId, schema.orders.id))
-				.where(and(eq(schema.requests.id, id), eq(schema.requests.deleted, false)));
+				.leftJoin(schema.orders, eq(schema.requests.orderId, schema.orders.id))
+				.leftJoin(schema.users, eq(schema.requests.userId, schema.users.id))
+				.leftJoin(orderAuthor, eq(schema.orders.userId, orderAuthor.id));
+		},
+
+		getRequestById: async id => {
+			const query = server.requestsService.getRequestsQuery();
+
+			const result = await query.where(
+				and(eq(schema.requests.id, id), eq(schema.requests.deleted, false))
+			);
 
 			return result[0];
 		},
@@ -68,33 +97,7 @@ async function requestsService(server) {
 		getRequests: async (queryParams, userId) => {
 			const { options, sort, limit, offset } = getClarifyParams(queryParams);
 
-			let query = server.db
-				.select({
-					id: schema.requests.id,
-					author: {
-						id: schema.users.id,
-						username: schema.users.username
-					},
-					reagentName: schema.requests.reagentName,
-					quantity: schema.requests.quantity,
-					status: schema.requests.requestStatus,
-					userComment: schema.requests.userComment,
-					poComment: schema.requests.poComment,
-					createdAt: schema.requests.createdAt,
-					updatedAt: schema.requests.updatedAt,
-					structure: schema.requests.structure,
-					casNumber: schema.requests.casNumber,
-					orderId: schema.requests.orderId
-					// TODO: add order info after implementation
-					// order: {
-					// 	id: schema.orders.id,
-					// 	...
-					// }
-				})
-				.from(schema.requests)
-				.innerJoin(schema.users, eq(schema.requests.userId, schema.users.id));
-			// TODO: add order join after implementation
-			// .innerJoin(schema.orders, eq(schema.requests.orderId, schema.orders.id))
+			let query = server.requestsService.getRequestsQuery();
 
 			const isOfficer = await server.usersService.isOfficer(userId);
 

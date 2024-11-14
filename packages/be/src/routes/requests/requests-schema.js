@@ -1,4 +1,5 @@
 import S from 'fluent-json-schema';
+import { getOrderSchema } from '../orders/orders-schema.js';
 
 const statusMessage = S.object()
 	.prop('status', S.string().required())
@@ -15,14 +16,13 @@ const Author = S.object()
 	.prop('id', S.number().minimum(1).required())
 	.prop('username', S.string().minLength(1).required());
 
-// TODO: add order object when it will be implemented
-// const Order = S.object();
-
 const Request = S.object()
 	.prop('id', S.string().format(S.FORMATS.UUID).required())
 	.prop('author', Author)
 	.prop('reagentName', S.string().minLength(1).required())
 	.prop('quantity', S.number().required())
+	.prop('quantityUnit', S.string().minLength(1).required())
+	.prop('amount', S.number().minimum(1).required())
 	.prop('status', S.string().enum(Object.values(StatusEnum)).default(StatusEnum.PENDING))
 	.prop('userComment', S.string().required())
 	.prop('poComment', S.string().required())
@@ -30,20 +30,11 @@ const Request = S.object()
 	.prop('updatedAt', S.string().format(S.FORMATS.DATE_TIME).required())
 	.prop('structure', S.string().required())
 	.prop('casNumber', S.string().maxLength(12).required())
-	// TODO: change to order object when it will be implemented
-	.prop('orderId', S.string().format(S.FORMATS.UUID).required());
+	.prop('order', getOrderSchema.without(['reagents', 'reagentRequests']));
 
 const createRequest = {
 	security: [{ Session: [] }],
-	body: Request.without([
-		'id',
-		'status',
-		'poComment',
-		'createdAt',
-		'updatedAt',
-		'orderId',
-		'author'
-	]),
+	body: Request.without(['id', 'status', 'poComment', 'createdAt', 'updatedAt', 'order', 'author']),
 	response: {
 		201: statusMessage,
 		401: statusMessage,
@@ -56,11 +47,6 @@ const getRequest = {
 	params: S.object().prop('id', S.string().format(S.FORMATS.UUID).required()),
 	response: {
 		200: Request,
-		// TODO: add order object
-		// .prop(
-		// 	'order',
-		// 	Order)
-		// ),
 		401: statusMessage,
 		403: statusMessage,
 		404: statusMessage,

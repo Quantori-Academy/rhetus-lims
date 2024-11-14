@@ -11,12 +11,14 @@ import {
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { users } from './users.js';
+import { orders } from './orders.js';
 
 export const RequestStatus = {
 	PENDING: 'pending',
 	ORDERED: 'ordered',
 	FULFILLED: 'fulfilled',
-	DECLINED: 'declined'
+	COMPLETED: 'completed',
+	CANCELED: 'canceled'
 };
 
 export const requestStatusEnum = pgEnum('reagent_request_status', Object.values(RequestStatus));
@@ -30,13 +32,14 @@ export const requests = pgTable('requests', {
 	poComment: text('po_comment').default(null),
 	requestStatus: requestStatusEnum('request_status').default(RequestStatus.PENDING),
 	reagentName: text('reagent_name').notNull(),
-	// TODO: add correct type after structure implementation
 	structure: text('structure').default(null),
 	casNumber: varchar('cas_number', { length: 12 }).default(null),
 	quantity: real('quantity').notNull(),
-	orderId: uuid('order_id').default(null),
-	// TODO: uncomment reference after order implementation
-	// .references(()=> orders.id)
+	quantityUnit: varchar('quantity_unit', { length: 256 }).notNull(),
+	amount: integer('amount').notNull().default(1),
+	orderId: uuid('order_id')
+		.references(() => orders.id)
+		.default(null),
 	createdAt: timestamp('created_at').notNull().defaultNow(),
 	updatedAt: timestamp('updated_at')
 		.notNull()

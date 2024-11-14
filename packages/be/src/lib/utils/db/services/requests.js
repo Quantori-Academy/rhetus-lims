@@ -14,13 +14,12 @@ const requests = {
 			schema: 'requests',
 			operator: 'ilike'
 		},
-		// TODO: uncomment when orders will be implemented
-		// order: {
-		// 	property: 'id',
-		// 	schema: 'orders',
-		// 	value: string => string,
-		// 	operator: 'equal'
-		// },
+		order: {
+			property: 'id',
+			schema: 'orders',
+			value: string => string,
+			operator: 'equal'
+		},
 		author: {
 			property: 'username',
 			schema: 'users',
