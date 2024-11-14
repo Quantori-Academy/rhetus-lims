@@ -1,29 +1,32 @@
+const fieldsToUpdate = {
+	name: 'name',
+	description: 'description',
+	storageId: 'storageId',
+	quantityLeft: 'quantityLeft'
+};
+
 export const checkEditedFields = (substanceFields, originalSubstance, updatedSubstanceValues) => {
-	if (substanceFields.name !== originalSubstance.value.name) {
-		updatedSubstanceValues.value = {
-			...updatedSubstanceValues.value,
-			name: substanceFields.name
-		};
-	}
-	if (substanceFields.description !== originalSubstance.value.description) {
-		updatedSubstanceValues.value = {
-			...updatedSubstanceValues.value,
-			description: substanceFields.description
-		};
-	}
-	if (substanceFields.storageLocation.id !== originalSubstance.value.storageLocation.id) {
-		updatedSubstanceValues.value = {
-			...updatedSubstanceValues.value,
-			storageId: substanceFields.storageLocation.id
-		};
-	}
-	if (substanceFields.quantityLeft !== originalSubstance.value.quantityLeft) {
-		updatedSubstanceValues.value = {
-			...updatedSubstanceValues.value,
-			quantityLeft: substanceFields.quantityLeft,
-			quantityUsed: originalSubstance.value.quantityLeft - substanceFields.quantityLeft,
-			reason: 'Experiment'
-		};
-	}
+	Object.keys(fieldsToUpdate).forEach(field => {
+		const originalValue = originalSubstance.value[field];
+		const newValue = substanceFields[field];
+		if (field === 'quantityLeft') {
+			if (newValue !== originalValue) {
+				updatedSubstanceValues.value = {
+					...updatedSubstanceValues.value,
+					[fieldsToUpdate[field]]: newValue,
+					quantityUsed: originalSubstance.value.quantityLeft - newValue,
+					reason: 'Experiment'
+				};
+			}
+		} else {
+			if (newValue !== originalValue) {
+				updatedSubstanceValues.value = {
+					...updatedSubstanceValues.value,
+					[fieldsToUpdate[field]]: newValue
+				};
+			}
+		}
+	});
+
 	return updatedSubstanceValues.value;
 };

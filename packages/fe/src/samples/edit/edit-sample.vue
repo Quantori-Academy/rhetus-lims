@@ -136,11 +136,14 @@ function redirect(row) {
 }
 
 async function setStorages() {
+	isLoading.value = true;
 	try {
 		const data = await $api.storages.fetchStorages();
 		storages.value = data.storages;
 	} catch (error) {
 		$notifyUserAboutError(error);
+	} finally {
+		isLoading.value = false;
 	}
 }
 
@@ -148,10 +151,9 @@ async function setSample(id) {
 	isLoading.value = true;
 	try {
 		const res = await $api.samples.fetchSample(id);
-		sample.value = res;
+		sample.value = { ...res, storageId: res.storageLocation.id };
 		originalSample.value = {
-			...sample.value,
-			storageLocation: { ...sample.value.storageLocation }
+			...sample.value
 		};
 	} catch (error) {
 		$notifyUserAboutError(error);
@@ -222,9 +224,9 @@ watch(
 			<el-form-item label="Expiration date" prop="expirationDate">
 				<el-date-picker v-model="sample.expirationDate" type="date" disabled />
 			</el-form-item>
-			<el-form-item label="Storage location" prop="storageLocation.id">
+			<el-form-item label="Storage location" prop="storageId">
 				<el-select
-					v-model="sample.storageLocation.id"
+					v-model="sample.storageId"
 					placeholder="Select storage location"
 					:disabled="!isEditing"
 				>
