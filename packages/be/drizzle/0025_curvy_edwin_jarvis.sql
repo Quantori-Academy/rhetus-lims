@@ -1,0 +1,1 @@
+ALTER TABLE "storages" ADD CONSTRAINT "storages_room_name_unique" UNIQUE("room","name");
