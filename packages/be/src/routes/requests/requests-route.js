@@ -189,7 +189,7 @@ async function requests(server, options) {
 			if (request.status !== RequestStatus.PENDING) {
 				return reply.code(403).send({
 					status: 'error',
-					message: `Sorry. You cannot mark reagent request as canceled while it is in processing`
+					message: `Sorry. You cannot mark reagent request as canceled while it is not in 'pending' status`
 				});
 			}
 
