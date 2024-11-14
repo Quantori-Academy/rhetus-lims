@@ -38,7 +38,8 @@ html {
 	width: 100%;
 	max-width: 350px;
 }
-.el-date-editor.el-input {
+.el-date-editor.el-input,
+.el-date-editor.el-input__wrapper {
 	--el-date-editor-width: 100%;
 }
 .el-textarea__inner {
