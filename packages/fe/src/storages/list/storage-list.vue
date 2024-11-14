@@ -116,7 +116,7 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="storages-table">
+	<div class="margin-table">
 		<rh-filters>
 			<template #action-buttons>
 				<el-button type="primary" @click="addNewStorageLocation">
@@ -176,9 +176,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.storages-table {
-	margin-top: 20px;
-}
 :deep(.el-table__row):hover {
 	cursor: pointer;
 }

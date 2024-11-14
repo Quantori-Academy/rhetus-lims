@@ -36,7 +36,7 @@ html {
 }
 .filters-container > * {
 	width: 100%;
-	max-width: 320px;
+	max-width: 350px;
 }
 .el-date-editor.el-input {
 	--el-date-editor-width: 100%;
@@ -47,6 +47,9 @@ html {
 .wrapper {
 	margin: 50px auto;
 	max-width: 900px;
+}
+.margin-table {
+	margin-top: 20px;
 }
 .btn-container {
 	display: flex;

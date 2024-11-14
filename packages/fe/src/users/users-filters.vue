@@ -17,18 +17,6 @@ const filters = defineModel('filters', { type: Object });
 	</filter-item>
 
 	<filter-item>
-		<el-date-picker
-			v-model="filters.date"
-			type="date"
-			placeholder="Date filter"
-			format="YYYY/MM/DD"
-			value-format="YYYY-MM-DD"
-		/>
+		<el-date-picker v-model="filters.date" type="date" placeholder="Date filter" />
 	</filter-item>
 </template>
-
-<style scoped>
-:deep(.el-date-editor) {
-	width: 300px;
-}
-</style>
