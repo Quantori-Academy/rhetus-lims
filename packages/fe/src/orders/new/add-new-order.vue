@@ -1,38 +1,29 @@
 <script setup>
-import { ref, useTemplateRef } from 'vue';
+import { onMounted, ref, useTemplateRef } from 'vue';
 import { ElInput, ElForm, ElButton, ElFormItem, ElTag, ElAutocomplete } from 'element-plus';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 import { $router } from '../../lib/router/router.js';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $api } from '../../lib/api/index.js';
-import { requiredRule } from './constants.js';
+import { formRef, formRules, newReagentRef, reagentRules } from './constants.js';
 import { requestInfo } from './test-data.js';
 
 const formEl = useTemplateRef('form-el');
+const newReagentFormEl = useTemplateRef('new-reagent-form-el');
 const isSaving = ref(false);
 const searchQuery = ref('');
 const linkedRequests = ref([]);
 const requestsToLink = ref([]);
+const loading = ref(false);
+const form = ref(formRef);
+const newReagent = ref(newReagentRef);
+const rules = ref(formRules);
+const newReagentRules = ref(reagentRules);
 
-const form = ref({
-	title: '',
-	seller: '',
-	reagentRequests: [],
-	reagents: []
+onMounted(() => {
+	setRequests();
 });
-
-const newReagent = ref({
-	reagentName: '',
-	quantityUnit: '',
-	quantity: 1,
-	amount: 1
-});
-const rules = ref({
-	title: [requiredRule('Title')],
-	seller: [requiredRule('Seller')]
-});
-
 async function submit() {
 	if (!(await $isFormValid(formEl))) return;
 	isSaving.value = true;
@@ -54,12 +45,27 @@ function cancel() {
 	$router.push({ name: 'orders-list' });
 }
 
-const fetchRequestSuggestions = (queryString, callback) => {
-	console.log(queryString);
+const setRequests = async () => {
+	loading.value = true;
+	try {
+		const data = await $api.requests.fetchRequests();
+		requestInfo.value = {
+			...data,
+			requests: data.requests.filter(request => request.status === 'pending')
+		};
+	} catch (error) {
+		$notifyUserAboutError(error.message || 'Error retrieving request');
+	} finally {
+		loading.value = false;
+	}
+};
+const fetchRequestSuggestions = async (queryString, callback) => {
 	if (!queryString) {
-		callback(requestInfo.requests);
+		callback(requestInfo.value.requests);
 	} else {
-		const filteredRequests = requestInfo.requests.filter(request =>
+		const data = await $api.requests.fetchRequests();
+		console.log(data);
+		const filteredRequests = requestInfo.value.requests.filter(request =>
 			request.reagentName.toLowerCase().includes(queryString.toLowerCase())
 		);
 		return callback(filteredRequests);
@@ -83,23 +89,15 @@ const removeLinkedRequest = request => {
 function viewRequestDetails(row) {
 	console.log(`Viewing request: ${row.id}`);
 }
-
-const addNewReagent = () => {
-	if (!newReagent.value.reagentName || !newReagent.value.quantityUnit) {
-		return $notifyUserAboutError('Please fill out all required fields.');
-	}
+const addNewReagent = async () => {
+	if (!(await $isFormValid(newReagentFormEl))) return;
 	form.value.reagents.push({
 		reagentName: newReagent.value.reagentName,
 		quantityUnit: newReagent.value.quantityUnit,
 		quantity: newReagent.value.quantity,
 		amount: newReagent.value.amount
 	});
-	newReagent.value = {
-		reagentName: '',
-		quantityUnit: '',
-		quantity: 1,
-		amount: 1
-	};
+	newReagentFormEl.value.resetFields();
 };
 function removeReagent(order) {
 	const index = form.value.reagents.indexOf(order);
@@ -123,9 +121,7 @@ function removeReagent(order) {
 					v-model="searchQuery"
 					:fetch-suggestions="fetchRequestSuggestions"
 					clearable
-					class="inline-input"
 					placeholder="Search for requests"
-					empty-text="No results found"
 					@select="linkRequest"
 				>
 					<template v-if="requestsToLink.length > 0" #append>
@@ -143,32 +139,21 @@ function removeReagent(order) {
 					</template>
 				</el-autocomplete>
 				<el-button type="primary" @click="confirmLinkedRequests">Link request</el-button>
-
-				<template v-if="linkedRequests.length > 0" #prepend>
-					<el-tag
-						v-for="request of linkedRequests"
-						:key="request.id"
-						closable
-						@close="() => removeLinkedRequest(request.id)"
-					>
-						{{ request.reagentName }}
-					</el-tag>
-				</template>
 			</el-form-item>
 			<div v-if="linkedRequests.length > 0" class="linked-requests-container">
 				<el-tag
 					v-for="request of linkedRequests"
 					:key="request.id"
 					closable
-					@click="viewRequestDetails"
+					@click="() => viewRequestDetails(request)"
 					@close="() => removeLinkedRequest(request.id)"
 				>
 					{{ request.reagentName }} ({{ request.quantity }} {{ request.quantityUnit }})
 				</el-tag>
 			</div>
 			<div class="data-table">
+				<h2 class="el-form-item__label">Requests to Order</h2>
 				<div class="orders-container" max-height="350">
-					<h2 class="el-form-item__label">Requests to Order</h2>
 					<div class="header-row">
 						<span>Reagent</span>
 						<span>Quantity Unit</span>
@@ -201,7 +186,12 @@ function removeReagent(order) {
 							<rh-icon color="white" name="trash"
 						/></el-button>
 					</div>
-					<el-form :model="newReagent" class="order-row">
+					<el-form
+						ref="new-reagent-form-el"
+						:model="newReagent"
+						:rules="newReagentRules"
+						class="order-row"
+					>
 						<el-form-item prop="reagentName">
 							<el-input v-model="newReagent.reagentName" placeholder="Enter reagent name" />
 						</el-form-item>
@@ -243,10 +233,6 @@ function removeReagent(order) {
 .el-form {
 	width: 100%;
 }
-.el-date-editor.el-input,
-.el-date-editor.el-input__wrapper {
-	width: 100%;
-}
 .add-btn {
 	width: 100%;
 }
@@ -255,9 +241,6 @@ function removeReagent(order) {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
-}
-.orders-container h2 {
-	width: max-content;
 }
 .header-row,
 .order-row {
