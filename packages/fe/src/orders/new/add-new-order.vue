@@ -41,13 +41,10 @@ const setSubstance = async (id, formValue, loadingState) => {
 	await fetchSubstances(id, formValue, loadingState);
 };
 async function submit() {
-	console.log(form.value.reagents);
 	if (!(await $isFormValid(formEl))) return;
 	isSaving.value = true;
 	try {
-		const response = await $api.orders.addOrder({
-			...form.value
-		});
+		const response = await $api.orders.addOrder({ ...form.value });
 		$notify({ message: response.message, type: 'success' });
 		$router.push({ name: 'orders-list' });
 	} catch (error) {
@@ -82,6 +79,7 @@ const linkRequest = selectedRequest => {
 };
 const removeLinkedRequest = request => {
 	linkedRequests.value = linkedRequests.value.filter(r => r.id !== request.id);
+	form.value.reagentRequests = form.value.reagentRequests.filter(r => r.id !== request.id);
 };
 
 function viewRequestDetails(request) {
@@ -132,7 +130,7 @@ function removeReagent(order) {
 						:key="request.id"
 						closable
 						@click="() => viewRequestDetails(request)"
-						@close="() => removeLinkedRequest(request.id)"
+						@close="() => removeLinkedRequest(request)"
 					>
 						{{ request.reagentName }} ({{ request.quantity }} {{ request.quantityUnit }})
 					</el-tag>
