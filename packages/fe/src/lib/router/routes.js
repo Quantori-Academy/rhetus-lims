@@ -353,7 +353,7 @@ export const routes = [
 	},
 	{
 		path: '/orders/new',
-		name: 'new-order-reagent',
+		name: 'new-order-substance',
 		component: () => import('../../orders/new/add-new-order.vue'),
 		meta: {
 			title: 'New Order',

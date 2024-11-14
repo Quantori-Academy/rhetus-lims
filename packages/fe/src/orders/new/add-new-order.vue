@@ -1,30 +1,47 @@
 <script setup>
-import { onMounted, ref, useTemplateRef } from 'vue';
-import { ElInput, ElForm, ElButton, ElFormItem, ElTag, ElAutocomplete } from 'element-plus';
+import { computed, onMounted, ref, useTemplateRef } from 'vue';
+import {
+	ElInput,
+	ElForm,
+	ElButton,
+	ElFormItem,
+	ElTag,
+	ElAutocomplete,
+	ElInputNumber
+} from 'element-plus';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
-import { $router } from '../../lib/router/router.js';
+import { $route, $router } from '../../lib/router/router.js';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $api } from '../../lib/api/index.js';
-import { formRef, formRules, newReagentRef, reagentRules } from './constants.js';
+import { formRef, formRules, newSubstanceRef, substanceRules } from './constants.js';
+import { fetchSubstances, fetchRequests } from './retrieve-data.js';
 
 const formEl = useTemplateRef('form-el');
-const newReagentFormEl = useTemplateRef('new-reagent-form-el');
+const substanceFormEl = useTemplateRef('substance-form-el');
 const isSaving = ref(false);
 const searchQuery = ref('');
 const incomingRequests = ref([]);
 const linkedRequests = ref([]);
-const requestsToLink = ref([]);
 const loading = ref(false);
 const form = ref(formRef);
-const newReagent = ref(newReagentRef);
+const newSubtance = ref(newSubstanceRef);
 const rules = ref(formRules);
-const newReagentRules = ref(reagentRules);
+const newSubstanceRules = ref(substanceRules);
+const isRequest = computed(() => $route.value.name === 'new-order-request');
 
 onMounted(() => {
-	setRequests();
+	fetchRequests(incomingRequests, loading);
+	const targetId = $route.value.query.id;
+	if (targetId) {
+		setSubstance(targetId, form, loading);
+	}
 });
+const setSubstance = async (id, formValue, loadingState) => {
+	await fetchSubstances(id, formValue, loadingState);
+};
 async function submit() {
+	console.log(form.value.reagents);
 	if (!(await $isFormValid(formEl))) return;
 	isSaving.value = true;
 	try {
@@ -39,65 +56,46 @@ async function submit() {
 		isSaving.value = false;
 	}
 }
-
 function cancel() {
 	formEl.value.resetFields();
+	substanceFormEl.value.resetFields();
 	$router.push({ name: 'orders-list' });
 }
 
-const setRequests = async () => {
-	loading.value = true;
-	try {
-		const data = await $api.requests.fetchRequests();
-		incomingRequests.value = {
-			...data,
-			requests: data.requests.filter(request => request.status === 'pending')
-		};
-	} catch (error) {
-		$notifyUserAboutError(error.message || 'Error retrieving request');
-	} finally {
-		loading.value = false;
-	}
-};
 const fetchRequestSuggestions = async (queryString, callback) => {
 	if (!queryString) {
 		callback(incomingRequests.value.requests);
 	} else {
-		const data = await $api.requests.fetchRequests();
-		console.log(data);
 		const filteredRequests = incomingRequests.value.requests.filter(request =>
 			request.reagentName.toLowerCase().includes(queryString.toLowerCase())
 		);
 		return callback(filteredRequests);
 	}
 };
+
 const linkRequest = selectedRequest => {
-	if (!requestsToLink.value.find(req => req.id === selectedRequest.id)) {
-		requestsToLink.value.push(selectedRequest);
+	const requestCopy = { ...selectedRequest };
+	if (!linkedRequests.value.find(req => req.id === selectedRequest.id)) {
+		linkedRequests.value.push(selectedRequest);
+		form.value.reagentRequests.push(requestCopy);
 	}
 };
-const confirmLinkedRequests = () => {
-	linkedRequests.value = [...linkedRequests.value, ...requestsToLink.value];
-	form.value.reagentRequests = [...form.value.reagentRequests, ...requestsToLink.value];
-	requestsToLink.value = [];
-};
 const removeLinkedRequest = request => {
-	requestsToLink.value = requestsToLink.value.filter(r => r.id !== request);
-	linkedRequests.value = linkedRequests.value.filter(r => r.id !== request);
+	linkedRequests.value = linkedRequests.value.filter(r => r.id !== request.id);
 };
 
-function viewRequestDetails(row) {
-	console.log(`Viewing request: ${row.id}`);
+function viewRequestDetails(request) {
+	console.log(`Viewing request: ${request.id}`);
 }
 const addNewReagent = async () => {
-	if (!(await $isFormValid(newReagentFormEl))) return;
+	if (!(await $isFormValid(substanceFormEl))) return;
 	form.value.reagents.push({
-		reagentName: newReagent.value.reagentName,
-		quantityUnit: newReagent.value.quantityUnit,
-		quantity: newReagent.value.quantity,
-		amount: newReagent.value.amount
+		reagentName: newSubtance.value.reagentName,
+		quantityUnit: newSubtance.value.quantityUnit,
+		quantity: newSubtance.value.quantity,
+		amount: newSubtance.value.amount
 	});
-	newReagentFormEl.value.resetFields();
+	substanceFormEl.value.resetFields();
 };
 function removeReagent(order) {
 	const index = form.value.reagents.indexOf(order);
@@ -116,7 +114,7 @@ function removeReagent(order) {
 			<el-form-item label="Seller" prop="seller">
 				<el-input v-model="form.seller" placeholder="Enter seller name" />
 			</el-form-item>
-			<el-form-item label="Linked Requests" class="requests" :rules="[]">
+			<el-form-item v-if="isRequest" label="Linked Requests" class="requests" :rules="[]">
 				<el-autocomplete
 					v-model="searchQuery"
 					:fetch-suggestions="fetchRequestSuggestions"
@@ -124,58 +122,55 @@ function removeReagent(order) {
 					placeholder="Search for requests"
 					@select="linkRequest"
 				>
-					<template v-if="requestsToLink.length > 0" #append>
-						<el-tag
-							v-for="request of requestsToLink"
-							:key="request.id"
-							closable
-							@close="() => removeLinkedRequest(request.id)"
-						>
-							<span>{{ request.reagentName }}</span>
-						</el-tag>
-					</template>
 					<template #default="{ item }">
 						<div>{{ item.reagentName }}</div>
 					</template>
 				</el-autocomplete>
-				<el-button type="primary" @click="confirmLinkedRequests">Link request</el-button>
+				<div v-if="linkedRequests.length > 0" class="linked-requests-container">
+					<el-tag
+						v-for="request of linkedRequests"
+						:key="request.id"
+						closable
+						@click="() => viewRequestDetails(request)"
+						@close="() => removeLinkedRequest(request.id)"
+					>
+						{{ request.reagentName }} ({{ request.quantity }} {{ request.quantityUnit }})
+					</el-tag>
+				</div>
 			</el-form-item>
-			<div v-if="linkedRequests.length > 0" class="linked-requests-container">
-				<el-tag
-					v-for="request of linkedRequests"
-					:key="request.id"
-					closable
-					@click="() => viewRequestDetails(request)"
-					@close="() => removeLinkedRequest(request.id)"
-				>
-					{{ request.reagentName }} ({{ request.quantity }} {{ request.quantityUnit }})
-				</el-tag>
-			</div>
 			<div class="data-table">
-				<h2 class="el-form-item__label">Requests to Order</h2>
+				<h2 class="el-form-item__label">
+					{{ isRequest ? `Requests to Order` : `Substances to Order` }}
+				</h2>
 				<div class="orders-container" max-height="350">
-					<div class="header-row">
-						<span>Reagent</span>
-						<span>Quantity Unit</span>
+					<div class="row">
+						<span>Name</span>
+						<span>Unit</span>
 						<span>Quantity</span>
 						<span>Amount</span>
 					</div>
 					<div
-						v-for="(order, index) of [...form.reagentRequests, ...form.reagents]"
+						v-for="(order, index) of isRequest
+							? [...form.reagentRequests, ...form.reagents]
+							: form.reagents"
 						:key="index"
-						class="order-row"
+						class="row"
 					>
-						<el-form-item>
-							<el-input v-model="order.reagentName" placeholder="Reagent name" />
+						<el-form-item
+							:prop="`${isRequest ? 'reagentRequests' : 'reagents'}.${index}.reagentName`"
+						>
+							<el-input v-model="order.reagentName" placeholder="Enter name" />
 						</el-form-item>
-						<el-form-item>
+						<el-form-item
+							:prop="`${isRequest ? 'reagentRequests' : 'reagents'}.${index}.quantityUnit`"
+						>
 							<el-input v-model="order.quantityUnit" placeholder="Quantity unit" />
 						</el-form-item>
-						<el-form-item>
-							<el-input v-model="order.quantity" placeholder="Quantity" />
+						<el-form-item :prop="`${isRequest ? 'reagentRequests' : 'reagents'}.${index}.quantity`">
+							<el-input-number v-model="order.quantity" placeholder="Quantity" :min="1" />
 						</el-form-item>
-						<el-form-item>
-							<el-input v-model="order.amount" placeholder="Amount" />
+						<el-form-item :prop="`${isRequest ? 'reagentRequests' : 'reagents'}.${index}.amount`">
+							<el-input-number v-model="order.amount" placeholder="Amount" :min="1" />
 						</el-form-item>
 						<el-button
 							:disabled="!form.reagents.includes(order)"
@@ -187,22 +182,22 @@ function removeReagent(order) {
 						/></el-button>
 					</div>
 					<el-form
-						ref="new-reagent-form-el"
-						:model="newReagent"
-						:rules="newReagentRules"
-						class="order-row"
+						ref="substance-form-el"
+						:model="newSubtance"
+						:rules="newSubstanceRules"
+						class="row"
 					>
 						<el-form-item prop="reagentName">
-							<el-input v-model="newReagent.reagentName" placeholder="Enter reagent name" />
+							<el-input v-model="newSubtance.reagentName" placeholder="Enter name" />
 						</el-form-item>
 						<el-form-item prop="quantityUnit">
-							<el-input v-model="newReagent.quantityUnit" placeholder="Enter unit" />
+							<el-input v-model="newSubtance.quantityUnit" placeholder="Enter unit" />
 						</el-form-item>
 						<el-form-item prop="quantity">
-							<el-input v-model="newReagent.quantity" min="1" />
+							<el-input-number v-model="newSubtance.quantity" placeholder="Quantity" :min="1" />
 						</el-form-item>
 						<el-form-item prop="amount">
-							<el-input v-model="newReagent.amount" min="1" />
+							<el-input-number v-model="newSubtance.amount" placeholder="Amount" :min="1" />
 						</el-form-item>
 						<el-button type="info" circle @click="addNewReagent">
 							<rh-icon color="white" name="plus"
@@ -219,40 +214,35 @@ function removeReagent(order) {
 </template>
 
 <style>
-.new-reagent-row,
-.order-row {
+.new-reagent-row {
 	display: flex;
 	flex-direction: row;
 	gap: 2rem;
+}
+.row {
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	gap: 8px;
+	color: var(--rh-color-info-700);
 }
 .requests-table,
 .data-table,
 .btn-container {
 	margin-top: 20px;
 }
-.el-form {
-	width: 100%;
-}
+.el-form,
 .add-btn {
 	width: 100%;
 }
+
 .orders-container,
-.requests {
+.requests,
+.linked-requests-container {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
 }
-.header-row,
-.order-row {
-	display: grid;
-	grid-template-columns: repeat(5, 1fr);
-	gap: 8px;
-	color: var(--rh-color-info-700);
-}
-.linked-requests-container {
-	display: flex;
-	flex-direction: row;
-}
+
 .el-input-group__append,
 .linked-requests-container,
 .el-form-item__content {
