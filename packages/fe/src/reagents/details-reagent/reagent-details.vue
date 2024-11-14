@@ -105,6 +105,8 @@ const handleSubmit = async () => {
 				type: 'success'
 			});
 			$router.push({ name: 'reagent-details', params: { id: reagent.value.id } });
+			setReagent(props.id);
+			updatedReagentValues.value = { category: 'reagent' };
 		}
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating reagent');

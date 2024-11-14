@@ -84,6 +84,8 @@ async function submit() {
 				type: 'success'
 			});
 			$router.push({ name: 'sample-details', params: { id: props.id } });
+			setSample(props.id);
+			updatedSampleValues.value = { category: 'sample' };
 		}
 	} catch (error) {
 		$notifyUserAboutError(error);
