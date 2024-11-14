@@ -8,6 +8,7 @@ import { formatDate } from '../../lib/utils/datetime/date-format';
 import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
 import RequestsFilters from '../requests-filters.vue';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg';
+import { $router } from '../../lib/router/router';
 
 const isLoading = ref(false);
 const requests = ref([]);
@@ -51,6 +52,10 @@ const cancelRequest = async id => {
 	}
 };
 
+const addNewRequest = () => {
+	$router.push({ name: 'new-request' });
+};
+
 watch(
 	filters,
 	() => {
@@ -68,7 +73,7 @@ onMounted(() => {
 	<div class="margin-table">
 		<rh-filters>
 			<template #action-buttons>
-				<el-button type="primary">Create New Request</el-button>
+				<el-button type="primary" @click="addNewRequest">Create New Request</el-button>
 			</template>
 			<template #filters>
 				<requests-filters v-model:filters="filters" />
@@ -77,8 +82,8 @@ onMounted(() => {
 		<el-table v-loading="isLoading" :data="requests">
 			<el-table-column prop="status" min-width="100" label="Status" />
 			<el-table-column prop="reagentName" min-width="120" label="Reagent Name" />
-			<el-table-column prop="quantityUnit" min-width="120" label="Quantity Unit" />
 			<el-table-column prop="quantity" label="Quantity" />
+			<el-table-column prop="quantityUnit" min-width="120" label="Quantity Unit" />
 			<el-table-column prop="amount" label="Amount" />
 			<el-table-column prop="userComment" min-width="120" label="User comment" />
 			<el-table-column

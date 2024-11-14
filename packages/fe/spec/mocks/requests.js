@@ -4,83 +4,56 @@ import { api } from './api-url';
 const requestInfo = {
 	requests: [
 		{
-			id: '22a5974b-cb37-4ebd-9060-8cc131945517',
-			author: {
-				id: 1,
-				username: 'username3'
-			},
-			reagentName: 'good acid',
-			quantityUnit: 'l, bottle',
-			quantity: 2,
-			amount: 1,
-			status: 'pending',
+			id: 'c10cb7e2-8b8d-4d89-a284-e703e369ca64',
+			reagentName: 'Not admin 03-11',
+			quantity: 18,
+			quantityUnit: 'g, box',
+			amount: 5,
 			userComment: 'we need it asap',
-			poComment: 'we have no enough money',
-			createdAt: '2024-09-27T13:16:35.744Z',
-			updatedAt: '2024-09-28T13:16:35.744Z',
+			poComment: '',
+			createdAt: '2024-11-11T09:55:38.531Z',
+			updatedAt: '2024-11-11T09:55:38.531Z',
+			structure: '',
+			casNumber: '2222222-22-2',
+			author: {
+				id: 35,
+				username: 'po1'
+			},
+			status: 'pending',
+			order: {
+				title: 'Tr order',
+				id: '82edd722-293b-4aed-bace-883a77946d99',
+				createdAt: '2024-11-10T22:45:21.174Z',
+				updatedAt: '2024-11-10T22:45:21.174Z',
+				seller: 'Seller ltd',
+				status: 'pending',
+				author: {
+					id: 35,
+					username: 'po1'
+				}
+			}
+		},
+		{
+			id: '1f8616d7-5b77-4643-bc76-b493500c738d',
+			reagentName: 'Admin one',
+			quantity: 15.5,
+			quantityUnit: '',
+			amount: 1,
+			userComment: 'jjj',
+			poComment: '',
+			createdAt: '2024-11-02T14:56:54.064Z',
+			updatedAt: '2024-11-03T08:09:51.148Z',
 			structure: 'H2SO4',
 			casNumber: '1111111-11-1',
-			orderId: '22a5974b-cb37-4ebd-9060-8cc131945517'
-		},
-		{
-			id: '22a5974b-cb37-4ebd-9060-8cc131943344',
 			author: {
-				id: 1,
-				username: 'username3'
+				id: 25,
+				username: 'adminuser2'
 			},
-			reagentName: 'better acid',
-			quantityUnit: 'l, bottle',
-			quantity: 2,
-			amount: 1,
-			status: 'ordered',
-			userComment: 'we need it asap',
-			poComment: "let's do it",
-			createdAt: '2024-09-27T13:16:35.744Z',
-			updatedAt: '2024-10-10T00:00:00.000Z',
-			structure: 'H2SO4',
-			casNumber: '2222222-22-2',
-			orderId: '22a5974b-cb37-4ebd-9060-8cc131945517'
-		},
-		{
-			id: '22a5974b-cb37-4ebd-9060-8cc131931274',
-			author: {
-				id: 1,
-				username: 'username3'
-			},
-			reagentName: 'Water',
-			quantityUnit: 'l, bottle',
-			quantity: 2,
-			amount: 1,
 			status: 'pending',
-			userComment: 'we need it asap',
-			poComment: "let's do it",
-			createdAt: '2024-09-30T13:16:35.744Z',
-			updatedAt: '2025-10-15T00:00:00.000Z',
-			structure: 'H2SO4',
-			casNumber: '2222222-22-2',
-			orderId: '22a5974b-cb37-4ebd-9060-8cc131945517'
-		},
-		{
-			id: '22a5974b-cb37-4ebd-9060-8cc131933333',
-			author: {
-				id: 1,
-				username: 'username3'
-			},
-			reagentName: 'Na Chlorid',
-			quantityUnit: 'mg, bottle',
-			quantity: 30,
-			amount: 4,
-			status: 'fulfilled',
-			userComment: 'we need it asap',
-			poComment: 'we have no enough money',
-			createdAt: '2024-09-20T13:16:35.744Z',
-			updatedAt: '2024-09-29T13:16:35.744Z',
-			structure: 'H2SO4',
-			casNumber: '1111111-11-1',
-			orderId: '22a5974b-cb37-4ebd-9060-8cc131945517'
+			order: {}
 		}
 	],
-	count: 4
+	count: 2
 };
 
 function createdDateFilter(parsedOptions, request) {
@@ -111,12 +84,20 @@ function filterRequests(parsedOptions) {
 export const requestHandlers = [
 	http.get(api('/requests'), req => {
 		const options = new URL(req.request.url).searchParams.get('options');
-		const parsedOptions = options ? JSON.parse(options) : null;
+		const parsedOptions = JSON.parse(options) || {};
 		if (parsedOptions === null) {
 			return HttpResponse.json(requestInfo);
 		} else {
 			return filterRequests(parsedOptions);
 		}
+	}),
+	http.post(api('/requests'), async ({ request }) => {
+		const newRequest = await request.json();
+		requestInfo.requests.push(newRequest);
+		return HttpResponse.json({
+			status: 'success',
+			message: 'New request was created'
+		});
 	}),
 	http.delete(api('/requests/:id'), async ({ params }) => {
 		const { id } = params;
