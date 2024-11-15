@@ -64,7 +64,7 @@ const submit = async () => {
 					<el-input-number v-model="form.amount" :min="1" placeholder="Enter amount" />
 				</el-form-item>
 			</div>
-			<el-form-item label="User Comment" prop="userComment">
+			<el-form-item label="Comment" prop="userComment">
 				<el-input v-model="form.userComment" type="textarea" placeholder="Enter comment" />
 			</el-form-item>
 			<div class="btn-container">
