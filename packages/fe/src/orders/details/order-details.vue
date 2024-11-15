@@ -61,12 +61,32 @@ const setOrder = async id => {
 	loading.value = true;
 	try {
 		order.value = await $api.orders.fetchOrder(id);
+		if (order.value.status === 'fulfilled') {
+			await moveInventory();
+		}
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating order');
 	} finally {
 		loading.value = false;
 	}
 };
+
+const moveInventory = async () => {
+	const incomingReagents = order.value.reagents;
+
+	try {
+		const response = await $api.reagents.addReagent(
+			incomingReagents.map(reagent => ({
+				...reagent,
+				quantityLeft: reagent.quantity
+			}))
+		);
+		console.log(`All reagents added successfully:`, response);
+	} catch (error) {
+		console.error('Error adding reagents:', error.message);
+	}
+};
+
 const deleteOrder = async () => {
 	try {
 		await $confirm('Do you want to delete this order?', 'Warning', {

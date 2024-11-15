@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 export const orderInfo = {
 	orders: [
 		{
@@ -47,7 +48,42 @@ export const orderInfo = {
 					orderId: null
 				}
 			],
-			reagents: []
+			reagents: [
+				{
+					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
+					author: {
+						id: 1,
+						username: 'username3'
+					},
+					reagentName: 'good acid from the order',
+					quantity: 15.5,
+					status: 'pending',
+					userComment: 'we need it asap',
+					poComment: 'we have no enough money',
+					createdAt: '2024-09-27T13:16:35.744Z',
+					updatedAt: '2024-09-27T13:16:35.744Z',
+					structure: 'H2SO4',
+					casNumber: '1111111-11-1',
+					orderId: null
+				},
+				{
+					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
+					author: {
+						id: 1,
+						username: 'username3'
+					},
+					reagentName: 'better acid from the order',
+					quantity: 17,
+					status: 'ordered',
+					userComment: 'we need it asap',
+					poComment: "let's do it",
+					createdAt: '2024-09-27T13:16:35.744Z',
+					updatedAt: '2024-09-27T13:16:35.744Z',
+					structure: 'H2SO4',
+					casNumber: '2222222-22-2',
+					orderId: null
+				}
+			]
 		},
 		{
 			id: 'f45d8c2a-0a17-4e2a-9d77-7f6b2b7cfd63',
@@ -96,7 +132,42 @@ export const orderInfo = {
 					orderId: null
 				}
 			],
-			reagents: []
+			reagents: [
+				{
+					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
+					author: {
+						id: 1,
+						username: 'username3'
+					},
+					reagentName: 'good acid',
+					quantity: 15.5,
+					status: 'pending',
+					userComment: 'we need it asap',
+					poComment: 'we have no enough money',
+					createdAt: '2024-09-27T13:16:35.744Z',
+					updatedAt: '2024-09-27T13:16:35.744Z',
+					structure: 'H2SO4',
+					casNumber: '1111111-11-1',
+					orderId: null
+				},
+				{
+					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
+					author: {
+						id: 1,
+						username: 'username3'
+					},
+					reagentName: 'better acid',
+					quantity: 17,
+					status: 'ordered',
+					userComment: 'we need it asap',
+					poComment: "let's do it",
+					createdAt: '2024-09-27T13:16:35.744Z',
+					updatedAt: '2024-09-27T13:16:35.744Z',
+					structure: 'H2SO4',
+					casNumber: '2222222-22-2',
+					orderId: null
+				}
+			]
 		},
 		{
 			id: '6b9f3d47-341b-43b8-8f99-c2c35e71366e',
@@ -145,7 +216,42 @@ export const orderInfo = {
 					orderId: null
 				}
 			],
-			reagents: []
+			reagents: [
+				{
+					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
+					author: {
+						id: 1,
+						username: 'username3'
+					},
+					reagentName: 'good acid',
+					quantity: 15.5,
+					status: 'pending',
+					userComment: 'we need it asap',
+					poComment: 'we have no enough money',
+					createdAt: '2024-09-27T13:16:35.744Z',
+					updatedAt: '2024-09-27T13:16:35.744Z',
+					structure: 'H2SO4',
+					casNumber: '1111111-11-1',
+					orderId: null
+				},
+				{
+					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
+					author: {
+						id: 1,
+						username: 'username3'
+					},
+					reagentName: 'better acid',
+					quantity: 17,
+					status: 'ordered',
+					userComment: 'we need it asap',
+					poComment: "let's do it",
+					createdAt: '2024-09-27T13:16:35.744Z',
+					updatedAt: '2024-09-27T13:16:35.744Z',
+					structure: 'H2SO4',
+					casNumber: '2222222-22-2',
+					orderId: null
+				}
+			]
 		},
 		{
 			id: '6b9f3d47-341b-43b8-8f99-c2c35e71366h',
