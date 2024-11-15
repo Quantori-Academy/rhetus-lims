@@ -75,49 +75,57 @@ const requestInfo = {
 	count: 3
 };
 
-function createdDateFilter(parsedOptions, request) {
-	let [createdStartDate, createdEndDate] = parsedOptions.creationRange.map(date => new Date(date));
-	const createdAt = new Date(request.createdAt);
-	return createdAt >= createdStartDate && createdAt <= createdEndDate;
+function dateFilter(request, parsedDate, option) {
+	let [startDate, endDate] = parsedDate.map(date => new Date(date));
+	const createdAt = new Date(option);
+	return createdAt >= startDate && createdAt <= endDate;
 }
-
+function matchesName(request, name) {
+	return name ? request.reagentName.toLowerCase().includes(name) : true;
+}
+function matchesStatus(request, status) {
+	return status ? request.status.includes(status) : true;
+}
+function matchesCreationDate(request, parsedDate) {
+	return parsedDate ? dateFilter(request, parsedDate, request.createdAt) : true;
+}
+function matchesUpdateDate(request, parsedDate) {
+	return parsedDate ? dateFilter(request, parsedDate, request.updatedAt) : true;
+}
 function filterRequests(parsedOptions) {
 	const filteredRequests = requestInfo.requests.filter(request => {
-		const matchesName = parsedOptions.reagentName
-			? request.reagentName.toLowerCase().includes(parsedOptions.reagentName)
-			: true;
-		const matchesStatus = parsedOptions.status
-			? request.status.includes(parsedOptions.status)
-			: true;
-		const matchesCreationDate = parsedOptions.creationRange
-			? createdDateFilter(parsedOptions, request)
-			: true;
-
-		return matchesName && matchesStatus && matchesCreationDate;
+		return (
+			matchesName(request, parsedOptions.reagentName) &&
+			matchesStatus(request, parsedOptions.status) &&
+			matchesCreationDate(request, parsedOptions.creationRange) &&
+			matchesUpdateDate(request, parsedOptions.updateRange)
+		);
 	});
-	return HttpResponse.json({
-		requests: filteredRequests
-	});
+	return filteredRequests;
 }
-
+function paginateRequests(items, page, limit) {
+	const start = (page - 1) * limit;
+	return items.slice(start, start + limit);
+}
 export const requestHandlers = [
 	http.get(api('/requests'), req => {
 		const url = new URL(req.request.url);
 		const options = url.searchParams.get('options');
-		const sort = url.searchParams.get('sort');
 		const parsedOptions = JSON.parse(options) || {};
+		const page = parseInt(url.searchParams.get('page')) || 1;
+		const limit = parseInt(url.searchParams.get('limit')) || 10;
 		const hasValidOptions = options => {
 			return Object.values(options).some(value => value !== '');
 		};
 		if (!hasValidOptions(parsedOptions)) {
 			return HttpResponse.json({
-				requests: requestInfo.requests, //to complete with pagination
+				requests: paginateRequests(requestInfo.requests, page, limit),
 				count: requestInfo.requests.length
 			});
 		} else {
 			const filtered = filterRequests(parsedOptions);
 			return HttpResponse.json({
-				requests: filtered,
+				requests: paginateRequests(filtered, page, limit),
 				count: filtered.length
 			});
 		}

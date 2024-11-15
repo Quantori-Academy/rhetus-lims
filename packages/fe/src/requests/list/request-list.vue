@@ -9,6 +9,7 @@ import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
 import RequestsFilters from '../requests-filters.vue';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg';
 import { $router } from '../../lib/router/router';
+import RhPagination from '../../lib/components/rh-pagination/rh-pagination.vue';
 
 const isLoading = ref(false);
 const requests = ref([]);
@@ -16,7 +17,8 @@ const sort = ref(null);
 const filters = ref({
 	reagentName: '',
 	status: '',
-	creationRange: ''
+	creationRange: '',
+	updateRange: ''
 });
 function createQuery(event) {
 	let query = {};
@@ -33,6 +35,8 @@ const setRequests = debounce(async (event = null) => {
 		sort.value = sortQuery;
 	}
 	const params = {
+		page: paginationData.value.page,
+		limit: paginationData.value.size,
 		sort: sort.value,
 		options: { ...filters.value }
 	};
@@ -66,6 +70,15 @@ const cancelRequest = async id => {
 		}
 	}
 };
+const paginationData = ref({
+	page: 1,
+	size: 10,
+	totalElements: 0
+});
+const handlePageChange = newPage => {
+	paginationData.value.page = newPage;
+};
+watch(paginationData.value, () => setRequests());
 const addNewRequest = () => {
 	$router.push({ name: 'new-request' });
 };
@@ -124,5 +137,6 @@ onMounted(() => {
 				</template>
 			</el-table-column>
 		</el-table>
+		<rh-pagination :pagination="paginationData" @change-page="handlePageChange" />
 	</div>
 </template>
