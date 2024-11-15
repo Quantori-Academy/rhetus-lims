@@ -200,7 +200,7 @@ async function substancesService(server) {
 				status: 'success',
 				message:
 					updateMessages.length > 1
-						? `${category === 'reagent' ? 'Reagent' : 'Sample'} was updated`
+						? `${Category.REAGENT ? 'Reagent' : 'Sample'} was updated`
 						: updateMessages[0]
 			};
 		}
