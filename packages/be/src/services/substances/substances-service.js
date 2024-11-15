@@ -180,8 +180,8 @@ async function substancesService(server) {
 
 		updateSubstance: async (id, data) => {
 			const { category, storageId, quantityUsed, userId, reason, name, description } = data;
-			const service =
-				category === Category.REAGENT ? server.reagentsService : server.samplesService;
+			const isReagent = category === Category.REAGENT;
+			const service = isReagent ? server.reagentsService : server.samplesService;
 
 			let updateMessages = [];
 
@@ -200,7 +200,7 @@ async function substancesService(server) {
 				status: 'success',
 				message:
 					updateMessages.length > 1
-						? `${Category.REAGENT ? 'Reagent' : 'Sample'} was updated`
+						? `${isReagent ? 'Reagent' : 'Sample'} was updated`
 						: updateMessages[0]
 			};
 		}
