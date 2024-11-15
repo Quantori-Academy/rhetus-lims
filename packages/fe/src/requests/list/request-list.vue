@@ -12,16 +12,32 @@ import { $router } from '../../lib/router/router';
 
 const isLoading = ref(false);
 const requests = ref([]);
+const sort = ref(null);
 const filters = ref({
 	reagentName: '',
 	status: '',
 	creationRange: ''
 });
-
-const setRequests = debounce(async () => {
+function createQuery(event) {
+	let query = {};
+	if (event && event.prop && event.order) {
+		const order = event.order === 'ascending' ? 'asc' : 'desc';
+		query = { [event.prop]: order };
+	}
+	return query;
+}
+const setRequests = debounce(async (event = null) => {
 	isLoading.value = true;
+	if (event) {
+		const sortQuery = createQuery(event);
+		sort.value = sortQuery;
+	}
+	const params = {
+		sort: sort.value,
+		options: { ...filters.value }
+	};
 	try {
-		const data = await $api.requests.fetchRequests(filters.value);
+		const data = await $api.requests.fetchRequests(params);
 		requests.value = data.requests;
 	} catch (error) {
 		$notifyUserAboutError(error);
@@ -29,7 +45,6 @@ const setRequests = debounce(async () => {
 		isLoading.value = false;
 	}
 }, 200);
-
 const cancelRequest = async id => {
 	try {
 		await $confirm('Do you want to cancel this request?', 'Warning', {
@@ -51,11 +66,9 @@ const cancelRequest = async id => {
 		}
 	}
 };
-
 const addNewRequest = () => {
 	$router.push({ name: 'new-request' });
 };
-
 watch(
 	filters,
 	() => {
@@ -63,7 +76,6 @@ watch(
 	},
 	{ deep: true }
 );
-
 onMounted(() => {
 	setRequests();
 });
@@ -79,24 +91,26 @@ onMounted(() => {
 				<requests-filters v-model:filters="filters" />
 			</template>
 		</rh-filters>
-		<el-table v-loading="isLoading" :data="requests">
-			<el-table-column prop="status" min-width="100" label="Status" />
-			<el-table-column prop="reagentName" min-width="120" label="Reagent Name" />
-			<el-table-column prop="quantity" label="Quantity" />
-			<el-table-column prop="quantityUnit" min-width="120" label="Quantity Unit" />
-			<el-table-column prop="amount" label="Amount" />
-			<el-table-column prop="userComment" min-width="120" label="User comment" />
+		<el-table v-loading="isLoading" :data="requests" @sort-change="setRequests">
+			<el-table-column prop="status" min-width="100" label="Status" sortable />
+			<el-table-column prop="reagentName" min-width="120" label="Reagent Name" sortable />
+			<el-table-column prop="quantity" label="Quantity" sortable />
+			<el-table-column prop="quantityUnit" min-width="120" label="Quantity Unit" sortable />
+			<el-table-column prop="amount" label="Amount" sortable />
+			<el-table-column prop="userComment" min-width="120" label="User comment" sortable />
 			<el-table-column
 				prop="createdAt"
 				label="Creation Date"
 				min-width="120"
 				:formatter="data => formatDate(data.createdAt)"
+				sortable
 			/>
 			<el-table-column
 				prop="updatedAt"
 				label="Update Date"
 				min-width="120"
 				:formatter="data => formatDate(data.updatedAt)"
+				sortable
 			/>
 			<el-table-column width="100">
 				<template #default="{ row }">

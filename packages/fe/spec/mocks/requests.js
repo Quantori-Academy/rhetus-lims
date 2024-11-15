@@ -37,9 +37,28 @@ const requestInfo = {
 			id: '1f8616d7-5b77-4643-bc76-b493500c738d',
 			reagentName: 'Admin one',
 			quantity: 15.5,
-			quantityUnit: '',
+			quantityUnit: 'ml, bottle',
 			amount: 1,
 			userComment: 'jjj',
+			poComment: '',
+			createdAt: '2024-11-02T14:56:54.064Z',
+			updatedAt: '2024-11-03T08:09:51.148Z',
+			structure: 'H2SO4',
+			casNumber: '1111111-11-1',
+			author: {
+				id: 25,
+				username: 'adminuser2'
+			},
+			status: 'ordered',
+			order: {}
+		},
+		{
+			id: '1f8616d7-5b77-4643-bc76-b493500534c6',
+			reagentName: 'Water',
+			quantity: 30,
+			quantityUnit: 'ml, bottle',
+			amount: 1,
+			userComment: 'comment',
 			poComment: '',
 			createdAt: '2024-11-02T14:56:54.064Z',
 			updatedAt: '2024-11-03T08:09:51.148Z',
@@ -53,7 +72,7 @@ const requestInfo = {
 			order: {}
 		}
 	],
-	count: 2
+	count: 3
 };
 
 function createdDateFilter(parsedOptions, request) {
@@ -83,12 +102,24 @@ function filterRequests(parsedOptions) {
 
 export const requestHandlers = [
 	http.get(api('/requests'), req => {
-		const options = new URL(req.request.url).searchParams.get('options');
+		const url = new URL(req.request.url);
+		const options = url.searchParams.get('options');
+		const sort = url.searchParams.get('sort');
 		const parsedOptions = JSON.parse(options) || {};
-		if (parsedOptions === null) {
-			return HttpResponse.json(requestInfo);
+		const hasValidOptions = options => {
+			return Object.values(options).some(value => value !== '');
+		};
+		if (!hasValidOptions(parsedOptions)) {
+			return HttpResponse.json({
+				requests: requestInfo.requests, //to complete with pagination
+				count: requestInfo.requests.length
+			});
 		} else {
-			return filterRequests(parsedOptions);
+			const filtered = filterRequests(parsedOptions);
+			return HttpResponse.json({
+				requests: filtered,
+				count: filtered.length
+			});
 		}
 	}),
 	http.post(api('/requests'), async ({ request }) => {
