@@ -40,6 +40,28 @@ function paginateOrders(items, page, limit) {
 	const start = (page - 1) * limit;
 	return items.slice(start, start + limit);
 }
+const statusTransitions = {
+	pending: 'ordered',
+	ordered: 'fulfilled'
+};
+
+function changeStatus(order, action) {
+	if (action === 'next') {
+		const nextStatus = statusTransitions[order.status];
+		if (nextStatus) {
+			order.status = nextStatus;
+		} else {
+			return { success: false, message: 'Invalid transition from current status' };
+		}
+	} else if (action === 'cancel') {
+		if (order.status === 'pending' || order.status === 'ordered') {
+			order.status = 'canceled';
+		} else {
+			return { success: false, message: 'Order cannot be canceled from this status' };
+		}
+	}
+	return { success: true, message: `Order status updated to ${order.status}` };
+}
 export const orderHandlers = [
 	http.get(api('/orders'), req => {
 		const url = new URL(req.request.url);
@@ -99,5 +121,17 @@ export const orderHandlers = [
 			status: 'success',
 			message: 'Order was deleted'
 		});
+	}),
+	http.put(api('/orders/:id/change-status'), async ({ request, params }) => {
+		const body = await request.json();
+		const { id } = params;
+		const { action } = body;
+		const order = orderInfo.orders.find(order => order.id === id);
+		if (!order) return HttpResponse.json({ message: 'Order not found' }, { status: 404 });
+		const result = changeStatus(order, action);
+		if (!result.success) {
+			return HttpResponse.json({ message: result.message }, { status: 400 });
+		}
+		return HttpResponse.json({ status: 'success', message: result.message });
 	})
 ];
