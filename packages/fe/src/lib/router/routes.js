@@ -296,5 +296,18 @@ export const routes = [
 				{ name: 'Requests', path: '/requests/list' }
 			]
 		}
+	},
+	{
+		path: '/requests/new',
+		name: 'new-request',
+		component: () => import('../../requests/new/add-new-request.vue'),
+		meta: {
+			title: 'New Reagent Request',
+			breadcrumb: [
+				{ name: 'Home', path: '/' },
+				{ name: 'Requests', path: '/requests/list' },
+				{ name: 'New Request', path: '' }
+			]
+		}
 	}
 ];
