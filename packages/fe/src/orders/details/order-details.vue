@@ -34,7 +34,6 @@ const rules = ref({
 	title: [requiredRule('Title')]
 });
 const isEdit = computed(() => $route.value.name === 'order-details-edit');
-
 const actionButtons = computed(() => {
 	const buttons = [];
 	if (['pending', 'ordered'].includes(order.value.status)) {
@@ -182,7 +181,6 @@ const updateOrder = async () => {
 			<el-form-item label="Seller" prop="seller">
 				<el-input v-model="order.seller" :disabled="!isEdit || order.status !== `pending`" />
 			</el-form-item>
-
 			<el-form-item label="Author" prop="author.username">
 				<el-input v-model="order.author.username" :disabled="true" />
 			</el-form-item>
