@@ -12,7 +12,7 @@ import { $notifyUserAboutError, $notify } from '../../lib/utils/feedback/notify-
 import { computed, onMounted, useTemplateRef, ref } from 'vue';
 import { $api } from '../../lib/api/index.js';
 import { $route, $router } from '../../lib/router/router';
-import { requiredRule } from './constants.js';
+import { getButtonType, requiredRule } from './constants.js';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 const props = defineProps({
 	id: {
@@ -76,10 +76,18 @@ const handleSubmit = async () => {
 <template>
 	<div v-if="order" v-loading="loading" class="wrapper">
 		<div v-if="order" class="editing-header">
-			<h2>{{ `${isEdit ? 'Editing ' : ''}${order.title}` }}</h2>
+			<h2>
+				{{ `${isEdit ? 'Editing ' : ''}${order.title}` }}
+				<span>
+					<el-button :type="getButtonType(order.status)" round>
+						{{ order.status }}
+					</el-button></span
+				>
+			</h2>
+
 			<div>
 				<el-button v-if="!isEdit && order.status === `pending`" @click="toggleEdit">Edit</el-button>
-				<el-button>Make Order</el-button>
+				<el-button type="primary">Make Order</el-button>
 			</div>
 		</div>
 		<div></div>
@@ -97,10 +105,10 @@ const handleSubmit = async () => {
 			<el-form-item label="Seller" prop="seller">
 				<el-input v-model="order.seller" :disabled="!isEdit || order.status !== `pending`" />
 			</el-form-item>
-			<!-- <el-form-item label="Author" prop="author.username">
-					<el-input v-model="order.author.username" :disabled="true" />
-				</el-form-item> -->
 
+			<el-form-item label="Author" prop="author.username">
+				<el-input v-model="order.author.username" :disabled="true" />
+			</el-form-item>
 			<el-form-item label="Requests to order" prop="reagentRequests">
 				<el-table :data="order.reagentRequests">
 					<el-table-column prop="reagentName" label="Name" />
@@ -126,9 +134,6 @@ const handleSubmit = async () => {
 					value-format="YYYY-MM-DD"
 					disabled
 				/>
-			</el-form-item>
-			<el-form-item label="Status" prop="status">
-				<el-input v-model="order.status" disabled />
 			</el-form-item>
 			<div v-if="isEdit" class="btn-container">
 				<el-button @click="cancelEdit">Cancel</el-button>
