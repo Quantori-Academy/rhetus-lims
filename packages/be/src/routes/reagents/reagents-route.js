@@ -24,6 +24,14 @@ async function reagents(server, options) {
 				return reply.code(404).send({ status: 'error', message: `No such storage location` });
 			}
 
+			const isStructureValid = await server.reagentsService.isStructureValid(
+				req.body.structure || ''
+			);
+
+			if (!isStructureValid) {
+				return reply.code(400).send({ status: 'error', message: `Invalid structure` });
+			}
+
 			const reagentName = await server.reagentsService.createReagent(req.body);
 
 			return reply

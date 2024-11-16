@@ -23,6 +23,11 @@ const substances = {
 			value: string => helpers.toDate(string),
 			schema: 'union',
 			operator: 'between'
+		},
+		smiles: {
+			property: 'structure',
+			schema: 'union',
+			operator: 'structure-search'
 		}
 	},
 	sort: {
@@ -37,6 +42,9 @@ const substances = {
 		},
 		expirationdate: {
 			property: 'expiration_date'
+		},
+		relevance: {
+			property: 'relevance'
 		}
 	}
 };

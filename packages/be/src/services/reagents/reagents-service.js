@@ -2,6 +2,8 @@ import { eq, and, sql } from 'drizzle-orm';
 import fp from 'fastify-plugin';
 import { schema } from '../../lib/db/schema/index.js';
 import { helpers } from '../../lib/utils/common/helpers.js';
+import { smilesToMol } from '../../lib/db/structure/utils/smiles-to-mol.js';
+import { isValidSmilesQuery } from '../../lib/db/structure/utils/is-valid-smiles.js';
 
 const formatMapping = {
 	name: string => helpers.capitalize(string),
@@ -24,7 +26,8 @@ async function reagentsService(server) {
 				quantityLeft,
 				expirationDate,
 				storageLocationId,
-				description
+				description,
+				structure
 			} = data;
 
 			const result = await server.db
@@ -41,11 +44,17 @@ async function reagentsService(server) {
 					quantityLeft,
 					expirationDate: new Date(expirationDate),
 					storageId: storageLocationId,
-					description
+					description,
+					...(structure && { structure: smilesToMol(structure) })
 				})
 				.returning({ name: schema.reagents.name });
 
 			return result.length ? result[0].name : null;
+		},
+
+		isStructureValid: async smiles => {
+			const result = await server.db.execute(isValidSmilesQuery(smiles));
+			return result.rows[0].is_valid;
 		},
 
 		getReagentById: async id => {
@@ -63,6 +72,7 @@ async function reagentsService(server) {
 					quantityLeft: schema.reagents.quantityLeft,
 					expirationDate: schema.reagents.expirationDate,
 					description: schema.reagents.description,
+					structure: schema.reagents.structure,
 					storageLocation: {
 						id: schema.storages.id,
 						room: schema.storages.room,
@@ -89,7 +99,7 @@ async function reagentsService(server) {
 			return result.length ? result[0].name : null;
 		},
 
-		getReagentsQuery: () => {
+		getReagentsQuery: (extras = {}) => {
 			return server.db
 				.select({
 					id: schema.reagents.id,
@@ -105,7 +115,13 @@ async function reagentsService(server) {
 						description: sql`${schema.storages.description}`.as('storageDescription')
 					},
 					description: schema.reagents.description,
-					category: sql`'reagent'`.as('category')
+					category: sql`'reagent'`.as('category'),
+					...Object.fromEntries(
+						Object.entries(extras).map(([col, query]) => [
+							col,
+							query === 'schema' ? schema.reagents[col] : query
+						])
+					)
 				})
 				.from(schema.reagents)
 				.innerJoin(schema.storages, eq(schema.storages.id, schema.reagents.storageId))

@@ -1,6 +1,6 @@
 {
-  "id": "cd172e44-6707-489c-9df0-8d313e4fa6f4",
-  "prevId": "0d42df35-f961-4ba4-b427-04c79f72c6cf",
+  "id": "bdf5a6ac-ecd4-41d9-8e73-c713a78390ae",
+  "prevId": "07fad497-501e-4de6-9e9b-3fd019980be1",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -450,6 +450,12 @@
           "notNull": false,
           "default": "''"
         },
+        "structure": {
+          "name": "structure",
+          "type": "mol",
+          "primaryKey": false,
+          "notNull": false
+        },
         "deleted": {
           "name": "deleted",
           "type": "boolean",
@@ -542,6 +548,19 @@
           "primaryKey": false,
           "notNull": true
         },
+        "quantity_unit": {
+          "name": "quantity_unit",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "amount": {
+          "name": "amount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
         "order_id": {
           "name": "order_id",
           "type": "uuid",
@@ -579,6 +598,19 @@
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "requests_order_id_orders_id_fk": {
+          "name": "requests_order_id_orders_id_fk",
+          "tableFrom": "requests",
+          "tableTo": "orders",
+          "columnsFrom": [
+            "order_id"
           ],
           "columnsTo": [
             "id"
@@ -741,7 +773,16 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {
+        "storages_room_name_unique": {
+          "name": "storages_room_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "room",
+            "name"
+          ]
+        }
+      }
     },
     "public.substances_quantity_changes": {
       "name": "substances_quantity_changes",
@@ -1103,7 +1144,8 @@
         "pending",
         "ordered",
         "fulfilled",
-        "declined"
+        "completed",
+        "canceled"
       ]
     },
     "public.name": {

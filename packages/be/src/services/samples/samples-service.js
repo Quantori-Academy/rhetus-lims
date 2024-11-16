@@ -177,7 +177,7 @@ async function samplesService(server) {
 			};
 		},
 
-		getSamplesQuery: () => {
+		getSamplesQuery: (extras = {}) => {
 			return server.db
 				.select({
 					id: schema.samples.id,
@@ -193,7 +193,13 @@ async function samplesService(server) {
 						description: sql`${schema.storages.description}`.as('storageDescription')
 					},
 					description: schema.samples.description,
-					category: sql`'sample'`.as('category')
+					category: sql`'sample'`.as('category'),
+					...Object.fromEntries(
+						Object.entries(extras).map(([col, query]) => [
+							col,
+							query === 'schema' ? schema.samples[col] : query
+						])
+					)
 				})
 				.from(schema.samples)
 				.innerJoin(schema.storages, eq(schema.storages.id, schema.samples.storageId))

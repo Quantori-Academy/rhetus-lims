@@ -40,41 +40,41 @@
         "components_id_samples_id_fk": {
           "name": "components_id_samples_id_fk",
           "tableFrom": "components",
-          "tableTo": "samples",
           "columnsFrom": [
             "id"
           ],
+          "tableTo": "samples",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "components_sample_id_samples_id_fk": {
           "name": "components_sample_id_samples_id_fk",
           "tableFrom": "components",
-          "tableTo": "samples",
           "columnsFrom": [
             "sample_id"
           ],
+          "tableTo": "samples",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "components_reagent_id_reagents_id_fk": {
           "name": "components_reagent_id_reagents_id_fk",
           "tableFrom": "components",
-          "tableTo": "reagents",
           "columnsFrom": [
             "reagent_id"
           ],
+          "tableTo": "reagents",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -183,15 +183,15 @@
         "reagents_storage_id_storages_id_fk": {
           "name": "reagents_storage_id_storages_id_fk",
           "tableFrom": "reagents",
-          "tableTo": "storages",
           "columnsFrom": [
             "storage_id"
           ],
+          "tableTo": "storages",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -287,15 +287,15 @@
         "samples_storage_id_storages_id_fk": {
           "name": "samples_storage_id_storages_id_fk",
           "tableFrom": "samples",
-          "tableTo": "storages",
           "columnsFrom": [
             "storage_id"
           ],
+          "tableTo": "storages",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -660,25 +660,25 @@
         "users_role_id_roles_id_fk": {
           "name": "users_role_id_roles_id_fk",
           "tableFrom": "users",
-          "tableTo": "roles",
           "columnsFrom": [
             "role_id"
           ],
+          "tableTo": "roles",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "users_username_unique": {
           "name": "users_username_unique",
-          "nullsNotDistinct": false,
           "columns": [
             "username"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       }
     }

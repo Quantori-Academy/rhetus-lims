@@ -1,6 +1,7 @@
 import { pgTable, timestamp, varchar, text, uuid, real, boolean } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { storages } from './storages.js';
+import { mol } from '../structure/types/mol.js';
 
 export const reagents = pgTable('reagents', {
 	id: uuid('id')
@@ -18,5 +19,6 @@ export const reagents = pgTable('reagents', {
 	expirationDate: timestamp('expiration_date').default(null),
 	storageId: uuid('storage_id').references(() => storages.id),
 	description: text('description').default(''),
+	structure: mol('structure'),
 	deleted: boolean('deleted').default(false)
 });

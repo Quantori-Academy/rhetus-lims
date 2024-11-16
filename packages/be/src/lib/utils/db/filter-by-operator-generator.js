@@ -1,4 +1,7 @@
-import { eq, inArray, ilike, between } from 'drizzle-orm';
+import { eq, inArray, ilike, between, or } from 'drizzle-orm';
+import { isExactStructure } from '../../db/structure/utils/is-exact-structure.js';
+import { hasSubstructure } from '../../db/structure/utils/has-substructure.js';
+import { isSimilar } from '../../db/structure/utils/is-similar.js';
 
 function generateArrayFilter(filterKey, value, formatValue) {
 	return inArray(
@@ -29,6 +32,14 @@ function generateBetweenFilter(filterKey, value, formatValue) {
 	return between(filterKey, formatValue(startValue), formatValue(endValue));
 }
 
+function generateStructureSearchFilter(filterKey, value) {
+	return or(
+		isExactStructure(filterKey, value),
+		hasSubstructure(filterKey, value),
+		isSimilar(filterKey, value)
+	);
+}
+
 function generateFilterByOperator(filterData) {
 	const { filterKey, value, operator, formatValue } = filterData;
 
@@ -41,6 +52,9 @@ function generateFilterByOperator(filterData) {
 
 		case 'between':
 			return generateBetweenFilter(filterKey, value, formatValue);
+
+		case 'structure-search':
+			return generateStructureSearchFilter(filterKey, value);
 
 		default:
 			return;
