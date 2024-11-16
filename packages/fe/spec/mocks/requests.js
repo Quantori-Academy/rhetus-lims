@@ -16,8 +16,8 @@ const requestInfo = {
 			structure: '',
 			casNumber: '2222222-22-2',
 			author: {
-				id: 35,
-				username: 'po1'
+				id: 'c7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3d3b333',
+				username: 'test1'
 			},
 			status: 'pending',
 			order: {
@@ -28,8 +28,8 @@ const requestInfo = {
 				seller: 'Seller ltd',
 				status: 'pending',
 				author: {
-					id: 35,
-					username: 'po1'
+					id: 'c7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3d3b333',
+					username: 'test1'
 				}
 			}
 		},
@@ -65,8 +65,8 @@ const requestInfo = {
 			structure: 'H2SO4',
 			casNumber: '1111111-11-1',
 			author: {
-				id: 25,
-				username: 'adminuser2'
+				id: 'c7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3d3b333',
+				username: 'test1'
 			},
 			status: 'pending',
 			order: {}
@@ -138,6 +138,24 @@ export const requestHandlers = [
 			message: 'New request was created'
 		});
 	}),
+	http.put(api('/requests/:id/cancel'), async ({ params }) => {
+		const { id } = params;
+		const requestIndex = requestInfo.requests.findIndex(request => request.id === id);
+		if (requestIndex === -1) {
+			return HttpResponse.json(
+				{
+					status: 'error',
+					message: `Request not found`
+				},
+				{ status: 404 }
+			);
+		}
+		requestInfo.requests.filter(request => request.id === id)[0].status = 'canceled';
+		return HttpResponse.json({
+			status: 'success',
+			message: 'Request was canceled'
+		});
+	}),
 	http.delete(api('/requests/:id'), async ({ params }) => {
 		const { id } = params;
 		const requestIndex = requestInfo.requests.findIndex(request => request.id === id);
@@ -153,7 +171,7 @@ export const requestHandlers = [
 		requestInfo.requests.splice(requestIndex, 1);
 		return HttpResponse.json({
 			status: 'success',
-			message: 'Request was canceled'
+			message: 'Request was deleted'
 		});
 	})
 ];
