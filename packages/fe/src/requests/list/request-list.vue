@@ -1,6 +1,6 @@
 <script setup>
 import { ElTable, ElTableColumn, ElButton, ElMessageBox } from 'element-plus';
-import { onMounted, ref, watch } from 'vue';
+import { inject, onMounted, ref, watch } from 'vue';
 import { debounce } from '../../lib/utils/debounce/debounce';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg';
 import { $api } from '../../lib/api';
@@ -9,11 +9,12 @@ import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
 import RequestsFilters from '../requests-filters.vue';
 import { $router } from '../../lib/router/router';
 import RhPagination from '../../lib/components/rh-pagination/rh-pagination.vue';
+import { $confirm } from '../../lib/utils/feedback/confirm-msg';
 
 const isLoading = ref(false);
 const requests = ref([]);
 const sort = ref(null);
-const user = ref(null);
+const user = inject('user');
 const filters = ref({
 	reagentName: '',
 	status: '',
@@ -28,16 +29,6 @@ function createQuery(event) {
 	}
 	return query;
 }
-async function userRequests() {
-	try {
-		user.value = await $api.users.fetchCurrentUserInfo();
-	} catch (error) {
-		$notifyUserAboutError(error);
-	}
-}
-const isPO = async () => {
-	return (await user.value.roleId) === 2;
-};
 const setRequests = debounce(async (event = null) => {
 	isLoading.value = true;
 	if (event) {
@@ -52,8 +43,10 @@ const setRequests = debounce(async (event = null) => {
 	};
 	try {
 		const data = await $api.requests.fetchRequests(params);
-		if (user.value.roleId === 3) {
-			requests.value = data.requests.filter(request => request.author.id === user.value.id);
+		if (user.user._rawValue.roleId === 3) {
+			requests.value = data.requests.filter(
+				request => request.author.id === user.user._rawValue.id
+			);
 		} else {
 			requests.value = data.requests;
 		}
@@ -65,15 +58,19 @@ const setRequests = debounce(async (event = null) => {
 }, 200);
 const cancelRequest = async id => {
 	try {
-		await ElMessageBox.prompt(
-			'Are you sure you want to cancel request? If yes, please, provide a reason',
-			'Warning',
-			{
-				confirmButtonText: 'OK',
-				cancelButtonText: 'Cancel'
-			}
-		).then(() => {
-			const response = $api.requests.cancelRequest(id);
+		await $confirm('Are you sure you want to cancel the request?', 'Please, confirm your action', {
+			confirmButtonText: 'Yes',
+			cancelButtonText: 'No',
+			type: 'warning'
+		});
+		await ElMessageBox.prompt('Please, provide a reason', 'Warning', {
+			confirmButtonText: 'Ok',
+			cancelButtonText: 'Cancel',
+			inputPattern: /\S+/,
+			inputErrorMessage: 'Reason is required'
+		}).then(({ value }) => {
+			console.log(value);
+			const response = $api.requests.cancelRequest(id, value);
 			$notify({
 				title: 'Success',
 				message: response.message,
@@ -107,7 +104,6 @@ watch(
 	{ deep: true }
 );
 onMounted(() => {
-	userRequests();
 	setRequests();
 });
 </script>
@@ -143,7 +139,7 @@ onMounted(() => {
 				:formatter="data => formatDate(data.updatedAt)"
 				sortable
 			/>
-			<el-table-column v-if="isPO()" width="100">
+			<el-table-column v-if="user.user._rawValue.roleId === 2" width="100">
 				<template #default="{ row }">
 					<el-button
 						type="danger"
