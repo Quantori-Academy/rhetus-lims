@@ -1,7 +1,7 @@
 <script setup>
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { ref, onMounted, watch, computed } from 'vue';
-import { ElTable, ElTableColumn, ElButton, ElTooltip } from 'element-plus';
+import { ElTable, ElTableColumn, ElButton } from 'element-plus';
 import { $router } from '../../lib/router/router.js';
 import { $api } from '../../lib/api/index.js';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
@@ -16,7 +16,7 @@ const isLoading = ref(false);
 const filters = ref({
 	name: '',
 	quantity: null,
-	expirationDate: { label: 'All', value: [] }
+	expired: false
 });
 
 const paginationData = ref({
@@ -67,19 +67,6 @@ const confirmDeleteReagent = async () => {
 	}
 };
 
-const confirmDeleteAll = async () => {
-	try {
-		return await $confirm('Are you sure you want to delete all selected items?', 'Delete all?', {
-			confirmButtonText: 'Delete',
-			cancelButtonText: 'Cancel',
-			type: 'warning'
-		});
-	} catch {
-		showNotification('Canceled', 'Deletion canceled', 'info');
-		return false;
-	}
-};
-
 const deleteSubstance = async (id, category) => {
 	if (category.toLowerCase() === 'reagent') {
 		await $api.reagents.deleteReagent(id);
@@ -99,19 +86,6 @@ const deleteSingleSubstance = async row => {
 	}
 };
 
-const deleteAllSubstances = async () => {
-	if (!(await confirmDeleteAll())) return;
-	try {
-		await Promise.all(
-			substances.value.map(element => deleteSubstance(element.id, element.category))
-		);
-		await setSubstances();
-		showNotification('Success', 'Items deleted', 'success');
-	} catch (error) {
-		showNotification('Error', error.message || 'Item update canceled', 'error');
-	}
-};
-
 const formattedSubstances = computed(
 	() =>
 		substances.value?.map(substance => ({
@@ -124,11 +98,15 @@ const formattedSubstances = computed(
 const setSubstances = debounce(async (event = null) => {
 	isLoading.value = true;
 	const sortQuery = createQuery(event);
+	const { expired, ...rest } = filters.value;
 	const params = {
 		page: paginationData.value.page,
 		limit: paginationData.value.size,
 		sort: { ...sortQuery.sort },
-		options: { ...filters.value, expirationDate: filters.value.expirationDate.value }
+		options: {
+			...rest,
+			expirationDate: expired ? [new Date('0001-01-01T00:00:00.000Z'), new Date()] : []
+		}
 	};
 	try {
 		const data = await $api.substances.fetchSubstances(params);
@@ -165,15 +143,6 @@ onMounted(() => {
 			<template #action-buttons>
 				<el-button type="primary" @click="addNewReagent">Add New Reagent</el-button>
 				<el-button type="primary" @click="addNewSample">Add New Sample</el-button>
-				<el-tooltip content="Delete all">
-					<el-button
-						type="danger"
-						:disabled="filters.expirationDate.label === 'All' || substances.length === 0"
-						@click="deleteAllSubstances"
-					>
-						<rh-icon color="white" name="trash" />
-					</el-button>
-				</el-tooltip>
 			</template>
 
 			<template #filters>
