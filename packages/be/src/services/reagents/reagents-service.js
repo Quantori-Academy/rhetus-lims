@@ -83,7 +83,6 @@ async function reagentsService(server) {
 				.from(schema.reagents)
 				.innerJoin(schema.storages, eq(schema.reagents.storageId, schema.storages.id))
 				.where(and(eq(schema.reagents.id, id), eq(schema.reagents.deleted, false)));
-
 			return result[0];
 		},
 
@@ -200,6 +199,37 @@ async function reagentsService(server) {
 				code: 200,
 				status: 'success',
 				message: `Storage location of reagent '${result[0].reagentName}' was changed`
+			};
+		},
+
+		changeName: async (id, data) => {
+			const { name } = data;
+
+			const result = await server.db
+				.update(schema.reagents)
+				.set({ name })
+				.where(eq(schema.reagents.id, id))
+				.returning({ reagentName: schema.reagents.name });
+
+			return {
+				code: 200,
+				status: 'success',
+				message: `Name of the reagent was changed to '${result[0].reagentName}'`
+			};
+		},
+		changeDescription: async (id, data) => {
+			const { description } = data;
+
+			const result = await server.db
+				.update(schema.reagents)
+				.set({ description })
+				.where(eq(schema.reagents.id, id))
+				.returning({ reagentName: schema.reagents.name });
+
+			return {
+				code: 200,
+				status: 'success',
+				message: `Description of reagent '${result[0].reagentName}' was changed`
 			};
 		}
 	});

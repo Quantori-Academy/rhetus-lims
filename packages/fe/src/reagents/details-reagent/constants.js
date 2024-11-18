@@ -1,7 +1,41 @@
-export const requiredRule = fieldName => {
+const requiredRule = fieldName => {
 	return {
 		required: true,
 		message: `${fieldName} can't be empty`,
 		trigger: ['blur', 'change']
 	};
+};
+
+export const formRules = {
+	quantityLeft: [
+		requiredRule('quantityLeft'),
+		{
+			type: 'number',
+			min: 0,
+			message: "Quantity can't be negative",
+			trigger: ['blur', 'change']
+		}
+	],
+	name: [requiredRule('Name')],
+	storageId: [requiredRule('Storage location')]
+};
+
+export const emptyReagent = {
+	name: '',
+	casNumber: '',
+	producer: '',
+	catalogId: '',
+	catalogLink: '',
+	unitPrice: '',
+	quantityUnit: '',
+	quantity: 1,
+	quantityLeft: 1,
+	expirationDate: '',
+	storageLocation: {
+		id: '',
+		room: '',
+		name: '',
+		description: ''
+	},
+	description: ''
 };

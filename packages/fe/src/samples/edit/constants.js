@@ -1,11 +1,14 @@
-const requiredRule = {
-	required: true,
-	message: 'Please enter a value',
-	trigger: ['blur', 'change']
+const requiredRule = fieldName => {
+	return {
+		required: true,
+		message: `${fieldName} can't be empty`,
+		trigger: ['blur', 'change']
+	};
 };
+
 export const formRules = {
 	quantityLeft: [
-		requiredRule,
+		requiredRule('quantityLeft'),
 		{
 			type: 'number',
 			min: 0,
@@ -13,9 +16,8 @@ export const formRules = {
 			trigger: ['blur', 'change']
 		}
 	],
-	storageLocation: {
-		id: [requiredRule]
-	}
+	name: [requiredRule('Name')],
+	storageId: [requiredRule('Storage location')]
 };
 
 export const emptySample = {

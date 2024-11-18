@@ -11,10 +11,11 @@ import {
 } from 'element-plus';
 import { $notifyUserAboutError, $notify } from '../../lib/utils/feedback/notify-msg';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg.js/';
-import { computed, onMounted, useTemplateRef, ref } from 'vue';
+import { computed, onMounted, useTemplateRef, ref, watch } from 'vue';
 import { $api } from '../../lib/api/index.js';
 import { $route, $router } from '../../lib/router/router';
-import { requiredRule } from './constants.js';
+import { formRules, emptyReagent } from './constants.js';
+import { checkEditedFields } from '../../substances/constants';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 const props = defineProps({
 	id: {
@@ -23,35 +24,51 @@ const props = defineProps({
 	}
 });
 const formEl = useTemplateRef('form-ref');
-const reagent = ref(null);
+const reagent = ref(emptyReagent);
 const loading = ref(true);
 const storages = ref([]);
-const storageDisplayValue = ref('');
 const isEdit = computed(() => $route.value.name === 'reagent-details-edit');
 const isOutOfStock = computed(() => reagent.value.quantityLeft === 0);
+const originalReagent = ref({});
+const rules = ref(formRules);
+const updatedReagentValues = ref({ category: 'reagent' });
+
 onMounted(() => {
 	setReagent(props.id);
 	setStorages();
 });
-const rules = ref({
-	quantityLeft: [requiredRule('Quantity left')]
-});
+
+watch(
+	reagent,
+	reagentFields => {
+		updatedReagentValues.value = checkEditedFields(
+			reagentFields,
+			originalReagent,
+			updatedReagentValues
+		);
+	},
+	{ deep: true }
+);
+
 async function setStorages() {
+	loading.value = true;
 	try {
 		const data = await $api.storages.fetchStorages();
 		storages.value = data.storages;
-		const foundStorage = storages.value.find(
-			storage => storage.id === reagent.value.storageLocationId
-		);
-		storageDisplayValue.value = foundStorage ? foundStorage.name : 'Select a storage';
 	} catch (error) {
 		$notifyUserAboutError(error);
+	} finally {
+		loading.value = false;
 	}
 }
 const setReagent = async id => {
 	loading.value = true;
 	try {
-		reagent.value = await $api.reagents.fetchReagent(id);
+		const data = await $api.reagents.fetchReagent(id);
+		reagent.value = { ...data, storageId: data.storageLocation.id };
+		originalReagent.value = {
+			...reagent.value
+		};
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating reagent');
 	} finally {
@@ -70,6 +87,7 @@ const cancelEdit = () => {
 		type: 'info'
 	});
 	formEl.value.resetFields();
+	reagent.value = originalReagent.value;
 };
 const handleSubmit = async () => {
 	if (!(await $isFormValid(formEl))) return;
@@ -77,14 +95,18 @@ const handleSubmit = async () => {
 		if (isOutOfStock.value) {
 			await deleteReagentZero();
 		} else {
-			const updatedReagent = await $api.reagents.updateReagent(reagent.value.id, reagent.value);
-			reagent.value = updatedReagent;
+			const response = await $api.substances.updateSubstance(
+				reagent.value.id,
+				updatedReagentValues.value
+			);
 			$notify({
-				title: 'Success',
-				message: 'Reagent has been updated',
-				type: 'success'
+				title: response.status.charAt(0).toUpperCase() + response.status.slice(1),
+				message: response.message || 'Reagent has been updated',
+				type: response.status
 			});
 			$router.push({ name: 'reagent-details', params: { id: reagent.value.id } });
+			setReagent(props.id);
+			updatedReagentValues.value = { category: 'reagent' };
 		}
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating reagent');
@@ -97,13 +119,13 @@ const deleteReagentZero = async () => {
 			cancelButtonText: 'Cancel',
 			type: 'warning'
 		});
-		await $api.reagents.updateReagent(reagent.value.id, reagent.value);
+		await $api.substances.updateSubstance(reagent.value.id, updatedReagentValues.value);
 		$notify({
 			title: 'Success',
 			message: 'Reagent deletion was requested',
 			type: 'success'
 		});
-		await $router.push({ name: 'substances-list' });
+		$router.push({ name: 'substances-list' });
 	} catch (error) {
 		if (!['cancel', 'close'].includes(error)) {
 			this.$notifyUserAboutError(error);
@@ -147,7 +169,7 @@ const deleteReagent = async () => {
 			@submit="handleSubmit"
 		>
 			<el-form-item label="Name" prop="name">
-				<el-input v-model="reagent.name" :disabled="true" />
+				<el-input v-model="reagent.name" :disabled="!isEdit" />
 			</el-form-item>
 			<div class="align-horizontal">
 				<el-form-item label="CAS number" prop="casNumber">
@@ -194,8 +216,8 @@ const deleteReagent = async () => {
 					disabled
 				/>
 			</el-form-item>
-			<el-form-item label="Storage location" prop="storageLocationId">
-				<el-select v-model="reagent.storageLocationId" :disabled="!isEdit" filterable>
+			<el-form-item label="Storage location" prop="storageId">
+				<el-select v-model="reagent.storageId" :disabled="!isEdit" filterable>
 					<el-option
 						v-for="storage of storages"
 						:key="storage.id"
@@ -205,7 +227,7 @@ const deleteReagent = async () => {
 				</el-select>
 			</el-form-item>
 			<el-form-item label="Description" prop="description">
-				<el-input v-model="reagent.description" type="textarea" :disabled="true" />
+				<el-input v-model="reagent.description" type="textarea" :disabled="!isEdit" />
 			</el-form-item>
 			<div v-if="isEdit" class="btn-container">
 				<el-button type="danger" @click="deleteReagent">{{ 'Delete reagent' }}</el-button>

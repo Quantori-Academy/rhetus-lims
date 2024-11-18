@@ -44,7 +44,7 @@ const getSample = {
 			.prop('quantityLeft', S.number().required())
 			.prop('expirationDate', S.string().format(S.FORMATS.DATE_TIME).required())
 			.prop('description', S.string())
-			.prop('storageLocation', Storage.without(['createdAt']))
+			.prop('storageLocation', Storage.without(['creationDate', 'isEmpty']))
 			.prop(
 				'components',
 				S.array().items(
