@@ -26,7 +26,7 @@ const filters = defineModel('filters', { type: Object });
 	</filter-item>
 
 	<filter-item>
-		<ketcher-editor :smiles="filters.smiles" />
+		<ketcher-editor v-model:smiles="filters.smiles" />
 	</filter-item>
 </template>
 

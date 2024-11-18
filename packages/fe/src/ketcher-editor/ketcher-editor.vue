@@ -5,19 +5,20 @@ import { $notifyUserAboutError } from '../lib/utils/feedback/notify-msg';
 import RhIcon from '../lib/components/rh-icon.vue';
 const isPopoverVisible = ref(false);
 const ketcherFrame = ref(null);
-
+const isSearching = ref(false);
 const smiles = defineModel('smiles', { type: String });
 const buttonRef = ref();
 
 const searchByStructure = async () => {
 	let ketcher = ketcherFrame.value.contentWindow.ketcher;
+	isSearching.value = true;
 	try {
 		smiles.value = await ketcher.getSmiles();
 	} catch (e) {
 		$notifyUserAboutError(e);
 	} finally {
 		isPopoverVisible.value = !isPopoverVisible.value;
-		ketcher.editor.struct(null);
+		isSearching.value = false;
 	}
 };
 </script>
@@ -29,8 +30,8 @@ const searchByStructure = async () => {
 				<rh-icon name="search" />
 			</el-button>
 			<el-popover
-				:virtual-ref="buttonRef"
 				v-model:visible="isPopoverVisible"
+				:virtual-ref="buttonRef"
 				trigger="click"
 				:width="600"
 				virtual-triggering
@@ -48,7 +49,13 @@ const searchByStructure = async () => {
 							></iframe>
 						</div>
 						<div class="search-btns">
-							<el-button type="primary" size="large" plain @click="searchByStructure">
+							<el-button
+								:loading="isSearching"
+								type="primary"
+								size="large"
+								plain
+								@click="searchByStructure"
+							>
 								Search
 							</el-button>
 						</div>

@@ -29,7 +29,6 @@ const paginationData = ref({
 const handlePageChange = newPage => {
 	paginationData.value.page = newPage;
 };
-const smiles = ref('');
 function addNewReagent() {
 	$router.push({ name: 'new-reagent' });
 }
