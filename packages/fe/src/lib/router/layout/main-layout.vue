@@ -28,7 +28,11 @@ provide('user', {
 });
 
 provide('auth', {
-	isAuthorized: isAuthorized.value
+	isAuthorized: isAuthorized.value,
+	logout: () => {
+		isAuthorized.value = false;
+		user.value = null;
+	}
 });
 
 onMounted(() => {
