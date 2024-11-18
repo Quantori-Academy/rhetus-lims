@@ -3,8 +3,11 @@ import { inject, computed } from 'vue';
 import RhIcon from '../lib/components/rh-icon.vue';
 import { $route } from '../lib/router/router.js';
 import { navigationLink } from './constants.js';
-import SidebarButton from './sidebar-button.vue';
+import CollapseButton from './sidebar-buttons/collapse-button.vue';
+import ProfileLink from './sidebar-buttons/profile-link.vue';
+import LogoutButton from './sidebar-buttons/logout-button.vue';
 import { routes } from '../lib/router/routes.js';
+
 const { user } = inject('user');
 
 const emit = defineEmits(['toggle-collapse']);
@@ -34,14 +37,10 @@ const filteredNavigationLinks = computed(() => {
 					<img src="../lib/assets/images/logo.svg" width="24" height="24" alt="Rhetus logo" />
 				</router-link>
 
-				<div class="toggle-and-profile">
-					<sidebar-button @click="handleCollapse" />
-
-					<router-link v-if="user" to="/profile" class="link">
-						<div class="profile">
-							{{ user.username.slice(0, 2) }}
-						</div>
-					</router-link>
+				<div class="button-group">
+					<collapse-button @click="handleCollapse" />
+					<profile-link />
+					<logout-button />
 				</div>
 			</div>
 		</div>
@@ -108,12 +107,6 @@ const filteredNavigationLinks = computed(() => {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-
-		.toggle-and-profile {
-			display: flex;
-			align-items: center;
-			gap: 6px;
-		}
 	}
 
 	.link {
@@ -123,7 +116,9 @@ const filteredNavigationLinks = computed(() => {
 		background: transparent;
 		color: inherit;
 		text-decoration: none;
-
+		transition:
+			box-shadow 0.2s ease-in-out,
+			background-color 0.2s ease-in-out;
 		&:hover {
 			background-color: var(--rh-color-neutral-350);
 		}
@@ -136,18 +131,12 @@ const filteredNavigationLinks = computed(() => {
 	.logo {
 		max-height: 32px;
 	}
+}
 
-	.profile {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-
-		width: 24px;
-		height: 24px;
-
-		border: 1px solid var(--border-color);
-		border-radius: 50%;
-	}
+.button-group {
+	display: flex;
+	align-items: center;
+	gap: 6px;
 }
 
 .navigation {

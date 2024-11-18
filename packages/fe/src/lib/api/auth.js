@@ -22,5 +22,8 @@ export default http => ({
 			method: 'PATCH',
 			body: password
 		});
+	},
+	async logout() {
+		return await http('/logout');
 	}
 });

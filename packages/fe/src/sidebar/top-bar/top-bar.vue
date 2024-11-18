@@ -1,5 +1,5 @@
 <script setup>
-import SidebarButton from '../sidebar-button.vue';
+import CollapseButton from '../sidebar-buttons/collapse-button.vue';
 import BreadcrumbsLinks from './breadcrumbs/breadcrumbs-links.vue';
 
 const props = defineProps({
@@ -21,7 +21,7 @@ function handleCollapse() {
 		<div class="top-bar-container">
 			<breadcrumbs-links>
 				<template #before>
-					<sidebar-button v-if="!props.isSidebarOpen" @click="handleCollapse" />
+					<collapse-button v-if="!props.isSidebarOpen" @click="handleCollapse" />
 				</template>
 			</breadcrumbs-links>
 		</div>
