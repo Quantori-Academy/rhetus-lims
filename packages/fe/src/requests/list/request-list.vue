@@ -43,10 +43,9 @@ const setRequests = debounce(async (event = null) => {
 	};
 	try {
 		const data = await $api.requests.fetchRequests(params);
-		if (user.user._rawValue.roleId === 3) {
-			requests.value = data.requests.filter(
-				request => request.author.id === user.user._rawValue.id
-			);
+		console.log(user);
+		if (user.isResearcher) {
+			requests.value = data.requests.filter(request => request.author.id === user.user.value.id);
 		} else {
 			requests.value = data.requests;
 		}
@@ -69,7 +68,6 @@ const cancelRequest = async id => {
 			inputPattern: /\S+/,
 			inputErrorMessage: 'Reason is required'
 		}).then(({ value }) => {
-			console.log(value);
 			const response = $api.requests.cancelRequest(id, value);
 			$notify({
 				title: 'Success',
@@ -139,7 +137,7 @@ onMounted(() => {
 				:formatter="data => formatDate(data.updatedAt)"
 				sortable
 			/>
-			<el-table-column v-if="user.user._rawValue.roleId === 2" width="100">
+			<el-table-column v-if="!user.isResearcher" width="100">
 				<template #default="{ row }">
 					<el-button
 						type="danger"

@@ -28,7 +28,7 @@ const requestInfo = {
 				seller: 'Seller ltd',
 				status: 'pending',
 				author: {
-					id: 'c7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3d3b333',
+					id: '2',
 					username: 'test1'
 				}
 			}
@@ -65,7 +65,7 @@ const requestInfo = {
 			structure: 'H2SO4',
 			casNumber: '1111111-11-1',
 			author: {
-				id: 'c7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3d3b333',
+				id: '0',
 				username: 'test1'
 			},
 			status: 'pending',
