@@ -9,7 +9,8 @@ import {
 	ElTableColumn,
 	ElDropdown,
 	ElDropdownMenu,
-	ElDropdownItem
+	ElDropdownItem,
+	ElTag
 } from 'element-plus';
 import { $notifyUserAboutError, $notify } from '../../lib/utils/feedback/notify-msg';
 import { computed, onMounted, useTemplateRef, ref } from 'vue';
@@ -134,11 +135,9 @@ const updateOrder = async () => {
 		<div v-if="order" class="editing-header">
 			<h2>
 				{{ order.title }}
-				<span>
-					<el-button :type="getButtonType(order.status)" round>
-						{{ order.status }}
-					</el-button>
-				</span>
+				<el-tag :type="getButtonType(order.status)" round>
+					{{ order.status }}
+				</el-tag>
 			</h2>
 			<div class="btn-container">
 				<el-button v-if="!isEdit && order.status === `pending`" @click="toggleEdit"
