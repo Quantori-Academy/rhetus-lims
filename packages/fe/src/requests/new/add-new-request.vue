@@ -1,7 +1,7 @@
 <script setup>
 import { ref, useTemplateRef } from 'vue';
 import { ElForm, ElFormItem, ElInput, ElInputNumber, ElButton } from 'element-plus';
-import { requiredRule } from '../../reagents/details-reagent/constants';
+import { requiredRule } from './constants';
 import { $router } from '../../lib/router/router';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
