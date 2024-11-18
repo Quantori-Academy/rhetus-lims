@@ -13,7 +13,7 @@ const substances = {
 			operator: 'ilike'
 		},
 		location: {
-			property: 'storage_id',
+			property: '"storageId"',
 			value: string => string,
 			schema: 'union',
 			operator: 'equal'
@@ -38,7 +38,7 @@ const substances = {
 			property: 'category'
 		},
 		location: {
-			property: 'storage_id'
+			property: '"storageName"'
 		},
 		expirationdate: {
 			property: 'expiration_date'
