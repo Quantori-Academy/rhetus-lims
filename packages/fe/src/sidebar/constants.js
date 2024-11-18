@@ -22,6 +22,6 @@ export const navigationLink = [
 	{
 		path: '/requests/list',
 		icon: 'book',
-		name: 'Reagent Requests'
+		name: 'Requests'
 	}
 ];
