@@ -221,6 +221,26 @@ async function requestsService(server) {
 				.update(schema.requests)
 				.set({ requestStatus: newStatus })
 				.where(eq(schema.requests.orderId, orderId));
+		},
+
+		cancelRequest: async (requestId, data) => {
+			const { reason, currentPoComment } = data ?? {};
+
+			const cancelationTemplate = `Cancelation reason: ${reason}`;
+			const newPoComment = currentPoComment
+				? `${currentPoComment}; ${cancelationTemplate}`
+				: `${cancelationTemplate}`;
+
+			const result = await server.db
+				.update(schema.requests)
+				.set({
+					requestStatus: RequestStatus.CANCELED,
+					poComment: newPoComment
+				})
+				.where(eq(schema.requests.id, requestId))
+				.returning({ reagentName: schema.requests.reagentName });
+
+			return result.length ? result[0].reagentName : null;
 		}
 	});
 }
