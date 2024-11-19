@@ -19,10 +19,10 @@ export const newSubstanceRef = {
 	amount: 1
 };
 export const requestRules = {
-	reagentName: [{ required: true, message: `Name can't be empty`, trigger: ['blur', 'change'] }],
-	quantityUnit: [{ required: true, message: `Unit can't be empty`, trigger: ['blur', 'change'] }],
-	quantity: [{ required: true, message: `Quantity can't be empty`, trigger: ['blur', 'change'] }],
-	amount: [{ required: true, message: `Amount can't be empty`, trigger: ['blur', 'change'] }]
+	reagentName: [requiredRule('Name')],
+	quantityUnit: [requiredRule('Unit')],
+	quantity: [requiredRule('Quantity')],
+	amount: [requiredRule('Amount')]
 };
 
 export const formRules = {

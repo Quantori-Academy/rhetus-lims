@@ -83,7 +83,7 @@ const removeLinkedRequest = request => {
 };
 
 function viewRequestDetails(request) {
-	console.log(`Viewing request: ${request.id}`);
+	$router.push({ name: 'request-details', params: { id: request.id } });
 }
 const addNewReagent = async () => {
 	if (!(await $isFormValid(substanceFormEl))) return;
