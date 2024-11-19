@@ -1,5 +1,5 @@
 <script setup>
-import { ElInput, ElInputNumber } from 'element-plus';
+import { ElInput, ElInputNumber, ElSwitch } from 'element-plus';
 import RhIcon from '../lib/components/rh-icon.vue';
 import FilterItem from '../lib/components/rh-filters/filter-item.vue';
 import { defineModel } from 'vue';
@@ -18,6 +18,10 @@ const filters = defineModel('filters', { type: Object });
 
 	<filter-item>
 		<el-input-number v-model="filters.quantity" placeholder="Enter amount" :min="1" />
+	</filter-item>
+
+	<filter-item>
+		<el-switch v-model="filters.expired" active-text="Expired" inactive-text="All" />
 	</filter-item>
 </template>
 

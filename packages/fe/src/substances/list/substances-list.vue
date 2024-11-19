@@ -15,7 +15,8 @@ const substances = ref(null);
 const isLoading = ref(false);
 const filters = ref({
 	name: '',
-	quantity: null
+	quantity: null,
+	expired: false
 });
 
 const paginationData = ref({
@@ -65,14 +66,19 @@ const confirmDeleteReagent = async () => {
 		return false;
 	}
 };
-const deleteSubstance = async row => {
+
+const deleteSubstance = async (id, category) => {
+	if (category.toLowerCase() === 'reagent') {
+		await $api.reagents.deleteReagent(id);
+	} else {
+		await $api.samples.deleteSample(id);
+	}
+};
+
+const deleteSingleSubstance = async row => {
 	if (!(await confirmDeleteReagent())) return;
 	try {
-		if (row.category.toLowerCase() === 'reagent') {
-			await $api.reagents.deleteReagent(row.id);
-		} else {
-			await $api.samples.deleteSample(row.id);
-		}
+		await deleteSubstance(row.id, row.category);
 		showNotification('Success', 'Item is deleted', 'success');
 		await setSubstances();
 	} catch (error) {
@@ -92,11 +98,15 @@ const formattedSubstances = computed(
 const setSubstances = debounce(async (event = null) => {
 	isLoading.value = true;
 	const sortQuery = createQuery(event);
+	const { expired, ...rest } = filters.value;
 	const params = {
 		page: paginationData.value.page,
 		limit: paginationData.value.size,
 		sort: { ...sortQuery.sort },
-		options: { ...filters.value }
+		options: {
+			...rest,
+			expirationDate: expired ? [new Date('0001-01-01T00:00:00.000Z'), new Date()] : []
+		}
 	};
 	try {
 		const data = await $api.substances.fetchSubstances(params);
@@ -160,7 +170,7 @@ onMounted(() => {
 			</el-table-column>
 			<el-table-column width="80">
 				<template #default="{ row }">
-					<el-button type="danger" @click.stop="() => deleteSubstance(row)">
+					<el-button type="danger" @click.stop="() => deleteSingleSubstance(row)">
 						<rh-icon color="white" name="trash" />
 					</el-button>
 				</template>
