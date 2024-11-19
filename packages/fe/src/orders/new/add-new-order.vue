@@ -1,48 +1,46 @@
 <script setup>
 import { computed, onMounted, ref, useTemplateRef } from 'vue';
-import {
-	ElInput,
-	ElForm,
-	ElButton,
-	ElFormItem,
-	ElTag,
-	ElAutocomplete,
-	ElInputNumber,
-	ElOption,
-	ElSelect
-} from 'element-plus';
-import RhIcon from '../../lib/components/rh-icon.vue';
+import { ElInput, ElForm, ElButton, ElFormItem } from 'element-plus';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 import { $route, $router } from '../../lib/router/router.js';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $api } from '../../lib/api/index.js';
-import { formRef, formRules, newSubstanceRef, substanceRules } from './constants.js';
-import { fetchSubstances, fetchRequests } from './retrieve-data.js';
-import { quantityUnits } from '../../lib/constants/quantity-units.js';
+import { formRef, formRules } from './constants.js';
+import SubstanceManagement from './substance-management.vue';
+import RequestsManagement from './requests-management.vue';
 
 const formEl = useTemplateRef('form-el');
-const substanceFormEl = useTemplateRef('substance-form-el');
 const isSaving = ref(false);
-const searchQuery = ref('');
-const incomingRequests = ref([]);
-const linkedRequests = ref([]);
 const loading = ref(false);
 const form = ref(formRef);
-const newSubtance = ref(newSubstanceRef);
 const rules = ref(formRules);
-const newSubstanceRules = ref(substanceRules);
 const isRequest = computed(() => $route.value.name === 'new-order-request');
 
 onMounted(() => {
-	fetchRequests(incomingRequests, loading);
 	const targetId = $route.value.query.id;
 	if (targetId) {
-		setSubstance(targetId, form, loading);
+		fetchSubstances(targetId, form, loading);
 	}
 });
-const setSubstance = async (id, formValue, loadingState) => {
-	await fetchSubstances(id, formValue, loadingState);
+
+const fetchSubstances = async (id, form, loading) => {
+	loading.value = true;
+	try {
+		const reagentData = await $api.reagents.fetchReagent(id);
+		const newReagent = {
+			reagentName: reagentData.name,
+			quantityUnit: reagentData.quantityUnit,
+			quantity: reagentData.quantity,
+			amount: reagentData.amount || 1
+		};
+		form.value.reagents = [...form.value.reagents, newReagent];
+	} catch (error) {
+		$notifyUserAboutError(error.message || 'Error fetching reagent');
+	} finally {
+		loading.value = false;
+	}
 };
+
 async function submit() {
 	if (!(await $isFormValid(formEl))) return;
 	isSaving.value = true;
@@ -58,50 +56,10 @@ async function submit() {
 }
 function cancel() {
 	formEl.value.resetFields();
-	substanceFormEl.value.resetFields();
-	$router.push({ name: 'orders-list' });
-}
-
-const fetchRequestSuggestions = async (queryString, callback) => {
-	if (!queryString) {
-		callback(incomingRequests.value.requests);
+	if (isRequest.value) {
+		$router.push({ name: 'orders-list' });
 	} else {
-		const filteredRequests = incomingRequests.value.requests.filter(request =>
-			request.reagentName.toLowerCase().includes(queryString.toLowerCase())
-		);
-		return callback(filteredRequests);
-	}
-};
-
-const linkRequest = selectedRequest => {
-	const requestCopy = { ...selectedRequest };
-	if (!linkedRequests.value.find(req => req.id === selectedRequest.id)) {
-		linkedRequests.value.push(selectedRequest);
-		form.value.reagentRequests.push(requestCopy);
-	}
-};
-const removeLinkedRequest = request => {
-	linkedRequests.value = linkedRequests.value.filter(r => r.id !== request.id);
-	form.value.reagentRequests = form.value.reagentRequests.filter(r => r.id !== request.id);
-};
-
-function viewRequestDetails(request) {
-	$router.push({ name: 'request-details', params: { id: request.id } });
-}
-const addNewReagent = async () => {
-	if (!(await $isFormValid(substanceFormEl))) return;
-	form.value.reagents.push({
-		reagentName: newSubtance.value.reagentName,
-		quantityUnit: newSubtance.value.quantityUnit,
-		quantity: newSubtance.value.quantity,
-		amount: newSubtance.value.amount
-	});
-	substanceFormEl.value.resetFields();
-};
-function removeReagent(order) {
-	const index = form.value.reagents.indexOf(order);
-	if (index !== -1) {
-		form.value.reagents.splice(index, 1);
+		$router.push({ name: 'substances-list' });
 	}
 }
 </script>
@@ -115,101 +73,8 @@ function removeReagent(order) {
 			<el-form-item label="Seller" prop="seller">
 				<el-input v-model="form.seller" placeholder="Enter seller name" />
 			</el-form-item>
-			<el-form-item v-if="isRequest" label="Linked Requests" class="requests" :rules="[]">
-				<el-autocomplete
-					v-model="searchQuery"
-					:fetch-suggestions="fetchRequestSuggestions"
-					clearable
-					placeholder="Search for requests"
-					@select="linkRequest"
-				>
-					<template #default="{ item }">
-						<div>{{ item.reagentName }}</div>
-					</template>
-				</el-autocomplete>
-				<div v-if="linkedRequests.length > 0" class="linked-requests-container">
-					<el-tag
-						v-for="request of linkedRequests"
-						:key="request.id"
-						closable
-						@click="() => viewRequestDetails(request)"
-						@close="() => removeLinkedRequest(request)"
-					>
-						{{ request.reagentName }} ({{ request.quantity }} {{ request.quantityUnit }})
-					</el-tag>
-				</div>
-			</el-form-item>
-			<div class="data-table">
-				<h2 class="el-form-item__label">
-					{{ isRequest ? `Requests to Order` : `Substances to Order` }}
-				</h2>
-				<div class="orders-container" max-height="350">
-					<div class="row">
-						<span>Name</span>
-						<span>Unit</span>
-						<span>Quantity</span>
-						<span>Amount</span>
-					</div>
-					<div
-						v-for="(order, index) of isRequest
-							? [...form.reagentRequests, ...form.reagents]
-							: form.reagents"
-						:key="index"
-						class="row"
-					>
-						<el-form-item
-							:prop="`${isRequest ? 'reagentRequests' : 'reagents'}.${index}.reagentName`"
-						>
-							<el-input v-model="order.reagentName" placeholder="Enter name" />
-						</el-form-item>
-						<el-form-item
-							:prop="`${isRequest ? 'reagentRequests' : 'reagents'}.${index}.quantityUnit`"
-						>
-							<el-select v-model="order.quantityUnit" filterable placeholder="Quantity unit">
-								<el-option v-for="unit of quantityUnits" :key="unit" :label="unit" :value="unit" />
-							</el-select>
-						</el-form-item>
-						<el-form-item :prop="`${isRequest ? 'reagentRequests' : 'reagents'}.${index}.quantity`">
-							<el-input-number v-model="order.quantity" placeholder="Quantity" :min="1" />
-						</el-form-item>
-						<el-form-item :prop="`${isRequest ? 'reagentRequests' : 'reagents'}.${index}.amount`">
-							<el-input-number v-model="order.amount" placeholder="Amount" :min="1" />
-						</el-form-item>
-						<el-button
-							:disabled="!form.reagents.includes(order)"
-							type="danger"
-							circle
-							@click="() => removeReagent(order)"
-						>
-							<rh-icon color="white" name="trash"
-						/></el-button>
-					</div>
-					<el-form
-						ref="substance-form-el"
-						:model="newSubtance"
-						:rules="newSubstanceRules"
-						class="row"
-					>
-						<el-form-item prop="reagentName">
-							<el-input v-model="newSubtance.reagentName" placeholder="Enter name" />
-						</el-form-item>
-						<el-form-item prop="quantityUnit">
-							<el-select v-model="newSubtance.quantityUnit" filterable placeholder="Enter unit">
-								<el-option v-for="unit of quantityUnits" :key="unit" :label="unit" :value="unit" />
-							</el-select>
-						</el-form-item>
-						<el-form-item prop="quantity">
-							<el-input-number v-model="newSubtance.quantity" placeholder="Quantity" :min="1" />
-						</el-form-item>
-						<el-form-item prop="amount">
-							<el-input-number v-model="newSubtance.amount" placeholder="Amount" :min="1" />
-						</el-form-item>
-						<el-button type="info" circle @click="addNewReagent">
-							<rh-icon color="white" name="plus"
-						/></el-button>
-					</el-form>
-				</div>
-			</div>
+			<requests-management :form="form" :is-request="isRequest" />
+			<substance-management :form="form" :is-request="isRequest" />
 		</el-form>
 		<div class="btn-container">
 			<el-button @click="cancel">Cancel</el-button>
@@ -219,19 +84,7 @@ function removeReagent(order) {
 </template>
 
 <style>
-.new-reagent-row {
-	display: flex;
-	flex-direction: row;
-	gap: 2rem;
-}
-.row {
-	display: grid;
-	grid-template-columns: repeat(5, 1fr);
-	gap: 8px;
-	color: var(--rh-color-info-700);
-}
 .requests-table,
-.data-table,
 .btn-container {
 	margin-top: 20px;
 }
