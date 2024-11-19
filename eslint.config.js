@@ -71,7 +71,7 @@ export default [
 		}
 	},
 	{
-		files: ['packages/be/src/services/orders/orders-service.js'],
+		files: ['packages/be/src/services/orders/orders-service.js', 'packages/be/src/services/reagents/reagents-service.js'],
 		rules: {
 			'max-lines': ['error', { max: 300, skipComments: true, skipBlankLines: true }]
 		}
