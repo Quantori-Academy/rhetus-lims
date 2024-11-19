@@ -7,7 +7,9 @@ import {
 	ElFormItem,
 	ElTag,
 	ElAutocomplete,
-	ElInputNumber
+	ElInputNumber,
+	ElOption,
+	ElSelect
 } from 'element-plus';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
@@ -16,6 +18,7 @@ import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-
 import { $api } from '../../lib/api/index.js';
 import { formRef, formRules, newSubstanceRef, substanceRules } from './constants.js';
 import { fetchSubstances, fetchRequests } from './retrieve-data.js';
+import { quantityUnits } from '../../lib/constants/quantity-units.js';
 
 const formEl = useTemplateRef('form-el');
 const substanceFormEl = useTemplateRef('substance-form-el');
@@ -162,7 +165,9 @@ function removeReagent(order) {
 						<el-form-item
 							:prop="`${isRequest ? 'reagentRequests' : 'reagents'}.${index}.quantityUnit`"
 						>
-							<el-input v-model="order.quantityUnit" placeholder="Quantity unit" />
+							<el-select v-model="order.quantityUnit" filterable placeholder="Quantity unit">
+								<el-option v-for="unit of quantityUnits" :key="unit" :label="unit" :value="unit" />
+							</el-select>
 						</el-form-item>
 						<el-form-item :prop="`${isRequest ? 'reagentRequests' : 'reagents'}.${index}.quantity`">
 							<el-input-number v-model="order.quantity" placeholder="Quantity" :min="1" />
@@ -189,7 +194,9 @@ function removeReagent(order) {
 							<el-input v-model="newSubtance.reagentName" placeholder="Enter name" />
 						</el-form-item>
 						<el-form-item prop="quantityUnit">
-							<el-input v-model="newSubtance.quantityUnit" placeholder="Enter unit" />
+							<el-select v-model="newSubtance.quantityUnit" filterable placeholder="Enter unit">
+								<el-option v-for="unit of quantityUnits" :key="unit" :label="unit" :value="unit" />
+							</el-select>
 						</el-form-item>
 						<el-form-item prop="quantity">
 							<el-input-number v-model="newSubtance.quantity" placeholder="Quantity" :min="1" />
