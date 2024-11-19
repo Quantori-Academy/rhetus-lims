@@ -1,0 +1,1 @@
+ALTER TABLE "orders_items" ADD COLUMN "deleted" boolean DEFAULT false;
