@@ -105,6 +105,10 @@ const setSubstances = debounce(async (event = null) => {
 	isLoading.value = true;
 	const sortQuery = createQuery(event);
 	const { expired, ...rest } = filters.value;
+	if (filters.value.smiles) {
+		sortQuery.sort = sortQuery.sort || {};
+		sortQuery.sort.relevance = 'desc';
+	}
 	if (sortQuery.sort && sortQuery.sort.structure) {
 		sortQuery.sort.relevance = sortQuery.sort.structure;
 		delete sortQuery.sort.structure;
