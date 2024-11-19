@@ -218,6 +218,13 @@
       "when": 1731944392961,
       "tag": "0030_plain_sprite",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1731996424489,
+      "tag": "0031_dear_firestar",
+      "breakpoints": true
     }
   ]
 }

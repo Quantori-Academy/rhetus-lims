@@ -2,10 +2,12 @@ import fp from 'fastify-plugin';
 
 import * as schema from './orders-schema.js';
 import ordersService from '../../services/orders/orders-service.js';
+import orderItemsService from '../../services/order-items/order-items-service.js';
 import { OrderStatus } from '../../lib/db/schema/orders.js';
 
 async function orders(server, options) {
 	await server.register(ordersService);
+	await server.register(orderItemsService);
 
 	server.route({
 		method: 'POST',
@@ -123,9 +125,12 @@ async function orders(server, options) {
 			}
 
 			if (order.status !== OrderStatus.PENDING) {
-				return reply
-					.code(403)
-					.send({ status: 'error', message: `Sorry. You cannot delete order while processing` });
+				const message =
+					order.status === OrderStatus.CANCELED
+						? `Sorry. You cannot delete canceled order`
+						: `Sorry. You cannot delete order while processing`;
+
+				return reply.code(403).send({ status: 'error', message });
 			}
 
 			const orderTitle = await server.ordersService.softDeleteOrder(orderId);
@@ -136,6 +141,129 @@ async function orders(server, options) {
 		} catch (err) {
 			return reply.code(500).send(err);
 		}
+	}
+
+	server.route({
+		method: 'PUT',
+		path: options.prefix + 'orders/:id/add-item',
+		preValidation: [server.authenticate, server.officer],
+		schema: schema.addOrderItem,
+		handler: onAddItem
+	});
+
+	async function onAddItem(req, reply) {
+		try {
+			const orderId = req.params.id;
+
+			const order = await server.ordersService.getOrderById(orderId);
+
+			if (!order) {
+				return reply.code(404).send({ status: 'error', message: `No such order` });
+			}
+
+			if (order.status !== OrderStatus.PENDING) {
+				return reply.code(403).send({
+					status: 'error',
+					message: `Sorry. You cannot add new items to order while processing`
+				});
+			}
+
+			const { reagents, reagentRequests } = req.body;
+			if (!reagents.length && !reagentRequests.length) {
+				return reply.code(403).send({
+					status: 'error',
+					message: `There is nothing to add. Check sending values!`
+				});
+			}
+
+			const orderTitle = await server.orderItemsService.addItemsToOrder(orderId, {
+				...req.body,
+				orderTitle: order.title
+			});
+			return reply
+				.code(200)
+				.send({ status: 'success', message: `New items were added to '${orderTitle}' order` });
+		} catch (err) {
+			return reply.code(500).send(err);
+		}
+	}
+
+	server.route({
+		method: 'PUT',
+		path: options.prefix + 'orders/:id/remove-item',
+		preValidation: [server.authenticate, server.officer],
+		schema: schema.removeOrderItem,
+		handler: onRemoveItem
+	});
+
+	async function onRemoveItem(req, reply) {
+		try {
+			const orderId = req.params.id;
+
+			const order = await server.ordersService.getOrderById(orderId);
+
+			if (!order) {
+				return reply.code(404).send({ status: 'error', message: `No such order` });
+			}
+
+			if (order.status !== OrderStatus.PENDING) {
+				return reply.code(403).send({
+					status: 'error',
+					message: `Sorry. You cannot remove items from order while processing`
+				});
+			}
+
+			const { reagents, reagentRequests } = req.body;
+			if (!reagents.length && !reagentRequests.length) {
+				return reply.code(403).send({
+					status: 'error',
+					message: `There is nothing to remove. Check sending values!`
+				});
+			}
+
+			const orderTitle = await server.orderItemsService.removeItemsFromOrder({
+				...req.body,
+				orderTitle: order.title
+			});
+			return reply
+				.code(200)
+				.send({ status: 'success', message: `Some items were removed from '${orderTitle}' order` });
+		} catch (err) {
+			return reply.code(500).send(err);
+		}
+	}
+
+	server.route({
+		method: 'PUT',
+		path: options.prefix + 'orders/:id/change-status',
+		preValidation: [server.authenticate, server.officer],
+		schema: schema.changeOrderStatus,
+		handler: onChangeStatus
+	});
+
+	async function onChangeStatus(req, reply) {
+		const orderId = req.params.id;
+		const order = await server.ordersService.getOrderById(orderId);
+
+		if (!order) {
+			return reply.code(404).send({ status: 'error', message: `No such order` });
+		}
+
+		if (order.status === OrderStatus.COMPLETED || order.status === OrderStatus.CANCELED) {
+			return reply.code(403).send({
+				status: 'error',
+				message: `Sorry. You cannot update status for this order. It is already ${order.status}`
+			});
+		}
+
+		const orderTitle = await server.ordersService.orderStatusChange(orderId, {
+			...req.body,
+			orderStatus: order.status
+		});
+
+		return reply
+			.code(200)
+			.send({ status: 'success', message: `Status for order '${orderTitle}' was changed` });
 	}
 }
 

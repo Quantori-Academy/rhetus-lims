@@ -32,6 +32,8 @@ const Request = S.object()
 	.prop('casNumber', S.string().maxLength(12).required())
 	.prop('order', getOrderSchema.without(['reagents', 'reagentRequests']));
 
+const cancelRequestSchema = S.object().prop('reason', S.string().minLength(1).required());
+
 const createRequest = {
 	security: [{ Session: [] }],
 	body: Request.without(['id', 'status', 'poComment', 'createdAt', 'updatedAt', 'order', 'author']),
@@ -100,4 +102,16 @@ const updateRequest = {
 	}
 };
 
-export { createRequest, getRequest, getRequests, deleteRequest, updateRequest };
+const cancelRequest = {
+	security: [{ Session: [] }],
+	params: S.object().prop('id', S.string().format(S.FORMATS.UUID).required()),
+	body: cancelRequestSchema,
+	response: {
+		200: statusMessage,
+		403: statusMessage,
+		404: statusMessage,
+		500: statusMessage
+	}
+};
+
+export { createRequest, getRequest, getRequests, deleteRequest, updateRequest, cancelRequest };

@@ -6,7 +6,8 @@ import {
 	varchar,
 	text,
 	real,
-	pgEnum
+	pgEnum,
+	boolean
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { orders } from './orders.js';
@@ -39,6 +40,7 @@ export const ordersItems = pgTable('orders_items', {
 	quantity: real('quantity').notNull(),
 	amount: integer('amount').notNull().default(1),
 	createdAt: timestamp('created_at').notNull().defaultNow(),
+	deleted: boolean('deleted').default(false),
 	updatedAt: timestamp('updated_at')
 		.notNull()
 		.defaultNow()

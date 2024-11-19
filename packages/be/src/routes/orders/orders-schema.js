@@ -1,6 +1,11 @@
 import S from 'fluent-json-schema';
 import { OrderStatus } from '../../lib/db/schema/orders.js';
 
+const OrderStatusActions = {
+	NEXT: 'next',
+	CANCEL: 'cancel'
+};
+
 const statusMessage = S.object()
 	.prop('status', S.string().required())
 	.prop('message', S.string().required());
@@ -48,6 +53,22 @@ const getOrderSchema = S.object()
 const updateOrderSchema = S.object()
 	.prop('title', S.string().minLength(1).maxLength(200))
 	.prop('seller', S.string().minLength(1).maxLength(200));
+
+const updateOrderStatusSchema = S.object().prop(
+	'action',
+	S.string().enum(Object.values(OrderStatusActions)).required()
+);
+
+const addOrderItemSchema = S.object()
+	.prop('reagentRequests', S.array().items(createOrderItemSchema).minItems(0).required())
+	.prop('reagents', S.array().items(createOrderItemSchema).minItems(0).required());
+
+const removeOrderItemSchema = S.object()
+	.prop(
+		'reagentRequests',
+		S.array().items(S.string().format(S.FORMATS.UUID)).minItems(0).required()
+	)
+	.prop('reagents', S.array().items(S.string().format(S.FORMATS.UUID)).minItems(0).required());
 
 const createOrder = {
 	security: [{ Session: [] }],
@@ -109,4 +130,50 @@ const deleteOrder = {
 	}
 };
 
-export { createOrder, getOrder, getOrders, updateOrder, deleteOrder, getOrderSchema };
+const addOrderItem = {
+	security: [{ Session: [] }],
+	params: S.object().prop('id', S.string().format(S.FORMATS.UUID).required()),
+	body: addOrderItemSchema,
+	response: {
+		200: statusMessage,
+		403: statusMessage,
+		404: statusMessage,
+		500: statusMessage
+	}
+};
+
+const removeOrderItem = {
+	security: [{ Session: [] }],
+	params: S.object().prop('id', S.string().format(S.FORMATS.UUID).required()),
+	body: removeOrderItemSchema,
+	response: {
+		200: statusMessage,
+		403: statusMessage,
+		404: statusMessage,
+		500: statusMessage
+	}
+};
+
+const changeOrderStatus = {
+	security: [{ Session: [] }],
+	params: S.object().prop('id', S.string().format(S.FORMATS.UUID).required()),
+	body: updateOrderStatusSchema,
+	response: {
+		200: statusMessage,
+		403: statusMessage,
+		404: statusMessage,
+		500: statusMessage
+	}
+};
+
+export {
+	createOrder,
+	getOrder,
+	getOrders,
+	updateOrder,
+	deleteOrder,
+	getOrderSchema,
+	changeOrderStatus,
+	addOrderItem,
+	removeOrderItem
+};
