@@ -101,9 +101,7 @@ const formattedSubstances = computed(
 		})) || []
 );
 
-const setSubstances = debounce(async (event = null) => {
-	isLoading.value = true;
-	const sortQuery = createQuery(event);
+const addStructureSort = sortQuery => {
 	const { expired, ...rest } = filters.value;
 	if (filters.value.smiles) {
 		sortQuery.sort = sortQuery.sort || {};
@@ -113,6 +111,12 @@ const setSubstances = debounce(async (event = null) => {
 		sortQuery.sort.relevance = sortQuery.sort.structure;
 		delete sortQuery.sort.structure;
 	}
+};
+
+const setSubstances = debounce(async (event = null) => {
+	isLoading.value = true;
+	const sortQuery = createQuery(event);
+	addStructureSort(sortQuery);
 	const params = {
 		page: paginationData.value.page,
 		limit: paginationData.value.size,
