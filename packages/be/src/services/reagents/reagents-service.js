@@ -249,8 +249,7 @@ async function reagentsService(server) {
 			orderItems.forEach(item => {
 				const {
 					reagentName,
-					// TODO: uncomment after structure will be implemented
-					// structure,
+					structure,
 					casNumber,
 					producer,
 					catalogId,
@@ -267,8 +266,7 @@ async function reagentsService(server) {
 							.insert(schema.reagents)
 							.values({
 								name: reagentName,
-								// TODO: uncomment after structure will be implemented
-								// structure
+								structure,
 								casNumber,
 								producer,
 								catalogId,
