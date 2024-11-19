@@ -104,12 +104,11 @@ const formattedSubstances = computed(
 const addStructureSort = sortQuery => {
 	const { expired, ...rest } = filters.value;
 	if (filters.value.smiles) {
-		sortQuery.sort = sortQuery.sort || {};
-		sortQuery.sort.relevance = 'desc';
+		sortQuery.sort = { ...(sortQuery.sort ?? {}), relevance: 'desc' };
 	}
 	if (sortQuery.sort && sortQuery.sort.structure) {
-		sortQuery.sort.relevance = sortQuery.sort.structure;
-		delete sortQuery.sort.structure;
+		const { structure, ...rest } = sortQuery.sort;
+		sortQuery.sort = { ...rest, relevance: structure };
 	}
 };
 
