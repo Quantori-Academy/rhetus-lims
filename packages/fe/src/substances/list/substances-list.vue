@@ -105,6 +105,10 @@ const setSubstances = debounce(async (event = null) => {
 	isLoading.value = true;
 	const sortQuery = createQuery(event);
 	const { expired, ...rest } = filters.value;
+	if (sortQuery.sort && sortQuery.sort.structure) {
+		sortQuery.sort.relevance = sortQuery.sort.structure;
+		delete sortQuery.sort.structure;
+	}
 	const params = {
 		page: paginationData.value.page,
 		limit: paginationData.value.size,
@@ -164,6 +168,7 @@ onMounted(() => {
 		>
 			<el-table-column prop="name" min-width="150" label="Name" sortable />
 			<el-table-column prop="category" min-width="120" label="Category" sortable />
+			<el-table-column prop="structure" min-width="120" label="Structure" sortable />
 			<el-table-column prop="description" min-width="160" label="Description" />
 			<el-table-column prop="quantityLeft" min-width="120" label="Quantity Left" />
 			<el-table-column prop="storageLocation" min-width="140" label="Storage Location" />
