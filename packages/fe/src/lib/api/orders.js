@@ -2,6 +2,12 @@ export default http => ({
 	async fetchOrders(params) {
 		return await http('/orders', { query: params });
 	},
+	async changeOrderStatus(id, action) {
+		return await http(`/orders/${id}/change-status`, {
+			method: 'PUT',
+			body: action
+		});
+	},
 	async fetchOrder(id) {
 		return await http(`/orders/${id}`);
 	},

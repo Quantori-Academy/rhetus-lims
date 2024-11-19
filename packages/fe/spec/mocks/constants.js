@@ -148,7 +148,7 @@ export const orderInfo = {
 			reagents: []
 		},
 		{
-			id: '6b9f3d47-341b-43b8-8f99-c2c35e71366e',
+			id: '6b9f3d47-341b-43b8-8f99-c2c35e71366h',
 			author: {
 				id: 1,
 				username: 'username1'
