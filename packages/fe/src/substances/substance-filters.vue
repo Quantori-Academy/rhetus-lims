@@ -22,12 +22,13 @@ const filters = defineModel('filters', { type: Object });
 	</filter-item>
 
 	<filter-item>
+		<ketcher-editor v-model:smiles="filters.smiles" />
+	</filter-item>
+	
+	<filter-item>
 		<el-switch v-model="filters.expired" active-text="Expired" inactive-text="All" />
 	</filter-item>
 
-	<filter-item>
-		<ketcher-editor v-model:smiles="filters.smiles" />
-	</filter-item>
 </template>
 
 <style scoped></style>
