@@ -14,12 +14,12 @@ import { $notifyUserAboutError, $notify } from '../../lib/utils/feedback/notify-
 import { computed, onMounted, useTemplateRef, ref } from 'vue';
 import { $api } from '../../lib/api/index.js';
 import { $route, $router } from '../../lib/router/router';
-import { getButtonType, requiredRule } from './constants.js';
+import { getButtonType, orderFormRules } from './constants.js';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
-import rhIcon from '../../lib/components/rh-icon.vue';
+import RhIcon from '../../lib/components/rh-icon.vue';
 import TimelineStatuses from '../../timeline/timeline-statuses.vue';
-import RequestsToOrder from './requests-to-order.vue';
+import OrderManagement from './order-management.vue';
 
 const props = defineProps({
 	id: {
@@ -27,14 +27,15 @@ const props = defineProps({
 		default: null
 	}
 });
-const formEl = useTemplateRef('form-ref');
+const orderForm = useTemplateRef('form-ref');
 const order = ref(null);
+const originalOrder = ref({});
 const loading = ref(true);
-const rules = ref({
-	seller: [requiredRule('Seller')],
-	title: [requiredRule('Title')]
-});
+const rules = ref(orderFormRules);
 const isEdit = computed(() => $route.value.name === 'order-details-edit');
+const isOrderValid = computed(
+	() => order.value.reagents.length > 0 || order.value.reagentRequests.length > 0
+);
 const actionButtons = computed(() => {
 	const buttons = [];
 	if (['pending', 'ordered'].includes(order.value.status)) {
@@ -63,6 +64,7 @@ const setOrder = async id => {
 	loading.value = true;
 	try {
 		order.value = await $api.orders.fetchOrder(id);
+		originalOrder.value = { ...order.value };
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating order');
 	} finally {
@@ -115,12 +117,13 @@ const cancelEdit = () => {
 		message: 'Order editing canceled',
 		type: 'info'
 	});
-	formEl.value.resetFields();
+	order.value = { ...originalOrder.value };
+	orderForm.value.resetFields();
 };
 
 const updateOrder = async () => {
 	try {
-		if (!(await $isFormValid(formEl))) return;
+		if (!(await $isFormValid(orderForm))) return;
 		const response = await $api.orders.updateOrder(order.value.id, order.value);
 		$notify({
 			title: 'Success',
@@ -150,7 +153,7 @@ const setStatusesHistory = async () => {
 	<div v-if="order" v-loading="loading" class="wrapper">
 		<div v-if="order" class="editing-header">
 			<h2>
-				{{ order.title }}
+				{{ `${isEdit ? 'Editing ' : ''}${order.title}` }}
 				<el-tag :type="getButtonType(order.status)" round>
 					{{ order.status }}
 				</el-tag>
@@ -199,7 +202,7 @@ const setStatusesHistory = async () => {
 			<el-form-item label="Author" prop="author.username">
 				<el-input v-model="order.author.username" :disabled="true" />
 			</el-form-item>
-			<requests-to-order :order="order" :is-edit="isEdit" />
+			<order-management :order="order" :is-edit="isEdit" :order-id="props.id" />
 			<el-form-item label="Created at" prop="createdAt">
 				<el-date-picker v-model="order.createdAt" type="date" format="YYYY-MM-DD" disabled />
 			</el-form-item>
@@ -208,7 +211,7 @@ const setStatusesHistory = async () => {
 			</el-form-item>
 			<div v-if="isEdit" class="btn-container">
 				<el-button @click="cancelEdit">Cancel</el-button>
-				<el-button type="primary" @click="updateOrder">Save</el-button>
+				<el-button type="primary" :disabled="!isOrderValid" @click="updateOrder">Save</el-button>
 			</div>
 		</el-form>
 		<timeline-statuses

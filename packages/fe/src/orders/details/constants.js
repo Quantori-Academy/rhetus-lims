@@ -40,3 +40,15 @@ export const substanceRules = {
 	quantity: [requiredRule('Quantity')],
 	amount: [requiredRule('Amount')]
 };
+export const requestRules = {
+	reagentName: [requiredRule('Name')],
+	quantityUnit: [requiredRule('Unit')],
+	quantity: [requiredRule('Quantity')],
+	amount: [requiredRule('Amount')]
+};
+export const orderFormRules = {
+	title: [requiredRule('Title')],
+	seller: [requiredRule('Seller')],
+	reagents: [requestRules],
+	reagentRequests: [requestRules]
+};

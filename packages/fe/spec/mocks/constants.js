@@ -3,33 +3,33 @@ export const orderInfo = {
 	orders: [
 		{
 			id: '82edd722-293b-4aed-bace-883a77946d99',
-			author: {
-				id: 2,
-				username: 'username2'
-			},
 			title: 'Order for Sodium Chloride',
 			createdAt: '2024-09-20T21:47:47.481Z',
 			updatedAt: '2024-10-05T10:15:06.720Z',
 			seller: 'LabChem',
 			status: 'pending',
+			author: {
+				id: 2,
+				username: 'username2'
+			},
 			reagentRequests: [
 				{
-					tempId: '22a5974b-cb37-4ebd-9060-8cc131945517',
-					author: {
-						id: 1,
-						username: 'username3'
-					},
+					id: '1f8616d7-5b77-4643-bc76-b493500c738d',
 					reagentName: 'good acid',
 					quantity: 15.5,
 					quantityUnit: 'ml, bottle',
 					amount: 5,
-					status: 'pending',
 					userComment: 'we need it asap',
 					poComment: 'we have no enough money',
-					createdAt: '2024-09-27T13:16:35.744Z',
-					updatedAt: '2024-09-27T13:16:35.744Z',
+					createdAt: '2024-11-02T14:56:54.064Z',
+					updatedAt: '2024-11-03T08:09:51.148Z',
 					structure: 'H2SO4',
 					casNumber: '1111111-11-1',
+					author: {
+						id: 1,
+						username: 'username3'
+					},
+					status: 'pending',
 					producer: '',
 					catalogId: '',
 					catalogLink: '',
@@ -37,7 +37,7 @@ export const orderInfo = {
 					orderId: null
 				},
 				{
-					tempId: '22a5974b-cb37-4ebd-9060-8cc131945517',
+					id: '1f8616d7-5b77-4643-bc76-b493500c738r',
 					author: {
 						id: 1,
 						username: 'username3'
@@ -110,7 +110,7 @@ export const orderInfo = {
 			status: 'ordered',
 			reagentRequests: [
 				{
-					tempId: '22a5974b-cb37-4ebd-9060-8cc131945517',
+					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
 					author: {
 						id: 1,
 						username: 'username3'
@@ -133,7 +133,7 @@ export const orderInfo = {
 					orderId: null
 				},
 				{
-					tempId: '22a5974b-cb37-4ebd-9060-8cc131945517',
+					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
 					author: {
 						id: 1,
 						username: 'username3'
@@ -206,7 +206,7 @@ export const orderInfo = {
 			status: 'fulfilled',
 			reagentRequests: [
 				{
-					tempId: '22a5974b-cb37-4ebd-9060-8cc131945517',
+					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
 					author: {
 						id: 1,
 						username: 'username3'
@@ -229,7 +229,7 @@ export const orderInfo = {
 					orderId: null
 				},
 				{
-					tempId: '22a5974b-cb37-4ebd-9060-8cc131945516',
+					id: '22a5974b-cb37-4ebd-9060-8cc131945516',
 					author: {
 						id: 1,
 						username: 'username3'
@@ -302,7 +302,7 @@ export const orderInfo = {
 			status: 'canceled',
 			reagentRequests: [
 				{
-					tempId: '22a5974b-cb37-4ebd-9060-8cc131945517',
+					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
 					author: {
 						id: 1,
 						username: 'username3'
@@ -325,7 +325,7 @@ export const orderInfo = {
 					orderId: null
 				},
 				{
-					tempId: '22a5974b-cb37-4ebd-9060-8cc131945516',
+					id: '22a5974b-cb37-4ebd-9060-8cc131945516',
 					author: {
 						id: 1,
 						username: 'username3'

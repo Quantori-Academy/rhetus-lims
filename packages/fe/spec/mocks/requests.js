@@ -24,12 +24,12 @@ const requestInfo = {
 		},
 		{
 			id: '1f8616d7-5b77-4643-bc76-b493500c738d',
-			reagentName: 'Admin one',
+			reagentName: 'good acid',
 			quantity: 15.5,
 			quantityUnit: 'ml, bottle',
-			amount: 1,
-			userComment: 'jjj',
-			poComment: '',
+			amount: 5,
+			userComment: 'we need it asap',
+			poComment: 'we have no enough money',
 			createdAt: '2024-11-02T14:56:54.064Z',
 			updatedAt: '2024-11-03T08:09:51.148Z',
 			structure: 'H2SO4',
@@ -39,10 +39,48 @@ const requestInfo = {
 				username: 'adminuser2'
 			},
 			status: 'ordered',
+			producer: '',
+			catalogId: '',
+			catalogLink: '',
+			unitPrice: 0,
 			order: {
 				id: '82edd722-293b-4aed-bace-883a77946d99',
 				title: 'Order for Sodium Chloride',
 				createdAt: '2024-09-20T21:47:47.481Z',
+				updatedAt: '2024-10-05T10:15:06.720Z',
+				seller: 'LabChem',
+				status: 'pending',
+				author: {
+					id: 2,
+					username: 'username2'
+				}
+			}
+		},
+		{
+			id: '1f8616d7-5b77-4643-bc76-b493500c738r',
+			reagentName: 'better acid',
+			quantity: 15.5,
+			quantityUnit: 'ml, bottle',
+			amount: 5,
+			userComment: 'we need it asap',
+			poComment: 'we have no enough money',
+			createdAt: '2024-11-02T14:56:54.064Z',
+			updatedAt: '2024-11-03T08:09:51.148Z',
+			structure: 'H2SO4',
+			casNumber: '1111111-11-1',
+			author: {
+				id: 1,
+				username: 'username3'
+			},
+			status: 'ordered',
+			producer: '',
+			catalogId: '',
+			catalogLink: '',
+			unitPrice: 0,
+			order: {
+				id: '82edd722-293b-4aed-bace-883a77946d99',
+				title: 'Order for Sodium Chloride',
+				createdAt: '2024-07-20T21:47:47.481Z',
 				updatedAt: '2024-10-05T10:15:06.720Z',
 				seller: 'LabChem',
 				status: 'pending',
