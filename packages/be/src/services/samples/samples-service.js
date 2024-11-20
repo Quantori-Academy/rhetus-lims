@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import fp from 'fastify-plugin';
 import { schema } from '../../lib/db/schema/index.js';
 import { and, eq, sql } from 'drizzle-orm';
@@ -279,8 +280,35 @@ async function samplesService(server) {
 				status: 'success',
 				message: `Description of sample '${result[0].sampleName}' was changed`
 			};
+		},
+
+		getQuantityChangeHistory: async () => {
+			const result = await server.db
+				.select({
+					user: {
+						id: schema.users.id,
+						firstName: schema.users.firstName,
+						lastName: schema.users.lastName
+					},
+					substance: {
+						id: schema.samples.id,
+						name: schema.samples.name,
+						category: sql`'sample'`.as('category')
+					},
+					quantityLeft: schema.substancesQuantityChanges.targetValue,
+					quantityUnit: schema.samples.quantityUnit,
+					actionType: sql`'quantity-update'`.as('actionType'),
+					changeReason: schema.substancesQuantityChanges.changeReason,
+					modifiedDate: schema.substancesQuantityChanges.createdAt
+				})
+				.from(schema.substancesQuantityChanges)
+				.innerJoin(schema.users, eq(schema.substancesQuantityChanges.userId, schema.users.id))
+				.innerJoin(schema.samples, eq(schema.substancesQuantityChanges.sampleId, schema.samples.id))
+			console.log("quantity change", result);
+			return result;
 		}
 	});
 }
 
 export default fp(samplesService);
+

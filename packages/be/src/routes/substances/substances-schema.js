@@ -1,5 +1,6 @@
 import S from 'fluent-json-schema';
 import { Storage } from '../storages/storages-schema.js';
+import { User } from '../users/users-schema.js';
 
 const Category = {
 	REAGENT: 'reagent',
@@ -64,4 +65,44 @@ const updateSubstanceSchema = {
 	}
 };
 
-export { getSubstances, changeQuantity, Substance, Category, updateSubstanceSchema };
+const Action = {
+	QUANTITY: 'quantity-update',
+	STORAGE: 'storage-update',
+	CREATE: 'create',
+	DELETE: 'delete'
+};
+
+const HistorySchema = S.object()
+	.prop('user', {
+		id: User.id,
+		firstName: User.firstName,
+		lastName: User.lastName
+	})
+	.required()
+	.prop('quantityLeft', S.number().minimum(0))
+	.prop('quantityUnit', S.string().minLength(1))
+	.prop('storageLocation', {
+		id: Storage.id,
+		room: Storage.room,
+		name: Storage.name
+	})
+	.prop('actionType', S.string().enum(Object.values(Action)).required())
+	.prop('changeReason', S.string().minLength(1))
+	.prop('modifiedDate', S.string().format(S.FORMATS.DATE_TIME).required());
+
+const getSubstanceHistorySchema = {
+	security: [{ Session: [] }],
+	params: S.object().prop('id', S.string()),
+	response: {
+		200: S.object().prop('histories', S.array().items(HistorySchema)),
+		500: statusMessage
+	}
+};
+export {
+	getSubstances,
+	changeQuantity,
+	Substance,
+	Category,
+	updateSubstanceSchema,
+	getSubstanceHistorySchema
+};

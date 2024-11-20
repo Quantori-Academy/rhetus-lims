@@ -200,6 +200,18 @@ async function substancesService(server) {
 						? `${isReagent ? 'Reagent' : 'Sample'} was updated`
 						: updateMessages[0]
 			};
+		},
+
+		getQuantityChangeHistory: async (substanceId, category) => {
+			const isReagent = category === Category.REAGENT;
+			const service = isReagent ? server.reagentsService : server.samplesService;
+
+			const quantityChanges = await service.getQuantityChangeHistory(substanceId);
+
+			const storageChanges = await service.getStorageChangeHistory(substanceId);
+			return {
+				histories: [...quantityChanges, ...storageChanges]
+			};
 		}
 	});
 }

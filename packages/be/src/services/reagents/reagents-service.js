@@ -1,9 +1,11 @@
+/* eslint-disable max-lines */
 import { eq, and, sql } from 'drizzle-orm';
 import fp from 'fastify-plugin';
 import { schema } from '../../lib/db/schema/index.js';
 import { helpers } from '../../lib/utils/common/helpers.js';
 import { smilesToMol } from '../../lib/db/structure/utils/smiles-to-mol.js';
 import { isValidSmilesQuery } from '../../lib/db/structure/utils/is-valid-smiles.js';
+import { substancesStorageChanges } from '../../lib/db/schema/substances-storage-changes.js';
 
 const formatMapping = {
 	name: string => helpers.capitalize(string),
@@ -301,6 +303,63 @@ async function reagentsService(server) {
 				.where(eq(schema.ordersReagents.orderId, orderId));
 
 			return reagents.length ? reagents : null;
+		},
+
+		getQuantityChangeHistory: async substanceId => {
+			const result = await server.db
+				.select({
+					user: {
+						id: schema.users.id,
+						firstName: schema.users.firstName,
+						lastName: schema.users.lastName
+					},
+					quantityLeft: schema.substancesQuantityChanges.targetValue,
+					quantityUnit: schema.reagents.quantityUnit,
+					actionType: sql`'quantity-update'`.as('actionType'),
+					changeReason: schema.substancesQuantityChanges.changeReason,
+					modifiedDate: schema.substancesQuantityChanges.createdAt
+				})
+				.from(schema.substancesQuantityChanges)
+				.innerJoin(schema.users, eq(schema.substancesQuantityChanges.userId, schema.users.id))
+				.innerJoin(schema.reagents, eq(schema.substancesQuantityChanges.reagentId, substanceId))
+				.where(eq(schema.reagents.id, substanceId));
+			console.log('quantity change', result);
+			return result;
+		},
+		getStorageChangeHistory: async substanceId => {
+			const result = await server.db
+				.select({
+					user: {
+						id: schema.users.id,
+						firstName: schema.users.firstName,
+						lastName: schema.users.lastName
+					},
+					substance: {
+						id: schema.reagents.id,
+						name: schema.reagents.name,
+						category: sql`'reagent'`.as('category')
+					},
+					storageLocation: {
+						id: schema.storages.id,
+						room: schema.storages.room,
+						name: schema.storages.name
+					},
+					actionType: sql`'storage-update'`.as('actionType'),
+					modifiedDate: schema.substancesStorageChanges.createdAt
+				})
+				.from(schema.substancesStorageChanges)
+				.innerJoin(schema.users, eq(schema.substancesStorageChanges.userId, schema.users.id))
+				.innerJoin(
+					schema.reagents,
+					eq(schema.substancesStorageChanges.reagentId, schema.reagents.id)
+				)
+				.innerJoin(
+					schema.storages,
+					eq(schema.storages.id, substancesStorageChanges.targetStorageId)
+				)
+				.where(eq(schema.reagents.id, substanceId));
+			console.log('quantity change', result);
+			return result;
 		}
 	});
 }
