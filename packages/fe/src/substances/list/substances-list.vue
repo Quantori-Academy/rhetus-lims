@@ -102,7 +102,6 @@ const formattedSubstances = computed(
 );
 
 const addStructureSort = sortQuery => {
-	const { expired, ...rest } = filters.value;
 	if (filters.value.smiles) {
 		sortQuery.sort = { ...(sortQuery.sort ?? {}), relevance: 'desc' };
 	}
@@ -115,7 +114,9 @@ const addStructureSort = sortQuery => {
 const setSubstances = debounce(async (event = null) => {
 	isLoading.value = true;
 	const sortQuery = createQuery(event);
+	const { expired, ...rest } = filters.value;
 	addStructureSort(sortQuery);
+
 	const params = {
 		page: paginationData.value.page,
 		limit: paginationData.value.size,
