@@ -8,7 +8,8 @@ import { $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 const props = defineProps({
 	order: { type: Object, default: null },
 	isEdit: { type: Boolean, default: false },
-	orderId: { type: String, default: null }
+	orderId: { type: String, default: null },
+	setOrder: { type: Function, default: null }
 });
 const searchQuery = ref('');
 const linkedRequests = ref([]);
@@ -67,9 +68,16 @@ const linkRequest = selectedRequest => {
 		order.value.reagentRequests.push(requestCopy);
 	}
 };
-const removeLinkedRequest = request => {
+const removeLinkedRequest = async request => {
 	linkedRequests.value = linkedRequests.value.filter(r => r.id !== request.id);
-	order.value.reagentRequests = order.value.reagentRequests.filter(r => r.id !== request.id);
+	try {
+		const response = await $api.orders.removeItemFromOrder(request.id);
+		if (response.status === 'success') {
+			props.setOrder(props.orderId);
+		}
+	} catch (error) {
+		$notifyUserAboutError(error);
+	}
 };
 
 function viewRequestDetails(request) {

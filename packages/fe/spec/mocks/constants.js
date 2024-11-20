@@ -62,13 +62,15 @@ export const orderInfo = {
 			],
 			reagents: [
 				{
-					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
+					id: '22a5974b-cb37-4ebd-9060-8cc131945510',
 					author: {
 						id: 1,
-						username: 'username3'
+						username: 'username4'
 					},
-					reagentName: 'good acid from the order',
-					quantity: 15.5,
+					reagentName: 'awesome acid',
+					quantity: 1.5,
+					quantityUnit: 'ml, bottle',
+					amount: 5,
 					status: 'pending',
 					userComment: 'we need it asap',
 					poComment: 'we have no enough money',
@@ -76,23 +78,10 @@ export const orderInfo = {
 					updatedAt: '2024-09-27T13:16:35.744Z',
 					structure: 'H2SO4',
 					casNumber: '1111111-11-1',
-					orderId: null
-				},
-				{
-					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
-					author: {
-						id: 1,
-						username: 'username3'
-					},
-					reagentName: 'better acid from the order',
-					quantity: 17,
-					status: 'ordered',
-					userComment: 'we need it asap',
-					poComment: "let's do it",
-					createdAt: '2024-09-27T13:16:35.744Z',
-					updatedAt: '2024-09-27T13:16:35.744Z',
-					structure: 'H2SO4',
-					casNumber: '2222222-22-2',
+					producer: '',
+					catalogId: '',
+					catalogLink: '',
+					unitPrice: 0,
 					orderId: null
 				}
 			]

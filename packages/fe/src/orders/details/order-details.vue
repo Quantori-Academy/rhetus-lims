@@ -63,8 +63,11 @@ onMounted(() => {
 const setOrder = async id => {
 	loading.value = true;
 	try {
-		order.value = await $api.orders.fetchOrder(id);
-		originalOrder.value = { ...order.value };
+		const fetchedOrder = await $api.orders.fetchOrder(id);
+		order.value = { ...fetchedOrder };
+		if (!originalOrder.value.id) {
+			originalOrder.value = { ...fetchedOrder };
+		}
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating order');
 	} finally {
@@ -202,7 +205,12 @@ const setStatusesHistory = async () => {
 			<el-form-item label="Author" prop="author.username">
 				<el-input v-model="order.author.username" :disabled="true" />
 			</el-form-item>
-			<order-management :order="order" :is-edit="isEdit" :order-id="props.id" />
+			<order-management
+				:order="order"
+				:is-edit="isEdit"
+				:order-id="props.id"
+				:set-order="setOrder"
+			/>
 			<el-form-item label="Created at" prop="createdAt">
 				<el-date-picker v-model="order.createdAt" type="date" format="YYYY-MM-DD" disabled />
 			</el-form-item>

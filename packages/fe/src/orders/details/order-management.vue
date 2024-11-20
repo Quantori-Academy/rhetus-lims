@@ -15,6 +15,8 @@ import LinkedRequests from './linked-requests.vue';
 import { quantityUnits } from '../../lib/constants/quantity-units.js';
 import { substanceRules } from './constants.js';
 import { newSubstanceRef } from './constants.js';
+import { $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
+import { $api } from '../../lib/api/index.js';
 
 const props = defineProps({
 	order: {
@@ -25,7 +27,8 @@ const props = defineProps({
 		type: Boolean,
 		default: false
 	},
-	orderId: { type: String, default: null }
+	orderId: { type: String, default: null },
+	setOrder: { type: Function, default: null }
 });
 const substanceFormEl = useTemplateRef('substance-form-el');
 const newSubstance = ref(newSubstanceRef);
@@ -44,16 +47,25 @@ const addNewReagent = async () => {
 	substanceFormEl.value.resetFields();
 };
 
-function removeReagent(item) {
-	const index = order.value.reagents.indexOf(item);
-	if (index !== -1) {
-		order.value.reagents.splice(index, 1);
+const removeReagent = async item => {
+	try {
+		const response = await $api.orders.removeItemFromOrder(item.id);
+		if (response.status === 'success') {
+			props.setOrder(props.orderId);
+		}
+	} catch (error) {
+		$notifyUserAboutError(error);
 	}
-}
+};
 </script>
 
 <template>
-	<linked-requests :order="order" :is-edit="isEdit" :order-id="props.orderId" />
+	<linked-requests
+		:order="order"
+		:is-edit="isEdit"
+		:order-id="props.orderId"
+		:set-order="props.setOrder"
+	/>
 	<div class="data-table">
 		<h2 class="el-form-item__label">Substances to Order</h2>
 		<div class="orders-container" max-height="350">
