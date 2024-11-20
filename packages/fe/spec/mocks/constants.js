@@ -2,7 +2,7 @@
 export const orderInfo = {
 	orders: [
 		{
-			id: '1a3e8e10-723f-43c2-8c1a-41a0e6e0c497',
+			id: '82edd722-293b-4aed-bace-883a77946d99',
 			author: {
 				id: 2,
 				username: 'username2'
@@ -14,13 +14,15 @@ export const orderInfo = {
 			status: 'pending',
 			reagentRequests: [
 				{
-					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
+					tempId: '22a5974b-cb37-4ebd-9060-8cc131945517',
 					author: {
 						id: 1,
 						username: 'username3'
 					},
 					reagentName: 'good acid',
 					quantity: 15.5,
+					quantityUnit: 'ml, bottle',
+					amount: 5,
 					status: 'pending',
 					userComment: 'we need it asap',
 					poComment: 'we have no enough money',
@@ -28,16 +30,22 @@ export const orderInfo = {
 					updatedAt: '2024-09-27T13:16:35.744Z',
 					structure: 'H2SO4',
 					casNumber: '1111111-11-1',
+					producer: '',
+					catalogId: '',
+					catalogLink: '',
+					unitPrice: 0,
 					orderId: null
 				},
 				{
-					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
+					tempId: '22a5974b-cb37-4ebd-9060-8cc131945517',
 					author: {
 						id: 1,
 						username: 'username3'
 					},
 					reagentName: 'better acid',
 					quantity: 17,
+					quantityUnit: 'ml, bottle',
+					amount: 10,
 					status: 'ordered',
 					userComment: 'we need it asap',
 					poComment: "let's do it",
@@ -45,6 +53,10 @@ export const orderInfo = {
 					updatedAt: '2024-09-27T13:16:35.744Z',
 					structure: 'H2SO4',
 					casNumber: '2222222-22-2',
+					producer: '',
+					catalogId: '',
+					catalogLink: '',
+					unitPrice: 0,
 					orderId: null
 				}
 			],
@@ -98,13 +110,15 @@ export const orderInfo = {
 			status: 'ordered',
 			reagentRequests: [
 				{
-					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
+					tempId: '22a5974b-cb37-4ebd-9060-8cc131945517',
 					author: {
 						id: 1,
 						username: 'username3'
 					},
 					reagentName: 'good acid',
 					quantity: 15.5,
+					quantityUnit: 'ml, bottle',
+					amount: 5,
 					status: 'pending',
 					userComment: 'we need it asap',
 					poComment: 'we have no enough money',
@@ -112,16 +126,22 @@ export const orderInfo = {
 					updatedAt: '2024-09-27T13:16:35.744Z',
 					structure: 'H2SO4',
 					casNumber: '1111111-11-1',
+					producer: '',
+					catalogId: '',
+					catalogLink: '',
+					unitPrice: 0,
 					orderId: null
 				},
 				{
-					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
+					tempId: '22a5974b-cb37-4ebd-9060-8cc131945517',
 					author: {
 						id: 1,
 						username: 'username3'
 					},
 					reagentName: 'better acid',
 					quantity: 17,
+					quantityUnit: 'ml, bottle',
+					amount: 10,
 					status: 'ordered',
 					userComment: 'we need it asap',
 					poComment: "let's do it",
@@ -129,6 +149,10 @@ export const orderInfo = {
 					updatedAt: '2024-09-27T13:16:35.744Z',
 					structure: 'H2SO4',
 					casNumber: '2222222-22-2',
+					producer: '',
+					catalogId: '',
+					catalogLink: '',
+					unitPrice: 0,
 					orderId: null
 				}
 			],
@@ -182,13 +206,15 @@ export const orderInfo = {
 			status: 'fulfilled',
 			reagentRequests: [
 				{
-					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
+					tempId: '22a5974b-cb37-4ebd-9060-8cc131945517',
 					author: {
 						id: 1,
 						username: 'username3'
 					},
 					reagentName: 'good acid',
 					quantity: 15.5,
+					quantityUnit: 'ml, bottle',
+					amount: 5,
 					status: 'pending',
 					userComment: 'we need it asap',
 					poComment: 'we have no enough money',
@@ -196,16 +222,22 @@ export const orderInfo = {
 					updatedAt: '2024-09-27T13:16:35.744Z',
 					structure: 'H2SO4',
 					casNumber: '1111111-11-1',
+					producer: '',
+					catalogId: '',
+					catalogLink: '',
+					unitPrice: 0,
 					orderId: null
 				},
 				{
-					id: '22a5974b-cb37-4ebd-9060-8cc131945516',
+					tempId: '22a5974b-cb37-4ebd-9060-8cc131945516',
 					author: {
 						id: 1,
 						username: 'username3'
 					},
 					reagentName: 'better acid',
 					quantity: 17,
+					quantityUnit: 'ml, bottle',
+					amount: 12,
 					status: 'ordered',
 					userComment: 'we need it asap',
 					poComment: "let's do it",
@@ -213,6 +245,10 @@ export const orderInfo = {
 					updatedAt: '2024-09-27T13:16:35.744Z',
 					structure: 'H2SO4',
 					casNumber: '2222222-22-2',
+					producer: '',
+					catalogId: '',
+					catalogLink: '',
+					unitPrice: 0,
 					orderId: null
 				}
 			],
@@ -266,13 +302,15 @@ export const orderInfo = {
 			status: 'canceled',
 			reagentRequests: [
 				{
-					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
+					tempId: '22a5974b-cb37-4ebd-9060-8cc131945517',
 					author: {
 						id: 1,
 						username: 'username3'
 					},
 					reagentName: 'good acid',
 					quantity: 15.5,
+					quantityUnit: 'ml, bottle',
+					amount: 2,
 					status: 'canceled',
 					userComment: 'we need it asap',
 					poComment: 'we have no enough money',
@@ -280,16 +318,22 @@ export const orderInfo = {
 					updatedAt: '2024-09-27T13:16:35.744Z',
 					structure: 'H2SO4',
 					casNumber: '1111111-11-1',
+					producer: '',
+					catalogId: '',
+					catalogLink: '',
+					unitPrice: 0,
 					orderId: null
 				},
 				{
-					id: '22a5974b-cb37-4ebd-9060-8cc131945516',
+					tempId: '22a5974b-cb37-4ebd-9060-8cc131945516',
 					author: {
 						id: 1,
 						username: 'username3'
 					},
 					reagentName: 'better acid',
 					quantity: 17,
+					quantityUnit: 'ml, bottle',
+					amount: 20,
 					status: 'canceled',
 					userComment: 'we need it asap',
 					poComment: "let's do it",
@@ -297,6 +341,10 @@ export const orderInfo = {
 					updatedAt: '2024-09-27T13:16:35.744Z',
 					structure: 'H2SO4',
 					casNumber: '2222222-22-2',
+					producer: '',
+					catalogId: '',
+					catalogLink: '',
+					unitPrice: 0,
 					orderId: null
 				}
 			],

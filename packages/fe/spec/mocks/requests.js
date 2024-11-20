@@ -20,18 +20,7 @@ const requestInfo = {
 				username: 'test1'
 			},
 			status: 'pending',
-			order: {
-				title: 'Tr order',
-				id: '82edd722-293b-4aed-bace-883a77946d99',
-				createdAt: '2024-11-10T22:45:21.174Z',
-				updatedAt: '2024-11-10T22:45:21.174Z',
-				seller: 'Seller ltd',
-				status: 'pending',
-				author: {
-					id: '2',
-					username: 'test1'
-				}
-			}
+			order: null
 		},
 		{
 			id: '1f8616d7-5b77-4643-bc76-b493500c738d',
@@ -50,7 +39,18 @@ const requestInfo = {
 				username: 'adminuser2'
 			},
 			status: 'ordered',
-			order: {}
+			order: {
+				id: '82edd722-293b-4aed-bace-883a77946d99',
+				title: 'Order for Sodium Chloride',
+				createdAt: '2024-09-20T21:47:47.481Z',
+				updatedAt: '2024-10-05T10:15:06.720Z',
+				seller: 'LabChem',
+				status: 'pending',
+				author: {
+					id: 2,
+					username: 'username2'
+				}
+			}
 		},
 		{
 			id: '1f8616d7-5b77-4643-bc76-b493500534c6',

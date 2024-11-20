@@ -19,6 +19,7 @@ import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
 import rhIcon from '../../lib/components/rh-icon.vue';
 import TimelineStatuses from '../../timeline/timeline-statuses.vue';
+import RequestsToOrder from './requests-to-order.vue';
 
 const props = defineProps({
 	id: {
@@ -27,7 +28,6 @@ const props = defineProps({
 	}
 });
 const formEl = useTemplateRef('form-ref');
-import RequestsToOrder from './requests-to-order.vue';
 const order = ref(null);
 const loading = ref(true);
 const rules = ref({
@@ -199,7 +199,7 @@ const setStatusesHistory = async () => {
 			<el-form-item label="Author" prop="author.username">
 				<el-input v-model="order.author.username" :disabled="true" />
 			</el-form-item>
-			<requests-to-order :order="order" />
+			<requests-to-order :order="order" :is-edit="isEdit" />
 			<el-form-item label="Created at" prop="createdAt">
 				<el-date-picker v-model="order.createdAt" type="date" format="YYYY-MM-DD" disabled />
 			</el-form-item>

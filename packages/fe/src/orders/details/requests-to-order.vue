@@ -13,7 +13,7 @@ import {
 import { defineProps, useTemplateRef, ref, toRef } from 'vue';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 import RhIcon from '../../lib/components/rh-icon.vue';
-// import RequestsManagement from '../new/requests-management.vue';
+import RequestsManagement from './requests-management.vue';
 import { quantityUnits } from '../../lib/constants/quantity-units.js';
 import { substanceRules } from './constants.js';
 import { newSubstanceRef } from './constants.js';
@@ -23,6 +23,10 @@ const props = defineProps({
 	order: {
 		type: Object,
 		default: null
+	},
+	isEdit: {
+		type: Boolean,
+		default: false
 	}
 });
 const newSubstance = ref(newSubstanceRef);
@@ -42,8 +46,7 @@ const addNewReagent = async () => {
 </script>
 
 <template>
-	<!-- <requests-management :form="order.reagentRequests" :is-request="true" /> -->
-
+	<requests-management :form="order.reagentRequests" :is-edit="isEdit" />
 	<!-- SUBTANCES TO ORDER -->
 	<el-form-item label="Substances to order" prop="reagentRequests">
 		<el-table :data="order.reagentRequests">
@@ -53,7 +56,13 @@ const addNewReagent = async () => {
 			<el-table-column prop="amount" label="Amount" />
 		</el-table>
 		<!-- NEW SUBSTANCE -->
-		<el-form ref="substance-form-el" :model="newSubstance" :rules="newSubstanceRules" class="row">
+		<el-form
+			v-if="props.isEdit"
+			ref="substance-form-el"
+			:model="newSubstance"
+			:rules="newSubstanceRules"
+			class="row"
+		>
 			<el-form-item prop="reagentName">
 				<el-input v-model="newSubstance.reagentName" placeholder="Enter name" />
 			</el-form-item>
@@ -97,5 +106,19 @@ const addNewReagent = async () => {
 .linked-requests-container,
 .el-form-item__content {
 	gap: 10px;
+}
+.data-table {
+	margin-top: 20px;
+}
+.new-reagent-row {
+	display: flex;
+	flex-direction: row;
+	gap: 2rem;
+}
+.row {
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	gap: 8px;
+	color: var(--rh-color-info-700);
 }
 </style>
