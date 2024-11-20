@@ -29,4 +29,12 @@ const filters = defineModel('filters', { type: Object });
 			end-placeholder="End date"
 		/>
 	</filter-item>
+	<filter-item>
+		<el-date-picker
+			v-model="filters.updateRange"
+			type="daterange"
+			start-placeholder="Update start date"
+			end-placeholder="End date"
+		/>
+	</filter-item>
 </template>

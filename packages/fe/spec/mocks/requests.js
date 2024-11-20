@@ -16,8 +16,8 @@ const requestInfo = {
 			structure: '',
 			casNumber: '2222222-22-2',
 			author: {
-				id: 35,
-				username: 'po1'
+				id: 'c7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3d3b333',
+				username: 'test1'
 			},
 			status: 'pending',
 			order: {
@@ -28,8 +28,8 @@ const requestInfo = {
 				seller: 'Seller ltd',
 				status: 'pending',
 				author: {
-					id: 35,
-					username: 'po1'
+					id: '2',
+					username: 'test1'
 				}
 			}
 		},
@@ -37,7 +37,7 @@ const requestInfo = {
 			id: '1f8616d7-5b77-4643-bc76-b493500c738d',
 			reagentName: 'Admin one',
 			quantity: 15.5,
-			quantityUnit: '',
+			quantityUnit: 'ml, bottle',
 			amount: 1,
 			userComment: 'jjj',
 			poComment: '',
@@ -49,46 +49,85 @@ const requestInfo = {
 				id: 25,
 				username: 'adminuser2'
 			},
+			status: 'ordered',
+			order: {}
+		},
+		{
+			id: '1f8616d7-5b77-4643-bc76-b493500534c6',
+			reagentName: 'Water',
+			quantity: 30,
+			quantityUnit: 'ml, bottle',
+			amount: 1,
+			userComment: 'comment',
+			poComment: '',
+			createdAt: '2024-11-02T14:56:54.064Z',
+			updatedAt: '2024-11-03T08:09:51.148Z',
+			structure: 'H2SO4',
+			casNumber: '1111111-11-1',
+			author: {
+				id: '0',
+				username: 'test1'
+			},
 			status: 'pending',
 			order: {}
 		}
 	],
-	count: 2
+	count: 3
 };
 
-function createdDateFilter(parsedOptions, request) {
-	let [createdStartDate, createdEndDate] = parsedOptions.creationRange.map(date => new Date(date));
-	const createdAt = new Date(request.createdAt);
-	return createdAt >= createdStartDate && createdAt <= createdEndDate;
+function dateFilter(request, parsedDate, option) {
+	let [startDate, endDate] = parsedDate.map(date => new Date(date));
+	const createdAt = new Date(option);
+	return createdAt >= startDate && createdAt <= endDate;
 }
-
+function matchesName(request, name) {
+	return name ? request.reagentName.toLowerCase().includes(name) : true;
+}
+function matchesStatus(request, status) {
+	return status ? request.status.includes(status) : true;
+}
+function matchesCreationDate(request, parsedDate) {
+	return parsedDate ? dateFilter(request, parsedDate, request.createdAt) : true;
+}
+function matchesUpdateDate(request, parsedDate) {
+	return parsedDate ? dateFilter(request, parsedDate, request.updatedAt) : true;
+}
 function filterRequests(parsedOptions) {
 	const filteredRequests = requestInfo.requests.filter(request => {
-		const matchesName = parsedOptions.reagentName
-			? request.reagentName.toLowerCase().includes(parsedOptions.reagentName)
-			: true;
-		const matchesStatus = parsedOptions.status
-			? request.status.includes(parsedOptions.status)
-			: true;
-		const matchesCreationDate = parsedOptions.creationRange
-			? createdDateFilter(parsedOptions, request)
-			: true;
-
-		return matchesName && matchesStatus && matchesCreationDate;
+		return (
+			matchesName(request, parsedOptions.reagentName) &&
+			matchesStatus(request, parsedOptions.status) &&
+			matchesCreationDate(request, parsedOptions.creationRange) &&
+			matchesUpdateDate(request, parsedOptions.updateRange)
+		);
 	});
-	return HttpResponse.json({
-		requests: filteredRequests
-	});
+	return filteredRequests;
 }
-
+function paginateRequests(items, page, limit) {
+	const start = (page - 1) * limit;
+	return items.slice(start, start + limit);
+}
 export const requestHandlers = [
 	http.get(api('/requests'), req => {
-		const options = new URL(req.request.url).searchParams.get('options');
+		const url = new URL(req.request.url);
+		const options = url.searchParams.get('options');
 		const parsedOptions = JSON.parse(options) || {};
-		if (parsedOptions === null) {
-			return HttpResponse.json(requestInfo);
+		const page = parseInt(url.searchParams.get('page')) || 1;
+		const limit = parseInt(url.searchParams.get('limit')) || 10;
+		const hasValidOptions = options => {
+			return Object.values(options).some(value => value !== '');
+		};
+		if (!hasValidOptions(parsedOptions)) {
+			return HttpResponse.json({
+				requests: paginateRequests(requestInfo.requests, page, limit),
+				count: requestInfo.requests.length
+			});
 		} else {
-			return filterRequests(parsedOptions);
+			const filtered = filterRequests(parsedOptions);
+			return HttpResponse.json({
+				requests: paginateRequests(filtered, page, limit),
+				count: filtered.length
+			});
 		}
 	}),
 	http.post(api('/requests'), async ({ request }) => {
@@ -97,6 +136,24 @@ export const requestHandlers = [
 		return HttpResponse.json({
 			status: 'success',
 			message: 'New request was created'
+		});
+	}),
+	http.put(api('/requests/:id/cancel'), async ({ params }) => {
+		const { id } = params;
+		const requestIndex = requestInfo.requests.findIndex(request => request.id === id);
+		if (requestIndex === -1) {
+			return HttpResponse.json(
+				{
+					status: 'error',
+					message: `Request not found`
+				},
+				{ status: 404 }
+			);
+		}
+		requestInfo.requests.filter(request => request.id === id)[0].status = 'canceled';
+		return HttpResponse.json({
+			status: 'success',
+			message: 'Request was canceled'
 		});
 	}),
 	http.delete(api('/requests/:id'), async ({ params }) => {
@@ -114,7 +171,7 @@ export const requestHandlers = [
 		requestInfo.requests.splice(requestIndex, 1);
 		return HttpResponse.json({
 			status: 'success',
-			message: 'Request was canceled'
+			message: 'Request was deleted'
 		});
 	})
 ];
