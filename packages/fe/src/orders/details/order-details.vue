@@ -5,8 +5,6 @@ import {
 	ElButton,
 	ElFormItem,
 	ElDatePicker,
-	ElTable,
-	ElTableColumn,
 	ElDropdown,
 	ElDropdownMenu,
 	ElDropdownItem,
@@ -29,6 +27,7 @@ const props = defineProps({
 	}
 });
 const formEl = useTemplateRef('form-ref');
+import RequestsToOrder from './requests-to-order.vue';
 const order = ref(null);
 const loading = ref(true);
 const rules = ref({
@@ -200,18 +199,7 @@ const setStatusesHistory = async () => {
 			<el-form-item label="Author" prop="author.username">
 				<el-input v-model="order.author.username" :disabled="true" />
 			</el-form-item>
-
-			<el-form-item label="Author" prop="author.username">
-				<el-input v-model="order.author.username" :disabled="true" />
-			</el-form-item>
-			<el-form-item label="Requests to order" prop="reagentRequests">
-				<el-table :data="order.reagentRequests">
-					<el-table-column prop="reagentName" label="Name" />
-					<el-table-column prop="quantityUnit" label="Quantity Unit" />
-					<el-table-column prop="quantity" label="Quantity" />
-					<el-table-column prop="amount" label="Amount" />
-				</el-table>
-			</el-form-item>
+			<requests-to-order :order="order" />
 			<el-form-item label="Created at" prop="createdAt">
 				<el-date-picker v-model="order.createdAt" type="date" format="YYYY-MM-DD" disabled />
 			</el-form-item>
