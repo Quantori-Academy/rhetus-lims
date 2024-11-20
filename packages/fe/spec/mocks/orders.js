@@ -93,6 +93,19 @@ export const orderHandlers = [
 		}
 		return HttpResponse.json(order);
 	}),
+	http.post(api('/orders'), async req => {
+		const order = await req.request.json();
+		orderInfo.orders.push({
+			...order,
+			createdAt: new Date().toISOString(),
+			updatedAt: new Date().toISOString(),
+			status: 'pending'
+		});
+		return HttpResponse.json({
+			status: 'success',
+			message: `Order was created`
+		});
+	}),
 	http.patch(api('/orders/:id'), async ({ request, params }) => {
 		const { id } = params;
 		const order = orderInfo.orders.find(o => o.id === id);

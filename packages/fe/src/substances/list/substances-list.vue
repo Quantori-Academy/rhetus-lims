@@ -35,6 +35,12 @@ function addNewReagent() {
 function addNewSample() {
 	$router.push({ name: 'new-sample' });
 }
+function orderReagent(row) {
+	$router.push({
+		name: 'new-order-substance',
+		query: { id: row.id }
+	});
+}
 
 function editSubstance(row) {
 	$router.push({
@@ -172,6 +178,13 @@ onMounted(() => {
 				<template #default="{ row }">
 					<el-button type="danger" @click.stop="() => deleteSingleSubstance(row)">
 						<rh-icon color="white" name="trash" />
+					</el-button>
+				</template>
+			</el-table-column>
+			<el-table-column width="80">
+				<template #default="{ row }">
+					<el-button type="primary" @click.stop="() => orderReagent(row)">
+						<rh-icon color="white" name="sync" />
 					</el-button>
 				</template>
 			</el-table-column>

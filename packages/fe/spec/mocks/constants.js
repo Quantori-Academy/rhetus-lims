@@ -11,7 +11,7 @@ export const orderInfo = {
 			updatedAt: '2024-10-05T10:15:06.720Z',
 			seller: 'LabChem',
 			status: 'pending',
-			requests: [
+			reagentRequests: [
 				{
 					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
 					author: {
@@ -60,7 +60,7 @@ export const orderInfo = {
 			updatedAt: '2024-10-02T10:15:06.720Z',
 			seller: 'BBR',
 			status: 'ordered',
-			requests: [
+			reagentRequests: [
 				{
 					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
 					author: {
@@ -109,7 +109,7 @@ export const orderInfo = {
 			updatedAt: '2024-10-05T10:15:06.720Z',
 			seller: 'ChemLab Central',
 			status: 'fulfilled',
-			requests: [
+			reagentRequests: [
 				{
 					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
 					author: {
@@ -158,7 +158,7 @@ export const orderInfo = {
 			updatedAt: '2024-10-10T10:15:06.720Z',
 			seller: 'Chems',
 			status: 'canceled',
-			requests: [
+			reagentRequests: [
 				{
 					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
 					author: {

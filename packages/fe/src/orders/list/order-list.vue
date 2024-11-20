@@ -23,8 +23,9 @@ const filters = ref({
 });
 
 function addNewOrder() {
-	$router.push({ name: 'new-order' });
+	$router.push({ name: 'new-order-request' });
 }
+
 function viewOrder(row) {
 	$router.push({ name: 'order-details', params: { id: row.id } });
 }
