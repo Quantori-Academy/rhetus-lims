@@ -16,7 +16,8 @@ const isLoading = ref(false);
 const filters = ref({
 	name: '',
 	quantity: null,
-	expired: false
+	expired: false,
+	smiles: ''
 });
 
 const paginationData = ref({
@@ -28,7 +29,6 @@ const paginationData = ref({
 const handlePageChange = newPage => {
 	paginationData.value.page = newPage;
 };
-
 function addNewReagent() {
 	$router.push({ name: 'new-reagent' });
 }
@@ -101,10 +101,22 @@ const formattedSubstances = computed(
 		})) || []
 );
 
+const addStructureSort = sortQuery => {
+	if (filters.value.smiles) {
+		sortQuery.sort = { ...(sortQuery.sort ?? {}), relevance: 'desc' };
+	}
+	if (sortQuery.sort && sortQuery.sort.structure) {
+		const { structure, ...rest } = sortQuery.sort;
+		sortQuery.sort = { ...rest, relevance: structure };
+	}
+};
+
 const setSubstances = debounce(async (event = null) => {
 	isLoading.value = true;
 	const sortQuery = createQuery(event);
 	const { expired, ...rest } = filters.value;
+	addStructureSort(sortQuery);
+
 	const params = {
 		page: paginationData.value.page,
 		limit: paginationData.value.size,
@@ -164,6 +176,7 @@ onMounted(() => {
 		>
 			<el-table-column prop="name" min-width="150" label="Name" sortable />
 			<el-table-column prop="category" min-width="120" label="Category" sortable />
+			<el-table-column prop="structure" min-width="120" label="Structure" sortable />
 			<el-table-column prop="description" min-width="160" label="Description" />
 			<el-table-column prop="quantityLeft" min-width="120" label="Quantity Left" />
 			<el-table-column prop="storageLocation" min-width="140" label="Storage Location" />

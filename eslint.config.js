@@ -4,7 +4,17 @@ import vue from 'eslint-plugin-vue';
 import prettier from 'eslint-config-prettier';
 
 export default [
-	{ ignores: ['**/dist', '.github', 'node_modules', 'scripts', 'packages/auto-mention-action', 'packages/fe/src/lib/router/routes.js'] },
+	{
+		ignores: [
+			'**/dist',
+			'.github',
+			'node_modules',
+			'scripts',
+			'packages/auto-mention-action',
+			'packages/fe/src/lib/router/routes.js', 'packages/be/src/services/orders/orders-service.js',
+			'packages/fe/public/ketcher'
+		]
+	},
 	{ languageOptions: { globals: { ...globals.browser, ...globals.node } } },
 	js.configs.recommended,
 	...vue.configs['flat/recommended'],
