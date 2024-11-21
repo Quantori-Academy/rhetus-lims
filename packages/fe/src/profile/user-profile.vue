@@ -1,17 +1,18 @@
 <script setup>
 import { onMounted, ref, useTemplateRef, computed } from 'vue';
 import { $api } from '../lib/api';
-import { ElForm, ElFormItem, ElInput, ElButton } from 'element-plus';
+import { ElForm, ElFormItem, ElInput, ElButton, ElDivider, ElSelect, ElOption } from 'element-plus';
 import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg';
 import { $confirm } from '../lib/utils/feedback/confirm-msg';
 import { $isFormValid } from '../lib/utils/form-validation/is-form-valid';
 import { passwordFormRules, profileFormRules } from './constants';
 import { $route, $router } from '../lib/router/router';
+import { languages } from './constants';
 
 const editable = computed(() => $route.value.name === 'edit-user-profile');
 const profile = ref(null);
 const form = useTemplateRef('form');
-
+const language = ref('English');
 const resetPassForm = useTemplateRef('reset-pass-form');
 const passwords = ref({ password: '', confirmPassword: '' });
 
@@ -71,6 +72,18 @@ const passwordChangeHandler = async () => {
 		if (!['cancel', 'close'].includes(error)) {
 			this.$notifyUserAboutError(error);
 		}
+	}
+};
+const langChangeHandler = () => {
+	try {
+		$notify({
+			title: 'Success',
+			message: 'Language changed',
+			type: 'success'
+		});
+		$router.push({ name: 'user-profile' });
+	} catch (error) {
+		$notifyUserAboutError(error);
 	}
 };
 
@@ -147,6 +160,28 @@ onMounted(() => {
 			</div>
 		</el-form>
 	</div>
+	<div class="wrapper">
+		<el-divider />
+		<div class="section-header">
+			Localization
+			<p>Customize language settings</p>
+		</div>
+		<el-form label-position="top">
+			<el-form-item label="Language">
+				<el-select v-model="language" :disabled="!editable">
+					<el-option
+						v-for="lang of languages"
+						:key="lang.value"
+						:label="lang.label"
+						:value="lang.value"
+					/>
+				</el-select>
+			</el-form-item>
+			<div v-if="editable" class="btn-container">
+				<el-button type="primary" @click="langChangeHandler">Save</el-button>
+			</div>
+		</el-form>
+	</div>
 </template>
 
 <style scoped>
@@ -154,6 +189,12 @@ onMounted(() => {
 	margin-bottom: 12px;
 	font-weight: 500;
 	font-size: large;
+
+	p {
+		margin-top: 6px;
+		color: var(--rh-color-info-700);
+		font-size: 14px;
+	}
 }
 @media (max-width: 520px) {
 	.form-container {

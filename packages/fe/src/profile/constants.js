@@ -29,3 +29,26 @@ export const passwordFormRules = passwords => ({
 		}
 	]
 });
+
+export const languages = [
+	{
+		value: 'en',
+		label: 'English'
+	},
+	{
+		value: 'ka',
+		label: 'Georgian'
+	},
+	{
+		value: 'hy',
+		label: 'Armenian'
+	},
+	{
+		value: 'kk',
+		label: 'Kazakh'
+	},
+	{
+		value: 'uk',
+		label: 'Ukrainian'
+	}
+];
