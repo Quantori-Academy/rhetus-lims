@@ -4,7 +4,7 @@ import RhIcon from '../../lib/components/rh-icon.vue';
 import BaseButton from '../sidebar-buttons/base-button.vue';
 
 const props = defineProps({
-	isSidebarOpen: {
+	isSidebarCollapsed: {
 		type: Boolean,
 		required: true
 	}
@@ -22,7 +22,7 @@ function handleCollapse() {
 		<div class="top-bar-container">
 			<breadcrumbs-links>
 				<template #before>
-					<base-button v-if="!props.isSidebarOpen" @click="handleCollapse">
+					<base-button v-if="props.isSidebarCollapsed" @click="handleCollapse">
 						<rh-icon name="sidebar" />
 					</base-button>
 				</template>
