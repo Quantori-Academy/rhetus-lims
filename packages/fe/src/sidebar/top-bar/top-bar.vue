@@ -42,7 +42,7 @@ function handleCollapse() {
 	padding: 0 16px;
 	width: 100%;
 
-	border-bottom: 1px solid var(--border-color);
+	box-shadow: 0 1px 0 0 var(--border-color);
 	background-color: var(--rh-color-page-white);
 
 	transition-property: width, left, right;

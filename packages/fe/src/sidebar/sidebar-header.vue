@@ -38,7 +38,7 @@ function handleCollapse() {
 .user-bar-container {
 	padding: 8px;
 	min-height: var(--top-bar-height);
-	border-bottom: 1px solid var(--rh-color-neutral-250);
+	box-shadow: 0 1px 0 0 var(--border-color);
 
 	background-color: var(--rh-color-neutral-250);
 
