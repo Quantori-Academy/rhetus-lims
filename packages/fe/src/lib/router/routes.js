@@ -290,7 +290,7 @@ export const routes = [
 		name: 'requests-list',
 		component: () => import('../../requests/list/request-list.vue'),
 		meta: {
-			roles: [roles.PROCUREMENT_OFFICER, roles.RESEARCHER],
+			// roles: [roles.PROCUREMENT_OFFICER, roles.RESEARCHER],
 			title: 'Reagent Requests List',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },
@@ -309,6 +309,34 @@ export const routes = [
 				{ name: 'Home', path: '/' },
 				{ name: 'Requests', path: '/requests/list' },
 				{ name: 'New Request', path: '' }
+			]
+		}
+	},
+	{
+		path: '/requests/:id',
+		name: 'request-details',
+		component: () => import('../../requests/details/request-details.vue'),
+		props: true,
+		meta: {
+			title: 'Request Details',
+			breadcrumb: route => [
+				{ name: 'Home', path: '/' },
+				{ name: 'Requests', path: '/requests/list' },
+				{ name: `${route.params.id}`, path: '' }
+			]
+		}
+	},
+	{
+		path: '/requests/:id/edit',
+		name: 'request-details-edit',
+		component: () => import('../../requests/details/request-details.vue'),
+		props: true,
+		meta: {
+			title: 'Edit Request',
+			breadcrumb: route => [
+				{ name: 'Home', path: '/' },
+				{ name: 'Requests', path: '/requests/list' },
+				{ name: `${route.params.id}`, path: '' }
 			]
 		}
 	},

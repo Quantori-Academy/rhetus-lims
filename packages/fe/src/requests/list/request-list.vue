@@ -90,9 +90,14 @@ const handlePageChange = newPage => {
 	paginationData.value.page = newPage;
 };
 watch(paginationData.value, () => setRequests());
+
 const addNewRequest = () => {
 	$router.push({ name: 'new-request' });
 };
+
+function viewRequestDetails(row) {
+	$router.push({ name: 'request-details', params: { id: row.id } });
+}
 watch(
 	filters,
 	() => {
@@ -115,7 +120,12 @@ onMounted(() => {
 				<requests-filters v-model:filters="filters" />
 			</template>
 		</rh-filters>
-		<el-table v-loading="isLoading" :data="requests" @sort-change="setRequests">
+		<el-table
+			v-loading="isLoading"
+			:data="requests"
+			@sort-change="setRequests"
+			@row-click="viewRequestDetails"
+		>
 			<el-table-column prop="status" min-width="100" label="Status" sortable />
 			<el-table-column prop="reagentName" min-width="120" label="Reagent Name" sortable />
 			<el-table-column prop="quantity" label="Quantity" sortable />
@@ -151,3 +161,9 @@ onMounted(() => {
 		<rh-pagination :pagination="paginationData" @change-page="handlePageChange" />
 	</div>
 </template>
+
+<style scoped>
+:deep(.el-table__row):hover {
+	cursor: pointer;
+}
+</style>
