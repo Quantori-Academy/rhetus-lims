@@ -16,7 +16,7 @@ import { $router } from '../../lib/router/router';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg';
 import { $api } from '../../lib/api';
 import { emptyComponent, formRules } from './constants';
-import rhIcon from '../../lib/components/rh-icon.vue';
+import RhIcon from '../../lib/components/rh-icon.vue';
 
 const storages = ref([]);
 
@@ -134,7 +134,12 @@ onMounted(() => {
 							:label="item.label"
 							:value="item"
 							:disabled="!isOptionChosen(item)"
-						/>
+						>
+							<div class="category-icons">
+								<rh-icon :name="item.category === 'Reagent' ? 'box' : 'th-large'" />
+								<span>{{ item.label }}</span>
+							</div>
+						</el-option>
 					</el-select>
 					<div class="w-full">
 						<el-input-number
@@ -197,7 +202,9 @@ onMounted(() => {
 
 			<div class="btn-container">
 				<el-button @click="cancel">Cancel</el-button>
-				<el-button :loading="isSaving" type="primary" @click="submit">Create</el-button>
+				<el-button :loading="isSaving" type="primary" @click="submit"
+					><rh-icon color="#7DCDEA" name="th-large" />Create</el-button
+				>
 			</div>
 		</el-form>
 	</div>
@@ -210,6 +217,11 @@ onMounted(() => {
 .subscript {
 	opacity: 0.6;
 	font-size: small;
+}
+.category-icons {
+	display: flex;
+	align-items: center;
+	gap: 5px;
 }
 .add-btn {
 	margin-top: -12px;
