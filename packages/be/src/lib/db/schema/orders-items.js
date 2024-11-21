@@ -12,6 +12,7 @@ import {
 import { sql } from 'drizzle-orm';
 import { orders } from './orders.js';
 import { requests } from './requests.js';
+import { mol } from '../structure/types/mol.js';
 
 export const ItemTypes = {
 	REAGENT: 'reagent',
@@ -30,7 +31,7 @@ export const ordersItems = pgTable('orders_items', {
 		.default(null),
 	itemType: itemTypesEnum('item_type').notNull(),
 	reagentName: text('reagent_name').notNull(),
-	structure: text('structure').default(null),
+	structure: mol('structure').default(null),
 	casNumber: varchar('cas_number', { length: 12 }).default(null),
 	producer: varchar('producer', { length: 256 }).default(null),
 	catalogId: varchar('catalog_id', { length: 256 }).default(null),
