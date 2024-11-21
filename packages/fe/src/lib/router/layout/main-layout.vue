@@ -23,6 +23,7 @@ async function setUser() {
 
 provide('user', {
 	user,
+	isAuthLoading: isLoading,
 	isAdmin: user.value?.role?.name === 'administrator',
 	isResearcher: user.value?.role?.name === 'researcher'
 });
