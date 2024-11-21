@@ -8,7 +8,7 @@ import {
 	ElDatePicker,
 	ElInputNumber
 } from 'element-plus';
-import { computed, ref, onMounted, useTemplateRef, inject } from 'vue';
+import { computed, ref, onMounted, inject } from 'vue';
 import { $notifyUserAboutError, $notify } from '../../lib/utils/feedback/notify-msg.js';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
 import { $api } from '../../lib/api/index.js';
@@ -20,7 +20,6 @@ const props = defineProps({ id: { type: String, default: null } });
 
 const { isOfficer, isResearcher } = inject('user');
 
-const formEl = useTemplateRef('form-ref');
 const loading = ref(false);
 const request = ref(emptyRequest);
 const isEdit = computed(() => $route.value.name === 'request-details-edit');
