@@ -67,7 +67,7 @@ All **colors** must be declared in [`colors.css`](src/lib/assets/stylesheets/col
 
 **Fonts** are declared in [`fonts.css`](src/lib/assets/stylesheets/fonts.css.css).
 
-For **icons**, we use [Prime Icons](https://github.com/primefaces/primeicons) and [`<rh-icon>`](src/lib/components/rh-icon.vue) component.
+For **icons**, we use [Gitlab SVGs](https://gitlab-org.gitlab.io/gitlab-svgs) and [`<rh-icon>`](src/lib/components/rh-icon.vue) component.
 
 ```vue
 <rh-icon name="dollar"></rh-icon>
