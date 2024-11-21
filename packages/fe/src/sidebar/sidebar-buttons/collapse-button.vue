@@ -11,6 +11,6 @@ function emitClick() {
 
 <template>
 	<base-button @click="emitClick">
-		<rh-icon name="sidebar" size="20" />
+		<rh-icon name="sidebar" />
 	</base-button>
 </template>

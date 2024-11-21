@@ -12,7 +12,7 @@ const props = defineProps({
 	},
 	size: {
 		type: String,
-		default: '24'
+		default: '16'
 	},
 	angle: {
 		type: String,

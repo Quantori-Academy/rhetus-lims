@@ -27,7 +27,7 @@ const searchByStructure = async () => {
 	<el-input v-model="smiles" clearable placeholder="Search structure">
 		<template #append>
 			<el-button ref="buttonRef" :class="['icon-button', { 'custom-border': isPopoverVisible }]">
-				<rh-icon name="search" />
+				<rh-icon name="diagram" />
 			</el-button>
 			<el-popover
 				v-model:visible="isPopoverVisible"

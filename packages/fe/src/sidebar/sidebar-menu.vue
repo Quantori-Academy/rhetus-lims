@@ -34,7 +34,12 @@ const filteredNavigationLinks = computed(() => {
 		<div class="user-bar-container">
 			<div class="user-bar">
 				<router-link to="/" class="logo link">
-					<img src="../lib/assets/images/logo.svg" width="24" height="24" alt="Rhetus logo" />
+					<img
+						src="../lib/assets/images/logo-in-square.png"
+						width="24"
+						height="24"
+						alt="Rhetus logo"
+					/>
 				</router-link>
 
 				<div class="button-group">

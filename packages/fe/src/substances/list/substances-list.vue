@@ -190,14 +190,14 @@ onMounted(() => {
 			<el-table-column width="80">
 				<template #default="{ row }">
 					<el-button type="danger" @click.stop="() => deleteSingleSubstance(row)">
-						<rh-icon color="white" name="trash" />
+						<rh-icon color="white" name="remove" />
 					</el-button>
 				</template>
 			</el-table-column>
 			<el-table-column width="80">
 				<template #default="{ row }">
 					<el-button type="primary" @click.stop="() => orderReagent(row)">
-						<rh-icon color="white" name="sync" />
+						<rh-icon color="white" name="file-addition" />
 					</el-button>
 				</template>
 			</el-table-column>

@@ -21,6 +21,6 @@ async function onClickLogout() {
 
 <template>
 	<base-button @click="onClickLogout">
-		<rh-icon name="sign-out" size="20" />
+		<rh-icon name="power" />
 	</base-button>
 </template>

@@ -102,7 +102,7 @@ onMounted(() => {
 						v-if="row.hasPasswordResetRequests"
 						:content="`${row.username} has a password reset request`"
 					>
-						<rh-icon name="lock" color="#4c8fd2" size="18" class="password-icon" />
+						<rh-icon name="approval" color="#4c8fd2" size="18" class="password-icon" />
 					</el-tooltip>
 				</template>
 			</el-table-column>
@@ -130,7 +130,7 @@ onMounted(() => {
 			<el-table-column width="80">
 				<template #default="{ row }">
 					<el-button type="danger" @click.stop="() => deleteUser(row.id)">
-						<rh-icon color="white" name="trash" />
+						<rh-icon color="white" name="remove" />
 					</el-button>
 				</template>
 			</el-table-column>
