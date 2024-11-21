@@ -5,7 +5,6 @@ import { getClarifyParams } from '../../lib/utils/common/parse-params.js';
 import { applyFilters } from '../../lib/utils/db/apply-filters.js';
 import { applySorting } from '../../lib/utils/db/apply-sorting.js';
 import { getRelevanceScore } from '../../lib/db/structure/utils/get-relevance-score.js';
-import { sql } from 'drizzle-orm';
 
 async function substancesService(server) {
 	server.decorate('substancesService', {
@@ -13,12 +12,10 @@ async function substancesService(server) {
 			const { options, sort, limit, offset } = getClarifyParams(queryParams);
 
 			const reagentsQuery = server.reagentsService.getReagentsQuery({
-				structure: 'schema',
 				relevance: getRelevanceScore('structure', options?.smiles || '').as('relevance')
 			});
 			const samplesQuery = server.samplesService.getSamplesQuery({
-				structure: sql`${null}`,
-				relevance: sql`${0}`.as('relevance')
+				relevance: getRelevanceScore('structure', options?.smiles || '').as('relevance')
 			});
 
 			const unionQuery = unionAll(reagentsQuery, samplesQuery);

@@ -19,6 +19,7 @@ const Substance = S.object()
 	.prop('storageLocation', Storage.without(['isEmpty', 'creationDate']))
 	.prop('quantityUnit', S.string().minLength(1).required())
 	.prop('quantity', S.number().required())
+	.prop('structure', S.string())
 	.prop('expirationDate', S.string().format(S.FORMATS.DATE_TIME).required());
 
 const getSubstances = {
