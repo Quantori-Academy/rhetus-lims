@@ -75,10 +75,13 @@ const requestInfo = {
 	count: 3
 };
 
-function dateFilter(request, parsedDate, option) {
-	let [startDate, endDate] = parsedDate.map(date => new Date(date));
-	const createdAt = new Date(option);
-	return createdAt >= startDate && createdAt <= endDate;
+function dateFilter(request, parsedDate) {
+	if (parsedDate && parsedDate.length === 2) {
+		const [startDate, endDate] = parsedDate;
+		const orderDateObj = new Date(request);
+		return orderDateObj >= new Date(startDate) && orderDateObj <= new Date(endDate);
+	}
+	return true;
 }
 function matchesName(request, name) {
 	return name ? request.reagentName.toLowerCase().includes(name) : true;
@@ -86,11 +89,11 @@ function matchesName(request, name) {
 function matchesStatus(request, status) {
 	return status ? request.status.includes(status) : true;
 }
-function matchesCreationDate(request, parsedDate) {
-	return parsedDate ? dateFilter(request, parsedDate, request.createdAt) : true;
+function matchesCreationDate(request, creationRange) {
+	return dateFilter(request.createdAt, creationRange);
 }
-function matchesUpdateDate(request, parsedDate) {
-	return parsedDate ? dateFilter(request, parsedDate, request.updatedAt) : true;
+function matchesUpdateDate(request, updateRange) {
+	return dateFilter(request.updatedAt, updateRange);
 }
 function filterRequests(parsedOptions) {
 	const filteredRequests = requestInfo.requests.filter(request => {
