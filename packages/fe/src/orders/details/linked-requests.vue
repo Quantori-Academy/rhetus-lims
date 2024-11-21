@@ -8,7 +8,6 @@ import { $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 const props = defineProps({
 	order: { type: Object, default: null },
 	isEdit: { type: Boolean, default: false },
-	orderId: { type: String, default: null },
 	setOrder: { type: Function, default: null }
 });
 const searchQuery = ref('');
@@ -47,33 +46,39 @@ const fetchRequestSuggestions = async (queryString, callback) => {
 	if (!queryString) {
 		callback(
 			suggestedRequests.value.requests.filter(
-				req => !linkedRequests.value.find(linked => linked.id === req.id)
+				req => !linkedRequests.value.find(linked => linked.tempId === req.tempId)
 			)
 		);
 	} else {
 		const filteredRequests = suggestedRequests.value.requests.filter(request =>
 			request.reagentName.toLowerCase().includes(queryString.toLowerCase())
 		);
+
 		const suggestions = filteredRequests.filter(
-			req => !linkedRequests.value.find(linked => linked.id === req.id)
+			req => !linkedRequests.value.find(linked => linked.tempId === req.tempId)
 		);
+
 		callback(suggestions);
 	}
 };
 
 const linkRequest = selectedRequest => {
 	const requestCopy = { ...selectedRequest };
-	if (!linkedRequests.value.find(req => req.id === selectedRequest.id)) {
+	if (!linkedRequests.value.find(req => req.tempId === selectedRequest.tempId)) {
 		linkedRequests.value.push(selectedRequest);
 		order.value.reagentRequests.push(requestCopy);
 	}
 };
 const removeLinkedRequest = async request => {
-	linkedRequests.value = linkedRequests.value.filter(r => r.id !== request.id);
+	console.log(request.tempid);
+	linkedRequests.value = linkedRequests.value.filter(r => r.tempId !== request.tempId);
 	try {
-		const response = await $api.orders.removeItemFromOrder(request.id);
+		const response = await $api.orders.removeItemFromOrder(request.tempId, {
+			reagentRequests: request.tempId,
+			reagents: []
+		});
 		if (response.status === 'success') {
-			props.setOrder(props.orderId);
+			props.setOrder(order.value.id);
 		}
 	} catch (error) {
 		$notifyUserAboutError(error);
@@ -123,14 +128,21 @@ function viewRequestDetails(request) {
 	</el-form-item>
 </template>
 
-<style scoped>
+<style>
+.requests {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
 .linked-requests-container {
 	display: flex;
 	flex-direction: row;
 	gap: 10px;
 }
-
 .linked-requests-container span {
+	width: max-content;
+}
+.el-form-item__label {
 	width: max-content;
 }
 </style>

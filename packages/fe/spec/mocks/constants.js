@@ -62,21 +62,21 @@ export const orderInfo = {
 			],
 			reagents: [
 				{
-					id: '22a5974b-cb37-4ebd-9060-8cc131945510',
+					id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d',
 					author: {
 						id: 1,
 						username: 'username4'
 					},
 					reagentName: 'awesome acid',
 					quantity: 1.5,
-					quantityUnit: 'ml, bottle',
+					quantityUnit: 'g',
 					amount: 5,
 					status: 'pending',
 					userComment: 'we need it asap',
 					poComment: 'we have no enough money',
 					createdAt: '2024-09-27T13:16:35.744Z',
 					updatedAt: '2024-09-27T13:16:35.744Z',
-					structure: 'H2SO4',
+					structure: 'Cl[Na]',
 					casNumber: '1111111-11-1',
 					producer: '',
 					catalogId: '',

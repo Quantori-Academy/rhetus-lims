@@ -33,9 +33,7 @@ const originalOrder = ref({});
 const loading = ref(true);
 const rules = ref(orderFormRules);
 const isEdit = computed(() => $route.value.name === 'order-details-edit');
-const isOrderValid = computed(
-	() => order.value.reagents.length > 0 || order.value.reagentRequests.length > 0
-);
+
 const actionButtons = computed(() => {
 	const buttons = [];
 	if (['pending', 'ordered'].includes(order.value.status)) {
@@ -82,7 +80,7 @@ const deleteOrder = async () => {
 			cancelButtonText: 'Cancel',
 			type: 'warning'
 		});
-		const response = await $api.orders.deleteOrder(props.id);
+		const response = await $api.orders.deleteOrder(order.value.id);
 		$notify({
 			title: 'Success',
 			message: response.message,
@@ -127,7 +125,12 @@ const cancelEdit = () => {
 const updateOrder = async () => {
 	try {
 		if (!(await $isFormValid(orderForm))) return;
-		const response = await $api.orders.updateOrder(order.value.id, order.value);
+		const updatedFields = {
+			title: order.value.title,
+			seller: order.value.seller
+		};
+		const response = await $api.orders.updateOrder(order.value.id, updatedFields);
+
 		$notify({
 			title: 'Success',
 			message: response.message,
@@ -162,10 +165,11 @@ const setStatusesHistory = async () => {
 				</el-tag>
 			</h2>
 			<div class="btn-container">
+				<el-button v-if="isEdit" @click="cancelEdit">Cancel</el-button>
 				<el-button v-if="!isEdit && order.status === `pending`" @click="toggleEdit"
 					><rh-icon name="pencil"
 				/></el-button>
-				<el-dropdown>
+				<el-dropdown v-if="actionButtons.length > 0 && !isEdit">
 					<el-button>More Actions<rh-icon name="arrow-down" /></el-button>
 					<template #dropdown>
 						<el-dropdown-menu>
@@ -176,7 +180,9 @@ const setStatusesHistory = async () => {
 							>
 								{{ button.label }}
 							</el-dropdown-item>
-							<el-dropdown-item @click="deleteOrder">Delete</el-dropdown-item>
+							<el-dropdown-item v-if="order.status === `pending`" @click="deleteOrder"
+								>Delete</el-dropdown-item
+							>
 						</el-dropdown-menu>
 					</template>
 				</el-dropdown>
@@ -205,12 +211,6 @@ const setStatusesHistory = async () => {
 			<el-form-item label="Author" prop="author.username">
 				<el-input v-model="order.author.username" :disabled="true" />
 			</el-form-item>
-			<order-management
-				:order="order"
-				:is-edit="isEdit"
-				:order-id="props.id"
-				:set-order="setOrder"
-			/>
 			<el-form-item label="Created at" prop="createdAt">
 				<el-date-picker v-model="order.createdAt" type="date" format="YYYY-MM-DD" disabled />
 			</el-form-item>
@@ -218,14 +218,21 @@ const setStatusesHistory = async () => {
 				<el-date-picker v-model="order.updatedAt" type="date" format="YYYY-MM-DD" disabled />
 			</el-form-item>
 			<div v-if="isEdit" class="btn-container">
-				<el-button @click="cancelEdit">Cancel</el-button>
-				<el-button type="primary" :disabled="!isOrderValid" @click="updateOrder">Save</el-button>
+				<el-button type="primary" @click="updateOrder">Save</el-button>
 			</div>
 		</el-form>
 		<timeline-statuses
 			v-if="!isEdit"
 			:statuses-history="statusesHistory"
 			@set-statuses-history="setStatusesHistory"
+		/>
+	</div>
+	<div v-if="order" v-loading="loading" class="wrapper">
+		<order-management
+			:order="order"
+			:is-edit="isEdit"
+			:set-order="setOrder"
+			:update-order="updateOrder"
 		/>
 	</div>
 </template>

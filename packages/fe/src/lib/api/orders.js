@@ -8,9 +8,10 @@ export default http => ({
 			body: action
 		});
 	},
-	async removeItemFromOrder(id) {
+	async removeItemFromOrder(id, data) {
 		return await http(`/orders/${id}/remove-item`, {
-			method: 'PUT'
+			method: 'PUT',
+			body: data
 		});
 	},
 	async addItemToOrder(id, substance) {
