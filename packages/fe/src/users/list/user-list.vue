@@ -62,7 +62,7 @@ const setUsers = debounce(async () => {
 	isLoading.value = true;
 	try {
 		const data = await $api.users.fetchUsers(filters.value);
-		users.value = data.items;
+		users.value = data.users;
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
