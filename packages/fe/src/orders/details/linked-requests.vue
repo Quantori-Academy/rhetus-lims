@@ -70,13 +70,13 @@ const linkRequest = selectedRequest => {
 	}
 };
 const removeLinkedRequest = async request => {
-	console.log(request.tempid);
 	linkedRequests.value = linkedRequests.value.filter(r => r.tempId !== request.tempId);
 	try {
-		const response = await $api.orders.removeItemFromOrder(request.tempId, {
-			reagentRequests: request.tempId,
+		const body = {
+			reagentRequests: [request.tempId],
 			reagents: []
-		});
+		};
+		const response = await $api.orders.removeItemFromOrder(request.tempId, body);
 		if (response.status === 'success') {
 			props.setOrder(order.value.id);
 		}
@@ -128,21 +128,22 @@ function viewRequestDetails(request) {
 	</el-form-item>
 </template>
 
-<style>
+<style scoped>
 .requests {
 	display: flex;
 	flex-direction: column;
+	align-items: flex-start;
 	gap: 8px;
 }
 .linked-requests-container {
 	display: flex;
 	flex-direction: row;
+	align-items: flex-start;
 	gap: 10px;
 }
-.linked-requests-container span {
-	width: max-content;
-}
-.el-form-item__label {
-	width: max-content;
+
+.el-form-item {
+	display: flex;
+	width: 100%;
 }
 </style>
