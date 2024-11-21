@@ -1,6 +1,7 @@
 <script setup>
-import CollapseButton from '../sidebar-buttons/collapse-button.vue';
 import BreadcrumbsLinks from './breadcrumbs/breadcrumbs-links.vue';
+import RhIcon from '../../lib/components/rh-icon.vue';
+import BaseButton from '../sidebar-buttons/base-button.vue';
 
 const props = defineProps({
 	isSidebarOpen: {
@@ -21,7 +22,9 @@ function handleCollapse() {
 		<div class="top-bar-container">
 			<breadcrumbs-links>
 				<template #before>
-					<collapse-button v-if="!props.isSidebarOpen" @click="handleCollapse" />
+					<base-button v-if="!props.isSidebarOpen" @click="handleCollapse">
+						<rh-icon name="sidebar" />
+					</base-button>
 				</template>
 			</breadcrumbs-links>
 		</div>
