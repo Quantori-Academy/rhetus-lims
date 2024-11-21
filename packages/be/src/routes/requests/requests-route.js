@@ -18,6 +18,15 @@ async function requests(server, options) {
 	async function onCreateRequest(req, reply) {
 		try {
 			const authenticatedUserId = Number(req.session.user.id);
+
+			const isStructureValid = await server.reagentsService.isStructureValid(
+				req.body.structure || ''
+			);
+
+			if (!isStructureValid) {
+				return reply.code(400).send({ status: 'error', message: `Invalid structure` });
+			}
+
 			const reagentName = await server.requestsService.createRequest({
 				...req.body,
 				userId: authenticatedUserId

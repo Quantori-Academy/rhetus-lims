@@ -225,6 +225,20 @@
       "when": 1731996424489,
       "tag": "0031_dear_firestar",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1732179745780,
+      "tag": "0032_majestic_naoko",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1732187164248,
+      "tag": "0033_freezing_kat_farrell",
+      "breakpoints": true
     }
   ]
 }

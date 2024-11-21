@@ -16,6 +16,7 @@ const createSample = {
 		.prop('expirationDate', S.string().format(S.FORMATS.DATE_TIME).required())
 		.prop('storageId', S.string().required())
 		.prop('description', S.string())
+		.prop('structure', S.string())
 		.prop(
 			'components',
 			S.array().items(

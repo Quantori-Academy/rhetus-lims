@@ -113,6 +113,7 @@ async function reagentsService(server) {
 						room: sql`${schema.storages.room}`.as('storageRoom'),
 						description: sql`${schema.storages.description}`.as('storageDescription')
 					},
+					structure: schema.reagents.structure,
 					description: schema.reagents.description,
 					category: sql`'reagent'`.as('category'),
 					...Object.fromEntries(

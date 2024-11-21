@@ -21,6 +21,14 @@ async function samples(server, options) {
 				return reply.code(400).send({ status: 'error', message: `No such storage location` });
 			}
 
+			const isStructureValid = await server.reagentsService.isStructureValid(
+				req.body.structure || ''
+			);
+
+			if (!isStructureValid) {
+				return reply.code(400).send({ status: 'error', message: `Invalid structure` });
+			}
+
 			const { components } = req.body;
 
 			const insufficientComponent =

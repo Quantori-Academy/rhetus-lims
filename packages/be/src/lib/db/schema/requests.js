@@ -12,6 +12,7 @@ import {
 import { sql } from 'drizzle-orm';
 import { users } from './users.js';
 import { orders } from './orders.js';
+import { mol } from '../structure/types/mol.js';
 
 export const RequestStatus = {
 	PENDING: 'pending',
@@ -32,7 +33,7 @@ export const requests = pgTable('requests', {
 	poComment: text('po_comment').default(null),
 	requestStatus: requestStatusEnum('request_status').default(RequestStatus.PENDING),
 	reagentName: text('reagent_name').notNull(),
-	structure: text('structure').default(null),
+	structure: mol('structure').default(null),
 	casNumber: varchar('cas_number', { length: 12 }).default(null),
 	quantity: real('quantity').notNull(),
 	quantityUnit: varchar('quantity_unit', { length: 256 }).notNull(),

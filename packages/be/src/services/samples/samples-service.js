@@ -19,7 +19,8 @@ async function samplesService(server) {
 				expirationDate,
 				description,
 				components,
-				storageId
+				storageId,
+				structure
 			} = data;
 
 			const sample = await server.db
@@ -30,6 +31,7 @@ async function samplesService(server) {
 					quantityUnit,
 					quantityLeft,
 					storageId,
+					structure,
 					description,
 					expirationDate: new Date(expirationDate)
 				})
@@ -53,9 +55,7 @@ async function samplesService(server) {
 					component.category
 				);
 
-				if (!substance) {
-					return true;
-				}
+				if (!substance) return true;
 
 				const diff = substance.quantityLeft - component.quantityUsed;
 
@@ -76,6 +76,7 @@ async function samplesService(server) {
 					quantity: schema.samples.quantity,
 					expirationDate: schema.samples.expirationDate,
 					description: schema.samples.description,
+					structure: schema.samples.structure,
 					storageLocation: {
 						id: schema.storages.id,
 						name: schema.storages.name,
@@ -192,6 +193,7 @@ async function samplesService(server) {
 						room: sql`${schema.storages.room}`.as('storageRoom'),
 						description: sql`${schema.storages.description}`.as('storageDescription')
 					},
+					structure: schema.samples.structure,
 					description: schema.samples.description,
 					category: sql`'sample'`.as('category'),
 					...Object.fromEntries(
