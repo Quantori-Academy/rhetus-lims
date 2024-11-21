@@ -6,7 +6,9 @@ import {
 	ElButton,
 	ElFormItem,
 	ElDatePicker,
-	ElInputNumber
+	ElInputNumber,
+	ElSelect,
+	ElOption
 } from 'element-plus';
 import { computed, ref, onMounted, inject } from 'vue';
 import { $notifyUserAboutError, $notify } from '../../lib/utils/feedback/notify-msg.js';
@@ -15,6 +17,7 @@ import { $api } from '../../lib/api/index.js';
 import { $route, $router } from '../../lib/router/router.js';
 import { emptyRequest } from './constants.js';
 import { getButtonType } from '../../orders/details/constants.js';
+import { quantityUnits } from '../../lib/constants/quantity-units.js';
 
 const props = defineProps({ id: { type: String, default: null } });
 
@@ -89,6 +92,7 @@ onMounted(() => {
 	<div class="wrapper">
 		<div class="editing-header">
 			<h2>
+				{{ request.reagentName }}
 				<el-tag :type="getButtonType(request.status)" round>
 					{{ request.status }}
 				</el-tag>
@@ -119,7 +123,14 @@ onMounted(() => {
 					<el-input-number v-model="request.quantity" :min="1" :disabled="!isEdit" />
 				</el-form-item>
 				<el-form-item label="Quantity Unit" prop="quantityUnit">
-					<el-input v-model="request.quantityUnit" :disabled="!isEdit" />
+					<el-select
+						v-model="request.quantityUnit"
+						:disabled="!isEdit"
+						filterable
+						placeholder="Select a unit"
+					>
+						<el-option v-for="unit of quantityUnits" :key="unit" :label="unit" :value="unit" />
+					</el-select>
 				</el-form-item>
 				<el-form-item label="Amount" prop="status">
 					<el-input v-model="request.amount" :disabled="true" />

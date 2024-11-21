@@ -27,7 +27,7 @@ export const emptyRequest = {
 	quantityUnit: '',
 	status: '',
 	userComment: '',
-	poComment: '',
+	poComment: 'x',
 	createdAt: '',
 	updatedAt: ''
 };
