@@ -5,7 +5,6 @@ import { schema } from '../../lib/db/schema/index.js';
 import { helpers } from '../../lib/utils/common/helpers.js';
 import { smilesToMol } from '../../lib/db/structure/utils/smiles-to-mol.js';
 import { isValidSmilesQuery } from '../../lib/db/structure/utils/is-valid-smiles.js';
-import { substancesStorageChanges } from '../../lib/db/schema/substances-storage-changes.js';
 
 const formatMapping = {
 	name: string => helpers.capitalize(string),
@@ -305,61 +304,69 @@ async function reagentsService(server) {
 			return reagents.length ? reagents : null;
 		},
 
-		getQuantityChangeHistory: async substanceId => {
-			const result = await server.db
+		getQuantityChangeHistory: substanceId => {
+			return server.db
 				.select({
+					historyId: schema.substancesQuantityChanges.id,
 					user: {
 						id: schema.users.id,
 						firstName: schema.users.firstName,
 						lastName: schema.users.lastName
 					},
-					quantityLeft: schema.substancesQuantityChanges.targetValue,
+					prevQuantityLeft: schema.substancesQuantityChanges.previousValue,
+					newQuantityLeft: schema.substancesQuantityChanges.targetValue,
 					quantityUnit: schema.reagents.quantityUnit,
+					prevStorageLocation: sql`${null}`.as('prevStorageLocation'),
+					newStorageLocation: sql`${null}`.as('newStorageLocation'),
 					actionType: sql`'quantity-update'`.as('actionType'),
 					changeReason: schema.substancesQuantityChanges.changeReason,
 					modifiedDate: schema.substancesQuantityChanges.createdAt
 				})
 				.from(schema.substancesQuantityChanges)
 				.innerJoin(schema.users, eq(schema.substancesQuantityChanges.userId, schema.users.id))
-				.innerJoin(schema.reagents, eq(schema.substancesQuantityChanges.reagentId, substanceId))
-				.where(eq(schema.reagents.id, substanceId));
-			console.log('quantity change', result);
-			return result;
+				.innerJoin(
+					schema.reagents,
+					eq(schema.substancesQuantityChanges.reagentId, schema.reagents.id)
+				)
+				.where(eq(schema.substancesQuantityChanges.reagentId, substanceId));
 		},
-		getStorageChangeHistory: async substanceId => {
-			const result = await server.db
+		getStorageChangeHistory: substanceId => {
+			return server.db
 				.select({
+					historyId: schema.substancesStorageChanges.id,
 					user: {
-						id: schema.users.id,
-						firstName: schema.users.firstName,
-						lastName: schema.users.lastName
+						userId: schema.users.id,
+						userFirstName: schema.users.firstName,
+						userLastName: schema.users.lastName
 					},
-					substance: {
-						id: schema.reagents.id,
-						name: schema.reagents.name,
-						category: sql`'reagent'`.as('category')
-					},
-					storageLocation: {
-						id: schema.storages.id,
-						room: schema.storages.room,
-						name: schema.storages.name
-					},
+					prevQuantityLeft: sql`${null}`.as('prevQuantityLeft'),
+					newQuantityLeft: sql`${null}`.as('newQuantityLeft'),
+					quantityUnit: sql`${null}`.as('quantityUnit'),
+					prevStorageLocation: sql`json_build_object(
+						'prevStorageId', prevStorage.id,
+						'prevStorageRoom', prevStorage.room,
+						'prevStorageName', prevStorage.name
+					)`.as('prevStorageLocation'),
+					newStorageLocation: sql`json_build_object(
+						'newStorageId', newStorage.id,
+						'newStorageRoom', newStorage.room,
+						'newStorageName', newStorage.name
+					)`.as('newStorageLocation'),
 					actionType: sql`'storage-update'`.as('actionType'),
+					changeReason: sql`${null}`.as('changeReason'),
 					modifiedDate: schema.substancesStorageChanges.createdAt
 				})
 				.from(schema.substancesStorageChanges)
 				.innerJoin(schema.users, eq(schema.substancesStorageChanges.userId, schema.users.id))
 				.innerJoin(
-					schema.reagents,
-					eq(schema.substancesStorageChanges.reagentId, schema.reagents.id)
+					sql`storages AS prevStorage`,
+					eq(sql`prevStorage.id`, schema.substancesStorageChanges.previousStorageId)
 				)
 				.innerJoin(
-					schema.storages,
-					eq(schema.storages.id, substancesStorageChanges.targetStorageId)
+					sql`storages AS newStorage`,
+					eq(sql`newStorage.id`, schema.substancesStorageChanges.targetStorageId)
 				)
-				.where(eq(schema.reagents.id, substanceId));
-			console.log('quantity change', result);
-			return result;
+				.where(eq(schema.substancesStorageChanges.reagentId, substanceId));
 		}
 	});
 }

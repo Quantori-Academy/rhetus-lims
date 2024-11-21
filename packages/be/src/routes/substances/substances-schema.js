@@ -73,18 +73,25 @@ const Action = {
 };
 
 const HistorySchema = S.object()
+	.prop('historyId', S.string().format(S.FORMATS.UUID).required())
 	.prop('user', {
-		id: User.id,
-		firstName: User.firstName,
-		lastName: User.lastName
+		userId: User.id,
+		userFirstName: User.firstName,
+		userLastName: User.lastName
 	})
 	.required()
-	.prop('quantityLeft', S.number().minimum(0))
+	.prop('prevQuantityLeft', S.number().minimum(0))
+	.prop('newQuantityLeft', S.number().minimum(0))
 	.prop('quantityUnit', S.string().minLength(1))
-	.prop('storageLocation', {
-		id: Storage.id,
-		room: Storage.room,
-		name: Storage.name
+	.prop('prevStorageLocation', {
+		prevStorageId: Storage.id,
+		prevStorageRoom: Storage.room,
+		prevStorageName: Storage.name
+	})
+	.prop('newStorageLocation', {
+		newStorageId: Storage.id,
+		newStorageRoom: Storage.room,
+		newStorageName: Storage.name
 	})
 	.prop('actionType', S.string().enum(Object.values(Action)).required())
 	.prop('changeReason', S.string().minLength(1))

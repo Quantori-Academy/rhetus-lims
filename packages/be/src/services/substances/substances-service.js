@@ -17,7 +17,8 @@ async function substancesService(server) {
 			const samplesQuery = server.samplesService.getSamplesQuery({
 				relevance: getRelevanceScore('structure', options?.smiles || '').as('relevance')
 			});
-
+			console.log('reagentsQuery', reagentsQuery);
+			console.log('samplesQuery', samplesQuery);
 			const unionQuery = unionAll(reagentsQuery, samplesQuery);
 			let query = server.db.select().from(unionQuery.as('substances'));
 
@@ -206,11 +207,15 @@ async function substancesService(server) {
 			const isReagent = category === Category.REAGENT;
 			const service = isReagent ? server.reagentsService : server.samplesService;
 
-			const quantityChanges = await service.getQuantityChangeHistory(substanceId);
-
-			const storageChanges = await service.getStorageChangeHistory(substanceId);
+			const quantityChangesQuery = service.getQuantityChangeHistory(substanceId);
+			const storageChangesQuery = service.getStorageChangeHistory(substanceId);
+			console.log('quantityChangesQuery', quantityChangesQuery);
+			console.log('storageChangesQuery', storageChangesQuery);
+			const unionQuery = unionAll(quantityChangesQuery, storageChangesQuery);
+			console.log('query', unionQuery);
+			let query = server.db.select().from(unionQuery.as('histories'));
 			return {
-				histories: [...quantityChanges, ...storageChanges]
+				histories: await query
 			};
 		}
 	});

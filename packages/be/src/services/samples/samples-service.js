@@ -282,20 +282,17 @@ async function samplesService(server) {
 			};
 		},
 
-		getQuantityChangeHistory: async () => {
-			const result = await server.db
+		getQuantityChangeHistory: async substanceId => {
+			return server.db
 				.select({
+					historyId: schema.substancesQuantityChanges.id,
 					user: {
 						id: schema.users.id,
 						firstName: schema.users.firstName,
 						lastName: schema.users.lastName
 					},
-					substance: {
-						id: schema.samples.id,
-						name: schema.samples.name,
-						category: sql`'sample'`.as('category')
-					},
-					quantityLeft: schema.substancesQuantityChanges.targetValue,
+					prevQuantityLeft: schema.substancesQuantityChanges.previousValue,
+					newQuantityLeft: schema.substancesQuantityChanges.targetValue,
 					quantityUnit: schema.samples.quantityUnit,
 					actionType: sql`'quantity-update'`.as('actionType'),
 					changeReason: schema.substancesQuantityChanges.changeReason,
@@ -304,11 +301,44 @@ async function samplesService(server) {
 				.from(schema.substancesQuantityChanges)
 				.innerJoin(schema.users, eq(schema.substancesQuantityChanges.userId, schema.users.id))
 				.innerJoin(schema.samples, eq(schema.substancesQuantityChanges.sampleId, schema.samples.id))
-			console.log("quantity change", result);
-			return result;
+				.where(eq(schema.substancesQuantityChanges.sampleId, substanceId));
+		},
+
+		getStorageChangeHistory: async substanceId => {
+			return server.db
+				.select({
+					historyId: schema.substancesStorageChanges.id,
+					user: {
+						id: schema.users.id,
+						firstName: schema.users.firstName,
+						lastName: schema.users.lastName
+					},
+					prevStorageLocation: {
+						id: sql`prevStorage.id`.as('storageId'),
+						room: sql`prevStorage.room`.as('storageRoom'),
+						name: sql`prevStorage.name`.as('storageName')
+					},
+					newStorageLocation: {
+						id: sql`newStorage.id`.as('storageId'),
+						room: sql`newStorage.room`.as('storageRoom'),
+						name: sql`newStorage.name`.as('storageName')
+					},
+					actionType: sql`'storage-update'`.as('actionType'),
+					modifiedDate: schema.substancesStorageChanges.createdAt
+				})
+				.from(schema.substancesStorageChanges)
+				.innerJoin(schema.users, eq(schema.substancesStorageChanges.userId, schema.users.id))
+				.innerJoin(
+					sql`storages AS prevStorage`,
+					eq(sql`prevStorage.id`, schema.substancesStorageChanges.previousStorageId)
+				)
+				.innerJoin(
+					sql`storages AS newStorage`,
+					eq(sql`newStorage.id`, schema.substancesStorageChanges.targetStorageId)
+				)
+				.where(eq(schema.substancesStorageChanges.sampleId, substanceId));
 		}
 	});
 }
 
 export default fp(samplesService);
-
