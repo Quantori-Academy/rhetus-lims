@@ -27,6 +27,8 @@ const filters = defineModel('filters', { type: Object });
 			type="daterange"
 			start-placeholder="Creation start date"
 			end-placeholder="End date"
+			format="YYYY/MM/DD"
+			value-format="YYYY-MM-DD"
 		/>
 	</filter-item>
 	<filter-item>
@@ -35,6 +37,8 @@ const filters = defineModel('filters', { type: Object });
 			type="daterange"
 			start-placeholder="Update start date"
 			end-placeholder="End date"
+			format="YYYY/MM/DD"
+			value-format="YYYY-MM-DD"
 		/>
 	</filter-item>
 </template>

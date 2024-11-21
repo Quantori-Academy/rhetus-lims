@@ -18,8 +18,8 @@ const user = inject('user');
 const filters = ref({
 	reagentName: '',
 	status: '',
-	creationRange: '',
-	updateRange: ''
+	creationRange: [],
+	updateRange: []
 });
 function createQuery(event) {
 	let query = {};
@@ -43,7 +43,6 @@ const setRequests = debounce(async (event = null) => {
 	};
 	try {
 		const data = await $api.requests.fetchRequests(params);
-		console.log(user);
 		if (user.isResearcher) {
 			requests.value = data.requests.filter(request => request.author.id === user.user.value.id);
 		} else {
@@ -68,7 +67,7 @@ const cancelRequest = async id => {
 			inputPattern: /\S+/,
 			inputErrorMessage: 'Reason is required'
 		}).then(({ value }) => {
-			const response = $api.requests.cancelRequest(id, value);
+			const response = $api.requests.cancelRequest(id, { reason: value });
 			$notify({
 				title: 'Success',
 				message: response.message,
@@ -137,7 +136,7 @@ onMounted(() => {
 				:formatter="data => formatDate(data.updatedAt)"
 				sortable
 			/>
-			<el-table-column v-if="!user.isResearcher" width="100">
+			<el-table-column v-if="user.user.value.role.name === 'procurement officer'" width="100">
 				<template #default="{ row }">
 					<el-button
 						type="danger"
