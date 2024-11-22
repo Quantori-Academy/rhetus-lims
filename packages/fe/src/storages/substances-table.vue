@@ -163,6 +163,11 @@ onMounted(() => {
 			</template>
 		</rh-filters>
 		<el-table :data="substances" @row-click="viewSubstance">
+			<el-table-column width="50">
+				<template #default="{ row }">
+					<rh-icon color="#1785BE" :name="row.category === 'Reagent' ? 'box' : 'th-large'" />
+				</template>
+			</el-table-column>
 			<el-table-column prop="name" label="Name" />
 			<el-table-column prop="category" label="Category" />
 			<el-table-column prop="structure" label="Structure" />

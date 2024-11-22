@@ -8,9 +8,7 @@ import {
 	ElFormItem,
 	ElSelect,
 	ElInputNumber,
-	ElOption,
-	ElTable,
-	ElTableColumn
+	ElOption
 } from 'element-plus';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg';
@@ -20,6 +18,7 @@ import { $route, $router } from '../../lib/router/router';
 import { emptySample, formRules } from './constants';
 import { checkEditedFields } from '../../substances/constants';
 import RhIcon from '../../lib/components/rh-icon.vue';
+import SubstancesUsed from './substances-used.vue';
 
 const props = defineProps({ id: { type: String, default: null } });
 const storages = ref([]);
@@ -121,12 +120,6 @@ function cancelEdit() {
 	formEl.value.resetFields();
 	sample.value = originalSample.value;
 }
-function redirect(row) {
-	$router.push({
-		name: row.category.toLowerCase() === 'reagent' ? 'reagent-details' : 'sample-details',
-		params: { id: row.id }
-	});
-}
 async function setStorages() {
 	isLoading.value = true;
 	try {
@@ -180,22 +173,7 @@ watch(
 			<el-form-item label="Name" prop="name">
 				<el-input v-model="sample.name" :disabled="!isEditing" />
 			</el-form-item>
-			<el-form-item label="Substances used" prop="components">
-				<el-table :data="componentTableData" :border="true" @row-click="redirect">
-					<el-table-column prop="name" label="Name" />
-					<el-table-column prop="category" label="Category">
-						<template #default="{ row }">
-							<div class="category-icons">
-								<rh-icon
-									color="#8892A8"
-									:name="row.category === 'Reagent' ? 'box' : 'th-large'"
-								/><span>{{ row.category }}</span>
-							</div>
-						</template>
-					</el-table-column>
-					<el-table-column prop="quantityUsed" label="Quantiy Used" />
-				</el-table>
-			</el-form-item>
+			<substances-used :data="componentTableData" />
 			<div class="align-horizontal">
 				<el-form-item label="Quantity unit" prop="quantityUnit">
 					<el-select v-model="sample.quantityUnit" filterable disabled />
