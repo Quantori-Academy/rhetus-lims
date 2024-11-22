@@ -7,7 +7,7 @@ import { $confirm } from '../lib/utils/feedback/confirm-msg';
 import { $isFormValid } from '../lib/utils/form-validation/is-form-valid';
 import { passwordFormRules, profileFormRules } from './constants';
 import { $route, $router } from '../lib/router/router';
-import { languages } from './constants';
+import { locales } from '../lib/locales/locales';
 
 const editable = computed(() => $route.value.name === 'edit-user-profile');
 const profile = ref(null);
@@ -170,7 +170,7 @@ onMounted(() => {
 			<el-form-item label="Language">
 				<el-select v-model="language" :disabled="!editable">
 					<el-option
-						v-for="lang of languages"
+						v-for="lang of locales"
 						:key="lang.value"
 						:label="lang.label"
 						:value="lang.value"
