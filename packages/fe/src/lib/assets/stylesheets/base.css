@@ -74,6 +74,9 @@ html {
 	display: flex;
 	justify-content: space-between;
 }
+.icon {
+	margin-right: 4px;
+}
 .align-horizontal {
 	display: flex;
 	gap: 18px;

@@ -165,7 +165,7 @@ watch(
 	<div v-loading="isLoading" class="wrapper">
 		<div class="editing-header">
 			<div class="category-icons">
-				<rh-icon name="th-large" />{{ `${isEditing ? 'Editing ' : ''}${sample.name}` }}
+				<rh-icon name="applications" />{{ `${isEditing ? 'Editing ' : ''}${sample.name}` }}
 			</div>
 			<el-button v-if="!isEditing" @click="toggleEdit">Edit</el-button>
 		</div>

@@ -165,7 +165,7 @@ onMounted(() => {
 		<el-table :data="substances" @row-click="viewSubstance">
 			<el-table-column width="50">
 				<template #default="{ row }">
-					<rh-icon color="#1785BE" :name="row.category === 'Reagent' ? 'box' : 'th-large'" />
+					<rh-icon color="#1785be" :name="row.category === 'Reagent' ? 'pod' : 'applications'" />
 				</template>
 			</el-table-column>
 			<el-table-column prop="name" label="Name" />

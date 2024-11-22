@@ -160,10 +160,10 @@ onMounted(() => {
 		<rh-filters>
 			<template #action-buttons>
 				<el-button type="primary" @click="addNewReagent"
-					><rh-icon color="#7DCDEA" name="box" />Add New Reagent</el-button
+					><rh-icon color="#7dcdea" name="pod" class="icon" />Add New Reagent</el-button
 				>
 				<el-button type="primary" @click="addNewSample"
-					><rh-icon color="#7DCDEA" name="th-large" />Add New Sample</el-button
+					><rh-icon color="#7DCDEA" name="applications" class="icon" />Add New Sample</el-button
 				>
 			</template>
 
@@ -180,7 +180,7 @@ onMounted(() => {
 		>
 			<el-table-column width="50">
 				<template #default="{ row }">
-					<rh-icon color="#1785BE" :name="row.category === 'Reagent' ? 'box' : 'th-large'" />
+					<rh-icon color="#1785be" :name="row.category === 'Reagent' ? 'pod' : 'applications'" />
 				</template>
 			</el-table-column>
 			<el-table-column prop="name" min-width="150" label="Name" sortable />

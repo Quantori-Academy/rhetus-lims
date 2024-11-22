@@ -136,7 +136,7 @@ onMounted(() => {
 							:disabled="!isOptionChosen(item)"
 						>
 							<div class="category-icons">
-								<rh-icon :name="item.category === 'Reagent' ? 'box' : 'th-large'" />
+								<rh-icon :name="item.category === 'Reagent' ? 'pod' : 'applications'" />
 								<span>{{ item.label }}</span>
 							</div>
 						</el-option>
@@ -203,7 +203,7 @@ onMounted(() => {
 			<div class="btn-container">
 				<el-button @click="cancel">Cancel</el-button>
 				<el-button :loading="isSaving" type="primary" @click="submit"
-					><rh-icon color="#7DCDEA" name="th-large" />Create</el-button
+					><rh-icon color="#7DCDEA" name="applications" class="icon" />Create</el-button
 				>
 			</div>
 		</el-form>

@@ -148,7 +148,7 @@ async function setStorages() {
 			<div class="btn-container">
 				<el-button @click="cancel">Cancel</el-button>
 				<el-button :loading="isSaving" type="primary" @click="submit"
-					><rh-icon color="#7DCDEA" name="box" />Create</el-button
+					><rh-icon color="#7DCDEA" name="pod" class="icon" />Create</el-button
 				>
 			</div>
 		</el-form>

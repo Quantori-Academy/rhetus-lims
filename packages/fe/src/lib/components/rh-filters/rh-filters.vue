@@ -23,10 +23,6 @@ const toggleFilterView = () => {
 </template>
 
 <style scoped>
-.icon {
-	margin-right: 4px;
-}
-
 .action-buttons {
 	display: flex;
 	justify-content: end;

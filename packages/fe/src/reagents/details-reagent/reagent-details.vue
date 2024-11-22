@@ -156,7 +156,7 @@ const deleteReagent = async () => {
 	<div v-if="reagent" v-loading="loading" class="wrapper">
 		<div v-if="reagent" class="editing-header">
 			<div class="category-icons">
-				<rh-icon name="box" />{{ `${isEdit ? 'Editing ' : ''}${reagent.name}` }}
+				<rh-icon name="pod" />{{ `${isEdit ? 'Editing ' : ''}${reagent.name}` }}
 			</div>
 			<el-button v-if="!isEdit" @click="toggleEdit">{{ 'Edit' }}</el-button>
 		</div>
