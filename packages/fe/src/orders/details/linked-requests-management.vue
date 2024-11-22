@@ -15,7 +15,11 @@ const linkedRequests = ref([]);
 const suggestedRequests = ref([]);
 const loading = ref(false);
 const order = toRef(props, 'order');
+const emit = defineEmits(['update-linked-requests']);
 
+watch(linkedRequests, newVal => {
+	emit('update-linked-requests', newVal);
+});
 watch(
 	() => props.order?.reagentRequests,
 	newReagentRequests => {
@@ -31,6 +35,7 @@ const fetchRequests = async () => {
 	loading.value = true;
 	try {
 		const data = await $api.requests.fetchRequests();
+
 		suggestedRequests.value = {
 			...data,
 			requests: [...data.requests.filter(request => request.status === 'pending')]
@@ -46,7 +51,7 @@ const fetchRequestSuggestions = async (queryString, callback) => {
 	if (!queryString) {
 		callback(
 			suggestedRequests.value.requests.filter(
-				req => !linkedRequests.value.find(linked => linked.tempId === req.tempId)
+				req => !linkedRequests.value.find(linked => linked.id === req.id)
 			)
 		);
 	} else {
@@ -55,31 +60,41 @@ const fetchRequestSuggestions = async (queryString, callback) => {
 		);
 
 		const suggestions = filteredRequests.filter(
-			req => !linkedRequests.value.find(linked => linked.tempId === req.tempId)
+			req => !linkedRequests.value.find(linked => linked.id === req.id)
 		);
 
 		callback(suggestions);
 	}
 };
 
-const linkRequest = selectedRequest => {
-	const requestCopy = { ...selectedRequest };
-	if (!linkedRequests.value.find(req => req.tempId === selectedRequest.tempId)) {
-		linkedRequests.value.push(selectedRequest);
-		order.value.reagentRequests.push(requestCopy);
+const linkRequest = async selectedRequest => {
+	const alreadyLinked = linkedRequests.value.find(req => req.id === selectedRequest.id);
+	if (alreadyLinked) {
+		return;
 	}
-};
-const removeLinkedRequest = async request => {
-	linkedRequests.value = linkedRequests.value.filter(r => r.tempId !== request.tempId);
 	try {
 		const body = {
-			reagentRequests: [request.tempId],
+			reagentRequests: [{ ...selectedRequest }],
 			reagents: []
 		};
-		const response = await $api.orders.removeItemFromOrder(request.tempId, body);
+		const response = await $api.orders.addItemToOrder(order.value.id, body);
+		if (response.status === 'success') {
+			props.setOrder(order.value.id);
+			linkedRequests.value.push(selectedRequest);
+		}
+	} catch (error) {
+		$notifyUserAboutError(error);
+	}
+};
+
+const removeLinkedRequest = async selectedRequest => {
+	try {
+		const body = { reagentRequests: [selectedRequest.tempId], reagents: [] };
+		const response = await $api.orders.removeItemFromOrder(order.value.id, body);
 		if (response.status === 'success') {
 			props.setOrder(order.value.id);
 		}
+		linkedRequests.value = linkedRequests.value.filter(r => r.id !== selectedRequest.tempId);
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
@@ -111,7 +126,9 @@ function viewRequestDetails(request) {
 			@select="linkRequest"
 		>
 			<template #default="{ item }">
-				<div>{{ item.reagentName }}</div>
+				<div>
+					{{ item.reagentName }} ({{ item.quantity }} {{ item.quantityUnit }}) - {{ item.amount }}
+				</div>
 			</template>
 		</el-autocomplete>
 		<div v-if="linkedRequests.length > 0" class="linked-requests-container">
@@ -122,7 +139,8 @@ function viewRequestDetails(request) {
 				@click="() => viewRequestDetails(request)"
 				@close="() => removeLinkedRequest(request)"
 			>
-				{{ request.reagentName }} ({{ request.quantity }} {{ request.quantityUnit }})
+				{{ request.reagentName }} ({{ request.quantity }} {{ request.quantityUnit }}) -
+				{{ request.amount }}
 			</el-tag>
 		</div>
 	</el-form-item>
@@ -134,6 +152,7 @@ function viewRequestDetails(request) {
 	flex-direction: column;
 	align-items: flex-start;
 	gap: 8px;
+	margin-top: -2rem;
 }
 .linked-requests-container {
 	display: flex;
@@ -141,7 +160,6 @@ function viewRequestDetails(request) {
 	align-items: flex-start;
 	gap: 10px;
 }
-
 .el-form-item {
 	display: flex;
 	width: 100%;

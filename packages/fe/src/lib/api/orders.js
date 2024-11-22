@@ -14,10 +14,10 @@ export default http => ({
 			body: payload
 		});
 	},
-	async addItemToOrder(id, substance) {
+	async addItemToOrder(id, payload) {
 		return await http(`/orders/${id}/add-item`, {
 			method: 'PUT',
-			body: substance
+			body: payload
 		});
 	},
 	async fetchOrder(id) {
