@@ -21,9 +21,9 @@ async function substances(server, options) {
 
 	async function onGetSubstances(req, reply) {
 		try {
-			const data = await server.substancesService.getSubstances(req.query);
+			const { code, data } = await server.substancesService.getSubstances(req.query);
 
-			return reply.code(200).send(data);
+			return reply.code(code).send(data);
 		} catch (err) {
 			return reply.code(500).send(err);
 		}
