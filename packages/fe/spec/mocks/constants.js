@@ -14,7 +14,7 @@ export const orderInfo = {
 			},
 			reagentRequests: [
 				{
-					id: '1f8616d7-5b77-4643-bc76-b493500c738d',
+					tempId: '1f8616d7-5b77-4643-bc76-b493500c738d',
 					reagentName: 'good acid',
 					quantity: 15.5,
 					quantityUnit: 'ml, bottle',
@@ -37,7 +37,7 @@ export const orderInfo = {
 					orderId: null
 				},
 				{
-					id: '1f8616d7-5b77-4643-bc76-b493500c738r',
+					tempId: '1f8616d7-5b77-4643-bc76-b493500c738r',
 					author: {
 						id: 1,
 						username: 'username3'
@@ -62,7 +62,7 @@ export const orderInfo = {
 			],
 			reagents: [
 				{
-					id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d',
+					tempId: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d',
 					author: {
 						id: 1,
 						username: 'username4'
@@ -99,7 +99,7 @@ export const orderInfo = {
 			status: 'ordered',
 			reagentRequests: [
 				{
-					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
+					tempId: '22a5974b-cb37-4ebd-9060-8cc131945517',
 					author: {
 						id: 1,
 						username: 'username3'
@@ -122,7 +122,7 @@ export const orderInfo = {
 					orderId: null
 				},
 				{
-					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
+					tempId: '22a5974b-cb37-4ebd-9060-8cc131945517',
 					author: {
 						id: 1,
 						username: 'username3'
@@ -195,7 +195,7 @@ export const orderInfo = {
 			status: 'fulfilled',
 			reagentRequests: [
 				{
-					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
+					tempId: '22a5974b-cb37-4ebd-9060-8cc131945517',
 					author: {
 						id: 1,
 						username: 'username3'
@@ -218,7 +218,7 @@ export const orderInfo = {
 					orderId: null
 				},
 				{
-					id: '22a5974b-cb37-4ebd-9060-8cc131945516',
+					tempId: '22a5974b-cb37-4ebd-9060-8cc131945516',
 					author: {
 						id: 1,
 						username: 'username3'
@@ -291,7 +291,7 @@ export const orderInfo = {
 			status: 'canceled',
 			reagentRequests: [
 				{
-					id: '22a5974b-cb37-4ebd-9060-8cc131945517',
+					tempId: '22a5974b-cb37-4ebd-9060-8cc131945517',
 					author: {
 						id: 1,
 						username: 'username3'
@@ -314,7 +314,7 @@ export const orderInfo = {
 					orderId: null
 				},
 				{
-					id: '22a5974b-cb37-4ebd-9060-8cc131945516',
+					tempId: '22a5974b-cb37-4ebd-9060-8cc131945516',
 					author: {
 						id: 1,
 						username: 'username3'

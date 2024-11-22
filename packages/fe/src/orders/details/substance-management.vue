@@ -38,7 +38,7 @@ const removeReagent = async selectedReagent => {
 		const body = { reagentRequests: [], reagents: [selectedReagent.tempId] };
 		const response = await $api.orders.removeItemFromOrder(order.value.id, body);
 		if (response.status === 'success') {
-			props.setOrder(order.value.id);
+			await props.setOrder(order.value.id);
 		}
 	} catch (error) {
 		$notifyUserAboutError(error);

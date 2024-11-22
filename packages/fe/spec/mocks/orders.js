@@ -147,62 +147,47 @@ export const orderHandlers = [
 		}
 		return HttpResponse.json({ status: 'success', message: result.message });
 	}),
-	http.put(api('/orders/:id/remove-item'), async ({ params }) => {
+	http.put(api('/orders/:id/remove-item'), async ({ request, params }) => {
+		const body = await request.json();
 		const { id } = params;
-		for (const targetOrder of orderInfo.orders) {
-			if (targetOrder.reagents.length === 0 && targetOrder.reagentRequests.length === 0) {
-				continue;
-			}
-			const reagentIndex = targetOrder.reagents.findIndex(item => item.id === id);
-			if (reagentIndex !== -1) {
-				targetOrder.reagents.splice(reagentIndex, 1);
-				return HttpResponse.json({
-					status: 'success',
-					message: 'Item removed successfully'
-				});
-			}
-			const requestIndex = targetOrder.reagentRequests.findIndex(item => item.id === id);
-			if (requestIndex !== -1) {
-				targetOrder.reagentRequests.splice(requestIndex, 1);
-				return HttpResponse.json({
-					status: 'success',
-					message: 'Item removed successfully'
-				});
-			}
+		const { reagentRequests, reagents } = body;
+		let targetOrder = orderInfo.orders.filter(order => order.id === id)[0];
+
+		const reagentIndex = targetOrder.reagents.findIndex(item => item.tempId === reagents[0]);
+		if (reagentIndex !== -1) {
+			targetOrder.reagents.splice(reagentIndex, 1);
+			return HttpResponse.json({
+				status: 'success',
+				message: 'Item removed successfully'
+			});
+		}
+		const requestIndex = targetOrder.reagentRequests.findIndex(
+			item => item.tempId === reagentRequests[0]
+		);
+		if (requestIndex !== -1) {
+			targetOrder.reagentRequests.splice(requestIndex, 1);
+			return HttpResponse.json({
+				status: 'success',
+				message: 'Item removed successfully'
+			});
 		}
 	}),
 	http.put(api('/orders/:id/add-item'), async ({ request, params }) => {
 		const item = await request.json();
 		const { id } = params;
-		console.log(item, id);
 		for (const targetOrder of orderInfo.orders) {
 			if (targetOrder.reagents.length === 0 && targetOrder.reagentRequests.length === 0) {
 				continue;
 			}
-
-			// Check if the item exists in reagents, if so add it
-			const reagentExists = targetOrder.reagents.some(item => item.id === id);
+			const reagentExists = targetOrder.reagents.some(item => item.tempId === id);
 			if (!reagentExists) {
-				targetOrder.reagents.push(item); // Add reagent to reagents
-				console.log(targetOrder);
+				targetOrder.reagents.push(item);
 				return HttpResponse.json({
 					status: 'success',
 					order: targetOrder
 				});
 			}
-
-			// Check if the item exists in reagentRequests, if so add it
-			// const requestExists = targetOrder.reagentRequests.some(item => item.id === id);
-			// if (!requestExists) {
-			// 	targetOrder.reagentRequests.push(item); // Add request to reagentRequests
-			// 	return HttpResponse.json({
-			// 		status: 'success',
-			// 		order: targetOrder
-			// 	});
-			// }
 		}
-
-		// If the item was not found or added
 		return HttpResponse.json({ status: 'error', message: 'Item not added to any order' });
 	})
 ];

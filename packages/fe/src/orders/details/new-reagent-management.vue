@@ -100,7 +100,7 @@ const onReagentSelect = async selectedRequest => {
 		};
 		const response = await $api.orders.addItemToOrder(order.value.id, body);
 		if (response.status === 'success') {
-			props.setOrder(order.value.id);
+			await props.setOrder(order.value.id);
 		}
 	} catch (error) {
 		$notifyUserAboutError(error);

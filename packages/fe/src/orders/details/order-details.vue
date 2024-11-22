@@ -21,6 +21,7 @@ import RhIcon from '../../lib/components/rh-icon.vue';
 import TimelineStatuses from '../../timeline/timeline-statuses.vue';
 import SubstanceManagement from './substance-management.vue';
 import LinkedRequestsManagement from './linked-requests-management.vue';
+
 const props = defineProps({
 	id: {
 		type: String,
@@ -35,6 +36,9 @@ const linkedRequests = ref([]);
 const loading = ref(true);
 const isEdit = computed(() => $route.value.name === 'order-details-edit');
 const isPending = computed(() => order.value.status === `pending`);
+const isOrderValid = computed(
+	() => order.value.reagents.length > 0 || order.value.reagentRequests.length > 0
+);
 const actions = computed(() => {
 	const buttons = [];
 	if (['pending', 'ordered'].includes(order.value.status)) {
@@ -141,6 +145,9 @@ const updateOrder = async () => {
 			message: response.message,
 			type: 'success'
 		});
+		if (response.status === 'success') {
+			await setOrder(order.value.id);
+		}
 		$router.push({ name: 'order-details' });
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating order');
@@ -218,7 +225,7 @@ const setStatusesHistory = async () => {
 					<el-date-picker v-model="order.updatedAt" type="date" format="YYYY-MM-DD" disabled />
 				</el-form-item>
 				<div v-if="isEdit" class="btn-container">
-					<el-button type="primary" @click="updateOrder">Save</el-button>
+					<el-button type="primary" :disabled="!isOrderValid" @click="updateOrder">Save</el-button>
 				</div>
 			</el-form>
 		</div>

@@ -68,7 +68,7 @@ const fetchRequestSuggestions = async (queryString, callback) => {
 };
 
 const linkRequest = async selectedRequest => {
-	const alreadyLinked = linkedRequests.value.find(req => req.id === selectedRequest.id);
+	const alreadyLinked = linkedRequests.value.find(req => req.tempId === selectedRequest.id);
 	if (alreadyLinked) {
 		return;
 	}
@@ -79,8 +79,7 @@ const linkRequest = async selectedRequest => {
 		};
 		const response = await $api.orders.addItemToOrder(order.value.id, body);
 		if (response.status === 'success') {
-			props.setOrder(order.value.id);
-			linkedRequests.value.push(selectedRequest);
+			await props.setOrder(order.value.id);
 		}
 	} catch (error) {
 		$notifyUserAboutError(error);
@@ -92,9 +91,8 @@ const removeLinkedRequest = async selectedRequest => {
 		const body = { reagentRequests: [selectedRequest.tempId], reagents: [] };
 		const response = await $api.orders.removeItemFromOrder(order.value.id, body);
 		if (response.status === 'success') {
-			props.setOrder(order.value.id);
+			await props.setOrder(order.value.id);
 		}
-		linkedRequests.value = linkedRequests.value.filter(r => r.id !== selectedRequest.tempId);
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
