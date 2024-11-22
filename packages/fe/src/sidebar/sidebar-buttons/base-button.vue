@@ -20,7 +20,7 @@ function onClick(event) {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	padding: 6px;
+	padding: 8px;
 	width: auto;
 	height: auto;
 	border: none;

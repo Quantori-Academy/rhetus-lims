@@ -153,7 +153,7 @@ onMounted(() => {
 						</div>
 					</div>
 					<el-button type="danger" @click="() => removeComponent(index)">
-						<rh-icon color="white" name="trash" />
+						<rh-icon color="white" name="remove" />
 					</el-button>
 				</div>
 			</el-form-item>

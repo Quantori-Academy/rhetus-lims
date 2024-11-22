@@ -88,7 +88,7 @@ function removeReagent(order) {
 					circle
 					@click="() => removeReagent(order)"
 				>
-					<rh-icon color="white" name="trash"
+					<rh-icon color="white" name="remove"
 				/></el-button>
 			</div>
 			<el-form ref="substance-form-el" :model="newSubstance" :rules="newSubstanceRules" class="row">

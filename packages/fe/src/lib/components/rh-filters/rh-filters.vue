@@ -12,7 +12,7 @@ const toggleFilterView = () => {
 <template>
 	<div class="action-buttons">
 		<el-button @click="toggleFilterView">
-			<rh-icon color="#1785be" name="sliders-h" />
+			<rh-icon color="#1785be" name="preferences" class="icon" />
 			{{ visible ? 'Hide filters' : 'Show filters' }}
 		</el-button>
 		<slot name="action-buttons" />
@@ -22,7 +22,11 @@ const toggleFilterView = () => {
 	</div>
 </template>
 
-<style>
+<style scoped>
+.icon {
+	margin-right: 4px;
+}
+
 .action-buttons {
 	display: flex;
 	justify-content: end;

@@ -149,7 +149,7 @@ onMounted(() => {
 			<el-table-column width="80">
 				<template #default="{ row }">
 					<el-button type="danger" @click.stop="() => deleteOrder(row.id)">
-						<rh-icon color="white" name="trash" />
+						<rh-icon color="white" name="remove" />
 					</el-button>
 				</template>
 			</el-table-column>

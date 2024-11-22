@@ -2,20 +2,22 @@
 import { ref } from 'vue';
 import SidebarMenu from './sidebar-menu.vue';
 import TopBar from './top-bar/top-bar.vue';
+import { getSidebarCollapsedState, toggleSidebarCollapse } from './sidebar-collapse.js';
 
-const isSidebarOpen = ref(true);
+const isSidebarCollapsed = ref(getSidebarCollapsedState());
 
 function handleToggle() {
-	isSidebarOpen.value = !isSidebarOpen.value;
+	isSidebarCollapsed.value = !isSidebarCollapsed.value;
+	toggleSidebarCollapse();
 }
 </script>
 
 <template>
-	<div class="page-with-sidebar" :class="{ 'page-with-sidebar-collapsed': !isSidebarOpen }">
+	<div class="page-with-sidebar" :class="{ 'page-with-sidebar-collapsed': isSidebarCollapsed }">
 		<sidebar-menu @toggle-collapse="handleToggle" />
 
 		<div class="content-wrapper">
-			<top-bar :is-sidebar-open="isSidebarOpen" @toggle-collapse="handleToggle" />
+			<top-bar :is-sidebar-collapsed="isSidebarCollapsed" @toggle-collapse="handleToggle" />
 
 			<div class="container-fluid">
 				<main>

@@ -1,22 +1,22 @@
 export const navigationLink = [
 	{
 		path: '/substances/list',
-		icon: 'asterisk',
+		icon: 'issue-type-test-case',
 		name: 'Substances'
 	},
 	{
 		path: '/storages/list',
-		icon: 'building',
+		icon: 'archive',
 		name: 'Storages'
 	},
 	{
 		path: '/users/list',
-		icon: 'user',
+		icon: 'users',
 		name: 'Users'
 	},
 	{
 		path: '/orders/list',
-		icon: 'shopping-cart',
+		icon: 'container-image',
 		name: 'Orders'
 	},
 	{
