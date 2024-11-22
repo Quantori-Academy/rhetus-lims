@@ -19,21 +19,18 @@ import { $confirm } from '../../lib/utils/feedback/confirm-msg';
 import { $route, $router } from '../../lib/router/router';
 import { emptySample, formRules } from './constants';
 import { checkEditedFields } from '../../substances/constants';
+import RhIcon from '../../lib/components/rh-icon.vue';
+
 const props = defineProps({ id: { type: String, default: null } });
-
 const storages = ref([]);
-
 const formEl = useTemplateRef('form-el');
 const sample = ref(emptySample);
-
 const rules = ref(formRules);
-
 const isEditing = computed(() => $route.value.name === 'edit-sample');
 const isLoading = ref(true);
 const isSaving = ref(false);
 const originalSample = ref({});
 const updatedSampleValues = ref({ category: 'sample' });
-
 watch(
 	sample,
 	sampleFields => {
@@ -68,10 +65,8 @@ async function deleteSample() {
 		}
 	}
 }
-
 async function submit() {
 	if (!(await $isFormValid(formEl))) return;
-
 	isSaving.value = true;
 	try {
 		if (sample.value.quantityLeft <= 0) {
@@ -93,7 +88,6 @@ async function submit() {
 		isSaving.value = false;
 	}
 }
-
 const deleteSampleZero = async () => {
 	try {
 		await $confirm('Quantity reached 0. Do you want to delete this sample?', 'Warning', {
@@ -114,11 +108,9 @@ const deleteSampleZero = async () => {
 		}
 	}
 };
-
 function toggleEdit() {
 	$router.push({ name: 'edit-sample', params: { id: props.id } });
 }
-
 function cancelEdit() {
 	$router.push({ name: 'sample-details', params: { id: props.id } });
 	$notify({
@@ -129,14 +121,12 @@ function cancelEdit() {
 	formEl.value.resetFields();
 	sample.value = originalSample.value;
 }
-
 function redirect(row) {
 	$router.push({
 		name: row.category.toLowerCase() === 'reagent' ? 'reagent-details' : 'sample-details',
 		params: { id: row.id }
 	});
 }
-
 async function setStorages() {
 	isLoading.value = true;
 	try {
@@ -148,7 +138,6 @@ async function setStorages() {
 		isLoading.value = false;
 	}
 }
-
 async function setSample(id) {
 	isLoading.value = true;
 	try {
@@ -163,19 +152,16 @@ async function setSample(id) {
 		isLoading.value = false;
 	}
 }
-
 const componentTableData = computed(() =>
 	sample.value.components.map(x => ({
 		...x,
 		quantityUsed: `${x.quantityUsed} ${x.quantityUnit}`
 	}))
 );
-
 onMounted(() => {
 	setSample(props.id);
 	setStorages();
 });
-
 watch(
 	() => props.id,
 	newId => setSample(newId)
@@ -185,7 +171,9 @@ watch(
 <template>
 	<div v-loading="isLoading" class="wrapper">
 		<div class="editing-header">
-			<div>{{ `${isEditing ? 'Editing ' : ''}${sample.name}` }}</div>
+			<div class="category-icons">
+				<rh-icon name="th-large" />{{ `${isEditing ? 'Editing ' : ''}${sample.name}` }}
+			</div>
 			<el-button v-if="!isEditing" @click="toggleEdit">Edit</el-button>
 		</div>
 		<el-form ref="form-el" :model="sample" :rules="rules" label-position="top">
@@ -195,7 +183,16 @@ watch(
 			<el-form-item label="Substances used" prop="components">
 				<el-table :data="componentTableData" :border="true" @row-click="redirect">
 					<el-table-column prop="name" label="Name" />
-					<el-table-column prop="category" label="Category" />
+					<el-table-column prop="category" label="Category">
+						<template #default="{ row }">
+							<div class="category-icons">
+								<rh-icon
+									color="#8892A8"
+									:name="row.category === 'Reagent' ? 'box' : 'th-large'"
+								/><span>{{ row.category }}</span>
+							</div>
+						</template>
+					</el-table-column>
 					<el-table-column prop="quantityUsed" label="Quantiy Used" />
 				</el-table>
 			</el-form-item>
@@ -248,7 +245,7 @@ watch(
 					:disabled="!isEditing"
 				/>
 			</el-form-item>
-			<div v-if="isEditing" class="btn-container">
+			<div v-if="isEditing" class="btns-container">
 				<el-button type="danger" @click="deleteSample">Delete</el-button>
 				<div>
 					<el-button @click="cancelEdit">Cancel</el-button>
@@ -258,10 +255,3 @@ watch(
 		</el-form>
 	</div>
 </template>
-
-<style>
-.btn-container {
-	display: flex;
-	justify-content: space-between;
-}
-</style>

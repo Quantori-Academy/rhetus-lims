@@ -218,11 +218,6 @@ onMounted(() => {
 	opacity: 0.6;
 	font-size: small;
 }
-.category-icons {
-	display: flex;
-	align-items: center;
-	gap: 5px;
-}
 .add-btn {
 	margin-top: -12px;
 	margin-bottom: 12px;
