@@ -123,7 +123,7 @@ const removeReagent = async selectedReagent => {
 					circle
 					@click="() => removeReagent(singleOrder)"
 				>
-					<rh-icon color="white" name="trash"
+					<rh-icon color="white" name="remove"
 				/></el-button>
 				<div
 					v-if="
