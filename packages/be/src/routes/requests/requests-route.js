@@ -19,7 +19,7 @@ async function requests(server, options) {
 		try {
 			const authenticatedUserId = Number(req.session.user.id);
 
-			const isStructureValid = await server.reagentsService.isStructureValid(
+			const isStructureValid = await server.substancesService.isStructureValid(
 				req.body.structure || ''
 			);
 
