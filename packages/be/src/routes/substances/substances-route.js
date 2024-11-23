@@ -102,7 +102,7 @@ async function substances(server, options) {
 	server.route({
 		method: 'POST',
 		path: options.prefix + 'substances',
-		// preValidation: [server.authenticate],
+		preValidation: [server.authenticate],
 		schema: schema.createSubstance,
 		handler: onCreateSubstance
 	});
@@ -150,7 +150,7 @@ async function substances(server, options) {
 	server.route({
 		method: 'DELETE',
 		path: options.prefix + 'substances/:category/:id',
-		// preValidation: [server.authenticate],
+		preValidation: [server.authenticate],
 		schema: schema.deleteSubstance,
 		handler: onDeleteSubstance
 	});
@@ -181,7 +181,7 @@ async function substances(server, options) {
 	server.route({
 		method: 'GET',
 		path: options.prefix + 'substances/:category/:id',
-		// preValidation: [server.authenticate],
+		preValidation: [server.authenticate],
 		schema: schema.getSubstance,
 		handler: onGetSubstance
 	});
