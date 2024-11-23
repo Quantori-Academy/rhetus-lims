@@ -20,7 +20,8 @@ async function samplesService(server) {
 				description,
 				components,
 				storageId,
-				structure
+				structure,
+				userId
 			} = data;
 
 			const sample = await server.db
@@ -37,33 +38,30 @@ async function samplesService(server) {
 				})
 				.returning({ id: schema.samples.id, name: schema.samples.name });
 
-			const sampleComponents = components.map(x => ({
+			const sampleComponents = components.map(component => ({
 				id: sample[0].id,
-				quantityUsed: x.quantityUsed,
-				...(x.category === Category.REAGENT ? { reagentId: x.id } : { sampleId: x.id })
+				quantityUsed: component.quantityUsed,
+				...(component.category === Category.REAGENT
+					? { reagentId: component.id }
+					: { sampleId: component.id })
 			}));
 
 			await server.db.insert(schema.components).values(sampleComponents);
 
-			return sample.length ? sample[0].name : null;
-		},
+			const sampleName = sample.length ? sample[0].name : null;
 
-		areComponentsInsufficient: async components => {
-			for (const component of components) {
-				const substance = await server.substancesService.getSubstanceById(
-					component.id,
-					component.category
-				);
+			await Promise.all(
+				components.map(async ({ id, category, quantityUsed }) => {
+					await server.substancesService.changeSubstanceQuantity(id, {
+						category,
+						quantityUsed,
+						userId,
+						reason: `Used in making ${sampleName}`
+					});
+				})
+			);
 
-				if (!substance) return true;
-
-				const diff = substance.quantityLeft - component.quantityUsed;
-
-				if (diff < 0) {
-					return true;
-				}
-			}
-			return false;
+			return sampleName;
 		},
 
 		getSampleById: async id => {
@@ -82,7 +80,8 @@ async function samplesService(server) {
 						name: schema.storages.name,
 						room: schema.storages.room,
 						description: schema.storages.description
-					}
+					},
+					category: sql`'sample'`.as('category')
 				})
 				.from(schema.samples)
 				.innerJoin(schema.storages, eq(schema.storages.id, schema.samples.storageId))
@@ -101,6 +100,7 @@ async function samplesService(server) {
 					quantityLeft: schema.reagents.quantityLeft,
 					expirationDate: schema.reagents.expirationDate,
 					description: schema.reagents.description,
+					structure: schema.reagents.structure,
 					category: sql`'reagent'`.as('category')
 				})
 				.from(schema.components)
@@ -117,6 +117,7 @@ async function samplesService(server) {
 							quantityLeft: schema.samples.quantityLeft,
 							expirationDate: schema.samples.expirationDate,
 							description: schema.samples.description,
+							structure: schema.samples.structure,
 							category: sql`'sample'`.as('category')
 						})
 						.from(schema.components)
@@ -196,6 +197,7 @@ async function samplesService(server) {
 					structure: schema.samples.structure,
 					description: schema.samples.description,
 					category: sql`'sample'`.as('category'),
+					orderId: sql`NULL`,
 					...Object.fromEntries(
 						Object.entries(extras).map(([col, query]) => [
 							col,
@@ -218,7 +220,8 @@ async function samplesService(server) {
 					quantityLeft: schema.samples.quantityLeft,
 					expirationDate: schema.samples.expirationDate,
 					description: schema.samples.description,
-					category: sql`'sample'`.as('category')
+					category: sql`'sample'`.as('category'),
+					structure: schema.samples.structure
 				})
 				.from(schema.samples)
 				.where(and(eq(schema.samples.storageId, id), eq(schema.samples.deleted, false)));
@@ -264,6 +267,7 @@ async function samplesService(server) {
 				message: `Name of the sample was changed to '${result[0].sampleName}'`
 			};
 		},
+
 		changeDescription: async (id, data) => {
 			const { description } = data;
 
