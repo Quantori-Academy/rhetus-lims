@@ -6,7 +6,9 @@ import { RequestStatus } from '../../lib/db/schema/requests.js';
 import { ItemTypes } from '../../lib/db/schema/orders-items.js';
 
 const formatMapping = {
-	quantityUnit: string => helpers.lowercase(string)
+	quantityUnit: string => helpers.lowercase(string),
+	name: string => helpers.capitalize(string),
+	casNumber: string => helpers.lowercase(string)
 };
 
 async function orderItemsService(server) {
@@ -21,7 +23,9 @@ async function orderItemsService(server) {
 					const request = await server.requestsService.getRequestById(id);
 
 					if (!request) {
-						throw new Error('No such request');
+						const error = new Error('No such request');
+						error.statusCode = 404;
+						throw error;
 					}
 
 					const {
@@ -36,7 +40,9 @@ async function orderItemsService(server) {
 					} = request ?? {};
 
 					if (status !== RequestStatus.PENDING) {
-						throw new Error('Request is already processing in another one order');
+						const error = new Error('Request is already processing in another order');
+						error.statusCode = 409;
+						throw error;
 					}
 
 					return {
@@ -69,7 +75,9 @@ async function orderItemsService(server) {
 					const reagent = await server.reagentsService.getReagentById(id);
 
 					if (!reagent) {
-						throw new Error('No such reagent');
+						const error = new Error('No such reagent');
+						error.statusCode = 404;
+						throw error;
 					}
 
 					const { name, structure, casNumber, producer, catalogId, catalogLink, unitPrice } =
@@ -87,6 +95,37 @@ async function orderItemsService(server) {
 						quantityUnit: formatMapping.quantityUnit(quantityUnit),
 						amount,
 						itemType: ItemTypes.REAGENT
+					};
+				})
+			);
+
+			return formattedReagents;
+		},
+
+		getFormattedOrderItemsFromNewReagents: async reagents => {
+			if (!reagents.length) {
+				return [];
+			}
+
+			const formattedReagents = await Promise.all(
+				reagents.map(async reagent => {
+					const { name, casNumber, quantityUnit, structure, ...restProperties } = reagent;
+
+					const isStructureValid = await server.substancesService.isStructureValid(structure || '');
+
+					if (!isStructureValid) {
+						const error = new Error('Invalid structure');
+						error.statusCode = 400;
+						throw error;
+					}
+
+					return {
+						reagentName: formatMapping.name(name),
+						casNumber: formatMapping.casNumber(casNumber),
+						quantityUnit: formatMapping.quantityUnit(quantityUnit),
+						structure,
+						itemType: ItemTypes.REAGENT,
+						...restProperties
 					};
 				})
 			);
@@ -149,14 +188,19 @@ async function orderItemsService(server) {
 		},
 
 		addItemsToOrder: async (orderId, data) => {
-			const { reagents, reagentRequests, orderTitle } = data ?? {};
+			const { reagents, reagentRequests, newReagents, orderTitle } = data ?? {};
 
-			const [formattedRequests, formattedReagents] = await Promise.all([
+			const [formattedRequests, formattedReagents, formattedNewReagents] = await Promise.all([
 				server.orderItemsService.getFormattedOrderItemsFromRequests(reagentRequests),
-				server.orderItemsService.getFormattedOrderItemsFromReagents(reagents)
+				server.orderItemsService.getFormattedOrderItemsFromReagents(reagents),
+				server.orderItemsService.getFormattedOrderItemsFromNewReagents(newReagents)
 			]);
 
-			const formattedOrderItems = [...formattedRequests, ...formattedReagents];
+			const formattedOrderItems = [
+				...formattedRequests,
+				...formattedReagents,
+				...formattedNewReagents
+			];
 
 			await server.db.transaction(async tx => {
 				await server.orderItemsService.orderItemsInsert(orderId, formattedOrderItems, tx);
