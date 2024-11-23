@@ -1,4 +1,12 @@
-import { requiredRule } from '../../lib/utils/form-validation/requiredRule.js';
+import { $confirm } from '../../lib/utils/feedback/confirm-msg';
+
+const requiredRule = fieldName => {
+	return {
+		required: true,
+		message: `${fieldName} can't be empty`,
+		trigger: ['blur', 'change']
+	};
+};
 
 export const formRules = {
 	quantityLeft: [
@@ -32,4 +40,12 @@ export const emptyReagent = {
 		description: ''
 	},
 	description: ''
+};
+
+export const confirmNotify = async message => {
+	return await $confirm(`${message}`, 'Warning', {
+		confirmButtonText: 'OK',
+		cancelButtonText: 'Cancel',
+		type: 'warning'
+	});
 };
