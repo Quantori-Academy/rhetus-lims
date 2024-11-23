@@ -20,6 +20,16 @@ async function orders(server, options) {
 	async function onCreateOrder(req, reply) {
 		try {
 			const authenticatedUserId = Number(req.session.user.id);
+
+			const { reagents, reagentRequests, newReagents } = req.body;
+
+			if (!reagents.length && !reagentRequests.length && !newReagents.length) {
+				return reply.code(403).send({
+					status: 'error',
+					message: `There is nothing to add as order item. Check sending values!`
+				});
+			}
+
 			const orderTitle = await server.ordersService.createOrder({
 				...req.body,
 				userId: authenticatedUserId
@@ -168,8 +178,11 @@ async function orders(server, options) {
 				});
 			}
 
-			const { reagents, reagentRequests } = req.body;
-			if (!reagents.length && !reagentRequests.length) {
+			const { reagents, reagentRequests, newReagents } = req.body;
+
+			const areAdditionsEmpty = reagents.length + reagentRequests.length + newReagents.length === 0;
+
+			if (areAdditionsEmpty) {
 				return reply.code(403).send({
 					status: 'error',
 					message: `There is nothing to add. Check sending values!`
