@@ -83,12 +83,12 @@ const deleteRequest = {
 
 const updateRequestSchema = S.object()
 	.additionalProperties(false)
-	.prop('reagentName', S.string().minLength(1))
+	.prop('reagentName', S.string().minLength(0))
 	.prop('quantity', S.number().minimum(0))
-	.prop('userComment', S.string().minLength(1))
-	.prop('poComment', S.string().minLength(1))
-	.prop('structure', S.string().minLength(1))
-	.prop('casNumber', S.string().minLength(1));
+	.prop('userComment', S.string().minLength(0))
+	.prop('poComment', S.string().minLength(0))
+	.prop('structure', S.string().minLength(0))
+	.prop('casNumber', S.string().minLength(0));
 
 const updateRequest = {
 	security: [{ Session: [] }],
