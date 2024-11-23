@@ -24,7 +24,9 @@ function generateEqualFilter(filterKey, value, formatValue) {
 
 function generateBetweenFilter(filterKey, value, formatValue) {
 	if (!Array.isArray(value) || value.length !== 2) {
-		throw new Error('Between filter value should be an array with 2 defined elements.');
+		const error = new Error('Between filter value should be an array with 2 defined elements.');
+		error.statusCode = 400;
+		throw error;
 	}
 
 	const [startValue, endValue] = value;
