@@ -28,6 +28,12 @@ const substances = {
 			property: 'structure',
 			schema: 'union',
 			operator: 'structure-search'
+		},
+		order: {
+			property: 'order_id',
+			value: string => string,
+			schema: 'union',
+			operator: 'equal'
 		}
 	},
 	sort: {
