@@ -22,14 +22,19 @@ const OrderStatusActions = {
 async function ordersService(server) {
 	server.decorate('ordersService', {
 		createOrder: async data => {
-			const { title, seller, reagents, reagentRequests, userId } = data;
+			const { title, seller, reagents, reagentRequests, newReagents, userId } = data;
 
-			const [formattedRequests, formattedReagents] = await Promise.all([
+			const [formattedRequests, formattedReagents, formattedNewReagents] = await Promise.all([
 				server.orderItemsService.getFormattedOrderItemsFromRequests(reagentRequests),
-				server.orderItemsService.getFormattedOrderItemsFromReagents(reagents)
+				server.orderItemsService.getFormattedOrderItemsFromReagents(reagents),
+				server.orderItemsService.getFormattedOrderItemsFromNewReagents(newReagents)
 			]);
 
-			const formattedOrderItems = [...formattedRequests, ...formattedReagents];
+			const formattedOrderItems = [
+				...formattedRequests,
+				...formattedReagents,
+				...formattedNewReagents
+			];
 
 			const createdOrderTitle = await server.db.transaction(async tx => {
 				const [{ orderId, orderTitle }] = await tx
@@ -202,7 +207,9 @@ async function ordersService(server) {
 
 			const nextStatus = server.ordersService.getNextOrderStatus(currentStatus);
 			if (!nextStatus) {
-				throw new Error('Sorry. The status for this order cannot be changed further');
+				const error = new Error('Sorry. The status for this order cannot be changed further');
+				error.statusCode = 409;
+				throw error;
 			}
 
 			let orderTitle;
@@ -213,7 +220,9 @@ async function ordersService(server) {
 
 			if (action === OrderStatusActions.CANCEL) {
 				if (currentStatus === OrderStatus.FULFILLED) {
-					throw new Error('Sorry. You cannot cancel fulfilled order');
+					const error = new Error('Sorry. You cannot cancel fulfilled order');
+					error.statusCode = 409;
+					throw error;
 				}
 				orderTitle = await server.ordersService.handleCancelOrder(orderId, OrderStatus.CANCELED);
 			}
@@ -260,9 +269,11 @@ async function ordersService(server) {
 					orderedReagents = await server.reagentsService.getReagentsFromOrder(orderId);
 
 					if (orderedReagents.some(({ storageId }) => !storageId)) {
-						throw new Error(
+						const error = new Error(
 							'You cannot mark this order as completed. There is no storage information in some reagents from this order. Please add storage info.'
 						);
+						error.statusCode = 409;
+						throw error;
 					}
 
 					updatedOrderTitle = await server.db.transaction(async tx => {
