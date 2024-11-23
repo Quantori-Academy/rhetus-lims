@@ -14,8 +14,7 @@ export const checkEditedFields = (substanceFields, originalSubstance, updatedSub
 				updatedSubstanceValues.value = {
 					...updatedSubstanceValues.value,
 					[fieldsToUpdate[field]]: newValue,
-					quantityUsed: originalSubstance.value.quantityLeft - newValue,
-					reason: 'Experiment'
+					quantityUsed: originalSubstance.value.quantityLeft - newValue
 				};
 			}
 		} else {
