@@ -11,6 +11,7 @@ import { orders } from './orders.js';
 import { ordersReagents } from './orders-reagents.js';
 import { ordersItems } from './orders-items.js';
 import { substancesHistory } from './substances-history.js';
+import { notifications } from './notifications.js';
 
 export const schema = {
 	users,
@@ -25,7 +26,8 @@ export const schema = {
 	orders,
 	ordersReagents,
 	ordersItems,
-	substancesHistory
+	substancesHistory,
+	notifications
 };
 
 export const relations = {};

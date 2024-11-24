@@ -46,7 +46,12 @@ async function ordersService(server) {
 					})
 					.returning({ orderId: schema.orders.id, orderTitle: schema.orders.title });
 
-				await server.orderItemsService.orderItemsInsert(orderId, formattedOrderItems, tx);
+				await server.orderItemsService.orderItemsInsert(orderId, formattedOrderItems, tx, title);
+
+				await server.notificationsService.addNotification({
+					orderId,
+					message: `New order '${orderTitle}' created for ${formattedOrderItems.length} items.`
+				});
 
 				return orderTitle;
 			});
@@ -172,27 +177,33 @@ async function ordersService(server) {
 		},
 
 		updateOrderStatus: async (orderId, nextStatus, tx = null) => {
-			if (!tx) {
-				const [{ orderTitle }] = await server.db
-					.update(schema.orders)
-					.set({
-						orderStatus: nextStatus
-					})
-					.where(eq(schema.orders.id, orderId))
-					.returning({ orderTitle: schema.orders.title });
+			const target = tx ?? server.db;
+			// if (!tx) {
+			const [{ orderTitle }] = await target
+				.update(schema.orders)
+				.set({
+					orderStatus: nextStatus
+				})
+				.where(eq(schema.orders.id, orderId))
+				.returning({ orderTitle: schema.orders.title });
 
-				return orderTitle;
-			} else {
-				const [{ orderTitle }] = await tx
-					.update(schema.orders)
-					.set({
-						orderStatus: nextStatus
-					})
-					.where(eq(schema.orders.id, orderId))
-					.returning({ orderTitle: schema.orders.title });
+			await server.notificationsService.addNotification({
+				orderId,
+				message: `Order status for '${orderTitle}' was updated to ${nextStatus}`
+			});
 
-				return orderTitle;
-			}
+			return orderTitle;
+			// } else {
+			// 	const [{ orderTitle }] = await tx
+			// 		.update(schema.orders)
+			// 		.set({
+			// 			orderStatus: nextStatus
+			// 		})
+			// 		.where(eq(schema.orders.id, orderId))
+			// 		.returning({ orderTitle: schema.orders.title });
+			// 	// notify
+			// 	return orderTitle;
+			// }
 		},
 
 		bindOrderToReagents: async (orderId, reagentIds, tx) => {
