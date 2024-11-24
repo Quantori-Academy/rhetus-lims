@@ -196,6 +196,7 @@ async function samplesService(server) {
 					structure: schema.samples.structure,
 					description: schema.samples.description,
 					category: sql`'sample'`.as('category'),
+					createdAt: schema.samples.createdAt,
 					...Object.fromEntries(
 						Object.entries(extras).map(([col, query]) => [
 							col,
