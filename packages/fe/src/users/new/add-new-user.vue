@@ -95,7 +95,12 @@ const cancelHandler = () => {
 				<el-input v-model="form.email" placeholder="Enter email"></el-input>
 			</el-form-item>
 			<el-form-item label="Password" prop="password">
-				<el-input v-model="form.password" placeholder="Enter password" type="password"></el-input>
+				<el-input
+					v-model="form.password"
+					placeholder="Enter password"
+					type="password"
+					show-password
+				></el-input>
 			</el-form-item>
 			<el-form-item label="Role" prop="role">
 				<el-select v-model="form.roleId" placeholder="Select role">
