@@ -1,0 +1,9 @@
+{
+	"messages": {
+		"": {
+			"domain": "messages",
+			"lang": "hy",
+			"plural_forms": "nplurals=2; plural=(n != 1);"
+		}
+	}
+}
