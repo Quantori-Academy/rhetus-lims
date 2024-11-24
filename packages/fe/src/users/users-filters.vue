@@ -15,8 +15,15 @@ const filters = defineModel('filters', { type: Object });
 			</template>
 		</el-input>
 	</filter-item>
-
 	<filter-item>
-		<el-date-picker v-model="filters.date" type="date" placeholder="Date filter" />
+		<el-date-picker
+			v-model="filters.lastLogin"
+			type="daterange"
+			range-separator="-"
+			start-placeholder="Logged in from"
+			end-placeholder="to"
+			format="YYYY/MM/DD"
+			value-format="YYYY-MM-DD"
+		/>
 	</filter-item>
 </template>

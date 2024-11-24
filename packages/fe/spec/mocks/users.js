@@ -79,26 +79,30 @@ let roleInfo = {
 		}
 	]
 };
-
+function paginateUsers(items, page, limit) {
+	const start = (page - 1) * limit;
+	return items.slice(start, start + limit);
+}
+function matchesRole(user, role) {
+	return role ? user.role.includes(role) : true;
+}
+function matchesDateRange(orderDate, dateRange) {
+	if (dateRange && dateRange.length === 2) {
+		const [startDate, endDate] = dateRange;
+		const orderDateObj = new Date(orderDate);
+		return orderDateObj >= new Date(startDate) && orderDateObj <= new Date(endDate);
+	}
+	return true;
+}
+function matchesLastLogin(user, range) {
+	return matchesDateRange(user.lastLogin, range);
+}
 function filterUsers(parsedOptions) {
 	const filteredUsers = userInfo.users.filter(user => {
-		let matchesDate = true;
-		let matchesRole = true;
-
-		if (parsedOptions.date) {
-			matchesDate = user.lastLogin.startsWith(parsedOptions.date);
-		}
-		if (parsedOptions.role) {
-			matchesRole = user.role.name.includes(parsedOptions.role);
-		}
-		return matchesDate && matchesRole;
+		return matchesRole(user, parsedOptions.role) && matchesLastLogin(user, parsedOptions.lastLogin);
 	});
-
-	return HttpResponse.json({
-		items: filteredUsers
-	});
+	return filteredUsers;
 }
-
 export const usersHandlers = [
 	http.get(api('/roles'), () => {
 		return HttpResponse.json(roleInfo);
@@ -106,12 +110,23 @@ export const usersHandlers = [
 	http.get(api('/users'), req => {
 		const url = new URL(req.request.url);
 		const options = url.searchParams.get('options');
-		const parsedOptions = JSON.parse(options);
-
-		if (parsedOptions === null) {
-			return HttpResponse.json(userInfo);
+		const parsedOptions = options ? JSON.parse(options) : null;
+		const page = parseInt(url.searchParams.get('page')) || 1;
+		const limit = parseInt(url.searchParams.get('limit')) || 10;
+		const hasValidOptions = options => {
+			return options && Object.values(options).some(value => value !== '');
+		};
+		if (!hasValidOptions(parsedOptions)) {
+			return HttpResponse.json({
+				users: paginateUsers(userInfo.users, page, limit),
+				count: userInfo.users.length
+			});
 		} else {
-			return filterUsers(parsedOptions);
+			const filtered = filterUsers(parsedOptions);
+			return HttpResponse.json({
+				users: paginateUsers(filtered, page, limit),
+				count: filtered.length
+			});
 		}
 	}),
 	http.post(api('/users'), async ({ request }) => {

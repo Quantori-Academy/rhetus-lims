@@ -15,7 +15,7 @@ const users = ref([]);
 const isLoading = ref(false);
 const filters = ref({
 	role: '',
-	date: null
+	date: []
 });
 
 function addNewUser() {
