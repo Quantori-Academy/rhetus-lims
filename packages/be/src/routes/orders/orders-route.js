@@ -278,6 +278,53 @@ async function orders(server, options) {
 			.code(200)
 			.send({ status: 'success', message: `Status for order '${orderTitle}' was changed` });
 	}
+
+	server.route({
+		method: 'PUT',
+		path: options.prefix + 'orders/:id/update-item/:tempId',
+		preValidation: [server.authenticate, server.officer],
+		schema: schema.updateOrderItem,
+		handler: onUpdateItem
+	});
+
+	async function onUpdateItem(req, reply) {
+		try {
+			const { id: orderId, tempId } = req.params;
+
+			const order = await server.ordersService.getOrderById(orderId);
+
+			if (!order) {
+				return reply.code(404).send({ status: 'error', message: `No such order` });
+			}
+
+			if (order.status !== OrderStatus.PENDING) {
+				return reply.code(403).send({
+					status: 'error',
+					message: `Sorry. You cannot update order items while order in processing`
+				});
+			}
+
+			const orderItem = await server.orderItemsService.getOrderItemByTempId(tempId);
+
+			if (!orderItem) {
+				return reply.code(404).send({ status: 'error', message: `No such order item` });
+			}
+
+			if (orderItem.orderId !== orderId) {
+				return reply
+					.code(404)
+					.send({ status: 'error', message: `There is no such order item in this order` });
+			}
+
+			await server.orderItemsService.updateOrderItem(orderItem, req.body);
+
+			return reply
+				.code(200)
+				.send({ status: 'success', message: `Order item in order '${order.title}' was updated` });
+		} catch (err) {
+			return reply.code(500).send(err);
+		}
+	}
 }
 
 export default fp(orders);

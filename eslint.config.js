@@ -84,7 +84,8 @@ export default [
 		files: [
 			'packages/be/src/services/orders/orders-service.js',
 			'packages/be/src/services/reagents/reagents-service.js',
-			'packages/be/src/services/samples/samples-service.js'
+			'packages/be/src/services/samples/samples-service.js',
+			'packages/be/src/routes/orders/orders-route.js'
 		],
 		rules: {
 			'max-lines': ['error', { max: 300, skipComments: true, skipBlankLines: true }]

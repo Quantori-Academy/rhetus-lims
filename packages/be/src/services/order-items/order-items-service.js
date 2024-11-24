@@ -1,4 +1,4 @@
-import { eq, inArray } from 'drizzle-orm';
+import { eq, inArray, and } from 'drizzle-orm';
 import fp from 'fastify-plugin';
 import { schema } from '../../lib/db/schema/index.js';
 import { helpers } from '../../lib/utils/common/helpers.js';
@@ -8,7 +8,8 @@ import { ItemTypes } from '../../lib/db/schema/orders-items.js';
 const formatMapping = {
 	quantityUnit: string => helpers.lowercase(string),
 	name: string => helpers.capitalize(string),
-	casNumber: string => helpers.lowercase(string)
+	casNumber: string => helpers.lowercase(string),
+	reagentName: string => helpers.capitalize(string)
 };
 
 async function orderItemsService(server) {
@@ -235,6 +236,56 @@ async function orderItemsService(server) {
 			}
 
 			return orderTitle;
+		},
+
+		getOrderItemByTempId: async tempId => {
+			const result = await server.db
+				.select()
+				.from(schema.ordersItems)
+				.where(and(eq(schema.ordersItems.tempId, tempId), eq(schema.ordersItems.deleted, false)));
+
+			return result[0];
+		},
+
+		updateOrderItem: async (existingItem, data) => {
+			const isStructureValid = await server.substancesService.isStructureValid(
+				data.structure || ''
+			);
+
+			if (!isStructureValid) {
+				const error = new Error('Invalid structure');
+				error.statusCode = 400;
+				throw error;
+			}
+
+			const dataForUpdate = Object.fromEntries(
+				Object.entries(data)
+					.map(([key, value]) => {
+						const formattedIncomingValue = Object.keys(formatMapping).includes(key)
+							? formatMapping[key](value)
+							: value;
+
+						if (existingItem[key] === formattedIncomingValue) {
+							return;
+						}
+
+						return [key, formattedIncomingValue];
+					})
+					.filter(Boolean)
+			);
+
+			if (!Object.keys(dataForUpdate).length) {
+				const error = new Error(
+					'There is nothing to update. Check sending values or order item state.'
+				);
+				error.statusCode = 400;
+				throw error;
+			}
+
+			return server.db
+				.update(schema.ordersItems)
+				.set(dataForUpdate)
+				.where(eq(schema.ordersItems.tempId, existingItem.tempId));
 		}
 	});
 }
