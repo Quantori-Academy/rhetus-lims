@@ -10,6 +10,7 @@ import { requests } from './requests.js';
 import { orders } from './orders.js';
 import { ordersReagents } from './orders-reagents.js';
 import { ordersItems } from './orders-items.js';
+import { substancesHistory } from './substances-history.js';
 
 export const schema = {
 	users,
@@ -23,7 +24,8 @@ export const schema = {
 	requests,
 	orders,
 	ordersReagents,
-	ordersItems
+	ordersItems,
+	substancesHistory
 };
 
 export const relations = {};
