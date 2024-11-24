@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 import fp from 'fastify-plugin';
 import { schema } from '../../lib/db/schema/index.js';
 import { and, eq, sql } from 'drizzle-orm';
@@ -146,16 +145,18 @@ async function samplesService(server) {
 		changeQuantity: async (id, data) => {
 			const { userId, quantityUsed, reason } = data;
 
-			const { quantityLeft } = await server.samplesService.getSampleById(id);
+			const { quantityLeft, quantityUnit } = await server.samplesService.getSampleById(id);
 
 			const targetValue = quantityLeft - quantityUsed;
 
-			await server.db.insert(schema.substancesQuantityChanges).values({
+			await server.db.insert(schema.substancesHistory).values({
 				userId,
 				sampleId: id,
 				previousValue: quantityLeft,
 				targetValue,
-				changeReason: reason
+				quantityUnit,
+				changeReason: reason,
+				actionType: 'quantity-update'
 			});
 
 			const result = await server.db
@@ -231,11 +232,12 @@ async function samplesService(server) {
 
 			const sample = await server.samplesService.getSampleById(id);
 
-			await server.db.insert(schema.substancesStorageChanges).values({
+			await server.db.insert(schema.substancesHistory).values({
 				sampleId: id,
 				userId,
 				previousStorageId: sample.storageLocation.id,
-				targetStorageId: storageId
+				targetStorageId: storageId,
+				actionType: 'storage-update'
 			});
 
 			const result = await server.db
@@ -282,61 +284,51 @@ async function samplesService(server) {
 			};
 		},
 
-		getQuantityChangeHistory: async substanceId => {
-			return server.db
+		getHistory: async substanceId => {
+			return await server.db
 				.select({
-					historyId: schema.substancesQuantityChanges.id,
+					id: sql`${schema.substancesHistory.id}`.as('historyId'),
 					user: {
-						id: schema.users.id,
-						firstName: schema.users.firstName,
-						lastName: schema.users.lastName
+						userId: schema.users.id,
+						userFirstName: schema.users.firstName,
+						userLastName: schema.users.lastName
 					},
-					prevQuantityLeft: schema.substancesQuantityChanges.previousValue,
-					newQuantityLeft: schema.substancesQuantityChanges.targetValue,
-					quantityUnit: schema.samples.quantityUnit,
-					actionType: sql`'quantity-update'`.as('actionType'),
-					changeReason: schema.substancesQuantityChanges.changeReason,
-					modifiedDate: schema.substancesQuantityChanges.createdAt
+					prevQuantityLeft: schema.substancesHistory.previousValue,
+					newQuantityLeft: schema.substancesHistory.targetValue,
+					quantityUnit: schema.substancesHistory.quantityUnit,
+					prevStorageLocation: sql`CASE 
+						WHEN prevStorage.id IS NOT NULL THEN json_build_object(
+							'prevStorageId', prevStorage.id,
+							'prevStorageRoom', prevStorage.room,
+							'prevStorageName', prevStorage.name
+						)
+						ELSE NULL
+						END`.as('prevStorageLocation'),
+					newStorageLocation: sql`CASE 
+						WHEN newStorage.id IS NOT NULL THEN json_build_object(
+							'newStorageId', newStorage.id,
+							'newStorageRoom', newStorage.room,
+							'newStorageName', newStorage.name
+						)
+						ELSE NULL
+						END`.as('newStorageLocation'),
+					actionType: schema.substancesHistory.actionType,
+					changeReason: schema.substancesHistory.changeReason,
+					isDeleted: schema.substancesHistory.isDeleted,
+					modifiedDate: schema.substancesHistory.createdAt
 				})
-				.from(schema.substancesQuantityChanges)
-				.innerJoin(schema.users, eq(schema.substancesQuantityChanges.userId, schema.users.id))
-				.innerJoin(schema.samples, eq(schema.substancesQuantityChanges.sampleId, schema.samples.id))
-				.where(eq(schema.substancesQuantityChanges.sampleId, substanceId));
-		},
-
-		getStorageChangeHistory: async substanceId => {
-			return server.db
-				.select({
-					historyId: schema.substancesStorageChanges.id,
-					user: {
-						id: schema.users.id,
-						firstName: schema.users.firstName,
-						lastName: schema.users.lastName
-					},
-					prevStorageLocation: {
-						id: sql`prevStorage.id`.as('storageId'),
-						room: sql`prevStorage.room`.as('storageRoom'),
-						name: sql`prevStorage.name`.as('storageName')
-					},
-					newStorageLocation: {
-						id: sql`newStorage.id`.as('storageId'),
-						room: sql`newStorage.room`.as('storageRoom'),
-						name: sql`newStorage.name`.as('storageName')
-					},
-					actionType: sql`'storage-update'`.as('actionType'),
-					modifiedDate: schema.substancesStorageChanges.createdAt
-				})
-				.from(schema.substancesStorageChanges)
-				.innerJoin(schema.users, eq(schema.substancesStorageChanges.userId, schema.users.id))
-				.innerJoin(
+				.from(schema.substancesHistory)
+				.innerJoin(schema.users, eq(schema.substancesHistory.userId, schema.users.id))
+				.leftJoin(
 					sql`storages AS prevStorage`,
-					eq(sql`prevStorage.id`, schema.substancesStorageChanges.previousStorageId)
+					eq(sql`prevStorage.id`, schema.substancesHistory.previousStorageId)
 				)
-				.innerJoin(
+				.leftJoin(
 					sql`storages AS newStorage`,
-					eq(sql`newStorage.id`, schema.substancesStorageChanges.targetStorageId)
+					eq(sql`newStorage.id`, schema.substancesHistory.targetStorageId)
 				)
-				.where(eq(schema.substancesStorageChanges.sampleId, substanceId));
+				.where(eq(schema.substancesHistory.sampleId, substanceId))
+				.orderBy(schema.substancesHistory.createdAt, 'asc');
 		}
 	});
 }
