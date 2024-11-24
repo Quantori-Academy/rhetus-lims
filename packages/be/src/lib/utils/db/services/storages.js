@@ -1,3 +1,5 @@
+import { schema } from '../../../db/schema/index.js';
+
 const storages = {
 	filter: {
 		name: {
@@ -20,7 +22,10 @@ const storages = {
 	},
 	sort: {
 		creationdate: {
-			property: 'created_at'
+			property: schema.storages.createdAt
+		},
+		default: {
+			property: schema.storages.createdAt
 		}
 	}
 };

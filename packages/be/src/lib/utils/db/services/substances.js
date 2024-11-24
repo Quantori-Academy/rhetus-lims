@@ -45,6 +45,12 @@ const substances = {
 		},
 		relevance: {
 			property: 'relevance'
+		},
+		createdat: {
+			property: 'created_at'
+		},
+		default: {
+			property: 'created_at'
 		}
 	}
 };

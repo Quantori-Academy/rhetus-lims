@@ -1,3 +1,4 @@
+import { schema } from '../../../db/schema/index.js';
 import { helpers } from '../../common/helpers.js';
 
 const users = {
@@ -40,6 +41,11 @@ const users = {
 			value: string => string === 'true',
 			schema: 'users',
 			operator: 'equal'
+		}
+	},
+	sort: {
+		default: {
+			property: schema.users.createdAt
 		}
 	}
 };

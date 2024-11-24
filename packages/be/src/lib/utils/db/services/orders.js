@@ -59,6 +59,9 @@ const orders = {
 		},
 		status: {
 			property: schema.orders.orderStatus
+		},
+		default: {
+			property: schema.orders.createdAt
 		}
 	}
 };
