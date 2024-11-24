@@ -8,7 +8,7 @@ import {
 	ElInputNumber,
 	ElTag
 } from 'element-plus';
-import { defineProps, toRef, computed } from 'vue';
+import { defineProps, toRef, computed, watch, ref } from 'vue';
 import { quantityUnits } from '../../lib/constants/quantity-units.js';
 import { $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $api } from '../../lib/api/index.js';
@@ -18,6 +18,10 @@ import NewReagentManagement from './new-reagent-management.vue';
 const props = defineProps({
 	order: {
 		type: Object,
+		default: null
+	},
+	requests: {
+		type: Array,
 		default: null
 	},
 	isEdit: {
@@ -44,6 +48,120 @@ const removeReagent = async selectedReagent => {
 		$notifyUserAboutError(error);
 	}
 };
+
+const baseState = ref(JSON.parse(JSON.stringify(props.order)));
+const previousRequests = ref(JSON.parse(JSON.stringify(props.order)));
+let updatedReagents = ref([]);
+let updatedRequests = ref([]);
+// watch(
+// 	() => [...order.value.reagentRequests, ...order.value.reagents],
+// 	() => {
+// 		updatedRequests.value = [];
+// 		updatedReagents.value = [];
+// 		order.value.reagentRequests.forEach((newOrder, index) => {
+// 			const previousOrderReq = previousRequests.value.reagentRequests[index];
+// 			const baseOrderReq = baseState.value.reagentRequests[index];
+
+// 			if (previousOrderReq) {
+// 				const isChanged =
+// 					newOrder.quantityUnit !== baseOrderReq.quantityUnit ||
+// 					newOrder.quantity !== baseOrderReq.quantity ||
+// 					newOrder.amount !== baseOrderReq.amount;
+
+// 				if (isChanged) {
+// 					updatedRequests.value.push(newOrder);
+// 				}
+// 			}
+// 		});
+
+// 		order.value.reagents.forEach((newOrder, index) => {
+// 			const previousOrder = previousRequests.value.reagents[index];
+// 			const baseOrder = baseState.value.reagents[index];
+
+// 			if (previousOrder) {
+// 				const isChanged =
+// 					newOrder.quantityUnit !== baseOrder.quantityUnit ||
+// 					newOrder.quantity !== baseOrder.quantity ||
+// 					newOrder.amount !== baseOrder.amount;
+
+// 				if (isChanged) {
+// 					updatedReagents.value.push(newOrder);
+// 				}
+// 			}
+// 		});
+// 		previousRequests.value = JSON.parse(JSON.stringify(order.value));
+// 	},
+// 	{ deep: true }
+// );
+// Reusable function to check if an order has changed
+const checkForChanges = (newOrder, baseOrder) => {
+	return (
+		newOrder.quantityUnit !== baseOrder.quantityUnit ||
+		newOrder.quantity !== baseOrder.quantity ||
+		newOrder.amount !== baseOrder.amount
+	);
+};
+
+const processOrders = (currentOrders, previousOrders, baseStateOrders, updatedOrders) => {
+	currentOrders.forEach((newOrder, index) => {
+		const previousOrder = previousOrders[index];
+		const baseOrder = baseStateOrders[index];
+
+		if (previousOrder && checkForChanges(newOrder, baseOrder)) {
+			updatedOrders.push(newOrder);
+		}
+	});
+};
+
+watch(
+	() => [...order.value.reagentRequests, ...order.value.reagents],
+	() => {
+		updatedRequests.value = [];
+		updatedReagents.value = [];
+		// Process reagentRequests and reagents using the reusable function
+		processOrders(
+			order.value.reagentRequests,
+			previousRequests.value.reagentRequests,
+			baseState.value.reagentRequests,
+			updatedRequests.value
+		);
+		processOrders(
+			order.value.reagents,
+			previousRequests.value.reagents,
+			baseState.value.reagents,
+			updatedReagents.value
+		);
+		previousRequests.value = JSON.parse(JSON.stringify(order.value));
+	},
+	{ deep: true }
+);
+
+const mapOrders = orders => {
+	return orders.map(order => ({
+		quantity: order.quantity,
+		quantityUnit: order.quantityUnit,
+		id: order.tempId,
+		amount: order.amount
+	}));
+};
+
+const updateRequests = async () => {
+	const req = mapOrders(updatedReagents.value);
+	const reag = mapOrders(updatedRequests.value);
+	try {
+		const body = {
+			reagentRequests: reag,
+			reagents: req
+		};
+		console.log(body);
+		// const response = await $api.orders.addItemToOrder(order.value.id, body);
+		// if (response.status === 'success') {
+		// 	await props.setOrder(order.value.id);
+		// }
+	} catch (error) {
+		$notifyUserAboutError(error);
+	}
+};
 </script>
 
 <template>
@@ -57,7 +175,7 @@ const removeReagent = async selectedReagent => {
 				<span class="mobile">Amount</span>
 			</div>
 			<div
-				v-for="(singleOrder, index) of [...order.reagentRequests, ...order.reagents]"
+				v-for="(singleOrder, index) of [...props.order.reagentRequests, ...props.order.reagents]"
 				:key="index"
 				class="row"
 			>
@@ -146,9 +264,7 @@ const removeReagent = async selectedReagent => {
 			</div>
 			<new-reagent-management :order="props.order" :is-edit="props.isEdit" :set-order="setOrder" />
 			<div v-if="isEdit" class="btn-container">
-				<el-button type="primary" :disabled="!isOrderValid" @click="props.updateOrder"
-					>Save</el-button
-				>
+				<el-button type="primary" :disabled="!isOrderValid" @click="updateRequests">Save</el-button>
 			</div>
 		</div>
 	</div>

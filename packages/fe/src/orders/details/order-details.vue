@@ -238,6 +238,7 @@ const setStatusesHistory = async () => {
 			/>
 			<substance-management
 				:order="order"
+				:requests="order.requests"
 				:is-edit="isEdit"
 				:set-order="setOrder"
 				:update-order="updateOrder"
