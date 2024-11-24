@@ -70,7 +70,7 @@ export const orderHandlers = [
 		const page = parseInt(url.searchParams.get('page')) || 1;
 		const limit = parseInt(url.searchParams.get('limit')) || 10;
 		const hasValidOptions = options => {
-			return Object.values(options).some(value => value !== '');
+			return options && Object.values(options).some(value => value !== '');
 		};
 		if (!hasValidOptions(parsedOptions)) {
 			return HttpResponse.json({
