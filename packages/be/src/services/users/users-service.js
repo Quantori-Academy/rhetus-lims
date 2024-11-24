@@ -5,6 +5,7 @@ import { Status } from '../../lib/db/schema/users.js';
 import { getClarifyParams } from '../../lib/utils/common/parse-params.js';
 import { applyFilters } from '../../lib/utils/db/apply-filters.js';
 import { helpers } from '../../lib/utils/common/helpers.js';
+import { applySorting } from '../../lib/utils/db/apply-sorting.js';
 
 const formatMapping = {
 	firstName: string => helpers.capitalize(string),
@@ -73,7 +74,7 @@ async function usersService(server) {
 		},
 
 		getUsers: async queryParams => {
-			const { options, limit, offset } = getClarifyParams(queryParams);
+			const { options, limit, sort, offset } = getClarifyParams(queryParams);
 
 			let query = server.db
 				.select({
@@ -94,6 +95,7 @@ async function usersService(server) {
 				.innerJoin(schema.roles, eq(schema.users.roleId, schema.roles.id));
 
 			query = applyFilters(query, { ...options, deleted: 'false' }, 'users');
+			query = applySorting(query, sort, 'users');
 
 			const count = await query;
 			const users = await query.limit(limit).offset(offset);
