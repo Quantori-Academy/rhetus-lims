@@ -65,36 +65,48 @@ const updateSubstanceSchema = {
 	}
 };
 
-const Action = {
+const actions = {
 	QUANTITY: 'quantity-update',
 	STORAGE: 'storage-update',
-	CREATE: 'create',
 	DELETE: 'delete'
 };
 
 const HistorySchema = S.object()
-	.prop('historyId', S.string().format(S.FORMATS.UUID).required())
+	.prop('id', S.string().format(S.FORMATS.UUID).required())
 	.prop('user', {
 		userId: User.id,
 		userFirstName: User.firstName,
 		userLastName: User.lastName
 	})
 	.required()
-	.prop('prevQuantityLeft', S.number().minimum(0))
-	.prop('newQuantityLeft', S.number().minimum(0))
-	.prop('quantityUnit', S.string().minLength(1))
-	.prop('prevStorageLocation', {
-		prevStorageId: Storage.id,
-		prevStorageRoom: Storage.room,
-		prevStorageName: Storage.name
-	})
-	.prop('newStorageLocation', {
-		newStorageId: Storage.id,
-		newStorageRoom: Storage.room,
-		newStorageName: Storage.name
-	})
-	.prop('actionType', S.string().enum(Object.values(Action)).required())
-	.prop('changeReason', S.string().minLength(1))
+	.prop('prevQuantityLeft', S.anyOf([S.number(), S.null()]))
+	.prop('newQuantityLeft', S.anyOf([S.number(), S.null()]))
+	.prop('quantityUnit', S.anyOf([S.string(), S.null()]))
+	.prop(
+		'prevStorageLocation',
+		S.anyOf[
+			({
+				prevStorageId: Storage.id,
+				prevStorageRoom: Storage.room,
+				prevStorageName: Storage.name
+			},
+			S.null())
+		]
+	)
+	.prop(
+		'newStorageLocation',
+		S.anyOf[
+			({
+				newStorageId: Storage.id,
+				newStorageRoom: Storage.room,
+				newStorageName: Storage.name
+			},
+			S.null())
+		]
+	)
+	.prop('actionType', S.string().enum(Object.values(actions)).required())
+	.prop('changeReason', S.anyOf([S.string(), S.null()]))
+	.prop('isDeleted', S.boolean())
 	.prop('modifiedDate', S.string().format(S.FORMATS.DATE_TIME).required());
 
 const getSubstanceHistorySchema = {

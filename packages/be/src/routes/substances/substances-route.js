@@ -121,7 +121,7 @@ async function substances(server, options) {
 
 	server.route({
 		method: 'GET',
-		path: options.prefix + 'substances/history-change/:id',
+		path: options.prefix + 'substances/history/:category/:id',
 		preValidation: [server.authenticate],
 		schema: schema.getSubstanceHistorySchema,
 		handler: onGetSubstancesHistory
@@ -129,15 +129,13 @@ async function substances(server, options) {
 
 	async function onGetSubstancesHistory(req, reply) {
 		try {
-			const category = 'reagent';
-			const substanceId = req.params.id;
-			const substance = await server.substancesService.getSubstanceById(substanceId, category);
+			const { category, id } = req.params;
+			const substance = await server.substancesService.getSubstanceById(id, category);
 			if (!substance) {
 				return reply.code(404).send({ status: 'error', message: `No such ${category}` });
 			}
 
-			const data = await server.substancesService.getQuantityChangeHistory(substanceId, category);
-			console.log('route data', data);
+			const data = await server.substancesService.getHistoryChanges(id, category);
 			return reply.code(200).send(data);
 		} catch (err) {
 			return reply.code(500).send(err);
@@ -146,24 +144,3 @@ async function substances(server, options) {
 }
 
 export default fp(substances);
-
-//GET /substances/history-change
-
-// {
-//     user: {
-//         id: "ferfergr",
-//         firstName: "fffwefwef",
-//         lastName: "fefwefwef",
-//     },
-//     substance: {
-//         id: "fewfewf",
-//         category: "fewfwefew",
-//         name: "fwefwef"
-//     },
-//     changeDetails: {
-//         prevValue: "fwefewf",
-//         newValue: "fwefew"
-//     },
-//     actionType: 'quantity' | 'storage' | 'delete' | 'create',
-//     modifiedDate: 'feferfer'
-// }

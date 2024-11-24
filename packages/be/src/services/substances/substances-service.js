@@ -203,19 +203,14 @@ async function substancesService(server) {
 			};
 		},
 
-		getQuantityChangeHistory: async (substanceId, category) => {
+		getHistoryChanges: async (substanceId, category) => {
 			const isReagent = category === Category.REAGENT;
 			const service = isReagent ? server.reagentsService : server.samplesService;
 
-			const quantityChangesQuery = service.getQuantityChangeHistory(substanceId);
-			const storageChangesQuery = service.getStorageChangeHistory(substanceId);
-			console.log('quantityChangesQuery', quantityChangesQuery);
-			console.log('storageChangesQuery', storageChangesQuery);
-			const unionQuery = unionAll(quantityChangesQuery, storageChangesQuery);
-			console.log('query', unionQuery);
-			let query = server.db.select().from(unionQuery.as('histories'));
+			const history = await service.getHistory(substanceId);
+
 			return {
-				histories: await query
+				histories: history
 			};
 		}
 	});
