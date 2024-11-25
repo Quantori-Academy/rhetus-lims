@@ -25,7 +25,7 @@ function redirect(row) {
 					<div class="category-icons">
 						<rh-icon
 							color="#8892A8"
-							:name="row.category === 'Reagent' ? 'pod' : 'applications'"
+							:name="row.category.toLowerCase() === 'reagent' ? 'pod' : 'applications'"
 						/><span>{{ row.category }}</span>
 					</div>
 				</template>

@@ -136,7 +136,9 @@ onMounted(() => {
 							:disabled="!isOptionChosen(item)"
 						>
 							<div class="category-icons">
-								<rh-icon :name="item.category === 'Reagent' ? 'pod' : 'applications'" />
+								<rh-icon
+									:name="item.category.toLowerCase() === 'reagent' ? 'pod' : 'applications'"
+								/>
 								<span>{{ item.label }}</span>
 							</div>
 						</el-option>
