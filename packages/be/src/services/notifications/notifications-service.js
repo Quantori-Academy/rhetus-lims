@@ -19,7 +19,7 @@ async function notificationsService(server) {
 			const { options, sort, limit, offset } = getClarifyParams(queryParams);
 
 			let query = server.db
-				.select({
+				.selectDistinct({
 					id: schema.notifications.id,
 					orderId: schema.notifications.orderId,
 					requestId: schema.notifications.requestId,
@@ -35,7 +35,8 @@ async function notificationsService(server) {
 					)
 				)
 				.leftJoin(schema.orders, eq(schema.notifications.orderId, schema.orders.id))
-				.where(or(eq(schema.requests.userId, userId), eq(schema.orders.userId, userId)));
+				.where(or(eq(schema.requests.userId, userId), eq(schema.orders.userId, userId)))
+				.orderBy(schema.notifications.id);
 
 			query = applyFilters(query, options, 'notifications');
 			query = applySorting(query, sort, 'notifications');

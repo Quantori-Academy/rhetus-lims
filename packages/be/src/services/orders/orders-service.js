@@ -36,24 +36,25 @@ async function ordersService(server) {
 				...formattedNewReagents
 			];
 
-			const createdOrderTitle = await server.db.transaction(async tx => {
-				const [{ orderId, orderTitle }] = await tx
-					.insert(schema.orders)
-					.values({
-						title: formatMapping.title(title),
-						userId,
-						seller: formatMapping.seller(seller)
-					})
-					.returning({ orderId: schema.orders.id, orderTitle: schema.orders.title });
+			const { orderTitle: createdOrderTitle, orderId: createdOrderId } =
+				await server.db.transaction(async tx => {
+					const [{ orderId, orderTitle }] = await tx
+						.insert(schema.orders)
+						.values({
+							title: formatMapping.title(title),
+							userId,
+							seller: formatMapping.seller(seller)
+						})
+						.returning({ orderId: schema.orders.id, orderTitle: schema.orders.title });
 
-				await server.orderItemsService.orderItemsInsert(orderId, formattedOrderItems, tx);
+					await server.orderItemsService.orderItemsInsert(orderId, formattedOrderItems, tx);
 
-				await server.notificationsService.addNotification({
-					orderId,
-					message: `New order '${orderTitle}' created for ${formattedOrderItems.length} item${formattedOrderItems.length > 1 ? 's' : ''} that includes your requests.`
+					return { orderTitle, orderId };
 				});
 
-				return orderTitle;
+			await server.notificationsService.addNotification({
+				orderId: createdOrderId,
+				message: `New order '${createdOrderTitle}' created for ${formattedOrderItems.length} item${formattedOrderItems.length > 1 ? 's' : ''} that includes your requests.`
 			});
 
 			return createdOrderTitle;
