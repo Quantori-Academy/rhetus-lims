@@ -34,21 +34,53 @@ export const newSubstanceRef = {
 	quantity: 1,
 	amount: 1
 };
-export const substanceRules = {
-	reagentName: [requiredRule('Name')],
-	quantityUnit: [requiredRule('Unit')],
-	quantity: [requiredRule('Quantity')],
-	amount: [requiredRule('Amount')]
-};
-export const requestRules = {
-	reagentName: [requiredRule('Name')],
-	quantityUnit: [requiredRule('Unit')],
-	quantity: [requiredRule('Quantity')],
-	amount: [requiredRule('Amount')]
-};
 export const orderFormRules = {
 	title: [requiredRule('Title')],
 	seller: [requiredRule('Seller')],
-	reagents: [requestRules],
-	reagentRequests: [requestRules]
+	reagentRequests: [
+		{
+			reagentName: [requiredRule('Name')],
+			quantityUnit: [requiredRule('Unit')],
+			quantity: [requiredRule('Quantity')],
+			amount: [requiredRule('Amount')]
+		}
+	],
+	reagents: [
+		{
+			reagentName: [requiredRule('Name')],
+			quantityUnit: [requiredRule('Unit')],
+			quantity: [requiredRule('Quantity')],
+			amount: [requiredRule('Amount')]
+		}
+	],
+	newReagents: [
+		{
+			reagentName: [requiredRule('Name')],
+			quantityUnit: [requiredRule('Unit')],
+			quantity: [requiredRule('Quantity')],
+			amount: [requiredRule('Amount')]
+		}
+	]
 };
+
+export const checkForChanges = (newOrder, baseOrder) => {
+	return (
+		newOrder.quantityUnit !== baseOrder.quantityUnit ||
+		newOrder.quantity !== baseOrder.quantity ||
+		newOrder.amount !== baseOrder.amount
+	);
+};
+
+export const processOrders = (currentOrders, previousOrders, baseStateOrders, updatedOrders) => {
+	currentOrders.forEach((newOrder, index) => {
+		const previousOrder = previousOrders[index];
+		const baseOrder = baseStateOrders[index];
+
+		if (previousOrder && checkForChanges(newOrder, baseOrder)) {
+			updatedOrders.push(newOrder);
+		}
+	});
+};
+
+export const createTracker = request =>
+	Object.fromEntries(Object.keys(request).map(key => [key, false]));

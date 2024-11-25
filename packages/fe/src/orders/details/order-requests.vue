@@ -1,8 +1,7 @@
 <script setup>
 import { ref, onMounted, toRef, watch } from 'vue';
-import { ElAutocomplete, ElTag, ElFormItem } from 'element-plus';
+import { ElAutocomplete, ElFormItem } from 'element-plus';
 import { $api } from '../../lib/api/index.js';
-import { $router } from '../../lib/router/router.js';
 import { $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 
 const props = defineProps({
@@ -85,33 +84,12 @@ const linkRequest = async selectedRequest => {
 		$notifyUserAboutError(error);
 	}
 };
-
-const removeLinkedRequest = async selectedRequest => {
-	try {
-		const body = { reagentRequests: [selectedRequest.tempId], reagents: [] };
-		const response = await $api.orders.removeItemFromOrder(order.value.id, body);
-		if (response.status === 'success') {
-			await props.setOrder(order.value.id);
-		}
-	} catch (error) {
-		$notifyUserAboutError(error);
-	}
-};
-
-function viewRequestDetails(request) {
-	const target = $router.resolve({ name: 'request-details', params: { id: request.id } }).href;
-	window.open(target, '_blank');
-}
 </script>
 
 <template>
 	<el-form-item
 		v-loading="loading"
-		:label="
-			linkedRequests.length > 0 || (linkedRequests.length == 0 && props.isEdit)
-				? 'Linked Requests'
-				: ''
-		"
+		:label="linkedRequests.length > 0 || props.isEdit ? 'Linked Requests' : ''"
 		class="requests"
 		:rules="[]"
 	>
@@ -129,18 +107,6 @@ function viewRequestDetails(request) {
 				</div>
 			</template>
 		</el-autocomplete>
-		<div v-if="linkedRequests.length > 0" class="linked-requests-container">
-			<el-tag
-				v-for="request of linkedRequests"
-				:key="request.id"
-				:closable="props.isEdit"
-				@click="() => viewRequestDetails(request)"
-				@close="() => removeLinkedRequest(request)"
-			>
-				{{ request.reagentName }} ({{ request.quantity }} {{ request.quantityUnit }}) -
-				{{ request.amount }}
-			</el-tag>
-		</div>
 	</el-form-item>
 </template>
 

@@ -9,12 +9,12 @@ import {
 	ElAutocomplete
 } from 'element-plus';
 import { defineProps, useTemplateRef, ref, toRef, onMounted, watch } from 'vue';
-import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
-import RhIcon from '../../lib/components/rh-icon.vue';
-import { quantityUnits } from '../../lib/constants/quantity-units.js';
-import { newSubstanceRef } from './constants.js';
-import { $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
-import { $api } from '../../lib/api/index.js';
+import { $isFormValid } from '../../../lib/utils/form-validation/is-form-valid.js';
+import RhIcon from '../../../lib/components/rh-icon.vue';
+import { quantityUnits } from '../../../lib/constants/quantity-units.js';
+import { newSubstanceRef } from '../constants.js';
+import { $notifyUserAboutError } from '../../../lib/utils/feedback/notify-msg.js';
+import { $api } from '../../../lib/api/index.js';
 
 const substanceFormEl = useTemplateRef('substance-form-el');
 const newSubstance = ref(newSubstanceRef);
@@ -110,13 +110,28 @@ const addNewReagent = async () => {
 	if (!(await $isFormValid(substanceFormEl))) return;
 	newSubstance.value.reagentName = searchQuery.value;
 	const newReagent = {
-		reagentName: newSubstance.value.reagentName,
+		name: newSubstance.value.reagentName,
 		quantityUnit: newSubstance.value.quantityUnit,
 		quantity: newSubstance.value.quantity,
-		amount: newSubstance.value.amount
+		amount: newSubstance.value.amount,
+		casNumber: '',
+		producer: '',
+		catalogId: '',
+		catalogLink: '',
+		unitPrice: null,
+		description: '',
+		structure: ''
 	};
-
-	order.value.reagents = [...order.value.reagents, newReagent];
+	const body = {
+		reagentRequests: [],
+		reagents: [],
+		newReagents: [{ ...newReagent }]
+	};
+	console.log(body);
+	// const response = await $api.orders.addItemToOrder(order.value.id, body);
+	// if (response.status === 'success') {
+	// 	await props.setOrder(order.value.id);
+	// }
 	searchQuery.value = '';
 	substanceFormEl.value.resetFields();
 };

@@ -19,8 +19,8 @@ import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import TimelineStatuses from '../../timeline/timeline-statuses.vue';
-import SubstanceManagement from './substance-management.vue';
-import LinkedRequestsManagement from './linked-requests-management.vue';
+import OrderTable from './details-table/order-table.vue';
+import OrderRequests from './order-requests.vue';
 
 const props = defineProps({
 	id: {
@@ -60,14 +60,18 @@ const actions = computed(() => {
 const statusesHistory = ref(null);
 const statusBtn = computed(() => actions.value[0] || {});
 const dropdownBtn = computed(() => actions.value.slice(1));
-
 const handleLinkedRequestsUpdate = updatedRequests => {
 	linkedRequests.value = updatedRequests;
 };
+
 onMounted(() => {
 	setOrder(props.id);
 });
-
+const handleToggleEdit = newState => {
+	if (newState === false) {
+		$router.push({ name: 'order-details', params: { id: order.value.id } });
+	}
+};
 const setOrder = async id => {
 	loading.value = true;
 	try {
@@ -76,6 +80,7 @@ const setOrder = async id => {
 		if (!originalOrder.value.id) {
 			originalOrder.value = { ...fetchedOrder };
 		}
+		// $router.push({ name: 'order-details', params: { id: order.value.id } });
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating order');
 	} finally {
@@ -131,7 +136,6 @@ const cancelEdit = () => {
 	order.value = { ...originalOrder.value };
 	orderForm.value.resetFields();
 };
-
 const updateOrder = async () => {
 	try {
 		if (!(await $isFormValid(orderForm))) return;
@@ -210,10 +214,10 @@ const setStatusesHistory = async () => {
 				@submit="updateOrder"
 			>
 				<el-form-item label="Title" prop="title">
-					<el-input v-model="order.title" :disabled="!isEdit || order.status !== `pending`" />
+					<el-input v-model="order.title" :disabled="!isEdit" />
 				</el-form-item>
 				<el-form-item label="Seller" prop="seller">
-					<el-input v-model="order.seller" :disabled="!isEdit || order.status !== `pending`" />
+					<el-input v-model="order.seller" :disabled="!isEdit" />
 				</el-form-item>
 				<el-form-item label="Author" prop="author.username">
 					<el-input v-model="order.author.username" :disabled="true" />
@@ -230,19 +234,18 @@ const setStatusesHistory = async () => {
 			</el-form>
 		</div>
 		<div v-if="order.status !== 'canceled'" class="wrapper">
-			<linked-requests-management
+			<order-requests
 				:order="order"
 				:is-edit="isEdit"
 				:set-order="setOrder"
 				@update-linked-requests="handleLinkedRequestsUpdate"
 			/>
-			<substance-management
+			<order-table
 				:order="order"
-				:requests="order.requests"
 				:is-edit="isEdit"
 				:set-order="setOrder"
-				:update-order="updateOrder"
 				:linked-requests="linkedRequests"
+				@toggle-edit="handleToggleEdit"
 			/>
 		</div>
 

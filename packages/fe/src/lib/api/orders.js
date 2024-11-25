@@ -20,6 +20,12 @@ export default http => ({
 			body: payload
 		});
 	},
+	async updateItemInOrder(id, payload) {
+		return await http(`/orders/${id}/update-item`, {
+			method: 'PUT',
+			body: payload
+		});
+	},
 	async fetchOrder(id) {
 		return await http(`/orders/${id}`);
 	},
