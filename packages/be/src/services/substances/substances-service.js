@@ -17,8 +17,6 @@ async function substancesService(server) {
 			const samplesQuery = server.samplesService.getSamplesQuery({
 				relevance: getRelevanceScore('structure', options?.smiles || '').as('relevance')
 			});
-			console.log('reagentsQuery', reagentsQuery);
-			console.log('samplesQuery', samplesQuery);
 			const unionQuery = unionAll(reagentsQuery, samplesQuery);
 			let query = server.db.select().from(unionQuery.as('substances'));
 
