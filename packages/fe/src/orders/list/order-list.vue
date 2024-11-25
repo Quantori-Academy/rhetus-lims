@@ -11,19 +11,20 @@ import OrderFilters from '../order-filters.vue';
 import { formatDate } from '../../lib/utils/datetime/date-format.js';
 import { debounce } from '../../lib/utils/debounce/debounce.js';
 import RhPagination from '../../lib/components/rh-pagination/rh-pagination.vue';
+import { Statuses } from './constants.js';
 
 const orders = ref([]);
 const isLoading = ref(false);
 const sort = ref(null);
 const filters = ref({
 	title: '',
-	status: [],
+	status: '',
 	createdAt: [],
 	updatedAt: []
 });
 
 function isPending(status) {
-	return status === 'pending';
+	return status === Statuses.PENDING;
 }
 
 function addNewOrder() {
