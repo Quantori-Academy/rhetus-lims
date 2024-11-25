@@ -1,4 +1,4 @@
-import { eq, and, sql } from 'drizzle-orm';
+import { eq, and, sql, aliasedTable } from 'drizzle-orm';
 import fp from 'fastify-plugin';
 import { schema } from '../../lib/db/schema/index.js';
 import { helpers } from '../../lib/utils/common/helpers.js';
@@ -307,6 +307,8 @@ async function reagentsService(server) {
 		},
 
 		getHistory: async substanceId => {
+			const prevStorage = aliasedTable(schema.storages, 'prevStorage');
+			const newStorage = aliasedTable(schema.storages, 'newStorage');
 			return await server.db
 				.select({
 					id: sql`${schema.substancesHistory.id}`.as('historyId'),
@@ -319,18 +321,18 @@ async function reagentsService(server) {
 					newQuantityLeft: schema.substancesHistory.targetValue,
 					quantityUnit: schema.substancesHistory.quantityUnit,
 					prevStorageLocation: sql`CASE 
-						WHEN prevStorage.id IS NOT NULL THEN json_build_object(
-							'prevStorageId', prevStorage.id,
-							'prevStorageRoom', prevStorage.room,
-							'prevStorageName', prevStorage.name
+						WHEN ${prevStorage}.id IS NOT NULL THEN json_build_object(
+							'prevStorageId', ${prevStorage}.id,
+							'prevStorageRoom', ${prevStorage}.room,
+							'prevStorageName', ${prevStorage}.name
 						)
 						ELSE NULL
 						END`.as('prevStorageLocation'),
 					newStorageLocation: sql`CASE 
-						WHEN newStorage.id IS NOT NULL THEN json_build_object(
-							'newStorageId', newStorage.id,
-							'newStorageRoom', newStorage.room,
-							'newStorageName', newStorage.name
+						WHEN ${newStorage}.id IS NOT NULL THEN json_build_object(
+							'newStorageId', ${newStorage}.id,
+							'newStorageRoom', ${newStorage}.room,
+							'newStorageName', ${newStorage}.name
 						)
 						ELSE NULL
 						END`.as('newStorageLocation'),
@@ -341,14 +343,8 @@ async function reagentsService(server) {
 				})
 				.from(schema.substancesHistory)
 				.innerJoin(schema.users, eq(schema.substancesHistory.userId, schema.users.id))
-				.leftJoin(
-					sql`storages AS prevStorage`,
-					eq(sql`prevStorage.id`, schema.substancesHistory.previousStorageId)
-				)
-				.leftJoin(
-					sql`storages AS newStorage`,
-					eq(sql`newStorage.id`, schema.substancesHistory.targetStorageId)
-				)
+				.leftJoin(prevStorage, eq(prevStorage.id, schema.substancesHistory.previousStorageId))
+				.leftJoin(newStorage, eq(newStorage.id, schema.substancesHistory.targetStorageId))
 				.where(eq(schema.substancesHistory.reagentId, substanceId))
 				.orderBy(schema.substancesHistory.createdAt, 'asc');
 		}
