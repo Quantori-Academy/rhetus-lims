@@ -16,6 +16,7 @@ import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-
 import { $api } from '../../lib/api';
 import { quantityUnits } from '../../lib/constants/quantity-units.js';
 import { requiredRule } from './constants.js';
+import RhIcon from '../../lib/components/rh-icon.vue';
 
 const formEl = useTemplateRef('form-el');
 const isSaving = ref(false);
@@ -146,7 +147,9 @@ async function setStorages() {
 			</el-form-item>
 			<div class="btn-container">
 				<el-button @click="cancel">Cancel</el-button>
-				<el-button :loading="isSaving" type="primary" @click="submit">Create</el-button>
+				<el-button :loading="isSaving" type="primary" @click="submit"
+					><rh-icon color="#7DCDEA" name="pod" class="icon" />Create</el-button
+				>
 			</div>
 		</el-form>
 	</div>

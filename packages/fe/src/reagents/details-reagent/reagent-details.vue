@@ -17,6 +17,7 @@ import { $route, $router } from '../../lib/router/router';
 import { formRules, emptyReagent } from './constants.js';
 import { checkEditedFields } from '../../substances/constants';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
+import RhIcon from '../../lib/components/rh-icon.vue';
 const props = defineProps({
 	id: {
 		type: String,
@@ -32,12 +33,10 @@ const isOutOfStock = computed(() => reagent.value.quantityLeft === 0);
 const originalReagent = ref({});
 const rules = ref(formRules);
 const updatedReagentValues = ref({ category: 'reagent' });
-
 onMounted(() => {
 	setReagent(props.id);
 	setStorages();
 });
-
 watch(
 	reagent,
 	reagentFields => {
@@ -78,7 +77,6 @@ const setReagent = async id => {
 const toggleEdit = () => {
 	$router.push({ name: 'reagent-details-edit', params: { id: reagent.value.id } });
 };
-
 const cancelEdit = () => {
 	$router.push({ name: 'reagent-details', params: { id: reagent.value.id } });
 	$notify({
@@ -157,7 +155,9 @@ const deleteReagent = async () => {
 <template>
 	<div v-if="reagent" v-loading="loading" class="wrapper">
 		<div v-if="reagent" class="editing-header">
-			<div>{{ `${isEdit ? 'Editing ' : ''}${reagent.name}` }}</div>
+			<div class="category-icons">
+				<rh-icon name="pod" />{{ `${isEdit ? 'Editing ' : ''}${reagent.name}` }}
+			</div>
 			<el-button v-if="!isEdit" @click="toggleEdit">{{ 'Edit' }}</el-button>
 		</div>
 		<el-form
@@ -229,7 +229,7 @@ const deleteReagent = async () => {
 			<el-form-item label="Description" prop="description">
 				<el-input v-model="reagent.description" type="textarea" :disabled="!isEdit" />
 			</el-form-item>
-			<div v-if="isEdit" class="btn-container">
+			<div v-if="isEdit" class="btns-container">
 				<el-button type="danger" @click="deleteReagent">{{ 'Delete reagent' }}</el-button>
 				<div>
 					<el-button @click="cancelEdit">Cancel</el-button>
@@ -241,14 +241,7 @@ const deleteReagent = async () => {
 </template>
 
 <style scoped>
-.el-input-number {
-	width: 100%;
-}
 :deep(.el-date-editor) {
 	width: 100%;
-}
-.btn-container {
-	display: flex;
-	justify-content: space-between;
 }
 </style>

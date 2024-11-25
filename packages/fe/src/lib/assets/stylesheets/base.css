@@ -65,6 +65,18 @@ html {
 	font-weight: 500;
 	font-size: large;
 }
+.category-icons {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+}
+.btns-container {
+	display: flex;
+	justify-content: space-between;
+}
+.icon {
+	margin-right: 4px;
+}
 .align-horizontal {
 	display: flex;
 	gap: 18px;

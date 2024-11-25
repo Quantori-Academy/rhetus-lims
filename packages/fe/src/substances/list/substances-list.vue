@@ -159,8 +159,12 @@ onMounted(() => {
 	<div class="margin-table">
 		<rh-filters>
 			<template #action-buttons>
-				<el-button type="primary" @click="addNewReagent">Add New Reagent</el-button>
-				<el-button type="primary" @click="addNewSample">Add New Sample</el-button>
+				<el-button type="primary" @click="addNewReagent"
+					><rh-icon color="#7dcdea" name="pod" class="icon" />Add New Reagent</el-button
+				>
+				<el-button type="primary" @click="addNewSample"
+					><rh-icon color="#7DCDEA" name="applications" class="icon" />Add New Sample</el-button
+				>
 			</template>
 
 			<template #filters>
@@ -174,6 +178,14 @@ onMounted(() => {
 			@row-click="viewSubstance"
 			@sort-change="setSubstances"
 		>
+			<el-table-column width="50">
+				<template #default="{ row }">
+					<rh-icon
+						color="#1785be"
+						:name="row.category.toLowerCase() === 'reagent' ? 'pod' : 'applications'"
+					/>
+				</template>
+			</el-table-column>
 			<el-table-column prop="name" min-width="150" label="Name" sortable />
 			<el-table-column prop="category" min-width="120" label="Category" sortable />
 			<el-table-column prop="structure" min-width="120" label="Structure" sortable />
