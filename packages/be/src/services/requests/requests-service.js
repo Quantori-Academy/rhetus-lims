@@ -46,11 +46,9 @@ async function requestsService(server) {
 				})
 				.returning({ reagentName: schema.requests.reagentName, id: schema.requests.id });
 
-			// notify about creation
-
 			await server.notificationsService.addNotification({
 				requestId: result[0].id,
-				message: `New request for ${result[0].reagentName} created. Status is pending.`
+				message: `New request for ${result[0].reagentName} created.`
 			});
 
 			return result.length ? result[0].reagentName : null;

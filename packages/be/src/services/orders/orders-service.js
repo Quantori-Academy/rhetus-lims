@@ -50,7 +50,7 @@ async function ordersService(server) {
 
 				await server.notificationsService.addNotification({
 					orderId,
-					message: `New order '${orderTitle}' created for ${formattedOrderItems.length} items.`
+					message: `New order '${orderTitle}' created for ${formattedOrderItems.length} item${formattedOrderItems.length > 1 ? 's' : ''}.`
 				});
 
 				return orderTitle;
@@ -178,7 +178,6 @@ async function ordersService(server) {
 
 		updateOrderStatus: async (orderId, nextStatus, tx = null) => {
 			const target = tx ?? server.db;
-			// if (!tx) {
 			const [{ orderTitle }] = await target
 				.update(schema.orders)
 				.set({
@@ -193,17 +192,6 @@ async function ordersService(server) {
 			});
 
 			return orderTitle;
-			// } else {
-			// 	const [{ orderTitle }] = await tx
-			// 		.update(schema.orders)
-			// 		.set({
-			// 			orderStatus: nextStatus
-			// 		})
-			// 		.where(eq(schema.orders.id, orderId))
-			// 		.returning({ orderTitle: schema.orders.title });
-			// 	// notify
-			// 	return orderTitle;
-			// }
 		},
 
 		bindOrderToReagents: async (orderId, reagentIds, tx) => {
@@ -248,7 +236,7 @@ async function ordersService(server) {
 			switch (nextStatus) {
 				case OrderStatus.ORDERED:
 					updatedOrderTitle = await server.ordersService.updateOrderStatus(orderId, nextStatus);
-					return updatedOrderTitle;
+					break;
 				case OrderStatus.FULFILLED:
 					updatedOrderTitle = await server.db.transaction(async tx => {
 						const [{ orderTitle }] = await server.ordersService.updateOrderStatus(
@@ -275,7 +263,7 @@ async function ordersService(server) {
 						return orderTitle;
 					});
 
-					return updatedOrderTitle;
+					break;
 				case OrderStatus.COMPLETED:
 					orderedReagents = await server.reagentsService.getReagentsFromOrder(orderId);
 
@@ -302,9 +290,13 @@ async function ordersService(server) {
 
 						return orderTitle;
 					});
-
-					return updatedOrderTitle;
+					break;
 			}
+			await server.notificationsService.addNotification({
+				orderId,
+				message: `Statuses for order '${updatedOrderTitle}' and its requests were updated to '${nextStatus}'.`
+			});
+			return updatedOrderTitle;
 		},
 
 		handleCancelOrder: async (orderId, nextStatus) => {
@@ -313,7 +305,10 @@ async function ordersService(server) {
 				await server.ordersService.resetOrdersItems(orderId, tx);
 				return orderTitle;
 			});
-
+			await server.notificationsService.addNotification({
+				orderId,
+				message: `Order '${canceledOrderTitle}' was cancelled.`
+			});
 			return canceledOrderTitle;
 		},
 

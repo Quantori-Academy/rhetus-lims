@@ -161,7 +161,6 @@ async function orderItemsService(server) {
 							})
 							.where(eq(schema.requests.id, requestId));
 
-						// notify that request was addressed in order
 						await server.notificationsService.addNotification({
 							requestId: requestId,
 							orderId,
