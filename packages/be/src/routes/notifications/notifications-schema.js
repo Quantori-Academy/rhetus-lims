@@ -13,9 +13,13 @@ const Notification = S.object()
 
 const getNotifications = {
 	security: [{ Session: [] }],
-	body: Notification,
+	query: S.object()
+		.prop('page', S.string())
+		.prop('limit', S.string())
+		.prop('options', S.string())
+		.prop('sort', S.string()),
 	response: {
-		201: statusMessage,
+		200: S.object().prop('notifications', S.array().items(Notification)).prop('count', S.number()),
 		401: statusMessage,
 		500: statusMessage
 	}

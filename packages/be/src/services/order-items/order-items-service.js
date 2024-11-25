@@ -134,7 +134,7 @@ async function orderItemsService(server) {
 			return formattedReagents;
 		},
 
-		orderItemsInsert: async (orderId, orderItems, tx, title = '') => {
+		orderItemsInsert: async (orderId, orderItems, tx) => {
 			return Promise.all(
 				orderItems.map(async orderItem => {
 					const {
@@ -160,12 +160,6 @@ async function orderItemsService(server) {
 								orderId
 							})
 							.where(eq(schema.requests.id, requestId));
-
-						await server.notificationsService.addNotification({
-							requestId: requestId,
-							orderId,
-							message: `Reagent request for ${reagentName} was ordered in order '${title}'`
-						});
 					}
 
 					await tx.insert(schema.ordersItems).values({

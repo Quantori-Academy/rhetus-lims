@@ -2,7 +2,7 @@ import fp from 'fastify-plugin';
 import notificationsService from '../../services/notifications/notifications-service.js';
 import * as schema from './notifications-schema.js';
 
-async function healthcheck(server, options) {
+async function notifications(server, options) {
 	await server.register(notificationsService);
 
 	server.route({
@@ -16,7 +16,10 @@ async function healthcheck(server, options) {
 	async function noGetNotificationns(req, reply) {
 		try {
 			const authenticatedUserId = req.session.user.id;
-			const notifications = await server.notificationsService.getNotifications(authenticatedUserId);
+			const notifications = await server.notificationsService.getNotifications(
+				authenticatedUserId,
+				req.query
+			);
 			return reply.code(200).send(notifications);
 		} catch (err) {
 			return reply.code(500).send(err);
@@ -24,4 +27,4 @@ async function healthcheck(server, options) {
 	}
 }
 
-export default fp(healthcheck);
+export default fp(notifications);

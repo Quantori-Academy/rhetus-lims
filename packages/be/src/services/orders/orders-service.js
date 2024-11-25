@@ -46,11 +46,11 @@ async function ordersService(server) {
 					})
 					.returning({ orderId: schema.orders.id, orderTitle: schema.orders.title });
 
-				await server.orderItemsService.orderItemsInsert(orderId, formattedOrderItems, tx, title);
+				await server.orderItemsService.orderItemsInsert(orderId, formattedOrderItems, tx);
 
 				await server.notificationsService.addNotification({
 					orderId,
-					message: `New order '${orderTitle}' created for ${formattedOrderItems.length} item${formattedOrderItems.length > 1 ? 's' : ''}.`
+					message: `New order '${orderTitle}' created for ${formattedOrderItems.length} item${formattedOrderItems.length > 1 ? 's' : ''} that includes your requests.`
 				});
 
 				return orderTitle;
@@ -185,11 +185,6 @@ async function ordersService(server) {
 				})
 				.where(eq(schema.orders.id, orderId))
 				.returning({ orderTitle: schema.orders.title });
-
-			await server.notificationsService.addNotification({
-				orderId,
-				message: `Order status for '${orderTitle}' was updated to ${nextStatus}`
-			});
 
 			return orderTitle;
 		},
