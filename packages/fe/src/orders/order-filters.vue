@@ -1,10 +1,31 @@
 <script setup>
-import { ElInput, ElDatePicker } from 'element-plus';
+import { ElInput, ElDatePicker, ElOption, ElSelect } from 'element-plus';
 import RhIcon from '../lib/components/rh-icon.vue';
 import FilterItem from '../lib/components/rh-filters/filter-item.vue';
-import { defineModel } from 'vue';
+import { defineModel, onMounted, ref } from 'vue';
+import { $notifyUserAboutError } from '../lib/utils/feedback/notify-msg';
+import { $api } from '../lib/api';
 
 const filters = defineModel('filters', { type: Object });
+const statuses = ref([]);
+const orders = ref([]);
+
+const setStatuses = async () => {
+	try {
+		const data = await $api.orders.fetchOrders();
+		orders.value = data.orders;
+		const uniqueStatuses = [...new Set(orders.value.map(room => room.status))];
+		statuses.value = uniqueStatuses.map(status => ({
+			value: status,
+			label: status
+		}));
+	} catch (error) {
+		$notifyUserAboutError(error);
+	}
+};
+onMounted(() => {
+	setStatuses();
+});
 </script>
 
 <template>
@@ -16,13 +37,18 @@ const filters = defineModel('filters', { type: Object });
 				</template>
 			</el-input>
 		</filter-item>
-
 		<filter-item>
-			<el-input v-model="filters.status" clearable placeholder="Enter status">
+			<el-select v-model="filters.status" filterable clearable placeholder="Enter status">
+				<el-option
+					v-for="status of statuses"
+					:key="status.value"
+					:label="status.label"
+					:value="status.value"
+				/>
 				<template #prefix>
 					<rh-icon name="search" />
 				</template>
-			</el-input>
+			</el-select>
 		</filter-item>
 	</div>
 	<div>

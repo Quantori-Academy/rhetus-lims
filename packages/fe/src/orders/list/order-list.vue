@@ -11,6 +11,7 @@ import OrderFilters from '../order-filters.vue';
 import { formatDate } from '../../lib/utils/datetime/date-format.js';
 import { debounce } from '../../lib/utils/debounce/debounce.js';
 import RhPagination from '../../lib/components/rh-pagination/rh-pagination.vue';
+import { Statuses } from './constants.js';
 
 const orders = ref([]);
 const isLoading = ref(false);
@@ -21,6 +22,10 @@ const filters = ref({
 	createdAt: [],
 	updatedAt: []
 });
+
+function isPending(status) {
+	return status === Statuses.PENDING;
+}
 
 function addNewOrder() {
 	$router.push({ name: 'new-order-request' });
@@ -143,12 +148,18 @@ onMounted(() => {
 			<el-table-column prop="seller" min-width="150" label="Seller" sortable />
 			<el-table-column width="80">
 				<template #default="{ row }">
-					<el-button @click.stop="() => editOrder(row.id)"><rh-icon name="pencil" /></el-button>
+					<el-button :disabled="!isPending(row.status)" @click.stop="() => editOrder(row.id)"
+						><rh-icon name="pencil"
+					/></el-button>
 				</template>
 			</el-table-column>
 			<el-table-column width="80">
 				<template #default="{ row }">
-					<el-button type="danger" @click.stop="() => deleteOrder(row.id)">
+					<el-button
+						type="danger"
+						:disabled="!isPending(row.status)"
+						@click.stop="() => deleteOrder(row.id)"
+					>
 						<rh-icon color="white" name="remove" />
 					</el-button>
 				</template>
