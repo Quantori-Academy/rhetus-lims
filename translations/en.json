@@ -1,0 +1,25 @@
+{
+	"messages": {
+		"": {
+			"domain": "messages",
+			"lang": "en",
+			"plural_forms": "nplurals=2; plural=(n != 1);"
+		},
+		"My Profile": ["My Profile"],
+		"Edit": ["Edit"],
+		"Cancel": ["Cancel"],
+		"Username": ["Username"],
+		"First name": ["First name"],
+		"Last name": ["Last name"],
+		"Email": ["Email"],
+		"Role": ["Role"],
+		"Update": ["Update"],
+		"Reset password": ["Reset password"],
+		"New password": ["New password"],
+		"Input password": ["Input password"],
+		"Confirm password": ["Confirm password"],
+		"Localization": ["Localization"],
+		"Customize language settings": ["Customize language settings"],
+		"Save": ["Save"]
+	}
+}

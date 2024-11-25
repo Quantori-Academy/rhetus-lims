@@ -8,11 +8,13 @@ import { $isFormValid } from '../lib/utils/form-validation/is-form-valid';
 import { passwordFormRules, profileFormRules } from './constants';
 import { $route, $router } from '../lib/router/router';
 import { locales } from '../lib/locales/locales';
+import { __, languageCode } from '../lib/locales';
+import { setLocale } from '../lib/locales/set-locale.js';
 
 const editable = computed(() => $route.value.name === 'edit-user-profile');
 const profile = ref(null);
 const form = useTemplateRef('form');
-const language = ref('English');
+const language = ref(languageCode());
 const resetPassForm = useTemplateRef('reset-pass-form');
 const passwords = ref({ password: '', confirmPassword: '' });
 
@@ -74,14 +76,17 @@ const passwordChangeHandler = async () => {
 		}
 	}
 };
-const langChangeHandler = () => {
+const langChangeHandler = async () => {
 	try {
+		setLocale(language.value);
+
 		$notify({
 			title: 'Success',
 			message: 'Language changed',
 			type: 'success'
 		});
-		$router.push({ name: 'user-profile' });
+		await $router.push({ name: 'user-profile' });
+		location.reload();
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
@@ -95,9 +100,9 @@ onMounted(() => {
 <template>
 	<div class="wrapper">
 		<div class="editing-header">
-			My Profile
+			{{ __('My Profile') }}
 			<el-button :type="editable ? 'default' : 'primary'" @click="toggleEdit">{{
-				editable ? 'Cancel' : 'Edit'
+				editable ? __('Cancel') : __('Edit')
 			}}</el-button>
 		</div>
 		<el-form
@@ -108,28 +113,30 @@ onMounted(() => {
 			:rules="profileRules"
 			@submit="editHandler"
 		>
-			<el-form-item label="Username" prop="username">
+			<el-form-item :label="__('Username')" prop="username">
 				<el-input v-model="profile.username" :disabled="true" />
 			</el-form-item>
-			<el-form-item label="First name" prop="firstName">
+			<el-form-item :label="__('First name')" prop="firstName">
 				<el-input v-model="profile.firstName" :disabled="!editable" />
 			</el-form-item>
-			<el-form-item label="Last name" prop="lastName">
+			<el-form-item :label="__('Last name')" prop="lastName">
 				<el-input v-model="profile.lastName" :disabled="!editable" />
 			</el-form-item>
-			<el-form-item label="Email" prop="email">
+			<el-form-item :label="__('Email')" prop="email">
 				<el-input v-model="profile.email" :disabled="!editable" />
 			</el-form-item>
-			<el-form-item label="Role" prop="role">
+			<el-form-item :label="__('Role')" prop="role">
 				<el-input v-model="profile.role.name" :disabled="true" />
 			</el-form-item>
 			<div v-if="editable" class="btn-container">
-				<el-button v-if="editable" type="primary" @click="editHandler">Update</el-button>
+				<el-button v-if="editable" type="primary" @click="editHandler">
+					{{ __('Update') }}
+				</el-button>
 			</div>
 		</el-form>
 	</div>
 	<div class="wrapper">
-		<div class="section-header">Reset password</div>
+		<div class="section-header">{{ __('Reset password') }}</div>
 		<el-form
 			ref="reset-pass-form"
 			:model="passwords"
@@ -137,37 +144,39 @@ onMounted(() => {
 			:rules="passwordRules"
 			@submit="passwordChangeHandler"
 		>
-			<el-form-item label="New password" prop="password">
+			<el-form-item :label="__('New password')" prop="password">
 				<el-input
 					v-model="passwords.password"
 					:disabled="!editable"
-					placeholder="Input password"
+					:placeholder="__('Input password')"
 					type="password"
 					show-password
 				/>
 			</el-form-item>
-			<el-form-item label="Confirm password" prop="confirmPassword">
+			<el-form-item :label="__('Confirm password')" prop="confirmPassword">
 				<el-input
 					v-model="passwords.confirmPassword"
 					:disabled="!editable"
-					placeholder="Confirm password"
+					:placeholder="__('Confirm password')"
 					type="password"
 					show-password
 				/>
 			</el-form-item>
 			<div v-if="editable" class="btn-container">
-				<el-button type="primary" @click="passwordChangeHandler"> Reset password </el-button>
+				<el-button type="primary" @click="passwordChangeHandler">
+					{{ __('Reset password') }}
+				</el-button>
 			</div>
 		</el-form>
 	</div>
 	<div class="wrapper">
 		<el-divider />
 		<div class="section-header">
-			Localization
-			<p>Customize language settings</p>
+			{{ __('Localization') }}
+			<p>{{ __('Customize language settings') }}</p>
 		</div>
 		<el-form label-position="top">
-			<el-form-item label="Language">
+			<el-form-item :label="__('Language')">
 				<el-select v-model="language" :disabled="!editable">
 					<el-option
 						v-for="lang of locales"
@@ -178,7 +187,7 @@ onMounted(() => {
 				</el-select>
 			</el-form-item>
 			<div v-if="editable" class="btn-container">
-				<el-button type="primary" @click="langChangeHandler">Save</el-button>
+				<el-button type="primary" @click="langChangeHandler">{{ __('Save') }}</el-button>
 			</div>
 		</el-form>
 	</div>

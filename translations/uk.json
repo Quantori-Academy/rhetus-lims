@@ -1,0 +1,26 @@
+{
+	"messages": {
+		"": {
+			"domain": "messages",
+			"lang": "uk",
+			"plural_forms": "nplurals=2; plural=(n != 1);"
+		},
+		"My Profile": ["Мій профіль"],
+		"Edit": ["Редагувати"],
+		"Cancel": ["Скасувати"],
+		"Username": ["Ім'я користувача"],
+		"First name": ["Ім'я"],
+		"Last name": ["Прізвище"],
+		"Email": ["Електронна пошта"],
+		"Role": ["Роль"],
+		"Update": ["Оновити"],
+		"Reset password": ["Скинути пароль"],
+		"New password": ["Новий пароль"],
+		"Confirm password": ["Підтвердити пароль"],
+		"Input password": ["Введіть пароль"],
+		"Localization": ["Локалізація"],
+		"Customize language settings": ["Налаштуйте мовні параметри"],
+		"Save": ["Зберегти"],
+		"Language": ["Мова"]
+	}
+}
