@@ -61,7 +61,13 @@ export const substancesHandler = [
 			});
 		}
 	}),
-
+	http.post(api('/substances'), async ({ request }) => {
+		const substance = await request.json();
+		return HttpResponse.json({
+			status: 'success',
+			message: `New ${substance.category} was created`
+		});
+	}),
 	http.patch(api('/substances/:id'), async ({ request, params }) => {
 		const { id } = params;
 		const body = await request.json();
