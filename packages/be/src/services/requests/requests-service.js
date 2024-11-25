@@ -48,7 +48,7 @@ async function requestsService(server) {
 
 			await server.notificationsService.addNotification({
 				requestId: result[0].id,
-				message: `New request for ${result[0].reagentName} created.`
+				message: `New request for '${result[0].reagentName}' created.`
 			});
 
 			return result.length ? result[0].reagentName : null;
@@ -166,7 +166,7 @@ async function requestsService(server) {
 
 				await server.notificationsService.addNotification({
 					requestId,
-					message: `New comment from a procurement officer in request for ${reagentName}`
+					message: `New comment from a procurement officer in request for '${reagentName}'`
 				});
 
 				return {
@@ -200,8 +200,6 @@ async function requestsService(server) {
 				error.statusCode = 400;
 				throw error;
 			}
-
-			// notify if request status is passed
 
 			const updatedRequestReagentName = await server.requestsService.updateRequest(
 				requestId,
@@ -287,7 +285,7 @@ async function requestsService(server) {
 
 			await server.notificationsService.addNotification({
 				requestId,
-				message: `Request for '${result[0].reagentName}' cancelled for the follwing reason: ${reason}.`
+				message: `Request for '${result[0].reagentName}' cancelled for the following reason: '${reason}'.`
 			});
 
 			return result.length ? result[0].reagentName : null;
