@@ -13,6 +13,11 @@ const formatMapping = {
 	quantityUnit: string => helpers.lowercase(string)
 };
 
+const CommentsType = {
+	USER: 'userComment',
+	OFFICER: 'poComment'
+};
+
 async function requestsService(server) {
 	server.decorate('requestsService', {
 		createRequest: async data => {
@@ -117,17 +122,9 @@ async function requestsService(server) {
 		},
 
 		updateRequest: async (id, data) => {
-			const dataForUpdate = Object.fromEntries(
-				Object.entries(data).map(([key, value]) =>
-					!Object.keys(formatMapping).includes(key)
-						? [key, value]
-						: [key, formatMapping[key](value)]
-				)
-			);
-
 			const result = await server.db
 				.update(schema.requests)
-				.set(dataForUpdate)
+				.set(data)
 				.where(eq(schema.requests.id, id))
 				.returning({ reagentName: schema.requests.reagentName });
 
@@ -146,52 +143,74 @@ async function requestsService(server) {
 			return isOfficer || isOwner;
 		},
 
-		handleRequestUpdate: async (requestData, updateData, userId) => {
-			const { requestId, requestStatus, ownerId } = requestData;
+		handleRequestUpdate: async (requestData, data, userId) => {
+			const { requestId, existingRequest } = requestData;
+
 			const isOfficer = await server.usersService.isOfficer(userId);
-			const isOwner = ownerId === userId;
+			const isOwner = existingRequest.author.id === userId;
 
-			if (isOfficer) {
-				if ('userComment' in updateData && !isOwner) {
-					return {
-						code: 403,
-						status: 'error',
-						message: 'Sorry. You cannot change user comment'
-					};
-				}
-
-				const reagentName = await server.requestsService.updateRequest(requestId, updateData);
-
+			if (existingRequest.status !== RequestStatus.PENDING) {
 				return {
-					code: 200,
-					status: 'success',
-					message: `Request for reagent '${reagentName}' was updated`
-				};
-			}
-
-			if ('poComment' in updateData) {
-				return {
-					code: 403,
+					code: 409,
 					status: 'error',
-					message: 'Sorry. You have no permissions to change procurement officer comment'
+					message: 'Sorry. You cannot update reagent request while processing'
 				};
 			}
 
-			if (requestStatus !== RequestStatus.PENDING) {
-				return {
-					code: 403,
-					status: 'error',
-					message: 'Sorry. You have no permissions to update reagent request while processing'
-				};
+			const updateData = Object.fromEntries(
+				Object.entries(data)
+					.map(([key, value]) => {
+						const formattedIncomingValue = Object.keys(formatMapping).includes(key)
+							? formatMapping[key](value)
+							: value;
+
+						if (existingRequest[key] === formattedIncomingValue) {
+							return;
+						}
+
+						return [key, formattedIncomingValue];
+					})
+					.filter(Boolean)
+					.filter(item => server.requestsService.filterByOwner(item, { isOfficer, isOwner }))
+			);
+
+			if (!Object.keys(updateData).length) {
+				const error = new Error(
+					'There is nothing to update. Check sending values or request state.'
+				);
+				error.statusCode = 400;
+				throw error;
 			}
 
-			const reagentName = await server.requestsService.updateRequest(requestId, updateData);
+			const updatedRequestReagentName = await server.requestsService.updateRequest(
+				requestId,
+				updateData
+			);
 
 			return {
 				code: 200,
 				status: 'success',
-				message: `Request for reagent '${reagentName}' was updated`
+				message: `Request for reagent '${updatedRequestReagentName}' was updated to reflect the new information and your permissions`
 			};
+		},
+
+		filterByOwner: (data, permissions) => {
+			const [key] = data;
+			const { isOfficer, isOwner } = permissions;
+
+			if (!Object.values(CommentsType).includes(key)) {
+				return true;
+			}
+
+			if (key === CommentsType.OFFICER && !isOfficer) {
+				return false;
+			}
+
+			if (key === CommentsType.USER && !isOwner) {
+				return false;
+			}
+
+			return true;
 		},
 
 		handleRequestSoftDelete: async requestData => {
@@ -226,10 +245,10 @@ async function requestsService(server) {
 		cancelRequest: async (requestId, data) => {
 			const { reason, currentPoComment } = data ?? {};
 
-			const cancelationTemplate = `Cancelation reason: ${reason}`;
+			const cancellationTemplate = `Cancellation reason: ${reason}`;
 			const newPoComment = currentPoComment
-				? `${currentPoComment}; ${cancelationTemplate}`
-				: `${cancelationTemplate}`;
+				? `${currentPoComment}; ${cancellationTemplate}`
+				: `${cancellationTemplate}`;
 
 			const result = await server.db
 				.update(schema.requests)
