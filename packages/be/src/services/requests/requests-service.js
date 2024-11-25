@@ -285,6 +285,11 @@ async function requestsService(server) {
 				.where(eq(schema.requests.id, requestId))
 				.returning({ reagentName: schema.requests.reagentName });
 
+			await server.notificationsService.addNotification({
+				requestId,
+				message: `Request for '${result[0].reagentName}' cancelled for the follwing reason: ${reason}.`
+			});
+
 			return result.length ? result[0].reagentName : null;
 		}
 	});
