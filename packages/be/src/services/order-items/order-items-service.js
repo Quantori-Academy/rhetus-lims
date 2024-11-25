@@ -247,45 +247,91 @@ async function orderItemsService(server) {
 			return result[0];
 		},
 
-		updateOrderItem: async (existingItem, data) => {
-			const isStructureValid = await server.substancesService.isStructureValid(
-				data.structure || ''
+		handleUpdateOrderItems: async (orderItemsData, orderId) => {
+			const preparedData = await Promise.all(
+				orderItemsData.map(async item => {
+					const orderItem = await server.orderItemsService.getOrderItemByTempId(item.tempId);
+
+					if (!orderItem) {
+						const error = new Error(`No such order item with tempId '${item.tempId}'`);
+						error.statusCode = 404;
+						throw error;
+					}
+
+					if (orderItem.orderId !== orderId) {
+						const error = new Error(
+							`There is no such order item with tempId '${item.tempId}' in this order`
+						);
+						error.statusCode = 404;
+						throw error;
+					}
+
+					const isStructureValid = await server.substancesService.isStructureValid(
+						item.structure || ''
+					);
+
+					if (!isStructureValid) {
+						const error = new Error('Invalid structure');
+						error.statusCode = 400;
+						throw error;
+					}
+
+					const dataForItemUpdate = Object.fromEntries(
+						Object.entries(item)
+							.map(([key, value]) => {
+								if (key === 'tempId') {
+									return [key, value];
+								}
+
+								const formattedIncomingValue = Object.keys(formatMapping).includes(key)
+									? formatMapping[key](value)
+									: value;
+
+								if (orderItem[key] === formattedIncomingValue) {
+									return;
+								}
+
+								return [key, formattedIncomingValue];
+							})
+							.filter(Boolean)
+					);
+
+					return dataForItemUpdate;
+				})
 			);
 
-			if (!isStructureValid) {
-				const error = new Error('Invalid structure');
-				error.statusCode = 400;
-				throw error;
-			}
+			const dataForUpdate = preparedData.filter(data => {
+				const keys = Object.keys(data);
+				if (keys.length === 1 && keys[0] === 'tempId') {
+					return false;
+				}
 
-			const dataForUpdate = Object.fromEntries(
-				Object.entries(data)
-					.map(([key, value]) => {
-						const formattedIncomingValue = Object.keys(formatMapping).includes(key)
-							? formatMapping[key](value)
-							: value;
+				return true;
+			});
 
-						if (existingItem[key] === formattedIncomingValue) {
-							return;
-						}
-
-						return [key, formattedIncomingValue];
-					})
-					.filter(Boolean)
-			);
-
-			if (!Object.keys(dataForUpdate).length) {
+			if (!dataForUpdate.length) {
 				const error = new Error(
-					'There is nothing to update. Check sending values or order item state.'
+					`There is nothing to update in order items. Check sending values or order items state.`
 				);
 				error.statusCode = 400;
 				throw error;
 			}
 
-			return server.db
-				.update(schema.ordersItems)
-				.set(dataForUpdate)
-				.where(eq(schema.ordersItems.tempId, existingItem.tempId));
+			const updatedOrderItemsIds = await Promise.all(
+				dataForUpdate.map(async data => {
+					const { tempId, ...restProperties } = data;
+
+					const [{ tempId: updatedTempId }] = await server.db
+						.update(schema.ordersItems)
+						.set({ ...restProperties })
+						.where(eq(schema.ordersItems.tempId, tempId))
+						.returning({ tempId: schema.ordersItems.tempId });
+
+					return updatedTempId;
+				})
+			);
+
+			return updatedOrderItemsIds;
 		}
 	});
 }

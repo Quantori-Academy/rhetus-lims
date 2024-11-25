@@ -281,7 +281,7 @@ async function orders(server, options) {
 
 	server.route({
 		method: 'PUT',
-		path: options.prefix + 'orders/:id/update-item/:tempId',
+		path: options.prefix + 'orders/:id/update-item',
 		preValidation: [server.authenticate, server.officer],
 		schema: schema.updateOrderItem,
 		handler: onUpdateItem
@@ -289,7 +289,14 @@ async function orders(server, options) {
 
 	async function onUpdateItem(req, reply) {
 		try {
-			const { id: orderId, tempId } = req.params;
+			const orderId = req.params.id;
+
+			if (!req.body.orderItems.length) {
+				return reply.code(403).send({
+					status: 'error',
+					message: `There is nothing to add. Check sending values!`
+				});
+			}
 
 			const order = await server.ordersService.getOrderById(orderId);
 
@@ -304,23 +311,15 @@ async function orders(server, options) {
 				});
 			}
 
-			const orderItem = await server.orderItemsService.getOrderItemByTempId(tempId);
+			const updatedOrderItemsIds = await server.orderItemsService.handleUpdateOrderItems(
+				req.body.orderItems,
+				orderId
+			);
 
-			if (!orderItem) {
-				return reply.code(404).send({ status: 'error', message: `No such order item` });
-			}
-
-			if (orderItem.orderId !== orderId) {
-				return reply
-					.code(404)
-					.send({ status: 'error', message: `There is no such order item in this order` });
-			}
-
-			await server.orderItemsService.updateOrderItem(orderItem, req.body);
-
-			return reply
-				.code(200)
-				.send({ status: 'success', message: `Order item in order '${order.title}' was updated` });
+			return reply.code(200).send({
+				status: 'success',
+				message: `Order items with tempIds '${updatedOrderItemsIds.join(', ')}' were updated`
+			});
 		} catch (err) {
 			return reply.code(500).send(err);
 		}
