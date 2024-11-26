@@ -51,6 +51,27 @@ async function auth(server, options) {
 				.send({ status: 'error', message: 'Oops! Something went wrong. Try again later.' });
 		}
 	}
+
+	server.route({
+		method: 'GET',
+		path: options.prefix + 'logout',
+		schema: schema.logout,
+		handler: onLogout
+	});
+
+	async function onLogout(req, reply) {
+		try {
+			req.session.destroy();
+
+			return reply.clearCookie().code(200).send({
+				status: 'success',
+				message: 'Successfully logged out'
+			});
+		} catch (err) {
+			server.log.error(err);
+			return reply.code(500).send({ status: 'error', message: 'Failed to log out' });
+		}
+	}
 }
 
 export default fp(auth);

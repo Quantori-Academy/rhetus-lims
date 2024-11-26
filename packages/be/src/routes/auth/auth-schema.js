@@ -14,4 +14,13 @@ const login = {
 	}
 };
 
-export { login };
+const logout = {
+	response: {
+		200: statusMessage,
+		400: statusMessage,
+		401: statusMessage,
+		500: statusMessage
+	}
+};
+
+export { login, logout };
