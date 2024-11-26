@@ -3,7 +3,7 @@ import { env } from '../../env.js';
 
 export default http => ({
 	async getRoles() {
-		return await http('/roles');
+		return (await http('/roles')).roles;
 	},
 	async fetchUsers(params) {
 		return await http(`/users`, { query: { options: params } });

@@ -1,19 +1,35 @@
 <script setup>
-import { ElDatePicker, ElInput } from 'element-plus';
-import RhIcon from '../lib/components/rh-icon.vue';
+import { defineModel, onMounted, ref } from 'vue';
+import { ElDatePicker, ElSelect, ElOption } from 'element-plus';
 import FilterItem from '../lib/components/rh-filters/filter-item.vue';
-import { defineModel } from 'vue';
+import { $notifyUserAboutError } from '../lib/utils/feedback/notify-msg.js';
+import { $api } from '../lib/api/index.js';
 
+const roles = ref([]);
+const isLoading = ref(true);
 const filters = defineModel('filters', { type: Object });
+
+async function setRoles() {
+	isLoading.value = true;
+	try {
+		roles.value = await $api.users.getRoles();
+	} catch (error) {
+		$notifyUserAboutError(error);
+	} finally {
+		isLoading.value = false;
+	}
+}
+
+onMounted(() => {
+	setRoles();
+});
 </script>
 
 <template>
 	<filter-item>
-		<el-input v-model="filters.role" clearable placeholder="Enter role">
-			<template #prefix>
-				<rh-icon name="search" />
-			</template>
-		</el-input>
+		<el-select v-model="filters.role" :loading="isLoading" placeholder="Select role" clearable>
+			<el-option v-for="role of roles" :key="role.id" :label="role.name" :value="role.name" />
+		</el-select>
 	</filter-item>
 	<filter-item>
 		<el-date-picker
