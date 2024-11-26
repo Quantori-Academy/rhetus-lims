@@ -288,7 +288,7 @@ export const routes = [
 		path: '/requests',
 		path: '/requests/list',
 		name: 'requests-list',
-		component: () => import('../../requests/list/request-list.vue'),
+		component: () => import('../../requests/request-list.vue'),
 		meta: {
 			// roles: [roles.PROCUREMENT_OFFICER, roles.RESEARCHER],
 			title: 'Reagent Requests List',
@@ -301,7 +301,7 @@ export const routes = [
 	{
 		path: '/requests/new',
 		name: 'new-request',
-		component: () => import('../../requests/new/add-new-request.vue'),
+		component: () => import('../../requests/add-new-request.vue'),
 		meta: {
 			roles: [roles.RESEARCHER],
 			title: 'New Reagent Request',
@@ -315,7 +315,7 @@ export const routes = [
 	{
 		path: '/requests/:id',
 		name: 'request-details',
-		component: () => import('../../requests/details/request-details.vue'),
+		component: () => import('../../requests/request-details.vue'),
 		props: true,
 		meta: {
 			title: 'Request Details',
@@ -329,7 +329,7 @@ export const routes = [
 	{
 		path: '/requests/:id/edit',
 		name: 'request-details-edit',
-		component: () => import('../../requests/details/request-details.vue'),
+		component: () => import('../../requests/request-details.vue'),
 		props: true,
 		meta: {
 			title: 'Edit Request',

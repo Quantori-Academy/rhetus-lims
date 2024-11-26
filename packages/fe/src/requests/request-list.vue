@@ -1,15 +1,15 @@
 <script setup>
 import { ElTable, ElTableColumn, ElButton, ElMessageBox } from 'element-plus';
 import { inject, onMounted, ref, watch } from 'vue';
-import { debounce } from '../../lib/utils/debounce/debounce';
-import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg';
-import { $api } from '../../lib/api';
-import { formatDate } from '../../lib/utils/datetime/date-format';
+import { debounce } from '../lib/utils/debounce/debounce';
+import { $notify, $notifyUserAboutError } from '../lib/utils/feedback/notify-msg';
+import { $api } from '../lib/api';
+import { formatDate } from '../lib/utils/datetime/date-format';
 import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
 import RequestsFilters from '../requests-filters.vue';
-import { $router } from '../../lib/router/router';
+import { $router } from '../lib/router/router';
 import RhPagination from '../../lib/components/rh-pagination/rh-pagination.vue';
-import { $confirm } from '../../lib/utils/feedback/confirm-msg';
+import { $confirm } from '../lib/utils/feedback/confirm-msg';
 
 const isLoading = ref(false);
 const requests = ref([]);

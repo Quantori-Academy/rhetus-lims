@@ -11,13 +11,13 @@ import {
 	ElOption
 } from 'element-plus';
 import { computed, ref, onMounted, inject } from 'vue';
-import { $notifyUserAboutError, $notify } from '../../lib/utils/feedback/notify-msg.js';
-import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
-import { $api } from '../../lib/api/index.js';
-import { $route, $router } from '../../lib/router/router.js';
+import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg.js';
+import { $confirm } from '../lib/utils/feedback/confirm-msg.js';
+import { $api } from '../lib/api/index.js';
+import { $route, $router } from '../lib/router/router.js';
 import { emptyRequest } from './constants.js';
-import { getButtonType } from '../../orders/details/constants.js';
-import { quantityUnits } from '../../lib/constants/quantity-units.js';
+import { getButtonType } from '../orders/details/constants.js';
+import { quantityUnits } from '../lib/constants/quantity-units.js';
 
 const props = defineProps({ id: { type: String, default: null } });
 
