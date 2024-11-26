@@ -67,7 +67,7 @@ async function substancesService(server) {
 			const storage = await server.storagesService.getStorageById(storageId);
 			if (!storage) {
 				const error = new Error(`No such storage with id: ${storageId}`);
-				error.codeStatus = 404;
+				error.statusCode = 404;
 				throw error;
 			}
 			return { storageId };
@@ -83,7 +83,7 @@ async function substancesService(server) {
 			});
 			if (!canQuantityChange) {
 				const error = new Error(`Quantity of ${category} cannot be changed. Check sending values`);
-				error.codeStatus = 409;
+				error.statusCode = 409;
 				throw error;
 			}
 			return {

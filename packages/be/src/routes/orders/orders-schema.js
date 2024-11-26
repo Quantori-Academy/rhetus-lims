@@ -20,12 +20,6 @@ const createOrderItemSchema = S.object()
 	.prop('quantity', S.number().minimum(0).required())
 	.prop('quantityUnit', S.string().minLength(1).required());
 
-const createOrderSchema = S.object()
-	.prop('title', S.string().minLength(1).maxLength(200).required())
-	.prop('seller', S.string().maxLength(200))
-	.prop('reagentRequests', S.array().items(createOrderItemSchema).required())
-	.prop('reagents', S.array().items(createOrderItemSchema).required());
-
 const getOrderItemSchema = S.object()
 	.prop('tempId', S.string().format(S.FORMATS.UUID).required())
 	.prop('amount', S.number().minimum(1).required())
@@ -38,6 +32,23 @@ const getOrderItemSchema = S.object()
 	.prop('catalogId', S.string().minLength(0).required())
 	.prop('catalogLink', S.string().minLength(0).required())
 	.prop('unitPrice', S.number().minimum(0).required());
+
+const createOrderSchema = S.object()
+	.prop('title', S.string().minLength(1).maxLength(200).required())
+	.prop('seller', S.string().maxLength(200))
+	.prop('reagentRequests', S.array().items(createOrderItemSchema).required().minItems(0))
+	.prop('reagents', S.array().items(createOrderItemSchema).required().minItems(0))
+	.prop(
+		'newReagents',
+		S.array()
+			.items(
+				getOrderItemSchema
+					.without(['tempId', 'reagentName'])
+					.prop('name', S.string().minLength(1).required())
+			)
+			.required()
+			.minItems(0)
+	);
 
 const getOrderSchema = S.object()
 	.prop('title', S.string().minLength(1).maxLength(200).required())
@@ -61,7 +72,23 @@ const updateOrderStatusSchema = S.object().prop(
 
 const addOrderItemSchema = S.object()
 	.prop('reagentRequests', S.array().items(createOrderItemSchema).minItems(0).required())
-	.prop('reagents', S.array().items(createOrderItemSchema).minItems(0).required());
+	.prop('reagents', S.array().items(createOrderItemSchema).minItems(0).required())
+	.prop(
+		'newReagents',
+		S.array()
+			.items(
+				getOrderItemSchema
+					.without(['tempId', 'reagentName'])
+					.prop('name', S.string().minLength(1).required())
+			)
+			.required()
+			.minItems(0)
+	);
+
+const updateOrderItemSchema = S.object().prop(
+	'orderItems',
+	S.array().items(getOrderItemSchema).minItems(0).required()
+);
 
 const removeOrderItemSchema = S.object()
 	.prop(
@@ -142,6 +169,18 @@ const addOrderItem = {
 	}
 };
 
+const updateOrderItem = {
+	security: [{ Session: [] }],
+	params: S.object().prop('id', S.string().format(S.FORMATS.UUID).required()),
+	body: updateOrderItemSchema,
+	response: {
+		200: statusMessage,
+		403: statusMessage,
+		404: statusMessage,
+		500: statusMessage
+	}
+};
+
 const removeOrderItem = {
 	security: [{ Session: [] }],
 	params: S.object().prop('id', S.string().format(S.FORMATS.UUID).required()),
@@ -175,5 +214,6 @@ export {
 	getOrderSchema,
 	changeOrderStatus,
 	addOrderItem,
-	removeOrderItem
+	removeOrderItem,
+	updateOrderItem
 };
