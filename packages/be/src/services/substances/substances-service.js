@@ -24,10 +24,7 @@ async function substancesService(server) {
 			const { options, sort, limit, offset } = getClarifyParams(queryParams);
 
 			if (!(await server.reagentsService.isStructureValid(options?.smiles || ''))) {
-				return {
-					code: 400,
-					data: { status: 'error', message: `Invalid structure` }
-				};
+				return { substances: [], count: 0 };
 			}
 
 			let query = server.substancesService.getSubstancesQuery(options);
@@ -40,11 +37,8 @@ async function substancesService(server) {
 			const substances = await query.limit(limit).offset(offset);
 
 			return {
-				code: 200,
-				data: {
-					substances,
-					count: count.length
-				}
+				substances,
+				count: count.length
 			};
 		},
 
