@@ -72,8 +72,8 @@ const setStorages = debounce(async (event = null) => {
 		options: { ...filters.value }
 	};
 	try {
-		const { storages, count } = await $api.storages.fetchStoragesWithCount(params);
-		storages.value = storages;
+		const { storages: storagesData, count } = await $api.storages.fetchStoragesWithCount(params);
+		storages.value = storagesData;
 		paginationData.value.totalElements = count;
 	} catch (error) {
 		$notifyUserAboutError(error);
