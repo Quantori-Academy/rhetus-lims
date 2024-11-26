@@ -5,7 +5,7 @@ const requestInfo = {
 	requests: [
 		{
 			id: 'c10cb7e2-8b8d-4d89-a284-e703e369ca64',
-			reagentName: 'Not admin 03-11',
+			reagentName: 'Acetone',
 			quantity: 18,
 			quantityUnit: 'g, box',
 			amount: 5,
@@ -17,7 +17,7 @@ const requestInfo = {
 			casNumber: '2222222-22-2',
 			author: {
 				id: 'c7b3d8e0-5e0b-4b0f-8b3a-4f9f4b3d3b333',
-				username: 'test1'
+				username: 'adam'
 			},
 			status: 'pending',
 			order: null

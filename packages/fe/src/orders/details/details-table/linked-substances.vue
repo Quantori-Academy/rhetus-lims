@@ -30,11 +30,6 @@ const props = defineProps({
 });
 
 const isOrderValid = computed(() => props.order.reagentRequests.length > 0);
-const emit = defineEmits('toggle-edit');
-const toggleEdit = () => {
-	emit('toggle-edit', false);
-};
-
 const changeTracker = ref(
 	props.order.reagentRequests.map(request =>
 		Object.fromEntries(Object.keys(request).map(key => [key, false]))
@@ -71,7 +66,6 @@ const getChangedItems = () => {
 };
 const updateRequests = async () => {
 	if (!checkForChanges()) {
-		toggleEdit();
 		return;
 	}
 	let changedSubstances = getChangedItems();
@@ -79,18 +73,16 @@ const updateRequests = async () => {
 		const body = {
 			orderItems: [...changedSubstances]
 		};
-		console.log(body);
-		// const response = await $api.orders.updateItemInOrder(props.order.id, body);
-		// if (response.status === 'success') {
-		// 	await props.setOrder(props.order.id);
-		// }
+		const response = await $api.orders.updateItemInOrder(props.order.id, body);
+		if (response.status === 'success') {
+			await props.setOrder(props.order.id);
+		}
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
 };
 
 const removeLinkedRequest = async selectedRequest => {
-	console.log(props.order.id);
 	try {
 		const body = { reagentRequests: [selectedRequest.tempId], reagents: [] };
 		const response = await $api.orders.removeItemFromOrder(props.order.id, body);

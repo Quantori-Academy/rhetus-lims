@@ -29,6 +29,7 @@ const props = defineProps({
 				<span class="mobile">Amount</span>
 			</div>
 			<linked-substances
+				v-if="props.linkedRequests.length > 0"
 				:order="props.order"
 				:is-edit="props.isEdit"
 				:linked-requests="linkedRequests"

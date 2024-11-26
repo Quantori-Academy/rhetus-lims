@@ -88,16 +88,18 @@ const onReagentSelect = async selectedRequest => {
 		return;
 	}
 	try {
-		const newReagent = {
+		let newReagent = {
 			...selectedRequest,
 			reagentName: selectedRequest.name,
 			quantity: 1,
-			amount: 1
+			amount: 1,
+			tempId: selectedRequest.id // use for msw
 		};
 		const body = {
 			reagentRequests: [],
 			reagents: [{ ...newReagent }]
 		};
+		// test id on prod
 		const response = await $api.orders.addItemToOrder(order.value.id, body);
 		if (response.status === 'success') {
 			await props.setOrder(order.value.id);
@@ -127,11 +129,10 @@ const addNewReagent = async () => {
 		reagents: [],
 		newReagents: [{ ...newReagent }]
 	};
-	console.log(body);
-	// const response = await $api.orders.addItemToOrder(order.value.id, body);
-	// if (response.status === 'success') {
-	// 	await props.setOrder(order.value.id);
-	// }
+	const response = await $api.orders.addItemToOrder(order.value.id, body);
+	if (response.status === 'success') {
+		await props.setOrder(order.value.id);
+	}
 	searchQuery.value = '';
 	substanceFormEl.value.resetFields();
 };

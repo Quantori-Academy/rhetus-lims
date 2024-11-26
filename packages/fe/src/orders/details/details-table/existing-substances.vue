@@ -29,10 +29,6 @@ const props = defineProps({
 });
 
 const isOrderValid = computed(() => props.order.reagents.length > 0);
-// const emit = defineEmits('toggle-edit');
-// const toggleEdit = () => {
-// 	emit('toggle-edit', false);
-// };
 
 const changeTracker = ref(
 	props.order.reagents.map(request =>
@@ -70,8 +66,6 @@ const getChangedItems = () => {
 };
 const updateReagents = async () => {
 	if (!checkForChanges()) {
-		// temporary
-		await props.setOrder(props.order.id);
 		return;
 	}
 	let changedSubstances = getChangedItems();
@@ -79,19 +73,19 @@ const updateReagents = async () => {
 		const body = {
 			orderItems: [...changedSubstances]
 		};
-		console.log(body);
-		// const response = await $api.orders.updateItemInOrder(props.order.id, body);
-		// if (response.status === 'success') {
-		// 	await props.setOrder(props.order.id);
-		// }
+		const response = await $api.orders.updateItemInOrder(props.order.id, body);
+		if (response.status === 'success') {
+			await props.setOrder(props.order.id);
+		}
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
 };
 
 const removeReagent = async selectedReagent => {
-	console.log(props.order);
 	try {
+		console.log(selectedReagent);
+		// ! test id for prod
 		const body = { reagentRequests: [], reagents: [selectedReagent.tempId] };
 		const response = await $api.orders.removeItemFromOrder(props.order.id, body);
 		if (response.status === 'success') {

@@ -1,4 +1,45 @@
 /* eslint-disable max-lines */
+function pushToArray(targetArray, items) {
+	if (items?.length > 0) {
+		items.forEach(item => targetArray.push(item));
+	}
+}
+function processNewReagents(newReagents) {
+	return newReagents.map(req => {
+		const newReg = {
+			...req,
+			tempId: '1f8616d7-5b77-4643-bc76-b493500c738d',
+			reagentName: req.name
+		};
+		delete newReg.name;
+		return newReg;
+	});
+}
+function removeFromArray(targetArray, removeIds) {
+	removeIds.forEach(id => {
+		const index = targetArray.findIndex(existingItem => existingItem.tempId === id);
+		if (index !== -1) {
+			targetArray.splice(index, 1);
+		}
+	});
+}
+export function updateOrderReagents(targetOrder, reagentRequests, reagents, newReagents) {
+	pushToArray(targetOrder.reagentRequests, reagentRequests);
+	pushToArray(targetOrder.reagents, reagents);
+	if (newReagents?.length > 0) {
+		const processedNewReagents = processNewReagents(newReagents);
+		processedNewReagents.forEach(newReg => targetOrder.reagents.push(newReg));
+	}
+}
+export function removeOrderReagents(targetOrder, reagentRequests, reagents) {
+	if (reagentRequests?.length > 0) {
+		removeFromArray(targetOrder.reagentRequests, reagentRequests);
+	}
+	if (reagents?.length > 0) {
+		removeFromArray(targetOrder.reagents, reagents);
+	}
+}
+
 export const orderInfo = {
 	orders: [
 		{
@@ -279,7 +320,7 @@ export const orderInfo = {
 			]
 		},
 		{
-			id: '6b9f3d47-341b-43b8-8f99-c2c35e71366h',
+			tempId: '6b9f3d47-341b-43b8-8f99-c2c35e71366h',
 			author: {
 				id: 1,
 				username: 'username1'

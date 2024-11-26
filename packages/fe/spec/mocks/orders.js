@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw';
 import { api } from './api-url.js';
-import { orderInfo } from './constants.js';
+import { orderInfo, removeOrderReagents, updateOrderReagents } from './constants.js';
 
 function matchesTitle(order, title) {
 	return title ? order.title.includes(title) : true;
@@ -148,46 +148,57 @@ export const orderHandlers = [
 		return HttpResponse.json({ status: 'success', message: result.message });
 	}),
 	http.put(api('/orders/:id/remove-item'), async ({ request, params }) => {
-		const body = await request.json();
 		const { id } = params;
+		const body = await request.json();
 		const { reagentRequests, reagents } = body;
 		let targetOrder = orderInfo.orders.filter(order => order.id === id)[0];
-
-		const reagentIndex = targetOrder.reagents.findIndex(item => item.tempId === reagents[0]);
-		if (reagentIndex !== -1) {
-			targetOrder.reagents.splice(reagentIndex, 1);
+		if (!targetOrder) {
 			return HttpResponse.json({
-				status: 'success',
-				message: 'Item removed successfully'
+				status: 'error',
+				message: 'Order is not found'
 			});
 		}
-		const requestIndex = targetOrder.reagentRequests.findIndex(
-			item => item.tempId === reagentRequests[0]
-		);
-		if (requestIndex !== -1) {
-			targetOrder.reagentRequests.splice(requestIndex, 1);
-			return HttpResponse.json({
-				status: 'success',
-				message: 'Item removed successfully'
-			});
-		}
+		removeOrderReagents(targetOrder, reagentRequests, reagents);
+		return HttpResponse.json({
+			status: 'success',
+			message: 'Item removed successfully'
+		});
 	}),
 	http.put(api('/orders/:id/add-item'), async ({ request, params }) => {
-		const item = await request.json();
+		const body = await request.json();
 		const { id } = params;
-		for (const targetOrder of orderInfo.orders) {
-			if (targetOrder.reagents.length === 0 && targetOrder.reagentRequests.length === 0) {
-				continue;
-			}
-			const reagentExists = targetOrder.reagents.some(item => item.tempId === id);
-			if (!reagentExists) {
-				targetOrder.reagents.push(item);
-				return HttpResponse.json({
-					status: 'success',
-					order: targetOrder
-				});
-			}
+		const { reagentRequests, reagents, newReagents } = body;
+		let targetOrder = orderInfo.orders.filter(order => order.id === id)[0];
+		if (!targetOrder) {
+			return HttpResponse.json({
+				status: 'error',
+				message: 'Order is not found'
+			});
 		}
-		return HttpResponse.json({ status: 'error', message: 'Item not added to any order' });
+
+		updateOrderReagents(targetOrder, reagentRequests, reagents, newReagents);
+		return HttpResponse.json({
+			status: 'success',
+			message: 'Item added successfully'
+		});
+	}),
+	http.put(api('/orders/:id/update-item'), async ({ request, params }) => {
+		const body = await request.json();
+		const { orderItems } = body;
+		const { id } = params;
+		let targetOrder = orderInfo.orders.filter(order => order.id === id)[0];
+		if (!targetOrder) {
+			return HttpResponse.json({
+				status: 'error',
+				message: 'Order is not found'
+			});
+		}
+		console.log('Items tp update:', orderItems);
+		if (orderItems.length > 0) {
+			return HttpResponse.json({
+				status: 'success',
+				message: 'Items updated successfully'
+			});
+		}
 	})
 ];
