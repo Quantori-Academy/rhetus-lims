@@ -79,12 +79,6 @@ const passwordChangeHandler = async () => {
 const langChangeHandler = async () => {
 	try {
 		setLocale(language.value);
-
-		$notify({
-			title: 'Success',
-			message: 'Language changed',
-			type: 'success'
-		});
 		await $router.push({ name: 'user-profile' });
 		location.reload();
 	} catch (error) {

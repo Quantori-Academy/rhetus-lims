@@ -7,6 +7,7 @@ import { $notify, $notifyUserAboutError } from '../lib/utils/feedback/notify-msg
 import { $isFormValid } from '../lib/utils/form-validation/is-form-valid';
 import { $route, $router } from '../lib/router/router.js';
 import { emptyStorage, formRules } from './constants';
+import { __ } from '../lib/locales/index.js';
 
 const props = defineProps({
 	id: {
@@ -106,8 +107,10 @@ onMounted(() => {
 <template>
 	<div class="wrapper">
 		<div class="editing-header">
-			Storage
-			<el-button v-if="!isEdit" type="primary" @click="toggleEdit">{{ 'Edit storage' }}</el-button>
+			{{ __('Storage') }}
+			<el-button v-if="!isEdit" type="primary" @click="toggleEdit">{{
+				__('Edit storage')
+			}}</el-button>
 		</div>
 		<el-form
 			ref="form-ref"
@@ -117,35 +120,35 @@ onMounted(() => {
 			:rules="rules"
 			@submit="updateStorage"
 		>
-			<el-form-item label="Room" prop="room">
+			<el-form-item :label="__('Room')" prop="room">
 				<el-input v-model="storage.room" :disabled="!isEdit" />
 			</el-form-item>
-			<el-form-item label="Name" prop="name">
+			<el-form-item :label="__('Name')" prop="name">
 				<el-input v-model="storage.name" :disabled="!isEdit" />
 			</el-form-item>
-			<el-form-item label="Description" prop="description">
+			<el-form-item :label="__('Description')" prop="description">
 				<el-input
 					v-model="storage.description"
 					type="textarea"
-					placeholder="Enter description"
+					:placeholder="__('Enter description')"
 					:disabled="!isEdit"
 				/>
 			</el-form-item>
 			<template v-if="isEdit">
 				<div class="btn-container">
-					<el-button @click="cancelEdit">Cancel</el-button>
-					<el-button type="primary" @click="updateStorage">Save</el-button>
+					<el-button @click="cancelEdit">{{ __('Cancel') }}</el-button>
+					<el-button type="primary" @click="updateStorage">{{ __('Save') }}</el-button>
 				</div>
 			</template>
 			<template v-else>
 				<div class="btn-container">
 					<el-tooltip
 						:disabled="storage.isEmpty"
-						content="Can't delete, storage is not empty."
+						:content="__(`Can't delete, storage is not empty.`)"
 						placement="top"
 					>
 						<el-button type="danger" :disabled="!storage.isEmpty" @click="deleteStorage">
-							{{ 'Delete storage' }}
+							{{ __('Delete storage') }}
 						</el-button>
 					</el-tooltip>
 				</div>

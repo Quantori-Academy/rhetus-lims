@@ -11,6 +11,7 @@ import StorageFilters from '../storage-filters.vue';
 import { formatDate } from '../../lib/utils/datetime/date-format.js';
 import { debounce } from '../../lib/utils/debounce/debounce.js';
 import RhPagination from '../../lib/components/rh-pagination/rh-pagination.vue';
+import { __ } from '../../lib/locales/index.js';
 
 const storages = ref([]);
 const isLoading = ref(false);
@@ -120,7 +121,7 @@ onMounted(() => {
 		<rh-filters>
 			<template #action-buttons>
 				<el-button type="primary" @click="addNewStorageLocation">
-					Add New Storage Location
+					{{ __('Add New Storage Location') }}
 				</el-button>
 			</template>
 
@@ -135,13 +136,13 @@ onMounted(() => {
 			@row-click="viewStorageLocation"
 			@sort-change="setStorages"
 		>
-			<el-table-column prop="room" min-width="150" label="Room" />
-			<el-table-column prop="name" min-width="150" label="Name" />
-			<el-table-column prop="description" min-width="200" label="Description" />
+			<el-table-column prop="room" min-width="150" :label="__('Room')" />
+			<el-table-column prop="name" min-width="150" :label="__('Name')" />
+			<el-table-column prop="description" min-width="200" :label="__('Description')" />
 			<el-table-column
 				prop="creationDate"
 				min-width="200"
-				label="Creation Date"
+				:label="__('Creation Date')"
 				width="140"
 				:formatter="data => formatDate(data.creationDate)"
 				sortable
@@ -157,7 +158,7 @@ onMounted(() => {
 				<template #default="{ row }">
 					<el-tooltip
 						:disabled="row.isEmpty"
-						content="Can't delete, storage is not empty."
+						:content="__(`Can't delete, storage is not empty.`)"
 						placement="top"
 					>
 						<el-button
