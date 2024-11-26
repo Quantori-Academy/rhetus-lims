@@ -15,6 +15,7 @@ import RhIcon from '../../../lib/components/rh-icon.vue';
 import { $notifyUserAboutError } from '../../../lib/utils/feedback/notify-msg.js';
 import NewSubstances from './new-substances.vue';
 import { $api } from '../../../lib/api/index.js';
+
 const props = defineProps({
 	order: {
 		type: Object,
@@ -28,13 +29,21 @@ const props = defineProps({
 	linkedRequests: { type: Array, default: null }
 });
 
-const isOrderValid = computed(() => props.order.reagents.length > 0);
-
 const changeTracker = ref(
 	props.order.reagents.map(request =>
 		Object.fromEntries(Object.keys(request).map(key => [key, false]))
 	)
 );
+const changes = computed(() => {
+	return getChangedItems();
+});
+const isChanged = computed(() => {
+	return checkForChanges();
+});
+defineExpose({
+	getChanges: () => changes.value,
+	trackChange: () => isChanged.value
+});
 
 const createPropertyWatcher = (request, key, index) => {
 	watch(
@@ -64,27 +73,27 @@ const getChangedItems = () => {
 		return Object.values(changeTracker.value[index]).includes(true);
 	});
 };
-const updateReagents = async () => {
-	if (!checkForChanges()) {
-		return;
-	}
-	let changedSubstances = getChangedItems();
-	try {
-		const body = {
-			orderItems: [...changedSubstances]
-		};
-		const response = await $api.orders.updateItemInOrder(props.order.id, body);
-		if (response.status === 'success') {
-			await props.setOrder(props.order.id);
-		}
-	} catch (error) {
-		$notifyUserAboutError(error);
-	}
-};
+// const updateReagents = async () => {
+// 	if (!checkForChanges()) {
+// 		$router.push({ name: 'order-details', params: { id: props.order.id } });
+// 		return;
+// 	}
+// 	let changedSubstances = getChangedItems();
+// 	try {
+// 		const body = {
+// 			orderItems: [...changedSubstances]
+// 		};
+// 		const response = await $api.orders.updateItemInOrder(props.order.id, body);
+// 		if (response.status === 'success') {
+// 			await props.setOrder(props.order.id);
+// 		}
+// 	} catch (error) {
+// 		$notifyUserAboutError(error);
+// 	}
+// };
 
 const removeReagent = async selectedReagent => {
 	try {
-		console.log(selectedReagent);
 		// ! test id for prod
 		const body = { reagentRequests: [], reagents: [selectedReagent.tempId] };
 		const response = await $api.orders.removeItemFromOrder(props.order.id, body);
@@ -164,10 +173,10 @@ const removeReagent = async selectedReagent => {
 			</div>
 		</div>
 		<new-substances :order="props.order" :is-edit="props.isEdit" :set-order="props.setOrder" />
-		<div v-if="isEdit" class="btn-container">
+		<!-- <div v-if="isEdit" class="btn-container">
 			<el-button type="primary" :disabled="!isOrderValid" @click="updateReagents"
 				>Update Reagents</el-button
 			>
-		</div>
+		</div> -->
 	</el-form>
 </template>

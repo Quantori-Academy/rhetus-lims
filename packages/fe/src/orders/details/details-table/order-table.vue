@@ -1,7 +1,11 @@
 <script setup>
-import { defineProps } from 'vue';
+import { ElButton } from 'element-plus';
+import { computed, defineProps, ref } from 'vue';
 import LinkedSubstances from './linked-substances.vue';
 import ExistingSubstances from './existing-substances.vue';
+import { $api } from '../../../lib/api';
+import { $notifyUserAboutError } from '../../../lib/utils/feedback/notify-msg';
+import { $router } from '../../../lib/router/router';
 
 const props = defineProps({
 	order: {
@@ -16,6 +20,36 @@ const props = defineProps({
 	toggleEdit: { type: Function, default: null },
 	linkedRequests: { type: Array, default: null }
 });
+const childOneRef = ref(null);
+const childTwoRef = ref(null);
+const isOrderValid = computed(
+	() => [...props.order.reagents, ...props.order.reagentRequests].length > 0
+);
+
+const updateReagents = async () => {
+	const changesFromChildOne = childOneRef.value.getChanges();
+	const trackFromChildOne = childOneRef.value.trackChange();
+	const trackFromChilTwo = childTwoRef.value.trackChange();
+	const changesFromChildTwo = childTwoRef.value.getChanges();
+	const combinedChanges = [...changesFromChildOne, ...changesFromChildTwo];
+
+	if (!trackFromChildOne || !trackFromChilTwo) {
+		$router.push({ name: 'order-details', params: { id: props.order.id } });
+		return;
+	}
+
+	try {
+		const body = {
+			orderItems: combinedChanges
+		};
+		const response = await $api.orders.updateItemInOrder(props.order.id, body);
+		if (response.status === 'success') {
+			await props.setOrder(props.order.id);
+		}
+	} catch (error) {
+		$notifyUserAboutError(error);
+	}
+};
 </script>
 
 <template>
@@ -30,6 +64,7 @@ const props = defineProps({
 			</div>
 			<linked-substances
 				v-if="props.linkedRequests.length > 0"
+				ref="childOneRef"
 				:order="props.order"
 				:is-edit="props.isEdit"
 				:linked-requests="linkedRequests"
@@ -37,12 +72,18 @@ const props = defineProps({
 				@toggle-edit="toggleEdit"
 			/>
 			<existing-substances
+				ref="childTwoRef"
 				:order="props.order"
 				:is-edit="props.isEdit"
 				:linked-requests="linkedRequests"
 				:set-order="props.setOrder"
 				@toggle-edit="toggleEdit"
 			/>
+			<div v-if="isEdit" class="btn-container">
+				<el-button type="primary" :disabled="!isOrderValid" @click="updateReagents"
+					>Update Form</el-button
+				>
+			</div>
 		</div>
 	</div>
 </template>
