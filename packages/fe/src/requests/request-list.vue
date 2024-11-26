@@ -1,15 +1,15 @@
 <script setup>
 import { ElTable, ElTableColumn, ElButton, ElMessageBox } from 'element-plus';
 import { inject, onMounted, ref, watch } from 'vue';
-import { debounce } from '../../lib/utils/debounce/debounce';
-import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg';
-import { $api } from '../../lib/api';
-import { formatDate } from '../../lib/utils/datetime/date-format';
-import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
-import RequestsFilters from '../requests-filters.vue';
-import { $router } from '../../lib/router/router';
-import RhPagination from '../../lib/components/rh-pagination/rh-pagination.vue';
-import { $confirm } from '../../lib/utils/feedback/confirm-msg';
+import { debounce } from '../lib/utils/debounce/debounce';
+import { $notify, $notifyUserAboutError } from '../lib/utils/feedback/notify-msg';
+import { $api } from '../lib/api';
+import { $router } from '../lib/router/router';
+import { $confirm } from '../lib/utils/feedback/confirm-msg';
+import { formatDate } from '../lib/utils/datetime/date-format';
+import RhFilters from '../lib/components/rh-filters/rh-filters.vue';
+import RequestsFilters from './requests-filters.vue';
+import RhPagination from '../lib/components/rh-pagination/rh-pagination.vue';
 
 const isLoading = ref(false);
 const requests = ref([]);
@@ -42,12 +42,9 @@ const setRequests = debounce(async (event = null) => {
 		options: { ...filters.value }
 	};
 	try {
-		const data = await $api.requests.fetchRequests(params);
-		if (user.isResearcher) {
-			requests.value = data.requests.filter(request => request.author.id === user.user.value.id);
-		} else {
-			requests.value = data.requests;
-		}
+		const { requests: requestsData, count } = await $api.requests.fetchRequests(params);
+		requests.value = requestsData;
+		paginationData.value.totalElements = count;
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
@@ -89,10 +86,16 @@ const paginationData = ref({
 const handlePageChange = newPage => {
 	paginationData.value.page = newPage;
 };
+
 watch(paginationData.value, () => setRequests());
+
 const addNewRequest = () => {
 	$router.push({ name: 'new-request' });
 };
+
+function viewRequestDetails(row) {
+	$router.push({ name: 'request-details', params: { id: row.id } });
+}
 watch(
 	filters,
 	() => {
@@ -115,28 +118,32 @@ onMounted(() => {
 				<requests-filters v-model:filters="filters" />
 			</template>
 		</rh-filters>
-		<el-table v-loading="isLoading" :data="requests" @sort-change="setRequests">
-			<el-table-column prop="status" min-width="100" label="Status" sortable />
+		<el-table
+			v-loading="isLoading"
+			:data="requests"
+			@sort-change="setRequests"
+			@row-click="viewRequestDetails"
+		>
+			<el-table-column prop="status" width="90" label="Status" sortable />
 			<el-table-column prop="reagentName" min-width="120" label="Reagent Name" sortable />
-			<el-table-column prop="quantity" label="Quantity" sortable />
-			<el-table-column prop="quantityUnit" min-width="120" label="Quantity Unit" sortable />
+			<el-table-column prop="quantity" label="Quantity" sortable>
+				<template #default="{ row }"> {{ row.quantity }} {{ row.quantityUnit }} </template>
+			</el-table-column>
 			<el-table-column prop="amount" label="Amount" sortable />
-			<el-table-column prop="userComment" min-width="120" label="User comment" sortable />
+			<el-table-column prop="author.username" label="Created by" sortable />
 			<el-table-column
 				prop="createdAt"
 				label="Creation Date"
-				min-width="120"
 				:formatter="data => formatDate(data.createdAt)"
 				sortable
 			/>
 			<el-table-column
 				prop="updatedAt"
 				label="Update Date"
-				min-width="120"
 				:formatter="data => formatDate(data.updatedAt)"
 				sortable
 			/>
-			<el-table-column v-if="user.user.value.role.name === 'procurement officer'" width="100">
+			<el-table-column v-if="user?.user?.value?.role.name === 'procurement officer'" width="100">
 				<template #default="{ row }">
 					<el-button
 						type="danger"
@@ -151,3 +158,9 @@ onMounted(() => {
 		<rh-pagination :pagination="paginationData" @change-page="handlePageChange" />
 	</div>
 </template>
+
+<style scoped>
+:deep(.el-table__row):hover {
+	cursor: pointer;
+}
+</style>

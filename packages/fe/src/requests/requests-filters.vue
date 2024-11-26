@@ -1,25 +1,20 @@
 <script setup>
 import FilterItem from '../lib/components/rh-filters/filter-item.vue';
-import { ElInput, ElDatePicker } from 'element-plus';
-import RhIcon from '../lib/components/rh-icon.vue';
+import { ElInput, ElDatePicker, ElSelect, ElOption } from 'element-plus';
+import { Statuses } from './constants.js';
 
 const filters = defineModel('filters', { type: Object });
+const statuses = Object.values(Statuses);
 </script>
 
 <template>
 	<filter-item>
-		<el-input v-model="filters.status" clearable placeholder="Enter status">
-			<template #prefix>
-				<rh-icon name="search" />
-			</template>
-		</el-input>
+		<el-select v-model="filters.status" filterable placeholder="Enter status" clearable>
+			<el-option v-for="status of statuses" :key="status" :label="status" :value="status" />
+		</el-select>
 	</filter-item>
 	<filter-item>
-		<el-input v-model="filters.reagentName" clearable placeholder="Enter reagent name">
-			<template #prefix>
-				<rh-icon name="search" />
-			</template>
-		</el-input>
+		<el-input v-model="filters.reagentName" clearable placeholder="Reagent name" />
 	</filter-item>
 	<filter-item>
 		<el-date-picker

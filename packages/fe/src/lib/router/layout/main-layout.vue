@@ -5,6 +5,7 @@ import PageWithSidebar from '../../../sidebar/page-with-sidebar.vue';
 import { $api } from '../../api/index.js';
 import { $router } from '../router.js';
 import { $notify } from '../../utils/feedback/notify-msg.js';
+import { roles } from '../../constants/roles.js';
 
 const user = ref(null);
 const isLoading = ref(true);
@@ -24,8 +25,9 @@ async function setUser() {
 provide('user', {
 	user,
 	isAuthLoading: isLoading,
-	isAdmin: user.value?.role?.name === 'administrator',
-	isResearcher: user.value?.role?.name === 'researcher'
+	isAdmin: user.value?.role?.name === roles.ADMIN,
+	isResearcher: user.value?.role?.name === roles.RESEARCHER,
+	isOfficer: user.value?.role?.name === roles.PROCUREMENT_OFFICER
 });
 
 provide('auth', {

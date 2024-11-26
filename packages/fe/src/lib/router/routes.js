@@ -288,9 +288,8 @@ export const routes = [
 		path: '/requests',
 		path: '/requests/list',
 		name: 'requests-list',
-		component: () => import('../../requests/list/request-list.vue'),
+		component: () => import('../../requests/request-list.vue'),
 		meta: {
-			roles: [roles.PROCUREMENT_OFFICER, roles.RESEARCHER],
 			title: 'Reagent Requests List',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },
@@ -301,14 +300,41 @@ export const routes = [
 	{
 		path: '/requests/new',
 		name: 'new-request',
-		component: () => import('../../requests/new/add-new-request.vue'),
+		component: () => import('../../requests/add-new-request.vue'),
 		meta: {
-			roles: [roles.RESEARCHER],
 			title: 'New Reagent Request',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },
 				{ name: 'Requests', path: '/requests/list' },
 				{ name: 'New Request', path: '' }
+			]
+		}
+	},
+	{
+		path: '/requests/:id',
+		name: 'request-details',
+		component: () => import('../../requests/request-details.vue'),
+		props: true,
+		meta: {
+			title: 'Request Details',
+			breadcrumb: route => [
+				{ name: 'Home', path: '/' },
+				{ name: 'Requests', path: '/requests/list' },
+				{ name: `${route.params.id}`, path: '' }
+			]
+		}
+	},
+	{
+		path: '/requests/:id/edit',
+		name: 'request-details-edit',
+		component: () => import('../../requests/request-details.vue'),
+		props: true,
+		meta: {
+			title: 'Edit Request',
+			breadcrumb: route => [
+				{ name: 'Home', path: '/' },
+				{ name: 'Requests', path: '/requests/list' },
+				{ name: `${route.params.id}`, path: '' }
 			]
 		}
 	},

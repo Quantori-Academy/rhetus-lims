@@ -13,5 +13,14 @@ export default http => ({
 			method: 'POST',
 			body: request
 		});
+	},
+	async fetchRequest(id) {
+		return await http(`/requests/${id}`);
+	},
+	async updateRequest(id, requestData) {
+		return await http(`/requests/${id}`, {
+			method: 'PATCH',
+			body: JSON.stringify(requestData)
+		});
 	}
 });
