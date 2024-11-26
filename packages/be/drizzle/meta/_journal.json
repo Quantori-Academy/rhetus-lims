@@ -246,6 +246,13 @@
       "when": 1732445984411,
       "tag": "0034_mysterious_brood",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1732606590115,
+      "tag": "0035_brave_scorpion",
+      "breakpoints": true
     }
   ]
 }
