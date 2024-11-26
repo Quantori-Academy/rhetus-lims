@@ -2,6 +2,9 @@ export default http => ({
 	async fetchStorages(params) {
 		return (await http('/storages', { query: params })).storages;
 	},
+	async fetchStoragesWithCount(params) {
+		return await http('/storages', { query: params });
+	},
 	async fetchStorage(id) {
 		return await http(`/storages/${id}`);
 	},

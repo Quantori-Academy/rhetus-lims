@@ -53,8 +53,7 @@ async function setSubstances(id) {
 async function fetchStorages() {
 	isLoading.value = true;
 	try {
-		const data = await $api.storages.fetchStorages();
-		storages.value = data.storages;
+		storages.value = await $api.storages.fetchStorages();
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error getting storage locations');
 	} finally {
