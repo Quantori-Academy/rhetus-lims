@@ -5,6 +5,7 @@ import { getClarifyParams } from '../../lib/utils/common/parse-params.js';
 import { applyFilters } from '../../lib/utils/db/apply-filters.js';
 import { applySorting } from '../../lib/utils/db/apply-sorting.js';
 import { getRelevanceScore } from '../../lib/db/structure/utils/get-relevance-score.js';
+import { isValidSmilesQuery } from '../../lib/db/structure/utils/is-valid-smiles.js';
 
 async function substancesService(server) {
 	server.decorate('substancesService', {
@@ -39,12 +40,9 @@ async function substancesService(server) {
 		},
 
 		changeSubstanceQuantity: async (id, data) => {
-			const { code, status, message } =
-				data.category === Category.REAGENT
-					? await server.reagentsService.changeQuantity(id, data)
-					: await server.samplesService.changeQuantity(id, data);
-
-			return { code, status, message };
+			return data.category === Category.REAGENT
+				? server.reagentsService.changeQuantity(id, data)
+				: server.samplesService.changeQuantity(id, data);
 		},
 
 		canQuantityChange: async (id, data) => {
@@ -69,7 +67,7 @@ async function substancesService(server) {
 			const storage = await server.storagesService.getStorageById(storageId);
 			if (!storage) {
 				const error = new Error(`No such storage with id: ${storageId}`);
-				error.codeStatus = 404;
+				error.statusCode = 404;
 				throw error;
 			}
 			return { storageId };
@@ -85,7 +83,7 @@ async function substancesService(server) {
 			});
 			if (!canQuantityChange) {
 				const error = new Error(`Quantity of ${category} cannot be changed. Check sending values`);
-				error.codeStatus = 409;
+				error.statusCode = 409;
 				throw error;
 			}
 			return {
@@ -210,6 +208,45 @@ async function substancesService(server) {
 			return {
 				histories: history
 			};
+		},
+
+		softDeleteSubstance: async (id, category) => {
+			return category === Category.REAGENT
+				? server.reagentsService.softDeleteReagent(id)
+				: server.samplesService.softDeleteSample(id);
+		},
+
+		isStructureValid: async smiles => {
+			const result = await server.db.execute(isValidSmilesQuery(smiles));
+			return result.rows[0].is_valid;
+		},
+
+		createSubstance: async data => {
+			return data.category === Category.REAGENT
+				? server.reagentsService.createReagent(data)
+				: server.samplesService.createSample(data);
+		},
+
+		areComponentsInsufficient: async (components, category) => {
+			if (category === Category.REAGENT) {
+				return false;
+			}
+
+			for (const component of components) {
+				const substance = await server.substancesService.getSubstanceById(
+					component.id,
+					component.category
+				);
+
+				if (!substance) return true;
+
+				const diff = substance.quantityLeft - component.quantityUsed;
+
+				if (diff < 0) {
+					return true;
+				}
+			}
+			return false;
 		}
 	});
 }

@@ -3,7 +3,6 @@ import fp from 'fastify-plugin';
 import { schema } from '../../lib/db/schema/index.js';
 import { helpers } from '../../lib/utils/common/helpers.js';
 import { smilesToMol } from '../../lib/db/structure/utils/smiles-to-mol.js';
-import { isValidSmilesQuery } from '../../lib/db/structure/utils/is-valid-smiles.js';
 
 const formatMapping = {
 	name: string => helpers.capitalize(string),
@@ -25,7 +24,7 @@ async function reagentsService(server) {
 				quantity,
 				quantityLeft,
 				expirationDate,
-				storageLocationId,
+				storageId,
 				description,
 				structure
 			} = data;
@@ -43,18 +42,13 @@ async function reagentsService(server) {
 					quantity,
 					quantityLeft,
 					expirationDate: new Date(expirationDate),
-					storageId: storageLocationId,
+					storageId,
 					description,
 					...(structure && { structure: smilesToMol(structure) })
 				})
 				.returning({ name: schema.reagents.name });
 
 			return result.length ? result[0].name : null;
-		},
-
-		isStructureValid: async smiles => {
-			const result = await server.db.execute(isValidSmilesQuery(smiles));
-			return result.rows[0].is_valid;
 		},
 
 		getReagentById: async id => {
@@ -78,7 +72,8 @@ async function reagentsService(server) {
 						room: schema.storages.room,
 						name: schema.storages.name,
 						description: schema.storages.description
-					}
+					},
+					category: sql`'reagent'`.as('category')
 				})
 				.from(schema.reagents)
 				.innerJoin(schema.storages, eq(schema.reagents.storageId, schema.storages.id))
@@ -117,6 +112,7 @@ async function reagentsService(server) {
 					description: schema.reagents.description,
 					category: sql`'reagent'`.as('category'),
 					createdAt: schema.reagents.createdAt,
+					orderId: schema.ordersReagents.orderId,
 					...Object.fromEntries(
 						Object.entries(extras).map(([col, query]) => [
 							col,
@@ -126,6 +122,7 @@ async function reagentsService(server) {
 				})
 				.from(schema.reagents)
 				.innerJoin(schema.storages, eq(schema.storages.id, schema.reagents.storageId))
+				.innerJoin(schema.ordersReagents, eq(schema.ordersReagents.reagentId, schema.reagents.id))
 				.where(eq(schema.reagents.deleted, false));
 		},
 
@@ -166,6 +163,7 @@ async function reagentsService(server) {
 				message: `Quantity of reagent '${result[0].reagentName}' was changed`
 			};
 		},
+
 		getReagentsByStorageId: async id => {
 			return await server.db
 				.select({
@@ -176,11 +174,13 @@ async function reagentsService(server) {
 					quantityLeft: schema.reagents.quantityLeft,
 					expirationDate: schema.reagents.expirationDate,
 					description: schema.reagents.description,
-					category: sql`'reagent'`.as('category')
+					category: sql`'reagent'`.as('category'),
+					structure: schema.reagents.structure
 				})
 				.from(schema.reagents)
 				.where(and(eq(schema.reagents.storageId, id), eq(schema.reagents.deleted, false)));
 		},
+
 		changeStorage: async (id, data) => {
 			const { storageId, userId } = data;
 
@@ -320,7 +320,7 @@ async function reagentsService(server) {
 					prevQuantityLeft: schema.substancesHistory.previousValue,
 					newQuantityLeft: schema.substancesHistory.targetValue,
 					quantityUnit: schema.substancesHistory.quantityUnit,
-					prevStorageLocation: sql`CASE 
+					prevStorageLocation: sql`CASE
 						WHEN ${prevStorage}.id IS NOT NULL THEN json_build_object(
 							'prevStorageId', ${prevStorage}.id,
 							'prevStorageRoom', ${prevStorage}.room,
@@ -328,7 +328,7 @@ async function reagentsService(server) {
 						)
 						ELSE NULL
 						END`.as('prevStorageLocation'),
-					newStorageLocation: sql`CASE 
+					newStorageLocation: sql`CASE
 						WHEN ${newStorage}.id IS NOT NULL THEN json_build_object(
 							'newStorageId', ${newStorage}.id,
 							'newStorageRoom', ${newStorage}.room,

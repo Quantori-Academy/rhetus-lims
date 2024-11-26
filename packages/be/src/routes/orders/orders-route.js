@@ -20,6 +20,16 @@ async function orders(server, options) {
 	async function onCreateOrder(req, reply) {
 		try {
 			const authenticatedUserId = Number(req.session.user.id);
+
+			const { reagents, reagentRequests, newReagents } = req.body;
+
+			if (!reagents.length && !reagentRequests.length && !newReagents.length) {
+				return reply.code(403).send({
+					status: 'error',
+					message: `There is nothing to add as order item. Check sending values!`
+				});
+			}
+
 			const orderTitle = await server.ordersService.createOrder({
 				...req.body,
 				userId: authenticatedUserId
@@ -168,8 +178,11 @@ async function orders(server, options) {
 				});
 			}
 
-			const { reagents, reagentRequests } = req.body;
-			if (!reagents.length && !reagentRequests.length) {
+			const { reagents, reagentRequests, newReagents } = req.body;
+
+			const areAdditionsEmpty = reagents.length + reagentRequests.length + newReagents.length === 0;
+
+			if (areAdditionsEmpty) {
 				return reply.code(403).send({
 					status: 'error',
 					message: `There is nothing to add. Check sending values!`
@@ -264,6 +277,52 @@ async function orders(server, options) {
 		return reply
 			.code(200)
 			.send({ status: 'success', message: `Status for order '${orderTitle}' was changed` });
+	}
+
+	server.route({
+		method: 'PUT',
+		path: options.prefix + 'orders/:id/update-item',
+		preValidation: [server.authenticate, server.officer],
+		schema: schema.updateOrderItem,
+		handler: onUpdateItem
+	});
+
+	async function onUpdateItem(req, reply) {
+		try {
+			const orderId = req.params.id;
+
+			if (!req.body.orderItems.length) {
+				return reply.code(403).send({
+					status: 'error',
+					message: `There is nothing to add. Check sending values!`
+				});
+			}
+
+			const order = await server.ordersService.getOrderById(orderId);
+
+			if (!order) {
+				return reply.code(404).send({ status: 'error', message: `No such order` });
+			}
+
+			if (order.status !== OrderStatus.PENDING) {
+				return reply.code(403).send({
+					status: 'error',
+					message: `Sorry. You cannot update order items while order in processing`
+				});
+			}
+
+			const updatedOrderItemsIds = await server.orderItemsService.handleUpdateOrderItems(
+				req.body.orderItems,
+				orderId
+			);
+
+			return reply.code(200).send({
+				status: 'success',
+				message: `Order items with tempIds '${updatedOrderItemsIds.join(', ')}' were updated`
+			});
+		} catch (err) {
+			return reply.code(500).send(err);
+		}
 	}
 }
 

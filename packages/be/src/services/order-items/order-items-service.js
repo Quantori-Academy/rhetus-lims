@@ -1,4 +1,4 @@
-import { eq, inArray } from 'drizzle-orm';
+import { eq, inArray, and } from 'drizzle-orm';
 import fp from 'fastify-plugin';
 import { schema } from '../../lib/db/schema/index.js';
 import { helpers } from '../../lib/utils/common/helpers.js';
@@ -6,7 +6,10 @@ import { RequestStatus } from '../../lib/db/schema/requests.js';
 import { ItemTypes } from '../../lib/db/schema/orders-items.js';
 
 const formatMapping = {
-	quantityUnit: string => helpers.lowercase(string)
+	quantityUnit: string => helpers.lowercase(string),
+	name: string => helpers.capitalize(string),
+	casNumber: string => helpers.lowercase(string),
+	reagentName: string => helpers.capitalize(string)
 };
 
 async function orderItemsService(server) {
@@ -21,7 +24,9 @@ async function orderItemsService(server) {
 					const request = await server.requestsService.getRequestById(id);
 
 					if (!request) {
-						throw new Error('No such request');
+						const error = new Error('No such request');
+						error.statusCode = 404;
+						throw error;
 					}
 
 					const {
@@ -36,7 +41,9 @@ async function orderItemsService(server) {
 					} = request ?? {};
 
 					if (status !== RequestStatus.PENDING) {
-						throw new Error('Request is already processing in another one order');
+						const error = new Error('Request is already processing in another order');
+						error.statusCode = 409;
+						throw error;
 					}
 
 					return {
@@ -69,7 +76,9 @@ async function orderItemsService(server) {
 					const reagent = await server.reagentsService.getReagentById(id);
 
 					if (!reagent) {
-						throw new Error('No such reagent');
+						const error = new Error('No such reagent');
+						error.statusCode = 404;
+						throw error;
 					}
 
 					const { name, structure, casNumber, producer, catalogId, catalogLink, unitPrice } =
@@ -87,6 +96,37 @@ async function orderItemsService(server) {
 						quantityUnit: formatMapping.quantityUnit(quantityUnit),
 						amount,
 						itemType: ItemTypes.REAGENT
+					};
+				})
+			);
+
+			return formattedReagents;
+		},
+
+		getFormattedOrderItemsFromNewReagents: async reagents => {
+			if (!reagents.length) {
+				return [];
+			}
+
+			const formattedReagents = await Promise.all(
+				reagents.map(async reagent => {
+					const { name, casNumber, quantityUnit, structure, ...restProperties } = reagent;
+
+					const isStructureValid = await server.substancesService.isStructureValid(structure || '');
+
+					if (!isStructureValid) {
+						const error = new Error('Invalid structure');
+						error.statusCode = 400;
+						throw error;
+					}
+
+					return {
+						reagentName: formatMapping.name(name),
+						casNumber: formatMapping.casNumber(casNumber),
+						quantityUnit: formatMapping.quantityUnit(quantityUnit),
+						structure,
+						itemType: ItemTypes.REAGENT,
+						...restProperties
 					};
 				})
 			);
@@ -149,14 +189,19 @@ async function orderItemsService(server) {
 		},
 
 		addItemsToOrder: async (orderId, data) => {
-			const { reagents, reagentRequests, orderTitle } = data ?? {};
+			const { reagents, reagentRequests, newReagents, orderTitle } = data ?? {};
 
-			const [formattedRequests, formattedReagents] = await Promise.all([
+			const [formattedRequests, formattedReagents, formattedNewReagents] = await Promise.all([
 				server.orderItemsService.getFormattedOrderItemsFromRequests(reagentRequests),
-				server.orderItemsService.getFormattedOrderItemsFromReagents(reagents)
+				server.orderItemsService.getFormattedOrderItemsFromReagents(reagents),
+				server.orderItemsService.getFormattedOrderItemsFromNewReagents(newReagents)
 			]);
 
-			const formattedOrderItems = [...formattedRequests, ...formattedReagents];
+			const formattedOrderItems = [
+				...formattedRequests,
+				...formattedReagents,
+				...formattedNewReagents
+			];
 
 			await server.db.transaction(async tx => {
 				await server.orderItemsService.orderItemsInsert(orderId, formattedOrderItems, tx);
@@ -191,6 +236,102 @@ async function orderItemsService(server) {
 			}
 
 			return orderTitle;
+		},
+
+		getOrderItemByTempId: async tempId => {
+			const result = await server.db
+				.select()
+				.from(schema.ordersItems)
+				.where(and(eq(schema.ordersItems.tempId, tempId), eq(schema.ordersItems.deleted, false)));
+
+			return result[0];
+		},
+
+		handleUpdateOrderItems: async (orderItemsData, orderId) => {
+			const preparedData = await Promise.all(
+				orderItemsData.map(async item => {
+					const orderItem = await server.orderItemsService.getOrderItemByTempId(item.tempId);
+
+					if (!orderItem) {
+						const error = new Error(`No such order item with tempId '${item.tempId}'`);
+						error.statusCode = 404;
+						throw error;
+					}
+
+					if (orderItem.orderId !== orderId) {
+						const error = new Error(
+							`There is no such order item with tempId '${item.tempId}' in this order`
+						);
+						error.statusCode = 404;
+						throw error;
+					}
+
+					const isStructureValid = await server.substancesService.isStructureValid(
+						item.structure || ''
+					);
+
+					if (!isStructureValid) {
+						const error = new Error('Invalid structure');
+						error.statusCode = 400;
+						throw error;
+					}
+
+					const dataForItemUpdate = Object.fromEntries(
+						Object.entries(item)
+							.map(([key, value]) => {
+								if (key === 'tempId') {
+									return [key, value];
+								}
+
+								const formattedIncomingValue = Object.keys(formatMapping).includes(key)
+									? formatMapping[key](value)
+									: value;
+
+								if (orderItem[key] === formattedIncomingValue) {
+									return;
+								}
+
+								return [key, formattedIncomingValue];
+							})
+							.filter(Boolean)
+					);
+
+					return dataForItemUpdate;
+				})
+			);
+
+			const dataForUpdate = preparedData.filter(data => {
+				const keys = Object.keys(data);
+				if (keys.length === 1 && keys[0] === 'tempId') {
+					return false;
+				}
+
+				return true;
+			});
+
+			if (!dataForUpdate.length) {
+				const error = new Error(
+					`There is nothing to update in order items. Check sending values or order items state.`
+				);
+				error.statusCode = 400;
+				throw error;
+			}
+
+			const updatedOrderItemsIds = await Promise.all(
+				dataForUpdate.map(async data => {
+					const { tempId, ...restProperties } = data;
+
+					const [{ tempId: updatedTempId }] = await server.db
+						.update(schema.ordersItems)
+						.set({ ...restProperties })
+						.where(eq(schema.ordersItems.tempId, tempId))
+						.returning({ tempId: schema.ordersItems.tempId });
+
+					return updatedTempId;
+				})
+			);
+
+			return updatedOrderItemsIds;
 		}
 	});
 }

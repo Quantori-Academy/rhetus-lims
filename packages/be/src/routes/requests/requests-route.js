@@ -19,7 +19,7 @@ async function requests(server, options) {
 		try {
 			const authenticatedUserId = Number(req.session.user.id);
 
-			const isStructureValid = await server.reagentsService.isStructureValid(
+			const isStructureValid = await server.substancesService.isStructureValid(
 				req.body.structure || ''
 			);
 
@@ -125,8 +125,16 @@ async function requests(server, options) {
 				});
 			}
 
+			const isStructureValid = await server.substancesService.isStructureValid(
+				req.body.structure || ''
+			);
+
+			if (!isStructureValid) {
+				return reply.code(400).send({ status: 'error', message: `Invalid structure` });
+			}
+
 			const { code, status, message } = await server.requestsService.handleRequestUpdate(
-				{ requestId, requestStatus: request.status, ownerId: request.author.id },
+				{ requestId, existingRequest: request },
 				req.body,
 				authenticatedUserId
 			);
