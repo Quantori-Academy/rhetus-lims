@@ -177,7 +177,9 @@ async function ordersService(server) {
 			return deletedOrderTitle;
 		},
 
-		updateOrderStatus: async (orderId, nextStatus, tx = null) => {
+		updateOrderStatus: async (orderId, nextStatus, tx = null, userId) => {
+			await server.ordersService.insertStatusInHistory(orderId, nextStatus, userId);
+
 			const target = tx ?? server.db;
 			const [{ orderTitle }] = await target
 				.update(schema.orders)
@@ -224,7 +226,11 @@ async function ordersService(server) {
 					error.statusCode = 409;
 					throw error;
 				}
-				orderTitle = await server.ordersService.handleCancelOrder(orderId, OrderStatus.CANCELED);
+				orderTitle = await server.ordersService.handleCancelOrder(
+					orderId,
+					OrderStatus.CANCELED,
+					userId
+				);
 			}
 
 			return orderTitle;
@@ -237,14 +243,19 @@ async function ordersService(server) {
 
 			switch (nextStatus) {
 				case OrderStatus.ORDERED:
-					updatedOrderTitle = await server.ordersService.updateOrderStatus(orderId, nextStatus);
+					updatedOrderTitle = await server.ordersService.updateOrderStatus(
+						orderId,
+						nextStatus,
+						userId
+					);
 					break;
 				case OrderStatus.FULFILLED:
 					updatedOrderTitle = await server.db.transaction(async tx => {
 						const orderTitle = await server.ordersService.updateOrderStatus(
 							orderId,
 							nextStatus,
-							tx
+							tx,
+							userId
 						);
 
 						const createdReagentIds = await server.reagentsService.createReagentsFromOrder(
@@ -257,7 +268,8 @@ async function ordersService(server) {
 						await server.requestsService.updateRequestStatusByOrder(
 							orderId,
 							RequestStatus.FULFILLED,
-							tx
+							tx,
+							userId
 						);
 
 						await server.orderItemsService.disableOrderItems(orderId, tx);
@@ -304,13 +316,15 @@ async function ordersService(server) {
 						const orderTitle = await server.ordersService.updateOrderStatus(
 							orderId,
 							nextStatus,
-							tx
+							tx,
+							userId
 						);
 
 						await server.requestsService.updateRequestStatusByOrder(
 							orderId,
 							RequestStatus.COMPLETED,
-							tx
+							tx,
+							userId
 						);
 
 						return orderTitle;
@@ -326,9 +340,14 @@ async function ordersService(server) {
 			return updatedOrderTitle;
 		},
 
-		handleCancelOrder: async (orderId, nextStatus) => {
+		handleCancelOrder: async (orderId, nextStatus, userId) => {
 			const canceledOrderTitle = await server.db.transaction(async tx => {
-				const orderTitle = await server.ordersService.updateOrderStatus(orderId, nextStatus, tx);
+				const orderTitle = await server.ordersService.updateOrderStatus(
+					orderId,
+					nextStatus,
+					tx,
+					userId
+				);
 				await server.ordersService.resetOrdersItems(orderId, tx);
 				return orderTitle;
 			});
@@ -373,6 +392,14 @@ async function ordersService(server) {
 			}
 
 			await tx.delete(schema.ordersItems).where(eq(schema.ordersItems.orderId, orderId));
+		},
+
+		insertStatusInHistory: async (orderId, status, userId) => {
+			return await server.db.insert(schema.statusesHistory).values({
+				userId,
+				orderId,
+				status
+			});
 		}
 	});
 }

@@ -14,7 +14,7 @@ export const Status = {
 
 export const statusEnum = pgEnum('status', Object.values(Status));
 
-export const statusHistory = pgTable('status_history', {
+export const statusesHistory = pgTable('status_history', {
 	id: uuid('id')
 		.primaryKey()
 		.default(sql`uuid_generate_v4()`),

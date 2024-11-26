@@ -246,11 +246,14 @@ async function requestsService(server) {
 			};
 		},
 
-		updateRequestStatusByOrder: async (orderId, newStatus, tx) => {
-			return tx
+		updateRequestStatusByOrder: async (orderId, newStatus, tx, userId) => {
+			const request = await tx
 				.update(schema.requests)
 				.set({ requestStatus: newStatus })
 				.where(eq(schema.requests.orderId, orderId));
+
+			await server.requestsService.insertStatusInHistory(request.id, newStatus, userId);
+			return request;
 		},
 
 		cancelRequest: async (requestId, data) => {
@@ -276,6 +279,15 @@ async function requestsService(server) {
 			});
 
 			return result.length ? result[0].reagentName : null;
+		},
+
+		insertStatusInHistory: async (requestId, data, userId) => {
+			return await server.db.insert(schema.statusesHistory).values({
+				userId,
+				requestId,
+				status: data.status,
+				changeReason: data.poComment
+			});
 		}
 	});
 }
