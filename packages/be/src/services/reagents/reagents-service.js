@@ -121,8 +121,8 @@ async function reagentsService(server) {
 					)
 				})
 				.from(schema.reagents)
-				.innerJoin(schema.storages, eq(schema.storages.id, schema.reagents.storageId))
-				.innerJoin(schema.ordersReagents, eq(schema.ordersReagents.reagentId, schema.reagents.id))
+				.leftJoin(schema.storages, eq(schema.storages.id, schema.reagents.storageId))
+				.leftJoin(schema.ordersReagents, eq(schema.ordersReagents.reagentId, schema.reagents.id))
 				.where(eq(schema.reagents.deleted, false));
 		},
 
