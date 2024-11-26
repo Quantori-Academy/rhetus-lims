@@ -1,5 +1,8 @@
 export default http => ({
 	async fetchStorages(params) {
+		return (await http('/storages', { query: params })).storages;
+	},
+	async fetchStoragesWithCount(params) {
 		return await http('/storages', { query: params });
 	},
 	async fetchStorage(id) {
@@ -23,7 +26,7 @@ export default http => ({
 		});
 	},
 	async fetchStoragesRooms() {
-		return await http('/storages/rooms');
+		return (await http('/storages/rooms')).rooms;
 	},
 	async fetchStoragesNames() {
 		return await http('/storages/names');

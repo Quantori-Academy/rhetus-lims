@@ -1,5 +1,5 @@
 <script setup>
-import { ElInput, ElInputNumber, ElSwitch } from 'element-plus';
+import { ElInput, ElSwitch } from 'element-plus';
 import RhIcon from '../lib/components/rh-icon.vue';
 import FilterItem from '../lib/components/rh-filters/filter-item.vue';
 import KetcherEditor from '../ketcher-editor/ketcher-editor.vue';
@@ -15,10 +15,6 @@ const filters = defineModel('filters', { type: Object });
 				<rh-icon name="search" />
 			</template>
 		</el-input>
-	</filter-item>
-
-	<filter-item>
-		<el-input-number v-model="filters.quantity" placeholder="Enter amount" :min="1" />
 	</filter-item>
 
 	<filter-item>

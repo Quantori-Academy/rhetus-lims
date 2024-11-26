@@ -52,8 +52,7 @@ watch(
 async function setStorages() {
 	loading.value = true;
 	try {
-		const data = await $api.storages.fetchStorages();
-		storages.value = data.storages;
+		storages.value = await $api.storages.fetchStorages();
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {

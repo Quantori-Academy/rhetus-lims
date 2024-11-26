@@ -74,8 +74,7 @@ function cancel() {
 async function setStorages() {
 	isLoading.value = true;
 	try {
-		const data = await $api.storages.fetchStorages();
-		storages.value = data.storages;
+		storages.value = await $api.storages.fetchStorages();
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
