@@ -116,6 +116,7 @@ async function reagentsService(server) {
 					structure: schema.reagents.structure,
 					description: schema.reagents.description,
 					category: sql`'reagent'`.as('category'),
+					createdAt: schema.reagents.createdAt,
 					...Object.fromEntries(
 						Object.entries(extras).map(([col, query]) => [
 							col,

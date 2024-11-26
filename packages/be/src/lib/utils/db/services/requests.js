@@ -63,6 +63,9 @@ const requests = {
 		},
 		createdat: {
 			property: schema.requests.createdAt
+		},
+		default: {
+			property: schema.requests.createdAt
 		}
 	}
 };

@@ -20,5 +20,6 @@ export const reagents = pgTable('reagents', {
 	storageId: uuid('storage_id').references(() => storages.id),
 	description: text('description').default(''),
 	structure: mol('structure'),
-	deleted: boolean('deleted').default(false)
+	deleted: boolean('deleted').default(false),
+	createdAt: timestamp('created_at').notNull().defaultNow()
 });
