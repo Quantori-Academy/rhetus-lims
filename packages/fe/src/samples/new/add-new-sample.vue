@@ -41,17 +41,6 @@ async function submit() {
 	if (!(await $isFormValid(formEl))) return;
 
 	isSaving.value = true;
-	console.log({
-		...form.value,
-		quantityLeft: form.value.quantity,
-		category: 'sample',
-		components: form.value.components.map(x => ({
-			id: x.id,
-			category: x.category,
-			quantityUsed: x.quantityUsed
-		}))
-	});
-
 	try {
 		const response = await $api.substances.addSubstance({
 			...form.value,

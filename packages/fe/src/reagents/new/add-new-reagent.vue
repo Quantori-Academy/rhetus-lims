@@ -57,11 +57,6 @@ async function submit() {
 	if (!(await $isFormValid(formEl))) return;
 	isSaving.value = true;
 	try {
-		console.log({
-			...form.value,
-			quantityLeft: form.value.quantity,
-			category: 'reagent'
-		});
 		const response = await $api.substances.addSubstance({
 			...form.value,
 			quantityLeft: form.value.quantity,
