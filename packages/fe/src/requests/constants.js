@@ -1,26 +1,19 @@
-export const requiredRule = fieldName => {
-	return {
-		required: true,
-		message: `${fieldName} can't be empty`,
-		trigger: ['blur', 'change']
-	};
+import { ref } from 'vue';
+import { requiredRule } from '../lib/utils/form-validation/requiredRule.js';
+
+export const Statuses = {
+	PENDING: 'pending',
+	ORDERED: 'ordered',
+	FULFILLED: 'fulfilled',
+	CANCELED: 'canceled'
 };
 
-export const formRules = {
-	reagentName: [requiredRule],
-	structure: [
-		{ required: false, message: 'Please enter a valid chemical structure', trigger: 'blur' }
-	],
-	quantity: [
-		requiredRule,
-		{ type: 'number', message: 'Quantity must be a number', trigger: 'blur' }
-	],
-	quantityUnit: [requiredRule],
-	status: [requiredRule],
-
-	createdAt: [requiredRule],
-	updatedAt: [requiredRule]
-};
+export const rules = ref({
+	reagentName: [requiredRule('Reagent Name')],
+	quantityUnit: [requiredRule('Quantity unit')],
+	quantity: [requiredRule('Quantity')],
+	amount: [requiredRule('Amount')]
+});
 
 export const emptyRequest = {
 	id: null,
@@ -31,7 +24,7 @@ export const emptyRequest = {
 	quantityUnit: '',
 	status: '',
 	userComment: '',
-	poComment: 'x',
+	poComment: '',
 	createdAt: '',
 	updatedAt: ''
 };

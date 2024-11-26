@@ -290,7 +290,6 @@ export const routes = [
 		name: 'requests-list',
 		component: () => import('../../requests/request-list.vue'),
 		meta: {
-			// roles: [roles.PROCUREMENT_OFFICER, roles.RESEARCHER],
 			title: 'Reagent Requests List',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },
@@ -303,7 +302,6 @@ export const routes = [
 		name: 'new-request',
 		component: () => import('../../requests/add-new-request.vue'),
 		meta: {
-			roles: [roles.RESEARCHER],
 			title: 'New Reagent Request',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },

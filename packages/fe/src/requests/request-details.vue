@@ -15,9 +15,10 @@ import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg
 import { $confirm } from '../lib/utils/feedback/confirm-msg.js';
 import { $api } from '../lib/api/index.js';
 import { $route, $router } from '../lib/router/router.js';
-import { emptyRequest } from './constants.js';
+import { emptyRequest, Statuses } from './constants.js';
 import { getButtonType } from '../orders/details/constants.js';
 import { quantityUnits } from '../lib/constants/quantity-units.js';
+import KetcherEditor from '../ketcher-editor/ketcher-editor.vue';
 
 const props = defineProps({ id: { type: String, default: null } });
 
@@ -26,6 +27,10 @@ const { isOfficer, isResearcher } = inject('user');
 const loading = ref(false);
 const request = ref(emptyRequest);
 const isEdit = computed(() => $route.value.name === 'request-details-edit');
+
+const showPoMessage = computed(
+	() => request.value.status === Statuses.CANCELED && request.value.poComment && !isEdit.value
+);
 
 const toggleEdit = () => {
 	$router.push({ name: 'request-details-edit', params: { id: request.value.id } });
@@ -92,15 +97,20 @@ onMounted(() => {
 	<div class="wrapper">
 		<div class="editing-header">
 			<h2>
-				{{ request.reagentName }}
-				<el-tag :type="getButtonType(request.status)" round>
-					{{ request.status }}
-				</el-tag>
+				<span v-if="request.reagentName">
+					{{ request.reagentName }}
+					<el-tag :type="getButtonType(request.status)" round>
+						{{ request.status }}
+					</el-tag>
+				</span>
 			</h2>
-			<div v-if="!isEdit" class="top-button-container">
+			<div v-if="!isEdit && request.status !== Statuses.CANCELED" class="top-button-container">
 				<el-button type="primary" @click="toggleEdit">Edit</el-button>
-				<el-button type="danger" @click="deleteRequest">Cancel Request</el-button>
+				<el-button type="danger" @click="deleteRequest"> Cancel Request </el-button>
 			</div>
+		</div>
+		<div v-if="showPoMessage" class="po-message">
+			<span class="po-message-prefix">Procurement Officer comment:</span> {{ request.poComment }}
 		</div>
 		<el-form
 			ref="form-ref"
@@ -109,16 +119,24 @@ onMounted(() => {
 			:model="request"
 			@submit="handleSubmit"
 		>
+			<el-form-item label="Reagent Name" prop="reagentName">
+				<el-input v-model="request.reagentName" :disabled="!isEdit" />
+			</el-form-item>
+			<el-form-item label="Structure" prop="structure">
+				<ketcher-editor
+					v-model:smiles="request.structure"
+					:disabled="!isEdit"
+					placeholder="Enter structure"
+				/>
+			</el-form-item>
+			<el-form-item label="CAS number" prop="casNumber">
+				<el-input
+					v-model="request.casNumber"
+					:disabled="!isEdit"
+					placeholder="Indicate CAS number"
+				/>
+			</el-form-item>
 			<div class="align-horizontal">
-				<el-form-item label="Reagent Name" prop="reagentName">
-					<el-input v-model="request.reagentName" :disabled="!isEdit" />
-				</el-form-item>
-			</div>
-			<div class="align-horizontal">
-				<el-form-item label="CAS Number" prop="casNumber">
-					<el-input v-model="request.casNumber" :disabled="!isEdit" />
-				</el-form-item>
-
 				<el-form-item label="Quantity" prop="quantity">
 					<el-input-number v-model="request.quantity" :min="1" :disabled="!isEdit" />
 				</el-form-item>
@@ -136,18 +154,16 @@ onMounted(() => {
 					<el-input v-model="request.amount" :disabled="true" />
 				</el-form-item>
 			</div>
-			<div class="align-horizontal">
-				<el-form-item label="User Comments" prop="userComment">
-					<el-input
-						v-model="request.userComment"
-						type="textarea"
-						:disabled="!isEdit || isResearcher"
-					/>
-				</el-form-item>
-				<el-form-item label="Procurement Comments" prop="poComment">
-					<el-input v-model="request.poComment" type="textarea" :disabled="!isEdit || isOfficer" />
-				</el-form-item>
-			</div>
+			<el-form-item label="User Comments" prop="userComment">
+				<el-input
+					v-model="request.userComment"
+					type="textarea"
+					:disabled="!isEdit || isResearcher"
+				/>
+			</el-form-item>
+			<el-form-item label="Procurement Comments" prop="poComment">
+				<el-input v-model="request.poComment" type="textarea" :disabled="!isEdit || isOfficer" />
+			</el-form-item>
 			<div class="align-horizontal">
 				<el-form-item label="Date Created" prop="createdAt">
 					<el-date-picker
@@ -189,5 +205,17 @@ onMounted(() => {
 .top-button-container {
 	display: flex;
 	gap: 10px;
+}
+
+.po-message {
+	margin-bottom: 8px;
+	padding: 8px;
+	width: 100%;
+	border-radius: 4px;
+	background: var(--el-color-danger-light-8);
+
+	.po-message-prefix {
+		font-weight: 500;
+	}
 }
 </style>
