@@ -159,6 +159,15 @@ export const requestHandlers = [
 			message: 'Request was canceled'
 		});
 	}),
+	http.get(api('/requests/:id'), req => {
+		const { id } = req.params;
+		const request = requestInfo.requests.find(req => req.id === id);
+		if (request) {
+			return HttpResponse.json(request);
+		} else {
+			return HttpResponse.json({ message: 'Request not found' }, { status: 404 });
+		}
+	}),
 	http.delete(api('/requests/:id'), async ({ params }) => {
 		const { id } = params;
 		const requestIndex = requestInfo.requests.findIndex(request => request.id === id);

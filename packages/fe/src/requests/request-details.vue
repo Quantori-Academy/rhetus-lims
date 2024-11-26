@@ -151,7 +151,7 @@ onMounted(() => {
 					</el-select>
 				</el-form-item>
 				<el-form-item label="Amount" prop="status">
-					<el-input v-model="request.amount" :disabled="true" />
+					<el-input-number v-model="request.amount" :min="1" :disabled="!isEdit" />
 				</el-form-item>
 			</div>
 			<el-form-item label="User Comments" prop="userComment">
