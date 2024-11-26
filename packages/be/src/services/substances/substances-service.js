@@ -17,7 +17,6 @@ async function substancesService(server) {
 			const samplesQuery = server.samplesService.getSamplesQuery({
 				relevance: getRelevanceScore('structure', options?.smiles || '').as('relevance')
 			});
-
 			const unionQuery = unionAll(reagentsQuery, samplesQuery);
 			let query = server.db.select().from(unionQuery.as('substances'));
 
@@ -199,6 +198,17 @@ async function substancesService(server) {
 					updateMessages.length > 1
 						? `${isReagent ? 'Reagent' : 'Sample'} was updated`
 						: updateMessages[0]
+			};
+		},
+
+		getHistoryChanges: async (substanceId, category) => {
+			const isReagent = category === Category.REAGENT;
+			const service = isReagent ? server.reagentsService : server.samplesService;
+
+			const history = await service.getHistory(substanceId);
+
+			return {
+				histories: history
 			};
 		}
 	});

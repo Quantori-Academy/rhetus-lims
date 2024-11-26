@@ -1,5 +1,6 @@
 import S from 'fluent-json-schema';
 import { Storage } from '../storages/storages-schema.js';
+import { User } from '../users/users-schema.js';
 
 const Category = {
 	REAGENT: 'reagent',
@@ -64,4 +65,63 @@ const updateSubstanceSchema = {
 	}
 };
 
-export { getSubstances, changeQuantity, Substance, Category, updateSubstanceSchema };
+const actions = {
+	QUANTITY: 'quantity-update',
+	STORAGE: 'storage-update',
+	DELETE: 'delete'
+};
+
+const HistorySchema = S.object()
+	.prop('id', S.string().format(S.FORMATS.UUID).required())
+	.prop('user', {
+		userId: User.id,
+		userFirstName: User.firstName,
+		userLastName: User.lastName
+	})
+	.required()
+	.prop('prevQuantityLeft', S.anyOf([S.number(), S.null()]))
+	.prop('newQuantityLeft', S.anyOf([S.number(), S.null()]))
+	.prop('quantityUnit', S.anyOf([S.string(), S.null()]))
+	.prop(
+		'prevStorageLocation',
+		S.anyOf[
+			({
+				prevStorageId: Storage.id,
+				prevStorageRoom: Storage.room,
+				prevStorageName: Storage.name
+			},
+			S.null())
+		]
+	)
+	.prop(
+		'newStorageLocation',
+		S.anyOf[
+			({
+				newStorageId: Storage.id,
+				newStorageRoom: Storage.room,
+				newStorageName: Storage.name
+			},
+			S.null())
+		]
+	)
+	.prop('actionType', S.string().enum(Object.values(actions)).required())
+	.prop('changeReason', S.anyOf([S.string(), S.null()]))
+	.prop('isDeleted', S.boolean())
+	.prop('modifiedDate', S.string().format(S.FORMATS.DATE_TIME).required());
+
+const getSubstanceHistorySchema = {
+	security: [{ Session: [] }],
+	params: S.object().prop('id', S.string()),
+	response: {
+		200: S.object().prop('histories', S.array().items(HistorySchema)),
+		500: statusMessage
+	}
+};
+export {
+	getSubstances,
+	changeQuantity,
+	Substance,
+	Category,
+	updateSubstanceSchema,
+	getSubstanceHistorySchema
+};

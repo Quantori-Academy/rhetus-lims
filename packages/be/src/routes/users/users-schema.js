@@ -107,4 +107,4 @@ const getMe = {
 	}
 };
 
-export { createUser, getUser, getUsers, updateUser, deleteUser, getMe };
+export { createUser, getUser, getUsers, updateUser, deleteUser, getMe, User };

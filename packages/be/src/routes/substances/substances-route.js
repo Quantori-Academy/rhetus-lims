@@ -118,6 +118,29 @@ async function substances(server, options) {
 			return reply.code(500).send(err);
 		}
 	}
+
+	server.route({
+		method: 'GET',
+		path: options.prefix + 'substances/history/:category/:id',
+		preValidation: [server.authenticate],
+		schema: schema.getSubstanceHistorySchema,
+		handler: onGetSubstancesHistory
+	});
+
+	async function onGetSubstancesHistory(req, reply) {
+		try {
+			const { category, id } = req.params;
+			const substance = await server.substancesService.getSubstanceById(id, category);
+			if (!substance) {
+				return reply.code(404).send({ status: 'error', message: `No such ${category}` });
+			}
+
+			const data = await server.substancesService.getHistoryChanges(id, category);
+			return reply.code(200).send(data);
+		} catch (err) {
+			return reply.code(500).send(err);
+		}
+	}
 }
 
 export default fp(substances);

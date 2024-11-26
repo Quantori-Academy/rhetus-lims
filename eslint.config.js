@@ -11,8 +11,11 @@ export default [
 			'node_modules',
 			'scripts',
 			'packages/auto-mention-action',
-			'packages/fe/src/lib/router/routes.js', 'packages/be/src/services/orders/orders-service.js',
-			'packages/fe/public/ketcher'
+			'packages/fe/src/lib/router/routes.js',
+			'packages/be/src/services/orders/orders-service.js',
+			'packages/fe/public/ketcher',
+			'packages/be/src/services/reagents/reagents-service.js',
+			'packages/be/src/services/samples/samples-service.js'
 		]
 	},
 	{ languageOptions: { globals: { ...globals.browser, ...globals.node } } },
@@ -81,7 +84,10 @@ export default [
 		}
 	},
 	{
-		files: ['packages/be/src/services/orders/orders-service.js', 'packages/be/src/services/reagents/reagents-service.js'],
+		files: [
+			'packages/be/src/services/orders/orders-service.js',
+			'packages/be/src/services/reagents/reagents-service.js'
+		],
 		rules: {
 			'max-lines': ['error', { max: 300, skipComments: true, skipBlankLines: true }]
 		}
