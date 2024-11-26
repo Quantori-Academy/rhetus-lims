@@ -28,8 +28,7 @@ const setNames = async () => {
 
 const setRooms = async () => {
 	try {
-		const data = await $api.storages.fetchStoragesRooms();
-		rooms.value = data.rooms;
+		rooms.value = await $api.storages.fetchStoragesRooms();
 		objectRooms.value = rooms.value.map(room => ({
 			value: room,
 			label: room

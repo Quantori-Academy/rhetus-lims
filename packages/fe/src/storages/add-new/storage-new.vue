@@ -45,22 +45,21 @@ const addStorage = async () => {
 
 const setRooms = async () => {
 	try {
-		const { storages } = await $api.storages.fetchStorages();
-		rooms.value = getRooms(storages);
+		const data = await $api.storages.fetchStoragesRooms();
+
+		rooms.value = formatRooms(data);
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
 };
-const getRooms = storages => {
-	return storages.map(storage => ({
-		value: storage.room,
-		label: storage.room
+const formatRooms = storages => {
+	return storages.map(room => ({
+		value: room,
+		label: room
 	}));
 };
 const filteredRooms = computed(() => {
-	return rooms.value.filter(room =>
-		room.value.toLowerCase().includes(storage.value.room.toLowerCase())
-	);
+	return rooms.value;
 });
 onMounted(() => {
 	setRooms();
