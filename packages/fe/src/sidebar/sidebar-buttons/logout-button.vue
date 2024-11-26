@@ -20,7 +20,13 @@ async function onClickLogout() {
 </script>
 
 <template>
-	<base-button @click="onClickLogout">
-		<rh-icon name="power" />
+	<base-button class="logout" @click="onClickLogout">
+		<rh-icon name="download" />
 	</base-button>
 </template>
+
+<style scoped>
+.logout {
+	transform: rotate(-90deg);
+}
+</style>
