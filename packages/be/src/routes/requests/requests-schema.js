@@ -88,7 +88,9 @@ const updateRequestSchema = S.object()
 	.prop('userComment', S.string().minLength(0))
 	.prop('poComment', S.string().minLength(0))
 	.prop('structure', S.string().minLength(0))
-	.prop('casNumber', S.string().minLength(0));
+	.prop('casNumber', S.string().minLength(0))
+	.prop('amount', S.number().minimum(1).required())
+	.prop('quantityUnit', S.string().minLength(1).required());
 
 const updateRequest = {
 	security: [{ Session: [] }],
