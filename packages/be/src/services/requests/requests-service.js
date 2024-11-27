@@ -150,25 +150,11 @@ async function requestsService(server) {
 
 		handleRequestUpdate: async (requestData, data, userId) => {
 			const { requestId, existingRequest } = requestData;
+
 			const isOfficer = await server.usersService.isOfficer(userId);
 			const isOwner = existingRequest.author.id === userId;
 
-			if (isOfficer) {
-				if ('userComment' in updateData && !isOwner) {
-					return {
-						code: 403,
-						status: 'error',
-						message: 'Sorry. You cannot change user comment'
-					};
-				}
-
-				const reagentName = await server.requestsService.updateRequest(requestId, updateData);
-
-				await server.notificationsService.addNotification({
-					requestId,
-					message: `New comment from a procurement officer in request for '${reagentName}'`
-				});
-
+			if (existingRequest.status !== RequestStatus.PENDING) {
 				return {
 					code: 409,
 					status: 'error',
@@ -206,10 +192,11 @@ async function requestsService(server) {
 				updateData
 			);
 
-			await server.notificationsService.addNotification({
-				requestId,
-				message: `Request status was updated for reagent ${updatedRequestReagentName}`
-			});
+			if (!isOwner)
+				await server.notificationsService.addNotification({
+					requestId,
+					message: `Request for reagent '${updatedRequestReagentName}' has updates`
+				});
 
 			return {
 				code: 200,
