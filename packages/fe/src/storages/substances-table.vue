@@ -9,6 +9,7 @@ import { $router } from '../lib/router/router.js';
 import RhFilters from '../lib/components/rh-filters/rh-filters.vue';
 import RhPagination from '../lib/components/rh-pagination/rh-pagination.vue';
 import SubstanceFilters from '../substances/substance-filters.vue';
+import { __ } from '../lib/locales/index.js';
 
 const props = defineProps({
 	id: {
@@ -170,17 +171,17 @@ onMounted(() => {
 					/>
 				</template>
 			</el-table-column>
-			<el-table-column prop="name" label="Name" />
-			<el-table-column prop="category" label="Category" />
-			<el-table-column prop="structure" label="Structure" />
-			<el-table-column prop="description" label="Description" />
-			<el-table-column prop="quantityLeft" label="Quantity Left" />
-			<el-table-column width="380" label="Storage Location">
+			<el-table-column prop="name" :label="__('Name')" />
+			<el-table-column prop="category" :label="__('Category')" />
+			<el-table-column prop="structure" :label="__('Structure')" />
+			<el-table-column prop="description" :label="__('Description')" />
+			<el-table-column prop="quantityLeft" :label="__('Quantity Left')" />
+			<el-table-column width="380" :label="__('Storage Location')">
 				<template #default="{ row }">
 					<el-select
 						v-model="row.storageLocationId"
 						class="custom-select"
-						placeholder="Please select a storage"
+						:placeholder="__('Please select a storage')"
 						@click.stop
 						@change="() => changeStorage(row)"
 					>

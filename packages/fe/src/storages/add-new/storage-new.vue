@@ -6,6 +6,7 @@ import { $router } from '../../lib/router/router.js';
 import { $api } from '../../lib/api/index.js';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
 import { formRules } from '../constants';
+import { __ } from '../../lib/locales/index.js';
 
 const formEl = useTemplateRef('form-ref');
 const storage = ref({
@@ -69,22 +70,26 @@ onMounted(() => {
 <template>
 	<div class="wrapper">
 		<el-form ref="form-ref" label-position="top" :model="storage" :rules="rules">
-			<el-form-item label="Room" prop="room">
+			<el-form-item :label="__('Room')" prop="room">
 				<el-autocomplete
 					v-model="storage.room"
 					:fetch-suggestions="filteredRooms"
-					placeholder="Enter room"
+					:placeholder="__('Enter room')"
 				/>
 			</el-form-item>
-			<el-form-item label="Name" prop="name">
-				<el-input v-model="storage.name" placeholder="Enter name" />
+			<el-form-item :label="__('Name')" prop="name">
+				<el-input v-model="storage.name" :placeholder="__('Enter name')" />
 			</el-form-item>
-			<el-form-item label="Description" prop="description">
-				<el-input v-model="storage.description" type="textarea" placeholder="Enter description" />
+			<el-form-item :label="__('Description')" prop="description">
+				<el-input
+					v-model="storage.description"
+					type="textarea"
+					:placeholder="__('Enter description')"
+				/>
 			</el-form-item>
 			<div class="btn-container">
-				<el-button @click="cancelHandler">Cancel</el-button>
-				<el-button type="primary" @click="addStorage">Add Storage</el-button>
+				<el-button @click="cancelHandler">{{ __('Cancel') }}</el-button>
+				<el-button type="primary" @click="addStorage">{{ __('Add Storage') }}</el-button>
 			</div>
 		</el-form>
 	</div>

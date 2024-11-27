@@ -6,6 +6,7 @@ import FilterItem from '../lib/components/rh-filters/filter-item.vue';
 import { defineModel } from 'vue';
 import { $notifyUserAboutError } from '../lib/utils/feedback/notify-msg';
 import { $api } from '../lib/api';
+import { __ } from '../lib/locales';
 
 const filters = defineModel('filters', { type: Object });
 const rooms = ref([]);
@@ -46,7 +47,7 @@ onMounted(() => {
 
 <template>
 	<filter-item>
-		<el-select v-model="filters.room" filterable clearable placeholder="Enter room">
+		<el-select v-model="filters.room" filterable clearable :placeholder="__('Enter room')">
 			<el-option
 				v-for="room of objectRooms"
 				:key="room.value"
@@ -60,7 +61,7 @@ onMounted(() => {
 	</filter-item>
 
 	<filter-item>
-		<el-select v-model="filters.name" filterable clearable placeholder="Enter name">
+		<el-select v-model="filters.name" filterable clearable :placeholder="__('Enter name')">
 			<el-option
 				v-for="name of objectNames"
 				:key="name.value"
