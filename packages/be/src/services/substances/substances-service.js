@@ -9,17 +9,26 @@ import { isValidSmilesQuery } from '../../lib/db/structure/utils/is-valid-smiles
 
 async function substancesService(server) {
 	server.decorate('substancesService', {
-		getSubstances: async queryParams => {
-			const { options, sort, limit, offset } = getClarifyParams(queryParams);
-
+		getSubstancesQuery: options => {
 			const reagentsQuery = server.reagentsService.getReagentsQuery({
 				relevance: getRelevanceScore('structure', options?.smiles || '').as('relevance')
 			});
 			const samplesQuery = server.samplesService.getSamplesQuery({
 				relevance: getRelevanceScore('structure', options?.smiles || '').as('relevance')
 			});
-			const unionQuery = unionAll(reagentsQuery, samplesQuery);
-			let query = server.db.select().from(unionQuery.as('substances'));
+
+			return unionAll(reagentsQuery, samplesQuery);
+		},
+
+		getSubstances: async queryParams => {
+			const { options, sort, limit, offset } = getClarifyParams(queryParams);
+
+			if (!(await server.substancesService.isStructureValid(options?.smiles || ''))) {
+				return { substances: [], count: 0 };
+			}
+
+			let query = server.substancesService.getSubstancesQuery(options);
+			query = server.db.select().from(query.as('substances'));
 
 			query = applyFilters(query, options, 'substances');
 			query = applySorting(query, sort, 'substances');
