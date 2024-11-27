@@ -36,19 +36,25 @@ async function ordersService(server) {
 				...formattedNewReagents
 			];
 
-			const createdOrderTitle = await server.db.transaction(async tx => {
-				const [{ orderId, orderTitle }] = await tx
-					.insert(schema.orders)
-					.values({
-						title: formatMapping.title(title),
-						userId,
-						seller: formatMapping.seller(seller)
-					})
-					.returning({ orderId: schema.orders.id, orderTitle: schema.orders.title });
+			const { orderTitle: createdOrderTitle, orderId: createdOrderId } =
+				await server.db.transaction(async tx => {
+					const [{ orderId, orderTitle }] = await tx
+						.insert(schema.orders)
+						.values({
+							title: formatMapping.title(title),
+							userId,
+							seller: formatMapping.seller(seller)
+						})
+						.returning({ orderId: schema.orders.id, orderTitle: schema.orders.title });
 
-				await server.orderItemsService.orderItemsInsert(orderId, formattedOrderItems, tx);
+					await server.orderItemsService.orderItemsInsert(orderId, formattedOrderItems, tx);
 
-				return orderTitle;
+					return { orderTitle, orderId };
+				});
+
+			await server.notificationsService.addNotification({
+				orderId: createdOrderId,
+				message: `New order '${createdOrderTitle}' created for ${formattedOrderItems.length} item${formattedOrderItems.length > 1 ? 's' : ''} that includes your requests.`
 			});
 
 			return createdOrderTitle;
@@ -172,27 +178,16 @@ async function ordersService(server) {
 		},
 
 		updateOrderStatus: async (orderId, nextStatus, tx = null) => {
-			if (!tx) {
-				const [{ orderTitle }] = await server.db
-					.update(schema.orders)
-					.set({
-						orderStatus: nextStatus
-					})
-					.where(eq(schema.orders.id, orderId))
-					.returning({ orderTitle: schema.orders.title });
+			const target = tx ?? server.db;
+			const [{ orderTitle }] = await target
+				.update(schema.orders)
+				.set({
+					orderStatus: nextStatus
+				})
+				.where(eq(schema.orders.id, orderId))
+				.returning({ orderTitle: schema.orders.title });
 
-				return orderTitle;
-			} else {
-				const [{ orderTitle }] = await tx
-					.update(schema.orders)
-					.set({
-						orderStatus: nextStatus
-					})
-					.where(eq(schema.orders.id, orderId))
-					.returning({ orderTitle: schema.orders.title });
-
-				return orderTitle;
-			}
+			return orderTitle;
 		},
 
 		bindOrderToReagents: async (orderId, reagentIds, tx) => {
@@ -237,7 +232,7 @@ async function ordersService(server) {
 			switch (nextStatus) {
 				case OrderStatus.ORDERED:
 					updatedOrderTitle = await server.ordersService.updateOrderStatus(orderId, nextStatus);
-					return updatedOrderTitle;
+					break;
 				case OrderStatus.FULFILLED:
 					updatedOrderTitle = await server.db.transaction(async tx => {
 						const [{ orderTitle }] = await server.ordersService.updateOrderStatus(
@@ -264,7 +259,7 @@ async function ordersService(server) {
 						return orderTitle;
 					});
 
-					return updatedOrderTitle;
+					break;
 				case OrderStatus.COMPLETED:
 					orderedReagents = await server.reagentsService.getReagentsFromOrder(orderId);
 
@@ -291,9 +286,13 @@ async function ordersService(server) {
 
 						return orderTitle;
 					});
-
-					return updatedOrderTitle;
+					break;
 			}
+			await server.notificationsService.addNotification({
+				orderId,
+				message: `Statuses for order '${updatedOrderTitle}' and its requests were updated to '${nextStatus}'.`
+			});
+			return updatedOrderTitle;
 		},
 
 		handleCancelOrder: async (orderId, nextStatus) => {
@@ -302,7 +301,10 @@ async function ordersService(server) {
 				await server.ordersService.resetOrdersItems(orderId, tx);
 				return orderTitle;
 			});
-
+			await server.notificationsService.addNotification({
+				orderId,
+				message: `Order '${canceledOrderTitle}' was cancelled.`
+			});
 			return canceledOrderTitle;
 		},
 

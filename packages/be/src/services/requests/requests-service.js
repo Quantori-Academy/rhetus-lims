@@ -44,7 +44,12 @@ async function requestsService(server) {
 					quantityUnit: formatMapping.quantityUnit(quantityUnit),
 					amount
 				})
-				.returning({ reagentName: schema.requests.reagentName });
+				.returning({ reagentName: schema.requests.reagentName, id: schema.requests.id });
+
+			await server.notificationsService.addNotification({
+				requestId: result[0].id,
+				message: `New request for '${result[0].reagentName}' created.`
+			});
 
 			return result.length ? result[0].reagentName : null;
 		},
@@ -187,6 +192,12 @@ async function requestsService(server) {
 				updateData
 			);
 
+			if (!isOwner)
+				await server.notificationsService.addNotification({
+					requestId,
+					message: `Request for reagent '${updatedRequestReagentName}' has updates`
+				});
+
 			return {
 				code: 200,
 				status: 'success',
@@ -258,6 +269,11 @@ async function requestsService(server) {
 				})
 				.where(eq(schema.requests.id, requestId))
 				.returning({ reagentName: schema.requests.reagentName });
+
+			await server.notificationsService.addNotification({
+				requestId,
+				message: `Request for '${result[0].reagentName}' cancelled for the following reason: '${reason}'.`
+			});
 
 			return result.length ? result[0].reagentName : null;
 		}
