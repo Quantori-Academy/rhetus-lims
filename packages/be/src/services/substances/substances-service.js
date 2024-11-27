@@ -23,7 +23,7 @@ async function substancesService(server) {
 		getSubstances: async queryParams => {
 			const { options, sort, limit, offset } = getClarifyParams(queryParams);
 
-			if (!(await server.reagentsService.isStructureValid(options?.smiles || ''))) {
+			if (!(await server.substancesService.isStructureValid(options?.smiles || ''))) {
 				return { substances: [], count: 0 };
 			}
 
