@@ -1,15 +1,15 @@
 <script setup>
-import RhIcon from '../../lib/components/rh-icon.vue';
+import RhIcon from '../lib/components/rh-icon.vue';
 import { ref, onMounted, watch, computed } from 'vue';
 import { ElTable, ElTableColumn, ElButton } from 'element-plus';
-import { $router } from '../../lib/router/router.js';
-import { $api } from '../../lib/api/index.js';
-import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
-import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
-import RhPagination from '../../lib/components/rh-pagination/rh-pagination.vue';
-import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
-import SubstanceFilters from '../substance-filters.vue';
-import { debounce } from '../../lib/utils/debounce/debounce.js';
+import { $router } from '../lib/router/router.js';
+import { $api } from '../lib/api/index.js';
+import { $confirm } from '../lib/utils/feedback/confirm-msg.js';
+import { $notify, $notifyUserAboutError } from '../lib/utils/feedback/notify-msg.js';
+import RhPagination from '../lib/components/rh-pagination/rh-pagination.vue';
+import RhFilters from '../lib/components/rh-filters/rh-filters.vue';
+import SubstanceFilters from './substance-filters.vue';
+import { debounce } from '../lib/utils/debounce/debounce.js';
 
 const substances = ref(null);
 const isLoading = ref(false);

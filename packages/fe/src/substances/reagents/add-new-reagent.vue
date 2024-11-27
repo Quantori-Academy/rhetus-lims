@@ -15,9 +15,9 @@ import { $router } from '../../lib/router/router';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg';
 import { $api } from '../../lib/api';
 import { quantityUnits } from '../../lib/constants/quantity-units.js';
-import { requiredRule } from './constants.js';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import KetcherEditor from '../../ketcher-editor/ketcher-editor.vue';
+import { requiredRule } from '../../lib/utils/form-validation/requiredRule.js';
 
 const formEl = useTemplateRef('form-el');
 const isSaving = ref(false);

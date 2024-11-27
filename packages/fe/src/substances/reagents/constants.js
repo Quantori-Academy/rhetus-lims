@@ -1,10 +1,4 @@
-const requiredRule = fieldName => {
-	return {
-		required: true,
-		message: `${fieldName} can't be empty`,
-		trigger: ['blur', 'change']
-	};
-};
+import { requiredRule } from '../../lib/utils/form-validation/requiredRule.js';
 
 export const formRules = {
 	quantityLeft: [
