@@ -392,5 +392,18 @@ export const routes = [
 				{ name: 'New Order', path: '' }
 			]
 		}
+	},
+	{
+		path: '/orders/:id/complete',
+		name: 'complete-order',
+		component: () => import('../../orders/complete-order/complete-order.vue'),
+		meta: {
+			title: 'New Order',
+			breadcrumb: [
+				{ name: 'Home', path: '/' },
+				{ name: 'Orders', path: '/orders/list' },
+				{ name: 'Complete Order', path: '' }
+			]
+		}
 	}
 ];
