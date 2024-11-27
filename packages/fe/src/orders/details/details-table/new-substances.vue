@@ -8,7 +8,7 @@ import {
 	ElInputNumber,
 	ElAutocomplete
 } from 'element-plus';
-import { defineProps, useTemplateRef, ref, toRef, onMounted, watch, computed } from 'vue';
+import { defineProps, useTemplateRef, ref, toRef, onMounted, watch } from 'vue';
 import { $isFormValid } from '../../../lib/utils/form-validation/is-form-valid.js';
 import RhIcon from '../../../lib/components/rh-icon.vue';
 import { quantityUnits } from '../../../lib/constants/quantity-units.js';
@@ -19,19 +19,10 @@ import { $api } from '../../../lib/api/index.js';
 const isAutoFilled = ref(false);
 const searchQuery = ref('');
 const newSubstance = ref(newSubstanceRef);
-const computedReagentName = computed({
-	get() {
-		return searchQuery.value || newSubstance.value.reagentName;
-	},
-	set(value) {
-		searchQuery.value = value;
-		newSubstance.value.reagentName = value;
-	}
-});
 const substanceRules = {
 	reagentName: [
 		{
-			required: computedReagentName.value !== '' && !isAutoFilled.value,
+			required: () => !isAutoFilled.value && searchQuery.value.trim() === '',
 			message: 'Reagent name cannot be empty',
 			trigger: 'blur'
 		}
@@ -69,7 +60,7 @@ watch(searchQuery, newValue => {
 			newSubstance.value.reagentName = newValue;
 		}
 	} catch (error) {
-		console.error('Error in watcher callback:', error);
+		$notifyUserAboutError(error);
 	}
 });
 
@@ -82,13 +73,15 @@ const fetchRequests = async () => {
 			limit: 200
 		};
 		const data = await $api.substances.fetchSubstances(params);
-		suggestedSubstances.value = [...data.substances];
+		suggestedSubstances.value = data.substances.filter(
+			substance => substance.category === 'reagent'
+		);
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error retrieving substances');
 	}
 };
 const fetchSubstanceSuggestions = async (queryString, callback) => {
-	const query = computedReagentName.value;
+	const query = searchQuery.value;
 	const selectedReagents = order.value.reagents.map(reagent => reagent.reagentName);
 	if (!queryString) {
 		const filteredSuggestions = suggestedSubstances.value.filter(
@@ -106,21 +99,22 @@ const fetchSubstanceSuggestions = async (queryString, callback) => {
 };
 const onReagentSelect = async selectedRequest => {
 	isAutoFilled.value = true;
+	substanceFormEl.value.resetFields();
 	const isReagentAdded = order.value.reagents.some(
 		reagent => reagent.reagentName === selectedRequest.name
 	);
 	if (isReagentAdded) {
 		return;
 	}
+
 	try {
 		let newReagent = {
 			...selectedRequest,
 			reagentName: selectedRequest.name,
 			quantity: 1,
-			amount: 1,
-			tempId: selectedRequest.id // use for msw
+			amount: 1
+			// tempId: selectedRequest.id // use for msw
 		};
-		console.log(newReagent);
 		const body = {
 			reagentRequests: [],
 			reagents: [{ ...newReagent }],
@@ -131,6 +125,7 @@ const onReagentSelect = async selectedRequest => {
 		if (response.status === 'success') {
 			await props.setOrder(order.value.id);
 		}
+		searchQuery.value = '';
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
@@ -138,8 +133,9 @@ const onReagentSelect = async selectedRequest => {
 	}
 };
 const addNewReagent = async () => {
-	if (!(await $isFormValid(substanceFormEl))) return;
-	newSubstance.value.reagentName = computedReagentName.value;
+	const isValid = await $isFormValid(substanceFormEl);
+	if (!isValid) return;
+	newSubstance.value.reagentName = searchQuery.value;
 	const newReagent = {
 		name: newSubstance.value.reagentName,
 		quantityUnit: newSubstance.value.quantityUnit,
@@ -162,7 +158,7 @@ const addNewReagent = async () => {
 	if (response.status === 'success') {
 		await props.setOrder(order.value.id);
 	}
-	computedReagentName.value = '';
+	searchQuery.value = '';
 	substanceFormEl.value.resetFields();
 };
 </script>
@@ -178,7 +174,7 @@ const addNewReagent = async () => {
 		<el-form-item prop="reagentName">
 			<span class="desktop">Name</span>
 			<el-autocomplete
-				v-model="computedReagentName"
+				v-model="searchQuery"
 				placeholder="Search for reagents"
 				popper-class="my-autocomplete"
 				:fetch-suggestions="fetchSubstanceSuggestions"
