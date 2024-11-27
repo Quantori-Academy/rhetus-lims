@@ -36,11 +36,11 @@ const createChangeTrackerEntry = item => {
 };
 const changeTracker = ref(props.order.reagents.map(createChangeTrackerEntry));
 watch(
-	() => props.order.reagentRequests,
-	newRequests => {
-		if (newRequests.length > changeTracker.value.length) {
-			for (let i = changeTracker.value.length; i < newRequests.length; i++) {
-				changeTracker.value.push(createChangeTrackerEntry(newRequests[i]));
+	() => props.order.reagents,
+	reagents => {
+		if (reagents.length > changeTracker.value.length) {
+			for (let i = changeTracker.value.length; i < reagents.length; i++) {
+				changeTracker.value.push(createChangeTrackerEntry(reagents[i]));
 			}
 		}
 	},
