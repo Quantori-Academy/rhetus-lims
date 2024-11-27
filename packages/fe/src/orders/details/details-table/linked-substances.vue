@@ -12,8 +12,6 @@ import {
 import { defineProps, computed, watch, ref } from 'vue';
 import { quantityUnits } from '../../../lib/constants/quantity-units.js';
 import RhIcon from '../../../lib/components/rh-icon.vue';
-import { $notifyUserAboutError } from '../../../lib/utils/feedback/notify-msg.js';
-import { $api } from '../../../lib/api/index.js';
 import { $router } from '../../../lib/router/router.js';
 
 const props = defineProps({
@@ -28,6 +26,11 @@ const props = defineProps({
 	setOrder: { type: Function, default: null },
 	linkedRequests: { type: Array, default: null }
 });
+const emit = defineEmits(['remove-linked-request']);
+const removeLinkedRequest = selectedRequest => {
+	emit('remove-linked-request', selectedRequest);
+};
+
 const createChangeTrackerEntry = item => {
 	return Object.keys(item).reduce((acc, field) => {
 		acc[field] = false;
@@ -85,18 +88,6 @@ const getChangedItems = () => {
 		return Object.values(changeTracker.value[index]).includes(true);
 	});
 };
-const removeLinkedRequest = async selectedRequest => {
-	try {
-		const body = { reagentRequests: [selectedRequest.tempId], reagents: [] };
-		const response = await $api.orders.removeItemFromOrder(props.order.id, body);
-		if (response.status === 'success') {
-			await props.setOrder(props.order.id);
-		}
-	} catch (error) {
-		$notifyUserAboutError(error);
-	}
-};
-
 function viewRequestDetails(request) {
 	const target = $router.resolve({ name: 'request-details', params: { id: request.id } }).href;
 	window.open(target, '_blank');

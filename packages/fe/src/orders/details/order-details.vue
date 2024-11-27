@@ -99,6 +99,17 @@ const setStatusesHistory = async () => {
 		loading.value = false;
 	}
 };
+const removeLinkedRequest = async selectedRequest => {
+	try {
+		const body = { reagentRequests: [selectedRequest.tempId], reagents: [] };
+		const response = await $api.orders.removeItemFromOrder(order.value.id, body);
+		if (response.status === 'success') {
+			await setOrder(order.value.id);
+		}
+	} catch (error) {
+		$notifyUserAboutError(error);
+	}
+};
 </script>
 
 <template>
@@ -158,6 +169,7 @@ const setStatusesHistory = async () => {
 				:set-order="setOrder"
 				:linked-requests="linkedRequests"
 				@toggle-edit="handleToggleEdit"
+				@remove-linked-request="removeLinkedRequest"
 			/>
 		</div>
 

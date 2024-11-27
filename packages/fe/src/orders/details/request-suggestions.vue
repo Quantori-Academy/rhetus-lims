@@ -16,20 +16,10 @@ const loading = ref(false);
 const order = toRef(props, 'order');
 const emit = defineEmits(['update-linked-requests']);
 
-watch(linkedRequests, newVal => {
-	emit('update-linked-requests', newVal);
-});
-watch(
-	() => props.order?.reagentRequests,
-	newReagentRequests => {
-		linkedRequests.value = [...newReagentRequests];
-	},
-	{ immediate: true }
-);
-
 onMounted(() => {
 	fetchRequests();
 });
+
 const fetchRequests = async () => {
 	loading.value = true;
 	try {
@@ -85,6 +75,17 @@ const linkRequest = async selectedRequest => {
 		$notifyUserAboutError(error);
 	}
 };
+watch(linkedRequests, newVal => {
+	emit('update-linked-requests', newVal);
+});
+watch(
+	() => props.order?.reagentRequests,
+	newReagentRequests => {
+		linkedRequests.value = [...newReagentRequests];
+		fetchRequests();
+	},
+	{ immediate: true }
+);
 </script>
 
 <template>

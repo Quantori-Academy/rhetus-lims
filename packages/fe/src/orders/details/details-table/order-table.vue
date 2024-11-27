@@ -25,7 +25,10 @@ const childTwoRef = ref(null);
 const isOrderValid = computed(
 	() => [...props.order.reagents, ...props.order.reagentRequests].length > 0
 );
-
+const emit = defineEmits(['remove-linked-request']);
+const removeLinkedRequest = selectedRequest => {
+	emit('remove-linked-request', selectedRequest);
+};
 const updateReagents = async () => {
 	const changesFromChildOne = childOneRef.value.getChanges();
 	const trackFromChildOne = childOneRef.value.trackChange();
@@ -70,6 +73,7 @@ const updateReagents = async () => {
 				:linked-requests="linkedRequests"
 				:set-order="props.setOrder"
 				@toggle-edit="toggleEdit"
+				@remove-linked-request="removeLinkedRequest"
 			/>
 			<existing-substances
 				ref="childTwoRef"
