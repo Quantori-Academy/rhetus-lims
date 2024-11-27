@@ -1,12 +1,13 @@
 /* eslint-disable max-lines */
 import LoginLayout from './layout/login-layout.vue';
 import { roles } from '../constants/roles.js';
+import Dashboard from '../../dashboard/main-dashboard.vue';
 
 export const routes = [
 	{
 		path: '/',
 		name: 'dashboard',
-		component: () => import('../../dashboard/main-dashboard.vue'),
+		component: Dashboard,
 		meta: {
 			title: 'Dashboard'
 		}

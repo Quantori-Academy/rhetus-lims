@@ -1,75 +1,26 @@
 <script setup>
-import { computed, onMounted, provide, ref } from 'vue';
 import PageWithSidebar from '../../../sidebar/page-with-sidebar.vue';
-
-import { $api } from '../../api/index.js';
 import { $router } from '../router.js';
 import { $notify } from '../../utils/feedback/notify-msg.js';
-import { roles } from '../../constants/roles.js';
+import { inject } from 'vue';
 
-const user = ref(null);
-const isLoading = ref(true);
-const isAuthorized = computed(() => !!user.value);
-
-async function setUser() {
-	isLoading.value = true;
-	try {
-		user.value = await $api.users.fetchCurrentUserInfo();
-	} catch {
-		$router.push({ name: 'login' });
-	} finally {
-		isLoading.value = false;
-	}
-}
-
-provide('user', {
-	user,
-	isAuthLoading: isLoading,
-	isAdmin: user.value?.role?.name === roles.ADMIN,
-	isResearcher: user.value?.role?.name === roles.RESEARCHER,
-	isOfficer: user.value?.role?.name === roles.PROCUREMENT_OFFICER
-});
-
-provide('auth', {
-	isAuthorized: isAuthorized.value,
-	logout: () => {
-		isAuthorized.value = false;
-		user.value = null;
-	}
-});
-
-onMounted(() => {
-	setUser();
-});
-
-function handleRoleCheck(routeRoles, userRole, next) {
-	if (routeRoles.length === 0) {
-		return next();
-	}
-
-	if (routeRoles.includes(userRole)) {
-		return next();
-	}
-
-	$notify({
-		title: 'Error',
-		message:
-			'You do not have the credentials to access this page. Please consult your administrator',
-		type: 'error'
-	});
-
-	$router.push({ name: '404' });
-}
+const { user } = inject('user');
 
 $router.beforeEach((to, from, next) => {
-	if (isLoading.value) {
-		next();
-		return;
-	}
-	const routeRoles = to.meta.roles || [];
-	const userRole = user.value?.role?.name;
+	const { meta } = to;
 
-	handleRoleCheck(routeRoles, userRole, next);
+	if (meta.roles && !meta.roles.includes(user.value?.role?.name)) {
+		next({ name: '404' });
+
+		$notify({
+			title: 'Error',
+			message:
+				'You do not have the credentials to access this page. Please consult your administrator',
+			type: 'error'
+		});
+	} else {
+		next();
+	}
 });
 </script>
 

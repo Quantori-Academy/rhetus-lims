@@ -1,9 +1,11 @@
 <script setup>
 import { ElForm, ElInput, ElButton, ElFormItem } from 'element-plus';
-import { ref } from 'vue';
+import { inject, onMounted, ref } from 'vue';
 import { $api } from '../../lib/api/index.js';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $router } from '../../lib/router/router.js';
+
+const { login, isAuthorized } = inject('auth');
 
 function createDefaultFormValues() {
 	return {
@@ -15,11 +17,13 @@ function createDefaultFormValues() {
 const form = ref(createDefaultFormValues());
 const isLoading = ref(false);
 
-async function login(form) {
+async function onSubmit() {
 	isLoading.value = true;
 
 	try {
-		const response = await $api.auth.login(form);
+		const response = await $api.auth.login(form.value);
+		const userData = await $api.users.fetchCurrentUserInfo();
+		login(userData);
 		$notify({
 			title: 'Success',
 			message: response.message,
@@ -32,9 +36,10 @@ async function login(form) {
 		isLoading.value = false;
 	}
 }
-function onSubmit() {
-	login(form.value);
-}
+
+onMounted(() => {
+	if (isAuthorized.value) $router.push({ name: 'dashboard' });
+});
 </script>
 
 <template>
