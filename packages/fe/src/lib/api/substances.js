@@ -2,6 +2,12 @@ export default http => ({
 	async fetchSubstances(params) {
 		return await http(`/substances`, { query: params });
 	},
+	async addSubstance(substance) {
+		return await http(`/substances`, {
+			method: 'POST',
+			body: substance
+		});
+	},
 	async updateSubstance(id, item) {
 		return await http(`/substances/${id}`, {
 			method: 'PATCH',

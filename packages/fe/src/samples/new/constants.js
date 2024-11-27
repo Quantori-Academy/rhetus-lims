@@ -21,12 +21,13 @@ export const formRules = {
 			trigger: ['blur', 'change']
 		}
 	],
-	storageId: [requiredRule]
+	storageId: [requiredRule],
+	structure: [requiredRule]
 };
 
 export const emptyComponent = {
 	id: '',
-	label: 'Select reagent',
+	label: 'Select substance',
 	quantityUsed: 0,
 	quantityLeft: 0,
 	quantityUnit: '',

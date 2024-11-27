@@ -17,6 +17,7 @@ import { $api } from '../../lib/api';
 import { quantityUnits } from '../../lib/constants/quantity-units.js';
 import { requiredRule } from './constants.js';
 import RhIcon from '../../lib/components/rh-icon.vue';
+import KetcherEditor from '../../ketcher-editor/ketcher-editor.vue';
 
 const formEl = useTemplateRef('form-el');
 const isSaving = ref(false);
@@ -32,7 +33,8 @@ const form = ref({
 	quantity: 1,
 	unitPrice: 0,
 	expirationDate: '',
-	storageLocationId: '',
+	storageId: '',
+	structure: '',
 	description: ''
 });
 
@@ -43,7 +45,8 @@ const rules = ref({
 		requiredRule('Quantity'),
 		{ type: 'number', min: 1, message: 'Quantity cannot be zero', trigger: ['blur', 'change'] }
 	],
-	storageLocationId: [requiredRule('Storage location')]
+	storageId: [requiredRule('Storage location')],
+	structure: [requiredRule('Structure')]
 });
 
 onMounted(() => {
@@ -54,10 +57,12 @@ async function submit() {
 	if (!(await $isFormValid(formEl))) return;
 	isSaving.value = true;
 	try {
-		const response = await $api.reagents.addReagent({
+		const response = await $api.substances.addSubstance({
 			...form.value,
-			quantityLeft: form.value.quantity
+			quantityLeft: form.value.quantity,
+			category: 'reagent'
 		});
+
 		$notify({ message: response.message, type: 'success' });
 		$router.push({ name: 'substances-list' });
 	} catch (error) {
@@ -126,9 +131,9 @@ async function setStorages() {
 					format="YYYY-MM-DD"
 				/>
 			</el-form-item>
-			<el-form-item label="Storage location" prop="storageLocationId">
+			<el-form-item label="Storage location" prop="storageId">
 				<el-select
-					v-model="form.storageLocationId"
+					v-model="form.storageId"
 					placeholder="Select storage location"
 					:loading="isLoading"
 					filterable
@@ -140,6 +145,9 @@ async function setStorages() {
 						:value="storage.id"
 					/>
 				</el-select>
+			</el-form-item>
+			<el-form-item label="Structure" prop="structure">
+				<ketcher-editor v-model:smiles="form.structure" placeholder="Enter structure" />
 			</el-form-item>
 			<el-form-item label="Description" prop="description">
 				<el-input v-model="form.description" type="textarea" placeholder="Enter description" />

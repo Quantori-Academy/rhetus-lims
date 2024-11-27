@@ -17,6 +17,7 @@ import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-
 import { $api } from '../../lib/api';
 import { emptyComponent, formRules } from './constants';
 import RhIcon from '../../lib/components/rh-icon.vue';
+import KetcherEditor from '../../ketcher-editor/ketcher-editor.vue';
 
 const storages = ref([]);
 
@@ -29,6 +30,7 @@ const form = ref({
 	quantityLeft: 1,
 	expirationDate: '',
 	storageId: '',
+	structure: '',
 	description: ''
 });
 
@@ -39,11 +41,11 @@ async function submit() {
 	if (!(await $isFormValid(formEl))) return;
 
 	isSaving.value = true;
-
 	try {
-		const response = await $api.samples.addSample({
+		const response = await $api.substances.addSubstance({
 			...form.value,
 			quantityLeft: form.value.quantity,
+			category: 'sample',
 			components: form.value.components.map(x => ({
 				id: x.id,
 				category: x.category,
@@ -196,7 +198,9 @@ onMounted(() => {
 					/>
 				</el-select>
 			</el-form-item>
-
+			<el-form-item label="Structure" prop="structure">
+				<ketcher-editor v-model:smiles="form.structure" placeholder="Enter structure" />
+			</el-form-item>
 			<el-form-item label="Description" prop="description">
 				<el-input v-model="form.description" type="textarea" placeholder="Enter description" />
 			</el-form-item>
