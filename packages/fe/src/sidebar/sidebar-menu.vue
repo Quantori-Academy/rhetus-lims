@@ -1,6 +1,9 @@
 <script setup>
+import { inject } from 'vue';
 import SidebarHeader from './sidebar-header.vue';
 import SidebarNavigation from './sidebar-navigation.vue';
+
+const { isInitLoading } = inject('auth');
 
 const emit = defineEmits(['toggle-collapse']);
 
@@ -11,8 +14,10 @@ function handleCollapse() {
 
 <template>
 	<nav class="sidebar">
-		<sidebar-header @toggle-collapse="handleCollapse" />
-		<sidebar-navigation />
+		<template v-if="!isInitLoading">
+			<sidebar-header @toggle-collapse="handleCollapse" />
+			<sidebar-navigation />
+		</template>
 	</nav>
 </template>
 

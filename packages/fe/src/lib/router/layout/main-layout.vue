@@ -4,6 +4,7 @@ import { $router } from '../router.js';
 import { $notify } from '../../utils/feedback/notify-msg.js';
 import { inject } from 'vue';
 
+const { isInitLoading } = inject('auth');
 const { user } = inject('user');
 
 $router.beforeEach((to, from, next) => {
@@ -26,6 +27,6 @@ $router.beforeEach((to, from, next) => {
 
 <template>
 	<page-with-sidebar>
-		<router-view />
+		<router-view v-if="!isInitLoading" />
 	</page-with-sidebar>
 </template>

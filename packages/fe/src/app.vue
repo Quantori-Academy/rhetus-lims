@@ -44,6 +44,5 @@ onMounted(() => {
 </script>
 
 <template>
-	<div v-if="isInitLoading" v-loading.fullscreen.lock="isInitLoading" />
-	<component :is="$route.meta.layout || MainLayout" v-else />
+	<component :is="$route.meta.layout || MainLayout" />
 </template>
