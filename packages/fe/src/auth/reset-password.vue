@@ -1,8 +1,8 @@
 <script setup>
 import { ElForm, ElInput, ElButton, ElFormItem } from 'element-plus';
 import { ref } from 'vue';
-import { $api } from '../../lib/api/index.js';
-import { $notifyUserAboutError, $notify } from '../../lib/utils/feedback/notify-msg.js';
+import { $api } from '../lib/api/index.js';
+import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg.js';
 
 function createDefaultFormValues() {
 	return {
@@ -36,48 +36,30 @@ function onSubmit() {
 </script>
 
 <template>
-	<div class="container">
-		<div class="login-form">
-			<div class="logo-container">
-				<img width="56" height="56" src="../../lib/assets/images/logo.svg" alt="" />
-				<div class="logo-title">Rhetus Lims</div>
-			</div>
+	<div class="logo-container">
+		<img width="56" height="56" src="../lib/assets/images/logo.svg" alt="" />
+		<div class="logo-title">Rhetus Lims</div>
+	</div>
 
-			<div class="form-container">
-				<el-form
-					:model="form"
-					label-position="top"
-					class="form"
-					@submit.prevent
-					@keyup.enter="onSubmit"
-				>
-					<el-form-item label="Username">
-						<el-input v-model="form.username" class="input" />
-					</el-form-item>
-					<el-form-item>
-						<el-button type="primary" @click="onSubmit"> Reset Password </el-button>
-					</el-form-item>
-				</el-form>
-			</div>
-		</div>
+	<div class="form-container">
+		<el-form
+			:model="form"
+			label-position="top"
+			class="form"
+			@submit.prevent
+			@keyup.enter="onSubmit"
+		>
+			<el-form-item label="Username">
+				<el-input v-model="form.username" class="input" />
+			</el-form-item>
+			<el-form-item>
+				<el-button type="primary" @click="onSubmit"> Reset Password </el-button>
+			</el-form-item>
+		</el-form>
 	</div>
 </template>
 
 <style scope>
-.container {
-	display: flex;
-	justify-content: center;
-	align-items: flex-start;
-	padding-top: 160px;
-	height: 100vh;
-}
-
-.login-form {
-	margin: 0 20px;
-	width: 100%;
-	max-width: 465px;
-}
-
 .logo-container {
 	display: flex;
 	flex-direction: column;

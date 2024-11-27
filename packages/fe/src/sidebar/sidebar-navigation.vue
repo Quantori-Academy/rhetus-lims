@@ -1,11 +1,10 @@
 <script setup>
-import LoadingSvg from '../../icons/spinner.svg?raw';
 import { computed, inject } from 'vue';
 import { navigationLink } from './constants.js';
 import { routes } from '../lib/router/routes.js';
 import SidebarNavigationItem from './sidebar-navigation-item.vue';
 
-const { user, isAuthLoading } = inject('user');
+const { user } = inject('user');
 
 function hasPermissions(link) {
 	if (!user.value?.role?.name) return false;
@@ -24,13 +23,7 @@ const filteredNavigationLinks = computed(() => {
 </script>
 
 <template>
-	<div
-		v-loading="isAuthLoading"
-		:element-loading-svg="LoadingSvg"
-		element-loading-svg-view-box="0 0 14 14"
-		element-loading-custom-class="sidebar-loading"
-		class="navigation"
-	>
+	<div class="navigation">
 		<div class="project-name">Rhetus</div>
 		<ul class="navigation-list">
 			<sidebar-navigation-item
@@ -44,16 +37,6 @@ const filteredNavigationLinks = computed(() => {
 </template>
 
 <style scoped>
-:deep(.el-loading-mask) {
-	height: 250px;
-	background: var(--bg-color);
-
-	svg {
-		width: 24px;
-		height: 24px;
-	}
-}
-
 .navigation {
 	.project-name {
 		padding: 8px 12px;

@@ -35,8 +35,7 @@ onMounted(() => {
 async function setRoles() {
 	loading.value = true;
 	try {
-		const data = await $api.users.getRoles();
-		roles.value = data.roles;
+		roles.value = await $api.users.getRoles();
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {

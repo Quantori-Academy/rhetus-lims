@@ -1,12 +1,13 @@
 /* eslint-disable max-lines */
 import LoginLayout from './layout/login-layout.vue';
 import { roles } from '../constants/roles.js';
+import Dashboard from '../../dashboard/main-dashboard.vue';
 
 export const routes = [
 	{
 		path: '/',
 		name: 'dashboard',
-		component: () => import('../../dashboard/main-dashboard.vue'),
+		component: Dashboard,
 		meta: {
 			title: 'Dashboard'
 		}
@@ -41,7 +42,7 @@ export const routes = [
 	{
 		path: '/login',
 		name: 'login',
-		component: () => import('../../auth/login-page/login-page.vue'),
+		component: () => import('../../auth/login-page.vue'),
 		meta: {
 			layout: LoginLayout
 		}
@@ -49,7 +50,7 @@ export const routes = [
 	{
 		path: '/reset-password',
 		name: 'reset-password',
-		component: () => import('../../auth/reset-password/reset-password.vue'),
+		component: () => import('../../auth/reset-password.vue'),
 		meta: {
 			layout: LoginLayout
 		}

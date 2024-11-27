@@ -39,15 +39,14 @@ async function addUser() {
 		$router.push({ name: 'users-list' });
 	} catch (error) {
 		$notifyUserAboutError(error);
+	} finally {
+		isSaving.value = false;
 	}
-
-	isSaving.value = false;
 }
 
 async function setRoles() {
 	try {
-		const data = await $api.users.getRoles();
-		roles.value = data.roles;
+		roles.value = await $api.users.getRoles();
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}

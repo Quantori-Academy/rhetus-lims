@@ -61,7 +61,6 @@ const deleteUser = async id => {
 const setUsers = debounce(async () => {
 	isLoading.value = true;
 	try {
-		console.log(filters.value);
 		const data = await $api.users.fetchUsers(filters.value);
 		users.value = data.users;
 	} catch (error) {
