@@ -47,7 +47,7 @@ async function ordersService(server) {
 						})
 						.returning({ orderId: schema.orders.id, orderTitle: schema.orders.title });
 
-					await server.orderItemsService.orderItemsInsert(orderId, formattedOrderItems, tx);
+				await server.orderItemsService.orderItemsInsert(orderId, formattedOrderItems, tx, userId);
 
 					return { orderTitle, orderId };
 				});
@@ -159,7 +159,7 @@ async function ordersService(server) {
 			return result.length ? result[0].orderTitle : null;
 		},
 
-		softDeleteOrder: async id => {
+		softDeleteOrder: async (id, userId) => {
 			const deletedOrderTitle = await server.db.transaction(async tx => {
 				const [{ orderTitle }] = await tx
 					.update(schema.orders)
@@ -169,7 +169,7 @@ async function ordersService(server) {
 					.where(eq(schema.orders.id, id))
 					.returning({ orderTitle: schema.orders.title });
 
-				await server.ordersService.resetOrdersItems(id, tx);
+				await server.ordersService.resetOrdersItems(id, tx, userId);
 
 				return orderTitle;
 			});
@@ -177,7 +177,7 @@ async function ordersService(server) {
 			return deletedOrderTitle;
 		},
 
-		updateOrderStatus: async (orderId, nextStatus, tx = null, userId) => {
+		updateOrderStatus: async (orderId, nextStatus, userId, tx = null) => {
 			await server.ordersService.insertStatusInHistory(orderId, nextStatus, userId);
 
 			const target = tx ?? server.db;
@@ -254,8 +254,8 @@ async function ordersService(server) {
 						const orderTitle = await server.ordersService.updateOrderStatus(
 							orderId,
 							nextStatus,
-							tx,
-							userId
+							userId,
+							tx
 						);
 
 						const createdReagentIds = await server.reagentsService.createReagentsFromOrder(
@@ -316,8 +316,8 @@ async function ordersService(server) {
 						const orderTitle = await server.ordersService.updateOrderStatus(
 							orderId,
 							nextStatus,
-							tx,
-							userId
+							userId,
+							tx
 						);
 
 						await server.requestsService.updateRequestStatusByOrder(
@@ -348,7 +348,7 @@ async function ordersService(server) {
 					tx,
 					userId
 				);
-				await server.ordersService.resetOrdersItems(orderId, tx);
+				await server.ordersService.resetOrdersItems(orderId, tx, userId);
 				return orderTitle;
 			});
 			await server.notificationsService.addNotification({
@@ -371,7 +371,7 @@ async function ordersService(server) {
 			}
 		},
 
-		resetOrdersItems: async (orderId, tx) => {
+		resetOrdersItems: async (orderId, tx, userId) => {
 			const requestsIds = await tx
 				.delete(schema.ordersItems)
 				.where(
@@ -389,6 +389,16 @@ async function ordersService(server) {
 					.update(schema.requests)
 					.set({ requestStatus: RequestStatus.PENDING, orderId: null })
 					.where(inArray(schema.requests.id, requestIdsForUpdate));
+
+				await Promise.all(
+					requestIdsForUpdate.map(requestId =>
+						server.requestsService.insertStatusInHistory(
+							requestId,
+							{ status: RequestStatus.PENDING },
+							userId
+						)
+					)
+				);
 			}
 
 			await tx.delete(schema.ordersItems).where(eq(schema.ordersItems.orderId, orderId));

@@ -247,17 +247,17 @@ async function requestsService(server) {
 		},
 
 		updateRequestStatusByOrder: async (orderId, newStatus, tx, userId) => {
-			const request = await tx
+			const [{ requestId }] = await tx
 				.update(schema.requests)
 				.set({ requestStatus: newStatus })
-				.where(eq(schema.requests.orderId, orderId));
-
-			await server.requestsService.insertStatusInHistory(request.id, newStatus, userId);
-			return request;
+				.where(eq(schema.requests.orderId, orderId))
+				.returning({ requestId: schema.requests.id });
+			await server.requestsService.insertStatusInHistory(requestId, { status: newStatus }, userId);
+			return requestId;
 		},
 
 		cancelRequest: async (requestId, data) => {
-			const { reason, currentPoComment } = data ?? {};
+			const { reason, currentPoComment, userId } = data ?? {};
 
 			const cancellationTemplate = `Cancellation reason: ${reason}`;
 			const newPoComment = currentPoComment
@@ -278,6 +278,11 @@ async function requestsService(server) {
 				message: `Request for '${result[0].reagentName}' cancelled for the following reason: '${reason}'.`
 			});
 
+			await server.requestsService.insertStatusInHistory(
+				requestId,
+				{ status: RequestStatus.CANCELED, poComment: newPoComment },
+				userId
+			);
 			return result.length ? result[0].reagentName : null;
 		},
 
@@ -286,7 +291,7 @@ async function requestsService(server) {
 				userId,
 				requestId,
 				status: data.status,
-				changeReason: data.poComment
+				changeReason: data?.poComment
 			});
 		}
 	});

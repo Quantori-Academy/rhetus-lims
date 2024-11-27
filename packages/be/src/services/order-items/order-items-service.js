@@ -134,7 +134,7 @@ async function orderItemsService(server) {
 			return formattedReagents;
 		},
 
-		orderItemsInsert: async (orderId, orderItems, tx) => {
+		orderItemsInsert: async (orderId, orderItems, tx, userId) => {
 			return Promise.all(
 				orderItems.map(async orderItem => {
 					const {
@@ -160,6 +160,12 @@ async function orderItemsService(server) {
 								orderId
 							})
 							.where(eq(schema.requests.id, requestId));
+
+						await server.requestsService.insertStatusInHistory(
+							requestId,
+							{ status: RequestStatus.ORDERED },
+							userId
+						);
 					}
 
 					await tx.insert(schema.ordersItems).values({
@@ -211,7 +217,7 @@ async function orderItemsService(server) {
 		},
 
 		removeItemsFromOrder: async data => {
-			const { reagents, reagentRequests, orderTitle } = data ?? {};
+			const { reagents, reagentRequests, orderTitle, userId } = data ?? {};
 
 			if (reagentRequests.length) {
 				await server.db.transaction(async tx => {
@@ -226,6 +232,16 @@ async function orderItemsService(server) {
 						.update(schema.requests)
 						.set({ requestStatus: RequestStatus.PENDING, orderId: null })
 						.where(inArray(schema.requests.id, requestIdsForUpdate));
+
+					await Promise.all(
+						requestIdsForUpdate.map(requestId =>
+							server.requestsService.insertStatusInHistory(
+								requestId,
+								{ status: RequestStatus.PENDING },
+								userId
+							)
+						)
+					);
 				});
 			}
 

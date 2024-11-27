@@ -221,7 +221,8 @@ async function requests(server, options) {
 
 			const reagentName = await server.requestsService.cancelRequest(requestId, {
 				...req.body,
-				currentPoComment: request.poComment
+				currentPoComment: request.poComment,
+				userId: authenticatedUserId
 			});
 
 			return reply.code(200).send({
