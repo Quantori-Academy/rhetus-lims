@@ -1,8 +1,8 @@
 <script setup>
 import { toRef } from 'vue';
 import { ElFormItem, ElTable, ElTableColumn } from 'element-plus';
-import RhIcon from '../../lib/components/rh-icon.vue';
-import { $router } from '../../lib/router/router';
+import RhIcon from '../../../lib/components/rh-icon.vue';
+import { $router } from '../../../lib/router/router';
 
 const props = defineProps({
 	data: { type: Object, default: null }

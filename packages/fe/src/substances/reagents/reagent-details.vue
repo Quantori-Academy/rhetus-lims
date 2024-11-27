@@ -56,10 +56,10 @@ async function setStorages() {
 		loading.value = false;
 	}
 }
-const setReagent = async id => {
+const setReagent = async () => {
 	loading.value = true;
 	try {
-		const data = await $api.substances.fetchSubstance('reagent', id);
+		const data = await $api.substances.fetchSubstance('reagent', props.id);
 		reagent.value = { ...data, storageId: data.storageLocation.id };
 		originalReagent.value = {
 			...reagent.value
@@ -81,7 +81,7 @@ const cancelEdit = () => {
 		type: 'info'
 	});
 	formEl.value.resetFields();
-	reagent.value = originalReagent.value;
+	setReagent();
 };
 const handleSubmit = async () => {
 	if (!(await $isFormValid(formEl))) return;
@@ -133,7 +133,7 @@ const deleteReagent = async () => {
 			cancelButtonText: 'Cancel',
 			type: 'warning'
 		});
-		const response = await $api.reagents.deleteReagent(props.id);
+		const response = await $api.substances.deleteSubstance('reagent', props.id);
 		$notify({
 			title: 'Success',
 			message: response.message,
@@ -148,7 +148,7 @@ const deleteReagent = async () => {
 };
 
 onMounted(() => {
-	setReagent(props.id);
+	setReagent();
 	setStorages();
 });
 </script>

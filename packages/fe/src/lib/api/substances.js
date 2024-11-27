@@ -2,6 +2,14 @@ export default http => ({
 	async fetchSubstances(params) {
 		return await http(`/substances`, { query: params });
 	},
+	async fetchSubstance(category, id) {
+		return await http(`/substances/${category}/${id}`);
+	},
+	async deleteSubstance(category, id) {
+		return await http(`/substances/${category}/${id}`, {
+			method: 'DELETE'
+		});
+	},
 	async addSubstance(substance) {
 		return await http(`/substances`, {
 			method: 'POST',

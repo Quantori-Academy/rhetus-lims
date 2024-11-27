@@ -1,6 +1,6 @@
 <script setup>
 import RhIcon from '../lib/components/rh-icon.vue';
-import { ref, onMounted, watch, computed } from 'vue';
+import { ref, onMounted, watch, computed, inject } from 'vue';
 import { ElTable, ElTableColumn, ElButton } from 'element-plus';
 import { $router } from '../lib/router/router.js';
 import { $api } from '../lib/api/index.js';
@@ -10,6 +10,8 @@ import RhPagination from '../lib/components/rh-pagination/rh-pagination.vue';
 import RhFilters from '../lib/components/rh-filters/rh-filters.vue';
 import SubstanceFilters from './substance-filters.vue';
 import { debounce } from '../lib/utils/debounce/debounce.js';
+
+const { isOfficer } = inject('user');
 
 const substances = ref(null);
 const isLoading = ref(false);
@@ -42,13 +44,6 @@ function orderReagent(row) {
 	});
 }
 
-function editSubstance(row) {
-	$router.push({
-		name: row.category.toLowerCase() === 'reagent' ? 'reagent-details-edit' : 'edit-sample',
-		params: { id: row.id }
-	});
-}
-
 function viewSubstance(row) {
 	$router.push({
 		name: row.category.toLowerCase() === 'reagent' ? 'reagent-details' : 'sample-details',
@@ -73,18 +68,10 @@ const confirmDeleteReagent = async () => {
 	}
 };
 
-const deleteSubstance = async (id, category) => {
-	if (category.toLowerCase() === 'reagent') {
-		await $api.reagents.deleteReagent(id);
-	} else {
-		await $api.samples.deleteSample(id);
-	}
-};
-
 const deleteSingleSubstance = async row => {
 	if (!(await confirmDeleteReagent())) return;
 	try {
-		await deleteSubstance(row.id, row.category);
+		await $api.substances.deleteSubstance(row.category.toLowerCase(), row.id);
 		showNotification('Success', 'Item is deleted', 'success');
 		await setSubstances();
 	} catch (error) {
@@ -192,24 +179,17 @@ onMounted(() => {
 			<el-table-column prop="description" min-width="160" label="Description" />
 			<el-table-column prop="quantityLeft" min-width="120" label="Quantity Left" />
 			<el-table-column prop="storageLocation" min-width="140" label="Storage Location" />
-			<el-table-column width="80">
-				<template #default="{ row }">
-					<el-button @click.stop="() => editSubstance(row)">
-						<rh-icon name="pencil" />
-					</el-button>
-				</template>
-			</el-table-column>
-			<el-table-column width="80">
-				<template #default="{ row }">
-					<el-button type="danger" @click.stop="() => deleteSingleSubstance(row)">
-						<rh-icon color="white" name="remove" />
-					</el-button>
-				</template>
-			</el-table-column>
-			<el-table-column width="80">
+			<el-table-column v-if="isOfficer" width="60">
 				<template #default="{ row }">
 					<el-button type="primary" @click.stop="() => orderReagent(row)">
 						<rh-icon color="white" name="file-addition" />
+					</el-button>
+				</template>
+			</el-table-column>
+			<el-table-column width="60">
+				<template #default="{ row }">
+					<el-button type="danger" @click.stop="() => deleteSingleSubstance(row)">
+						<rh-icon color="white" name="remove" />
 					</el-button>
 				</template>
 			</el-table-column>
