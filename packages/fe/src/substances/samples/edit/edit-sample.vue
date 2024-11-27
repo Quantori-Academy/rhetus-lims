@@ -10,14 +10,14 @@ import {
 	ElInputNumber,
 	ElOption
 } from 'element-plus';
-import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
-import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg';
-import { $promptInputBox } from '../../lib/utils/feedback/prompt-box';
-import { $api } from '../../lib/api';
-import { $route, $router } from '../../lib/router/router';
+import { $isFormValid } from '../../../lib/utils/form-validation/is-form-valid';
+import { $notify, $notifyUserAboutError } from '../../../lib/utils/feedback/notify-msg';
+import { $promptInputBox } from '../../../lib/utils/feedback/prompt-box';
+import { $api } from '../../../lib/api';
+import { $route, $router } from '../../../lib/router/router';
 import { confirmNotify, emptySample, formRules } from './constants';
-import { checkEditedFields } from '../../substances/constants';
-import RhIcon from '../../lib/components/rh-icon.vue';
+import { checkEditedFields } from '../../../substances/constants';
+import RhIcon from '../../../lib/components/rh-icon.vue';
 import SubstancesUsed from './substances-used.vue';
 
 const props = defineProps({ id: { type: String, default: null } });
@@ -47,8 +47,6 @@ async function deleteSample() {
 	try {
 		await confirmNotify('Are you sure you want to delete this sample?', 'Delete Sample?');
 		try {
-			const response = await $api.samples.deleteSample(props.id);
-			$notify({ title: 'Success', message: response.message, type: 'success' });
 			const response = await $api.substances.deleteSubstance('sample', props.id);
 			$notify({
 				title: 'Success',

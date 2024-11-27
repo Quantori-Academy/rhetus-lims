@@ -1,4 +1,4 @@
-import { $confirm } from '../../lib/utils/feedback/confirm-msg';
+import { $confirm } from '../../../lib/utils/feedback/confirm-msg';
 
 const requiredRule = fieldName => {
 	return {

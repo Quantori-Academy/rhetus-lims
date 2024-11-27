@@ -129,7 +129,7 @@ const checkReagentZero = async () => {
 const deleteReagent = async () => {
 	try {
 		await confirmNotify('Do you want to delete this reagent?');
-		const response = await $api.reagents.deleteReagent(props.id);
+		const response = await $api.substances.deleteSubstance('reagent', props.id);
 		$notify({ title: 'Success', message: response.message, type: 'success' });
 		await $router.push({ name: 'substances-list' });
 	} catch (error) {
