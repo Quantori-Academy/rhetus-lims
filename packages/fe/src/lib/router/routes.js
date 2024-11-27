@@ -9,7 +9,8 @@ export const routes = [
 		name: 'dashboard',
 		component: Dashboard,
 		meta: {
-			title: 'Dashboard'
+			title: 'Dashboard',
+			breadcrumb: [{ name: 'Home', path: '/' }]
 		}
 	},
 	{
