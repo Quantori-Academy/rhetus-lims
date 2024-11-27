@@ -28,11 +28,23 @@ const props = defineProps({
 	setOrder: { type: Function, default: null },
 	linkedRequests: { type: Array, default: null }
 });
-
-const changeTracker = ref(
-	props.order.reagents.map(request =>
-		Object.fromEntries(Object.keys(request).map(key => [key, false]))
-	)
+const createChangeTrackerEntry = item => {
+	return Object.keys(item).reduce((acc, field) => {
+		acc[field] = false;
+		return acc;
+	}, {});
+};
+const changeTracker = ref(props.order.reagents.map(createChangeTrackerEntry));
+watch(
+	() => props.order.reagentRequests,
+	newRequests => {
+		if (newRequests.length > changeTracker.value.length) {
+			for (let i = changeTracker.value.length; i < newRequests.length; i++) {
+				changeTracker.value.push(createChangeTrackerEntry(newRequests[i]));
+			}
+		}
+	},
+	{ deep: true }
 );
 const changes = computed(() => {
 	return getChangedItems();
@@ -173,10 +185,5 @@ const removeReagent = async selectedReagent => {
 			</div>
 		</div>
 		<new-substances :order="props.order" :is-edit="props.isEdit" :set-order="props.setOrder" />
-		<!-- <div v-if="isEdit" class="btn-container">
-			<el-button type="primary" :disabled="!isOrderValid" @click="updateReagents"
-				>Update Reagents</el-button
-			>
-		</div> -->
 	</el-form>
 </template>
