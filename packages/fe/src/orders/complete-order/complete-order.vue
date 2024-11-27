@@ -45,13 +45,13 @@ const setSubstances = async () => {
 		const params = {
 			limiit: 200,
 			options: {
-				order: '',
+				order: orderId,
 				category: 'reagent'
 			}
 		};
 		const response = await $api.substances.fetchSubstances(params);
 		const filteredSubstances = response.substances.filter(
-			substance => substance.orderId !== orderId
+			substance => substance.orderId === orderId
 		);
 		fulfilledReagents.value = filteredSubstances;
 	} catch (error) {
@@ -72,21 +72,49 @@ async function setStorages() {
 		loading.value = false;
 	}
 }
+// const saveChanges = async () => {
+// 	const updatedReagents = fulfilledReagents.value.filter(
+// 		item => item.storageLocation.id.length > 0
+// 	);
+// 	console.log('Updated Substances:', updatedReagents);
+// 	try {
+// 		const item = {
+// 			...updatedReagents
+// 		};
+// 		const data = await $api.substances.updateSubstance(item.id, item);
+// 		$notify({
+// 			title: 'Success',
+// 			message: 'Storage locations updated successfully',
+// 			type: 'success'
+// 		});
+// 	} catch (error) {
+// 		$notifyUserAboutError(error.message || 'Error updating storage locations');
+// 	}
+// };
 const saveChanges = async () => {
-	const updatedReagents = fulfilledReagents.value.filter(
-		item => item.storageLocation.id.length > 0
-	);
-	console.log('Updated Substances:', updatedReagents);
+	const updatedReagents = fulfilledReagents.value.filter(item => item.storageLocation?.id);
 	try {
+		const updateRequests = updatedReagents.map(item => {
+			const updatePayload = {
+				name: item.name,
+				category: item.category,
+				storageId: item.storageLocation.id
+			};
+			return $api.substances.updateSubstance(item.id, updatePayload);
+		});
+		console.log(updateRequests);
+		await Promise.all(updateRequests);
+
 		$notify({
 			title: 'Success',
-			message: 'Storage locations updated successfully',
+			message: 'All storage locations updated successfully',
 			type: 'success'
 		});
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating storage locations');
 	}
 };
+
 const cancelChanges = () => {
 	$router.push({ name: 'order-details', params: { id: order.value.id } });
 };

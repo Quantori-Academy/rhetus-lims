@@ -13,14 +13,36 @@ export const reagents = [
 		structure: 'Cl[Na]'
 	},
 	{
+		id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3s',
+		name: 'Sodium Chloride',
+		category: 'Reagent',
+		description: 'Common salt used in various chemical reactions and as a preservative.',
+		quantityLeft: 500,
+		quantityUnit: 'g',
+		storageLocationId: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',
+		structure: 'Cl[Na]'
+	},
+	{
+		id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b31',
+		name: 'Sodium Chloride',
+		category: 'Reagent',
+		description: 'Common salt used in various chemical reactions and as a preservative.',
+		quantityLeft: 500,
+		quantityUnit: 'g',
+		storageLocationId: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',
+		structure: 'Cl[Na]'
+	},
+	{
 		id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b322',
 		name: 'Acetic Acid',
 		category: 'Reagent',
 		description: 'Weak acid used in the production of synthetic fibers and food preservation.',
 		quantityLeft: 1,
 		quantityUnit: 'L',
+		quantity: 20,
 		storageLocationId: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b4t5y5y5y',
-		structure: 'CC(=O)O'
+		structure: 'CC(=O)O',
+		orderId: '0c2243be-8325-41fd-bb47-3372be2eec04'
 	},
 	{
 		id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b999',
@@ -29,8 +51,10 @@ export const reagents = [
 		description: 'Used as an oxidant in various organic and inorganic reactions.',
 		quantityLeft: 250,
 		quantityUnit: 'g',
+		quantity: 10,
 		storageLocationId: 'c7b3d8e0-5e0b-4b0f-8b3a-3b93f5g6d6d4g6g',
-		structure: 'O=[Mn](=O)(=O)=O[O-].[K+]'
+		structure: 'O=[Mn](=O)(=O)=O[O-].[K+]',
+		orderId: '0c2243be-8325-41fd-bb47-3372be2eec04'
 	}
 ];
 
