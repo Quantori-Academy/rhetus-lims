@@ -37,16 +37,6 @@ const filteredNavigationLinks = computed(() => {
 </template>
 
 <style scoped>
-:deep(.el-loading-mask) {
-	height: 250px;
-	background: var(--bg-color);
-
-	svg {
-		width: 24px;
-		height: 24px;
-	}
-}
-
 .navigation {
 	.project-name {
 		padding: 8px 12px;
