@@ -11,13 +11,13 @@ import {
 	ElOption
 } from 'element-plus';
 import { $isFormValid } from '../../../lib/utils/form-validation/is-form-valid';
-import { $notify, $notifyUserAboutError } from '../../../lib//utils/feedback/notify-msg';
-import { $api } from '../../../lib//api';
-import { $confirm } from '../../../lib//utils/feedback/confirm-msg';
+import { $notify, $notifyUserAboutError } from '../../../lib/utils/feedback/notify-msg';
+import { $promptInputBox } from '../../../lib/utils/feedback/prompt-box';
+import { $api } from '../../../lib/api';
+import { $route, $router } from '../../../lib/router/router';
+import { confirmNotify, emptySample, formRules } from './constants';
+import { checkEditedFields } from '../../../substances/constants';
 import RhIcon from '../../../lib/components/rh-icon.vue';
-import { $route, $router } from '../../../lib//router/router';
-import { emptySample, formRules } from './constants';
-import { checkEditedFields } from '../../constants.js';
 import SubstancesUsed from './substances-used.vue';
 
 const props = defineProps({ id: { type: String, default: null } });
@@ -30,6 +30,8 @@ const isLoading = ref(true);
 const isSaving = ref(false);
 const originalSample = ref({});
 const updatedSampleValues = ref({ category: 'sample' });
+const isOutOfStock = computed(() => sample.value.quantityLeft === 0);
+
 watch(
 	sample,
 	sampleFields => {
@@ -43,10 +45,7 @@ watch(
 );
 async function deleteSample() {
 	try {
-		await $confirm('Are you sure you want to delete this sample?', 'Delete Sample?', {
-			confirmButtonText: 'Delete',
-			type: 'warning'
-		});
+		await confirmNotify('Are you sure you want to delete this sample?', 'Delete Sample?');
 		try {
 			const response = await $api.substances.deleteSubstance('sample', props.id);
 			$notify({
@@ -68,43 +67,47 @@ async function submit() {
 	if (!(await $isFormValid(formEl))) return;
 	isSaving.value = true;
 	try {
-		if (sample.value.quantityLeft <= 0) {
-			await deleteSampleZero();
-		} else {
-			const response = await $api.substances.updateSubstance(props.id, updatedSampleValues.value);
-			$notify({
-				title: response.status.charAt(0).toUpperCase() + response.status.slice(1),
-				message: response.message || 'Sample has been updated',
-				type: response.status
-			});
-			$router.push({ name: 'sample-details', params: { id: props.id } });
-			setSample(props.id);
-			updatedSampleValues.value = { category: 'sample' };
-		}
+		await reasonQuantityChange();
+		await checkSampleZero();
+		const response = await $api.substances.updateSubstance(props.id, updatedSampleValues.value);
+		$notify({
+			title: response.status.charAt(0).toUpperCase() + response.status.slice(1),
+			message: response.message || 'Sample has been updated',
+			type: response.status
+		});
+		routerChange();
 	} catch (error) {
-		$notifyUserAboutError(error);
+		if (!['cancel', 'close'].includes(error)) {
+			$notifyUserAboutError(error.message || 'Error updating reagent');
+		}
 	} finally {
 		isSaving.value = false;
 	}
 }
-const deleteSampleZero = async () => {
-	try {
-		await $confirm('Quantity reached 0. Do you want to delete this sample?', 'Warning', {
-			confirmButtonText: 'OK',
-			cancelButtonText: 'Cancel',
-			type: 'warning'
-		});
-		await $api.substances.updateSubstance(sample.value.id, updatedSampleValues.value);
-		$notify({
-			title: 'Success',
-			message: 'Sample deletion was requested',
-			type: 'success'
-		});
+
+const routerChange = () => {
+	if (isOutOfStock.value) {
 		$router.push({ name: 'substances-list' });
-	} catch (error) {
-		if (!['cancel', 'close'].includes(error)) {
-			this.$notifyUserAboutError(error);
-		}
+	} else {
+		$router.push({ name: 'sample-details', params: { id: props.id } });
+		setSample(props.id);
+		updatedSampleValues.value = { category: 'sample' };
+	}
+};
+
+const checkSampleZero = async () => {
+	if (isOutOfStock.value) {
+		await confirmNotify('Quantity reached 0. Do you want to delete this sample?');
+	}
+};
+
+const reasonQuantityChange = async () => {
+	if (updatedSampleValues.value.quantityUsed) {
+		const reason = await $promptInputBox({
+			message: 'Please, provide a reason for quantity change',
+			error: 'Reason is required'
+		});
+		updatedSampleValues.value.reason = reason.value;
 	}
 };
 function toggleEdit() {
@@ -112,11 +115,6 @@ function toggleEdit() {
 }
 function cancelEdit() {
 	$router.push({ name: 'sample-details', params: { id: props.id } });
-	$notify({
-		title: 'Canceled',
-		message: 'Sample editing canceled',
-		type: 'info'
-	});
 	formEl.value.resetFields();
 	sample.value = originalSample.value;
 }

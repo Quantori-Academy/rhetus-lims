@@ -1,3 +1,5 @@
+import { $confirm } from '../../../lib/utils/feedback/confirm-msg';
+
 const requiredRule = fieldName => {
 	return {
 		required: true,
@@ -33,4 +35,12 @@ export const emptySample = {
 		name: ''
 	},
 	description: ''
+};
+
+export const confirmNotify = async message => {
+	return await $confirm(`${message}`, 'Warning', {
+		confirmButtonText: 'OK',
+		cancelButtonText: 'Cancel',
+		type: 'warning'
+	});
 };
