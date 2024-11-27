@@ -10,14 +10,14 @@ import {
 	ElOption,
 	ElInputNumber
 } from 'element-plus';
-import { quantityUnits } from '../../lib/constants/quantity-units';
-import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
-import { $router } from '../../lib/router/router';
-import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg';
-import { $api } from '../../lib/api';
+import { quantityUnits } from '../../../lib/constants/quantity-units';
+import { $isFormValid } from '../../../lib/utils/form-validation/is-form-valid';
+import { $router } from '../../../lib/router/router';
+import { $notify, $notifyUserAboutError } from '../../../lib/utils/feedback/notify-msg';
+import { $api } from '../../../lib/api';
 import { emptyComponent, formRules } from './constants';
-import RhIcon from '../../lib/components/rh-icon.vue';
-import KetcherEditor from '../../ketcher-editor/ketcher-editor.vue';
+import RhIcon from '../../../lib/components/rh-icon.vue';
+import KetcherEditor from '../../../ketcher-editor/ketcher-editor.vue';
 
 const storages = ref([]);
 
@@ -74,22 +74,33 @@ const addComponent = () => {
 	form.value.components.push(emptyComponent);
 };
 
+const allSubstances = ref([]);
 const componentOptions = ref([]);
+
+function filterComponents(query) {
+	console.log(query);
+
+	componentOptions.value = allSubstances.value
+		.filter(component => component.label.toLowerCase().includes(query.toLowerCase()))
+		.slice(0, 50);
+}
 
 const isOptionChosen = option =>
 	!form.value.components.some(component => component.id === option.id);
 
 async function setComponents() {
 	try {
-		const res = await $api.substances.fetchSubstances();
-		componentOptions.value = res.substances.map(x => ({
+		const res = await $api.substances.fetchSubstances({ limit: 999 });
+		allSubstances.value = res.substances.map(x => ({
 			id: x.id,
-			label: x.name,
+			label: `${x.name} (${x.storageLocation.room} ${x.storageLocation.name})`,
 			category: x.category,
 			quantityLeft: x.quantityLeft,
 			quantityUnit: x.quantityUnit,
 			quantityUsed: 0
 		}));
+
+		componentOptions.value = allSubstances.value.slice(0, 50);
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
@@ -127,12 +138,13 @@ onMounted(() => {
 						v-model="form.components[index]"
 						value-key="id"
 						filterable
-						placeholder="Select substances"
+						remote
+						:remote-method="filterComponents"
 					>
 						<el-option
 							v-for="item of componentOptions"
 							:key="item.id"
-							:label="item.label"
+							:label="`${item.label}`"
 							:value="item"
 							:disabled="!isOptionChosen(item)"
 						>

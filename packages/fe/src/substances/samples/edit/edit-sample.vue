@@ -10,14 +10,14 @@ import {
 	ElInputNumber,
 	ElOption
 } from 'element-plus';
-import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid';
-import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg';
-import { $api } from '../../lib/api';
-import { $confirm } from '../../lib/utils/feedback/confirm-msg';
-import { $route, $router } from '../../lib/router/router';
+import { $isFormValid } from '../../../lib/utils/form-validation/is-form-valid';
+import { $notify, $notifyUserAboutError } from '../../../lib//utils/feedback/notify-msg';
+import { $api } from '../../../lib//api';
+import { $confirm } from '../../../lib//utils/feedback/confirm-msg';
+import RhIcon from '../../../lib/components/rh-icon.vue';
+import { $route, $router } from '../../../lib//router/router';
 import { emptySample, formRules } from './constants';
-import { checkEditedFields } from '../../substances/constants';
-import RhIcon from '../../lib/components/rh-icon.vue';
+import { checkEditedFields } from '../../constants.js';
 import SubstancesUsed from './substances-used.vue';
 
 const props = defineProps({ id: { type: String, default: null } });
@@ -48,7 +48,7 @@ async function deleteSample() {
 			type: 'warning'
 		});
 		try {
-			const response = await $api.samples.deleteSample(props.id);
+			const response = await $api.substances.deleteSubstance('sample', props.id);
 			$notify({
 				title: 'Success',
 				message: response.message,
@@ -133,7 +133,7 @@ async function setStorages() {
 async function setSample(id) {
 	isLoading.value = true;
 	try {
-		const res = await $api.samples.fetchSample(id);
+		const res = await $api.substances.fetchSubstance('sample', id);
 		sample.value = { ...res, storageId: res.storageLocation.id };
 		originalSample.value = {
 			...sample.value

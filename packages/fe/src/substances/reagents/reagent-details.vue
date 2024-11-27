@@ -9,13 +9,13 @@ import {
 	ElDatePicker,
 	ElInputNumber
 } from 'element-plus';
-import { $notifyUserAboutError, $notify } from '../../lib/utils/feedback/notify-msg';
+import { $notifyUserAboutError, $notify } from '../../lib/utils/feedback/notify-msg.js';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg.js/';
 import { computed, onMounted, useTemplateRef, ref, watch } from 'vue';
 import { $api } from '../../lib/api/index.js';
-import { $route, $router } from '../../lib/router/router';
+import { $route, $router } from '../../lib/router/router.js';
 import { formRules, emptyReagent } from './constants.js';
-import { checkEditedFields } from '../../substances/constants';
+import { checkEditedFields } from '../constants.js';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 import RhIcon from '../../lib/components/rh-icon.vue';
 const props = defineProps({
@@ -33,10 +33,7 @@ const isOutOfStock = computed(() => reagent.value.quantityLeft === 0);
 const originalReagent = ref({});
 const rules = ref(formRules);
 const updatedReagentValues = ref({ category: 'reagent' });
-onMounted(() => {
-	setReagent(props.id);
-	setStorages();
-});
+
 watch(
 	reagent,
 	reagentFields => {
@@ -59,10 +56,10 @@ async function setStorages() {
 		loading.value = false;
 	}
 }
-const setReagent = async id => {
+const setReagent = async () => {
 	loading.value = true;
 	try {
-		const data = await $api.reagents.fetchReagent(id);
+		const data = await $api.substances.fetchSubstance('reagent', props.id);
 		reagent.value = { ...data, storageId: data.storageLocation.id };
 		originalReagent.value = {
 			...reagent.value
@@ -84,7 +81,7 @@ const cancelEdit = () => {
 		type: 'info'
 	});
 	formEl.value.resetFields();
-	reagent.value = originalReagent.value;
+	setReagent();
 };
 const handleSubmit = async () => {
 	if (!(await $isFormValid(formEl))) return;
@@ -136,7 +133,7 @@ const deleteReagent = async () => {
 			cancelButtonText: 'Cancel',
 			type: 'warning'
 		});
-		const response = await $api.reagents.deleteReagent(props.id);
+		const response = await $api.substances.deleteSubstance('reagent', props.id);
 		$notify({
 			title: 'Success',
 			message: response.message,
@@ -149,11 +146,16 @@ const deleteReagent = async () => {
 		}
 	}
 };
+
+onMounted(() => {
+	setReagent();
+	setStorages();
+});
 </script>
 
 <template>
-	<div v-if="reagent" v-loading="loading" class="wrapper">
-		<div v-if="reagent" class="editing-header">
+	<div class="wrapper">
+		<div class="editing-header">
 			<div class="category-icons">
 				<rh-icon name="pod" />{{ `${isEdit ? 'Editing ' : ''}${reagent.name}` }}
 			</div>
@@ -161,7 +163,7 @@ const deleteReagent = async () => {
 		</div>
 		<el-form
 			ref="form-ref"
-			v-loading="loading || !reagent"
+			v-loading="loading"
 			label-position="top"
 			:model="reagent"
 			:rules="rules"

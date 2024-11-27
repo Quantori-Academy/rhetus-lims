@@ -113,7 +113,7 @@ export const routes = [
 	{
 		path: '/samples/new',
 		name: 'new-sample',
-		component: () => import('../../samples/new/add-new-sample.vue'),
+		component: () => import('../../substances/samples/new/add-new-sample.vue'),
 		meta: {
 			title: 'New Sample',
 			breadcrumb: [
@@ -126,7 +126,7 @@ export const routes = [
 	{
 		path: '/samples/:id',
 		name: 'sample-details',
-		component: () => import('../../samples/edit/edit-sample.vue'),
+		component: () => import('../../substances/samples/edit/edit-sample.vue'),
 		props: true,
 		meta: {
 			title: 'Sample Details',
@@ -140,7 +140,7 @@ export const routes = [
 	{
 		path: '/samples/edit/:id',
 		name: 'edit-sample',
-		component: () => import('../../samples/edit/edit-sample.vue'),
+		component: () => import('../../substances/samples/edit/edit-sample.vue'),
 		props: true,
 		meta: {
 			title: 'Edit Sample Details',
@@ -209,7 +209,7 @@ export const routes = [
 	{
 		path: '/substances/list',
 		name: 'substances-list',
-		component: () => import('../../substances/list/substances-list.vue'),
+		component: () => import('../../substances/substances-list.vue'),
 		meta: {
 			title: 'Substances List',
 			breadcrumb: [
@@ -221,7 +221,7 @@ export const routes = [
 	{
 		path: '/reagents/:id',
 		name: 'reagent-details',
-		component: () => import('../../reagents/details-reagent/reagent-details.vue'),
+		component: () => import('../../substances/reagents/reagent-details.vue'),
 		props: true,
 		meta: {
 			title: 'Reagent Details',
@@ -235,7 +235,7 @@ export const routes = [
 	{
 		path: '/reagents/:id/edit',
 		name: 'reagent-details-edit',
-		component: () => import('../../reagents/details-reagent/reagent-details.vue'),
+		component: () => import('../../substances/reagents/reagent-details.vue'),
 		props: true,
 		meta: {
 			title: 'Edit Reagent Details',
@@ -249,7 +249,7 @@ export const routes = [
 	{
 		path: '/reagents/new',
 		name: 'new-reagent',
-		component: () => import('../../reagents/new/add-new-reagent.vue'),
+		component: () => import('../../substances/reagents/add-new-reagent.vue'),
 		meta: {
 			title: 'New Reagent',
 			breadcrumb: [

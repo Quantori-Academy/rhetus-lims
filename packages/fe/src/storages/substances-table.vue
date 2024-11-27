@@ -96,12 +96,7 @@ const deleteSubstance = async row => {
 			cancelButtonText: 'Cancel',
 			type: 'warning'
 		});
-
-		if (row.category.toLowerCase() === 'reagent') {
-			await $api.reagents.deleteReagent(row.id);
-		} else {
-			await $api.samples.deleteSample(row.id);
-		}
+		await $api.substances.deleteSubstance(row.category.toLowerCase(), row.id);
 		$notify({
 			title: 'Success',
 			message: 'Item is deleted',
