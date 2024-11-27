@@ -222,7 +222,7 @@ onMounted(() => {
 			<el-form-item label="Description" prop="description">
 				<el-input v-model="reagent.description" type="textarea" :disabled="!isEdit" />
 			</el-form-item>
-			<div v-if="isEdit" class="btn-container">
+			<div v-if="isEdit" class="btns-container">
 				<el-button type="danger" @click="deleteReagent">{{ 'Delete' }}</el-button>
 				<div>
 					<el-button @click="cancelEdit">Cancel</el-button>

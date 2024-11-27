@@ -27,5 +27,8 @@ export default http => ({
 			method: 'PUT',
 			body
 		});
+	},
+	async getSubstance(id, category) {
+		return await http(`/substances/${category}/${id}`);
 	}
 });
