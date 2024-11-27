@@ -20,6 +20,24 @@
 		"Confirm password": ["Confirm password"],
 		"Localization": ["Localization"],
 		"Customize language settings": ["Customize language settings"],
-		"Save": ["Save"]
+		"Save": ["Save"],
+		"Add New Storage Location": ["Add New Storage Location"],
+		"Enter room": ["Enter room"],
+		"Enter name": ["Enter name"],
+		"Room": ["Room"],
+		"Name": ["Name"],
+		"Description": ["Description"],
+		"Creation Date": ["Creation Date"],
+		"Can't delete, storage is not empty.": ["Can't delete, storage is not empty."],
+		"Enter description": ["Enter description"],
+		"Add Storage": ["Add Storage"],
+		"Storage": ["Storage"],
+		"Edit storage": ["Edit storage"],
+		"Delete storage": ["Delete storage"],
+		"Category": ["Category"],
+		"Structure": ["Structure"],
+		"Quantity Left": ["Quantity Left"],
+		"Storage Location": ["Storage Location"],
+		"Please select a storage": ["Please select a storage"]
 	}
 }
