@@ -74,7 +74,8 @@ const linkRequest = async selectedRequest => {
 	try {
 		const body = {
 			reagentRequests: [{ ...selectedRequest }],
-			reagents: []
+			reagents: [],
+			newReagents: []
 		};
 		const response = await $api.orders.addItemToOrder(order.value.id, body);
 		if (response.status === 'success') {

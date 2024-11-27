@@ -85,25 +85,6 @@ const getChangedItems = () => {
 		return Object.values(changeTracker.value[index]).includes(true);
 	});
 };
-// const updateRequests = async () => {
-// 	if (!checkForChanges()) {
-// 		$router.push({ name: 'order-details', params: { id: props.order.id } });
-// 		return;
-// 	}
-// 	let changedSubstances = getChangedItems();
-// 	try {
-// 		const body = {
-// 			orderItems: [...changedSubstances]
-// 		};
-// 		const response = await $api.orders.updateItemInOrder(props.order.id, body);
-// 		if (response.status === 'success') {
-// 			await props.setOrder(props.order.id);
-// 		}
-// 	} catch (error) {
-// 		$notifyUserAboutError(error);
-// 	}
-// };
-
 const removeLinkedRequest = async selectedRequest => {
 	try {
 		const body = { reagentRequests: [selectedRequest.tempId], reagents: [] };

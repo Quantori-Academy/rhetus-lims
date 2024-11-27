@@ -8,18 +8,41 @@ import {
 	ElInputNumber,
 	ElAutocomplete
 } from 'element-plus';
-import { defineProps, useTemplateRef, ref, toRef, onMounted, watch } from 'vue';
+import { defineProps, useTemplateRef, ref, toRef, onMounted, watch, computed } from 'vue';
 import { $isFormValid } from '../../../lib/utils/form-validation/is-form-valid.js';
 import RhIcon from '../../../lib/components/rh-icon.vue';
 import { quantityUnits } from '../../../lib/constants/quantity-units.js';
-import { newSubstanceRef } from '../constants.js';
+import { newSubstanceRef, requiredRule } from '../constants.js';
 import { $notifyUserAboutError } from '../../../lib/utils/feedback/notify-msg.js';
 import { $api } from '../../../lib/api/index.js';
 
-const substanceFormEl = useTemplateRef('substance-form-el');
-const newSubstance = ref(newSubstanceRef);
-const suggestedSubstances = ref([]);
+const isAutoFilled = ref(false);
 const searchQuery = ref('');
+const newSubstance = ref(newSubstanceRef);
+const computedReagentName = computed({
+	get() {
+		return searchQuery.value || newSubstance.value.reagentName;
+	},
+	set(value) {
+		searchQuery.value = value;
+		newSubstance.value.reagentName = value;
+	}
+});
+const substanceRules = {
+	reagentName: [
+		{
+			required: computedReagentName.value !== '' && !isAutoFilled.value,
+			message: 'Reagent name cannot be empty',
+			trigger: 'blur'
+		}
+	],
+	quantityUnit: [requiredRule('Unit')],
+	quantity: [requiredRule('Quantity')],
+	amount: [requiredRule('Amount')]
+};
+const newSubstanceRules = ref(substanceRules);
+const substanceFormEl = useTemplateRef('substance-form-el');
+const suggestedSubstances = ref([]);
 
 const props = defineProps({
 	order: {
@@ -32,6 +55,7 @@ const props = defineProps({
 	},
 	setOrder: { type: Function, default: null }
 });
+
 const order = toRef(props, 'order');
 
 watch(searchQuery, newValue => {
@@ -64,6 +88,7 @@ const fetchRequests = async () => {
 	}
 };
 const fetchSubstanceSuggestions = async (queryString, callback) => {
+	const query = computedReagentName.value;
 	const selectedReagents = order.value.reagents.map(reagent => reagent.reagentName);
 	if (!queryString) {
 		const filteredSuggestions = suggestedSubstances.value.filter(
@@ -73,14 +98,14 @@ const fetchSubstanceSuggestions = async (queryString, callback) => {
 	} else {
 		const filteredRequests = suggestedSubstances.value.filter(
 			suggest =>
-				suggest.name.toLowerCase().includes(queryString.toLowerCase()) &&
+				suggest.name.toLowerCase().includes(query.toLowerCase()) &&
 				!selectedReagents.includes(suggest.name)
 		);
 		callback(filteredRequests);
 	}
 };
-
 const onReagentSelect = async selectedRequest => {
+	isAutoFilled.value = true;
 	const isReagentAdded = order.value.reagents.some(
 		reagent => reagent.reagentName === selectedRequest.name
 	);
@@ -95,9 +120,11 @@ const onReagentSelect = async selectedRequest => {
 			amount: 1,
 			tempId: selectedRequest.id // use for msw
 		};
+		console.log(newReagent);
 		const body = {
 			reagentRequests: [],
-			reagents: [{ ...newReagent }]
+			reagents: [{ ...newReagent }],
+			newReagents: []
 		};
 		// test id on prod
 		const response = await $api.orders.addItemToOrder(order.value.id, body);
@@ -106,11 +133,13 @@ const onReagentSelect = async selectedRequest => {
 		}
 	} catch (error) {
 		$notifyUserAboutError(error);
+	} finally {
+		isAutoFilled.value = false;
 	}
 };
 const addNewReagent = async () => {
 	if (!(await $isFormValid(substanceFormEl))) return;
-	newSubstance.value.reagentName = searchQuery.value;
+	newSubstance.value.reagentName = computedReagentName.value;
 	const newReagent = {
 		name: newSubstance.value.reagentName,
 		quantityUnit: newSubstance.value.quantityUnit,
@@ -133,17 +162,23 @@ const addNewReagent = async () => {
 	if (response.status === 'success') {
 		await props.setOrder(order.value.id);
 	}
-	searchQuery.value = '';
+	computedReagentName.value = '';
 	substanceFormEl.value.resetFields();
 };
 </script>
 
 <template>
-	<el-form v-if="props.isEdit" ref="substance-form-el" :model="newSubstance" class="row">
+	<el-form
+		v-if="props.isEdit"
+		ref="substance-form-el"
+		:model="newSubstance"
+		:rules="newSubstanceRules"
+		class="row"
+	>
 		<el-form-item prop="reagentName">
 			<span class="desktop">Name</span>
 			<el-autocomplete
-				v-model="searchQuery"
+				v-model="computedReagentName"
 				placeholder="Search for reagents"
 				popper-class="my-autocomplete"
 				:fetch-suggestions="fetchSubstanceSuggestions"
