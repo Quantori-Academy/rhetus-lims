@@ -10,6 +10,7 @@ import RhFilters from '../lib/components/rh-filters/rh-filters.vue';
 import RhPagination from '../lib/components/rh-pagination/rh-pagination.vue';
 import SubstanceFilters from '../substances/substance-filters.vue';
 import { __ } from '../lib/locales/index.js';
+import { debounce } from '../lib/utils/debounce/debounce.js';
 
 const props = defineProps({
 	id: {
@@ -20,7 +21,7 @@ const props = defineProps({
 
 const filters = ref({
 	name: '',
-	quantity: null
+	expired: false
 });
 
 const substances = ref([]);
@@ -31,17 +32,32 @@ const paginationData = ref({
 	size: 10,
 	totalElements: 0
 });
-
-async function setSubstances(id) {
+const addStructureSort = sortQuery => {
+	if (filters.value.smiles) {
+		sortQuery.sort = { ...(sortQuery.sort ?? {}), relevance: 'desc' };
+	}
+	if (sortQuery.sort && sortQuery.sort.structure) {
+		const { structure, ...rest } = sortQuery.sort;
+		sortQuery.sort = { ...rest, relevance: structure };
+	}
+};
+const setSubstances = debounce(async (event = null, id) => {
 	isLoading.value = true;
+	const sortQuery = createQuery(event);
+	addStructureSort(sortQuery);
+	const { expired, ...rest } = filters.value;
 	try {
 		const params = {
-			options: { location: id, ...filters.value },
 			page: paginationData.value.page,
-			limit: paginationData.value.size
+			limit: paginationData.value.size,
+			sort: { ...sortQuery.sort },
+			options: {
+				...rest,
+				expirationDate: expired ? [new Date('0001-01-01T00:00:00.000Z'), new Date()] : [],
+				location: id
+			}
 		};
 		const data = await $api.substances.fetchSubstances(params);
-
 		substances.value = data.substances;
 		paginationData.value.totalElements = data.count;
 	} catch (error) {
@@ -49,7 +65,7 @@ async function setSubstances(id) {
 	} finally {
 		isLoading.value = false;
 	}
-}
+}, 200);
 
 async function fetchStorages() {
 	isLoading.value = true;
@@ -140,7 +156,14 @@ const handlePageChange = newPage => {
 	paginationData.value.page = newPage;
 	setSubstances(props.id);
 };
-
+function createQuery(event) {
+	let query = {};
+	if (event && event.prop && event.order) {
+		const order = event.order === 'ascending' ? 'desc' : 'asc';
+		query.sort = { [event.prop]: order };
+	}
+	return query;
+}
 watch(
 	filters,
 	() => {
@@ -162,7 +185,7 @@ onMounted(() => {
 				<substance-filters v-model:filters="filters" />
 			</template>
 		</rh-filters>
-		<el-table :data="substances" @row-click="viewSubstance">
+		<el-table :data="substances" @row-click="viewSubstance" @sort-change="setSubstances">
 			<el-table-column width="50">
 				<template #default="{ row }">
 					<rh-icon
@@ -171,11 +194,11 @@ onMounted(() => {
 					/>
 				</template>
 			</el-table-column>
-			<el-table-column prop="name" :label="__('Name')" />
-			<el-table-column prop="category" :label="__('Category')" />
-			<el-table-column prop="structure" :label="__('Structure')" />
+			<el-table-column prop="name" :label="__('Name')" sortable />
+			<el-table-column prop="category" :label="__('Category')" sortable />
+			<el-table-column prop="structure" :label="__('Structure')" sortable />
 			<el-table-column prop="description" :label="__('Description')" />
-			<el-table-column prop="quantityLeft" :label="__('Quantity Left')" />
+			<el-table-column prop="quantityLeft" :label="__('Quantity Left')" sortable />
 			<el-table-column width="380" :label="__('Storage Location')">
 				<template #default="{ row }">
 					<el-select
