@@ -57,7 +57,6 @@ const setSubstances = debounce(async (event = null, id) => {
 				location: id
 			}
 		};
-		console.log(params);
 		const data = await $api.substances.fetchSubstances(params);
 		substances.value = data.substances;
 		paginationData.value.totalElements = data.count;
