@@ -1,3 +1,5 @@
+import { STATUS } from '../../lib/constants/statuses';
+
 export const requiredRule = fieldName => {
 	return {
 		required: true,
@@ -6,22 +8,15 @@ export const requiredRule = fieldName => {
 	};
 };
 
-export const ORDER_STATUS = {
-	PENDING: 'pending',
-	ORDERED: 'ordered',
-	FULFILLED: 'fulfilled',
-	CANCELED: 'canceled'
-};
-
 export const getButtonType = status => {
 	switch (status) {
-		case ORDER_STATUS.PENDING:
+		case STATUS.PENDING:
 			return 'info';
-		case ORDER_STATUS.ORDERED:
+		case STATUS.ORDERED:
 			return 'warning';
-		case ORDER_STATUS.FULFILLED:
+		case STATUS.FULFILLED:
 			return 'success';
-		case ORDER_STATUS.CANCELED:
+		case STATUS.CANCELED:
 			return 'danger';
 		default:
 			return 'info';
@@ -33,6 +28,19 @@ export const newSubstanceRef = {
 	quantityUnit: '',
 	quantity: 1,
 	amount: 1
+};
+export const orderRef = {
+	title: '',
+	seller: '',
+	author: {
+		username: '',
+		id: ''
+	},
+	createdAt: '',
+	updatedAt: '',
+	reagentRequests: [],
+	reagents: [],
+	newReagents: []
 };
 export const orderFormRules = {
 	title: [requiredRule('Title')],

@@ -23,7 +23,6 @@ const props = defineProps({
 		type: Boolean,
 		default: false
 	},
-	setOrder: { type: Function, default: null },
 	linkedRequests: { type: Array, default: null }
 });
 const emit = defineEmits(['remove-linked-request']);

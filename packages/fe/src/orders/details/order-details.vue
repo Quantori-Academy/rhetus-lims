@@ -4,7 +4,7 @@ import { $notifyUserAboutError, $notify } from '../../lib/utils/feedback/notify-
 import { computed, onMounted, useTemplateRef, ref } from 'vue';
 import { $api } from '../../lib/api/index.js';
 import { $route, $router } from '../../lib/router/router';
-import { getButtonType, orderFormRules } from './constants.js';
+import { getButtonType, orderFormRules, orderRef } from './constants.js';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
 import RhIcon from '../../lib/components/rh-icon.vue';
@@ -21,7 +21,7 @@ const props = defineProps({
 });
 const orderForm = useTemplateRef('form-ref');
 const rules = ref(orderFormRules);
-const order = ref(null);
+const order = ref(orderRef);
 const originalOrder = ref({});
 const linkedRequests = ref([]);
 const loading = ref(true);
@@ -113,7 +113,7 @@ const removeLinkedRequest = async selectedRequest => {
 </script>
 
 <template>
-	<div v-if="order" v-loading="loading">
+	<div v-loading="loading">
 		<div class="wrapper">
 			<div class="header">
 				<h2>
@@ -125,7 +125,7 @@ const removeLinkedRequest = async selectedRequest => {
 				<order-actions
 					:order="order"
 					:is-edit="isEdit"
-					:set-order="setOrder"
+					@set-order="setOrder"
 					@cancel-edit="cancelEdit"
 				/>
 			</div>
@@ -160,14 +160,14 @@ const removeLinkedRequest = async selectedRequest => {
 			<request-suggestions
 				:order="order"
 				:is-edit="isEdit"
-				:set-order="setOrder"
+				@set-order="setOrder"
 				@update-linked-requests="handleLinkedRequestsUpdate"
 			/>
 			<order-table
 				:order="order"
 				:is-edit="isEdit"
-				:set-order="setOrder"
 				:linked-requests="linkedRequests"
+				@set-order="setOrder"
 				@toggle-edit="handleToggleEdit"
 				@remove-linked-request="removeLinkedRequest"
 			/>

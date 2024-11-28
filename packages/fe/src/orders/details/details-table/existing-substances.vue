@@ -25,9 +25,9 @@ const props = defineProps({
 		type: Boolean,
 		default: false
 	},
-	setOrder: { type: Function, default: null },
 	linkedRequests: { type: Array, default: null }
 });
+const emit = defineEmits(['set-order']);
 const createChangeTrackerEntry = item => {
 	return Object.keys(item).reduce((acc, field) => {
 		acc[field] = false;
@@ -92,11 +92,14 @@ const removeReagent = async selectedReagent => {
 		const body = { reagentRequests: [], reagents: [selectedReagent.tempId] };
 		const response = await $api.orders.removeItemFromOrder(props.order.id, body);
 		if (response.status === 'success') {
-			await props.setOrder(props.order.id);
+			setOrder();
 		}
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
+};
+const setOrder = () => {
+	emit('set-order', props.order.id);
 };
 </script>
 
@@ -166,6 +169,6 @@ const removeReagent = async selectedReagent => {
 				</el-tag>
 			</div>
 		</div>
-		<new-substances :order="props.order" :is-edit="props.isEdit" :set-order="props.setOrder" />
+		<new-substances :order="props.order" :is-edit="props.isEdit" @set-order="setOrder" />
 	</el-form>
 </template>

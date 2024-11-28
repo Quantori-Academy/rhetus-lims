@@ -6,15 +6,14 @@ import { $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 
 const props = defineProps({
 	order: { type: Object, default: null },
-	isEdit: { type: Boolean, default: false },
-	setOrder: { type: Function, default: null }
+	isEdit: { type: Boolean, default: false }
 });
 const searchQuery = ref('');
 const linkedRequests = ref([]);
 const suggestedRequests = ref([]);
 const loading = ref(false);
 const order = toRef(props, 'order');
-const emit = defineEmits(['update-linked-requests']);
+const emit = defineEmits(['update-linked-requests', 'set-order']);
 
 onMounted(() => {
 	fetchRequests();
@@ -69,7 +68,7 @@ const linkRequest = async selectedRequest => {
 		};
 		const response = await $api.orders.addItemToOrder(order.value.id, body);
 		if (response.status === 'success') {
-			await props.setOrder(order.value.id);
+			emit('set-order', order.value.id);
 		}
 	} catch (error) {
 		$notifyUserAboutError(error);

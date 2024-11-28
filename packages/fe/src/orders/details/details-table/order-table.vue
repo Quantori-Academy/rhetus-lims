@@ -16,7 +16,6 @@ const props = defineProps({
 		type: Boolean,
 		default: false
 	},
-	setOrder: { type: Function, default: null },
 	toggleEdit: { type: Function, default: null },
 	linkedRequests: { type: Array, default: null }
 });
@@ -25,7 +24,7 @@ const childTwoRef = ref(null);
 const isOrderValid = computed(
 	() => [...props.order.reagents, ...props.order.reagentRequests].length > 0
 );
-const emit = defineEmits(['remove-linked-request']);
+const emit = defineEmits(['remove-linked-request', 'set-order']);
 const removeLinkedRequest = selectedRequest => {
 	emit('remove-linked-request', selectedRequest);
 };
@@ -47,11 +46,15 @@ const updateReagents = async () => {
 		};
 		const response = await $api.orders.updateItemInOrder(props.order.id, body);
 		if (response.status === 'success') {
-			await props.setOrder(props.order.id);
+			setOrder();
 		}
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
+};
+
+const setOrder = () => {
+	emit('set-order', props.order.id);
 };
 </script>
 
@@ -71,7 +74,6 @@ const updateReagents = async () => {
 				:order="props.order"
 				:is-edit="props.isEdit"
 				:linked-requests="linkedRequests"
-				:set-order="props.setOrder"
 				@toggle-edit="toggleEdit"
 				@remove-linked-request="removeLinkedRequest"
 			/>
@@ -80,7 +82,7 @@ const updateReagents = async () => {
 				:order="props.order"
 				:is-edit="props.isEdit"
 				:linked-requests="linkedRequests"
-				:set-order="props.setOrder"
+				@set-order="setOrder"
 				@toggle-edit="toggleEdit"
 			/>
 			<div v-if="isEdit" class="btn-container">

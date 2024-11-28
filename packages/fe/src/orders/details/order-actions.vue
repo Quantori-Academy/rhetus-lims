@@ -9,10 +9,9 @@ import { $confirm } from '../../lib/utils/feedback/confirm-msg';
 
 const props = defineProps({
 	order: { type: Object, default: null },
-	isEdit: { type: Boolean, default: false },
-	setOrder: { type: Function, default: null }
+	isEdit: { type: Boolean, default: false }
 });
-
+const emit = defineEmits(['set-order', 'cancel-edit']);
 const isPending = computed(() => props.order && props.order.status === `pending`);
 const statusBtn = computed(() => actions.value[0] || {});
 const dropdownBtn = computed(() => actions.value.slice(1));
@@ -34,7 +33,7 @@ const actions = computed(() => {
 	}
 	return buttons;
 });
-const emit = defineEmits(['cancel-edit']);
+
 const cancelEdit = () => {
 	emit('cancel-edit');
 };
@@ -66,7 +65,7 @@ const changeStatus = async status => {
 			message: response.message,
 			type: 'success'
 		});
-		await props.setOrder(props.order.id);
+		emit('set-order', props.order.id);
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Failed to update order status');
 	}

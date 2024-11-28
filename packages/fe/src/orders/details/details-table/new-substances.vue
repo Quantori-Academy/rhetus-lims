@@ -43,12 +43,11 @@ const props = defineProps({
 	isEdit: {
 		type: Boolean,
 		default: false
-	},
-	setOrder: { type: Function, default: null }
+	}
 });
 
 const order = toRef(props, 'order');
-
+const emit = defineEmits(['set-order']);
 watch(searchQuery, newValue => {
 	try {
 		if (
@@ -123,7 +122,7 @@ const onReagentSelect = async selectedRequest => {
 		// test id on prod
 		const response = await $api.orders.addItemToOrder(order.value.id, body);
 		if (response.status === 'success') {
-			await props.setOrder(order.value.id);
+			emit('set-order', props.order.id);
 		}
 		searchQuery.value = '';
 	} catch (error) {
@@ -156,7 +155,7 @@ const addNewReagent = async () => {
 	};
 	const response = await $api.orders.addItemToOrder(order.value.id, body);
 	if (response.status === 'success') {
-		await props.setOrder(order.value.id);
+		emit('set-order', props.order.id);
 	}
 	searchQuery.value = '';
 	substanceFormEl.value.resetFields();
