@@ -160,8 +160,8 @@ const handleStorageChange = row => {
 					</template>
 				</el-table-column>
 				<el-table-column label="Status" width="150">
-					<el-tag size="large" type="success" effect="light">{{
-						hasStorage ? `ASSIGNED` : `Not filASSIGNEDled`
+					<el-tag size="large" :type="hasStorage ? `info` : `success`" effect="light">{{
+						hasStorage ? `NOT ASSIGNED` : `ASSIGNED`
 					}}</el-tag>
 				</el-table-column>
 			</el-table>
