@@ -66,7 +66,7 @@ export const routes = [
 			breadcrumb: route => [
 				{ name: 'Home', path: '/' },
 				{ name: 'Users', path: '/users/list' },
-				{ name: `${route.params.id}`, path: '' }
+				{ name: 'User', path: '' }
 			]
 		}
 	},
@@ -81,7 +81,7 @@ export const routes = [
 			breadcrumb: route => [
 				{ name: 'Home', path: '/' },
 				{ name: 'Users', path: '/users/list' },
-				{ name: `${route.params.id}`, path: '' }
+				{ name: 'User', path: '' }
 			]
 		}
 	},
@@ -130,10 +130,10 @@ export const routes = [
 		props: true,
 		meta: {
 			title: 'Sample Details',
-			breadcrumb: route => [
+			breadcrumb: [
 				{ name: 'Home', path: '/' },
 				{ name: 'Substances', path: '/substances/list' },
-				{ name: `${route.params.id}`, path: '' }
+				{ name: 'Sample', path: '' }
 			]
 		}
 	},
@@ -144,10 +144,10 @@ export const routes = [
 		props: true,
 		meta: {
 			title: 'Edit Sample Details',
-			breadcrumb: route => [
+			breadcrumb: [
 				{ name: 'Home', path: '/' },
 				{ name: 'Substances', path: '/substances/list' },
-				{ name: `${route.params.id}`, path: '' }
+				{ name: 'Sample', path: '' }
 			]
 		}
 	},
@@ -170,10 +170,10 @@ export const routes = [
 		props: true,
 		meta: {
 			title: 'Storage Details',
-			breadcrumb: route => [
+			breadcrumb: [
 				{ name: 'Home', path: '/' },
 				{ name: 'Storages', path: '/storages/list' },
-				{ name: `${route.params.id}`, path: '' }
+				{ name: 'Storage', path: '' }
 			]
 		}
 	},
@@ -185,10 +185,10 @@ export const routes = [
 		meta: {
 			roles: [roles.ADMIN],
 			title: 'Edit Storage Details',
-			breadcrumb: route => [
+			breadcrumb: [
 				{ name: 'Home', path: '/' },
 				{ name: 'Storages', path: '/storages/list' },
-				{ name: `${route.params.id}`, path: '' }
+				{ name: 'Storage', path: '' }
 			]
 		}
 	},
@@ -225,10 +225,10 @@ export const routes = [
 		props: true,
 		meta: {
 			title: 'Reagent Details',
-			breadcrumb: route => [
+			breadcrumb: [
 				{ name: 'Home', path: '/' },
 				{ name: 'Substances', path: '/substances/list' },
-				{ name: `${route.params.id}`, path: '' }
+				{ name: 'Reagent', path: '' }
 			]
 		}
 	},
@@ -239,10 +239,10 @@ export const routes = [
 		props: true,
 		meta: {
 			title: 'Edit Reagent Details',
-			breadcrumb: route => [
+			breadcrumb: [
 				{ name: 'Home', path: '/' },
 				{ name: 'Substances', path: '/substances/list' },
-				{ name: `${route.params.id}`, path: '' }
+				{ name: 'Reagent', path: '' }
 			]
 		}
 	},
@@ -318,10 +318,10 @@ export const routes = [
 		props: true,
 		meta: {
 			title: 'Request Details',
-			breadcrumb: route => [
+			breadcrumb: [
 				{ name: 'Home', path: '/' },
 				{ name: 'Requests', path: '/requests/list' },
-				{ name: `${route.params.id}`, path: '' }
+				{ name: 'Request', path: '' }
 			]
 		}
 	},
@@ -332,10 +332,10 @@ export const routes = [
 		props: true,
 		meta: {
 			title: 'Edit Request',
-			breadcrumb: route => [
+			breadcrumb: [
 				{ name: 'Home', path: '/' },
 				{ name: 'Requests', path: '/requests/list' },
-				{ name: `${route.params.id}`, path: '' }
+				{ name: 'Request', path: '' }
 			]
 		}
 	},
@@ -346,10 +346,10 @@ export const routes = [
 		props: true,
 		meta: {
 			title: 'Order Details',
-			breadcrumb: route => [
+			breadcrumb: [
 				{ name: 'Home', path: '/' },
 				{ name: 'Orders', path: '/orders/list' },
-				{ name: `${route.params.id}`, path: '' }
+				{ name: 'Order', path: '' }
 			]
 		}
 	},
@@ -373,10 +373,10 @@ export const routes = [
 		props: true,
 		meta: {
 			title: 'Edit Order Details',
-			breadcrumb: route => [
+			breadcrumb: [
 				{ name: 'Home', path: '/' },
 				{ name: 'Orders', path: '/orders/list' },
-				{ name: `${route.params.id}`, path: '' }
+				{ name: 'Order', path: '' }
 			]
 		}
 	},
