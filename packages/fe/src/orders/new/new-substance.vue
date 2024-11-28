@@ -1,5 +1,5 @@
 <script setup>
-import { ref, useTemplateRef, onMounted, watch } from 'vue';
+import { ref, useTemplateRef, onMounted, watch, computed } from 'vue';
 import {
 	ElForm,
 	ElButton,
@@ -11,7 +11,7 @@ import {
 } from 'element-plus';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { quantityUnits } from '../../lib/constants/quantity-units.js';
-import { newSubstanceRef, newSubstanceRules } from './constants.js';
+import { newSubstanceRef, generateNewSubstanceRules } from './constants.js';
 import { $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $api } from '../../lib/api/index.js';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
@@ -21,7 +21,7 @@ const props = defineProps({
 });
 const newSubstanceEl = useTemplateRef('new-substance');
 const newSubstance = ref(newSubstanceRef);
-const rules = ref(newSubstanceRules);
+const rules = computed(() => generateNewSubstanceRules());
 const searchQuery = ref('');
 const suggestedSubstances = ref([]);
 watch(searchQuery, newVal => {
@@ -48,7 +48,7 @@ const fetchSubstances = async () => {
 const addNewReagent = async () => {
 	if (!(await $isFormValid(newSubstanceEl))) return;
 	const newReagent = {
-		name: newSubstance.value.name,
+		reagentName: newSubstance.value.reagentName,
 		quantity: newSubstance.value.quantity,
 		amount: newSubstance.value.amount,
 		quantityUnit: newSubstance.value.quantityUnit
@@ -98,7 +98,7 @@ const fetchSubstanceSuggestions = async (queryString, callback) => {
 
 <template>
 	<el-form ref="new-substance" :model="newSubstance" class="row" :rules="rules">
-		<el-form-item prop="name">
+		<el-form-item prop="reagentName">
 			<span class="desktop">Name</span>
 			<el-autocomplete
 				v-model="searchQuery"

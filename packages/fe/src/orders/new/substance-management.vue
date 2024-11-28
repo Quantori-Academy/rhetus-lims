@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import {
 	ElInput,
 	ElForm,
@@ -124,6 +124,7 @@ const bulkUpdate = async () => {
 };
 
 const handleInputChange = (index, field, newValue) => {
+	console.log(newValue);
 	const item = combinedItems.value[index];
 	emit('update-item', {
 		index,
@@ -177,12 +178,12 @@ const handleInputChange = (index, field, newValue) => {
 						{{ request.quantityUnit }} ({{ request.amount }})
 					</el-tag>
 				</div>
-				<el-form-item :prop="`combinedItems.${index}.reagentName`">
+				<el-form-item :prop="`combinedItems.${index}.name`">
 					<span class="desktop">Name</span>
 					<el-input
-						v-model="singleItem.reagentName"
+						v-model="singleItem.name"
 						placeholder="Enter name"
-						@input="() => handleInputChange(index, 'reagentName', singleItem.reagentName)"
+						@input="() => handleInputChange(index, 'name', singleItem.name)"
 					/>
 				</el-form-item>
 				<el-form-item :prop="`combinedItems.${index}.quantityUnit`">

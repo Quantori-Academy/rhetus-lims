@@ -89,17 +89,59 @@ function removeReagent(index) {
 		form.value.reagents.splice(index, 1);
 	}
 }
+const extractRelevantProperties = () => {
+	const selectedReagents = form.value.reagents.map(({ id, amount, quantity, quantityUnit }) => ({
+		id,
+		amount,
+		quantity,
+		quantityUnit
+	}));
+	return selectedReagents;
+};
+
+const extractNewReagentProperties = () => {
+	const selectedNewReagents = form.value.newReagents.map(
+		({
+			reagentName,
+			casNumber,
+			producer,
+			catalogId,
+			catalogLink,
+			unitPrice,
+			quantityUnit,
+			quantity,
+			description,
+			structure,
+			amount
+		}) => ({
+			name: reagentName,
+			casNumber,
+			producer,
+			catalogId,
+			catalogLink,
+			unitPrice,
+			quantityUnit,
+			quantity,
+			description,
+			structure,
+			amount
+		})
+	);
+	return selectedNewReagents;
+};
 
 async function submit() {
 	if (!(await $isFormValid(formEl))) return;
 	isSaving.value = true;
+	const relevantData = extractRelevantProperties();
+	const relevantDataNew = extractNewReagentProperties();
 	try {
 		const body = {
 			title: form.value.title,
 			seller: form.value.seller,
-			reagents: [...form.value.reagents],
+			reagents: [...relevantData],
 			reagentRequests: [...form.value.reagentRequests],
-			newReagents: [...form.value.newReagents]
+			newReagents: [...relevantDataNew]
 		};
 		const response = await $api.orders.addOrder(body);
 		$notify({ message: response.message, type: 'success' });
@@ -136,7 +178,7 @@ const bulkUpdate = async newOrders => {
 		}
 	});
 	submit();
-	console.log('ITEMS ADDED', form.value);
+	console.log('ITEMS ADDED', form.value.reagents);
 };
 
 const handleUpdateItem = ({ index, type, field, newValue }) => {

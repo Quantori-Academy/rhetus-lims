@@ -29,7 +29,14 @@ export const generateSubstanceRules = combinedItems => {
 	});
 	return rules;
 };
-
+export const generateNewSubstanceRules = () => {
+	return {
+		reagentName: [requiredRule('Name')],
+		quantity: [numberFieldRule('Quantity')],
+		quantityUnit: [requiredRule('Unit')],
+		amount: [numberFieldRule('Amount')]
+	};
+};
 export const notEmptyArrayRule = {
 	validator: (rule, value) => {
 		if (value.length === 0) {
@@ -48,13 +55,13 @@ export const formRef = {
 };
 
 export const newSubstanceRef = {
-	name: '',
+	reagentName: '',
 	quantityUnit: '',
 	quantity: 1,
 	amount: 1
 };
 export const newSubstanceRules = {
-	name: [requiredRule('Name')],
+	reagentName: [requiredRule('dd')],
 	quantityUnit: [requiredRule('Unit')],
 	quantity: [requiredRule('Quantity')],
 	amount: [requiredRule('Amount')]
@@ -72,7 +79,7 @@ export const reagentRules = {
 	amount: [requiredRule('Amount')]
 };
 export const substanceRules = {
-	name: [requiredRule('Name')],
+	reagentName: [requiredRule('Name')],
 	quantityUnit: [requiredRule('Unit')],
 	quantity: [requiredRule('Quantity')],
 	amount: [requiredRule('Amount')]
