@@ -332,6 +332,31 @@ async function orders(server, options) {
 			return reply.code(500).send(err);
 		}
 	}
+
+	server.route({
+		method: 'GET',
+		path: options.prefix + 'orders/history/:id',
+		preValidation: [server.authenticate, server.officer],
+		schema: schema.getOrdersHistorySchema,
+		handler: onGetOrderHistory
+	});
+
+	async function onGetOrderHistory(req, reply) {
+		try {
+			const orderId = req.params.id;
+
+			const order = await server.ordersService.getOrderById(orderId);
+
+			if (!order) {
+				return reply.code(404).send({ status: 'error', message: `No such order` });
+			}
+
+			const data = await server.ordersService.getHistoryChanges(orderId);
+			return reply.code(200).send(data);
+		} catch (err) {
+			return reply.code(500).send(err);
+		}
+	}
 }
 
 export default fp(orders);

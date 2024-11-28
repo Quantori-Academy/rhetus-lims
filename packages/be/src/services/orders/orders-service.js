@@ -49,6 +49,8 @@ async function ordersService(server) {
 
 				await server.orderItemsService.orderItemsInsert(orderId, formattedOrderItems, tx, userId);
 
+				await server.ordersService.insertStatusInHistory(orderId, OrderStatus.PENDING, userId);
+
 					return { orderTitle, orderId };
 				});
 
@@ -170,6 +172,13 @@ async function ordersService(server) {
 					.returning({ orderTitle: schema.orders.title });
 
 				await server.ordersService.resetOrdersItems(id, tx, userId);
+
+				await server.db.insert(schema.statusesHistory).values({
+					userId,
+					orderId: id,
+					status: OrderStatus.PENDING,
+					isDeleted: true
+				});
 
 				return orderTitle;
 			});
@@ -345,8 +354,8 @@ async function ordersService(server) {
 				const orderTitle = await server.ordersService.updateOrderStatus(
 					orderId,
 					nextStatus,
-					tx,
-					userId
+					userId,
+					tx
 				);
 				await server.ordersService.resetOrdersItems(orderId, tx, userId);
 				return orderTitle;
@@ -410,6 +419,28 @@ async function ordersService(server) {
 				orderId,
 				status
 			});
+		},
+
+		getHistoryChanges: async orderId => {
+			const histories = await server.db
+				.select({
+					id: sql`${schema.statusesHistory.id}`.as('historyId'),
+					user: {
+						userId: schema.users.id,
+						userFirstName: schema.users.firstName,
+						userLastName: schema.users.lastName
+					},
+					status: schema.statusesHistory.status,
+					changeReason: schema.statusesHistory.changeReason,
+					isDeleted: schema.statusesHistory.isDeleted,
+					modifiedDate: schema.statusesHistory.createdAt
+				})
+				.from(schema.statusesHistory)
+				.innerJoin(schema.users, eq(schema.statusesHistory.userId, schema.users.id))
+				.where(eq(schema.statusesHistory.orderId, orderId))
+				.orderBy(schema.statusesHistory.createdAt, 'asc');
+
+			return { histories };
 		}
 	});
 }
