@@ -257,6 +257,7 @@ async function orders(server, options) {
 	async function onChangeStatus(req, reply) {
 		const orderId = req.params.id;
 		const order = await server.ordersService.getOrderById(orderId);
+		const authenticatedUserId = Number(req.session.user.id);
 
 		if (!order) {
 			return reply.code(404).send({ status: 'error', message: `No such order` });
@@ -269,10 +270,14 @@ async function orders(server, options) {
 			});
 		}
 
-		const orderTitle = await server.ordersService.orderStatusChange(orderId, {
-			...req.body,
-			orderStatus: order.status
-		});
+		const orderTitle = await server.ordersService.orderStatusChange(
+			orderId,
+			{
+				...req.body,
+				orderStatus: order.status
+			},
+			authenticatedUserId
+		);
 
 		return reply
 			.code(200)

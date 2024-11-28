@@ -10,9 +10,7 @@ import { isValidSmilesQuery } from '../../lib/db/structure/utils/is-valid-smiles
 async function substancesService(server) {
 	server.decorate('substancesService', {
 		getSubstancesQuery: options => {
-			const reagentsQuery = server.reagentsService.getReagentsQuery({
-				relevance: getRelevanceScore('structure', options?.smiles || '').as('relevance')
-			});
+			const reagentsQuery = server.substancesService.getSubstanceQueryByOrderOption(options);
 			const samplesQuery = server.samplesService.getSamplesQuery({
 				relevance: getRelevanceScore('structure', options?.smiles || '').as('relevance')
 			});
@@ -34,6 +32,7 @@ async function substancesService(server) {
 			query = applySorting(query, sort, 'substances');
 
 			const count = await query;
+			console.log({ QUERY: query.toSQL() });
 			const substances = await query.limit(limit).offset(offset);
 
 			return {
@@ -256,6 +255,18 @@ async function substancesService(server) {
 				}
 			}
 			return false;
+		},
+
+		// eslint-disable-next-line complexity
+		getSubstanceQueryByOrderOption: options => {
+			const isOrderOption = options && 'order' in options;
+			return isOrderOption
+				? server.reagentsService.getReagentsQueryForOrders({
+						relevance: getRelevanceScore('structure', options?.smiles || '').as('relevance')
+					})
+				: server.reagentsService.getReagentsQuery({
+						relevance: getRelevanceScore('structure', options?.smiles || '').as('relevance')
+					});
 		}
 	});
 }
