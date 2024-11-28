@@ -241,7 +241,7 @@ async function ordersService(server) {
 					break;
 				case OrderStatus.FULFILLED:
 					updatedOrderTitle = await server.db.transaction(async tx => {
-						const [{ orderTitle }] = await server.ordersService.updateOrderStatus(
+						const orderTitle = await server.ordersService.updateOrderStatus(
 							orderId,
 							nextStatus,
 							tx
@@ -301,7 +301,7 @@ async function ordersService(server) {
 					);
 
 					updatedOrderTitle = await server.db.transaction(async tx => {
-						const [{ orderTitle }] = await server.ordersService.updateOrderStatus(
+						const orderTitle = await server.ordersService.updateOrderStatus(
 							orderId,
 							nextStatus,
 							tx
