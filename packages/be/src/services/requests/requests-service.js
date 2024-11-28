@@ -1,4 +1,4 @@
-import { eq, and, aliasedTable } from 'drizzle-orm';
+import { eq, and, aliasedTable, sql } from 'drizzle-orm';
 import fp from 'fastify-plugin';
 import { schema } from '../../lib/db/schema/index.js';
 import { RequestStatus } from '../../lib/db/schema/requests.js';
@@ -44,13 +44,20 @@ async function requestsService(server) {
 					quantityUnit: formatMapping.quantityUnit(quantityUnit),
 					amount
 				})
-				.returning({ reagentName: schema.requests.reagentName, id: schema.requests.id });
+				.returning({ reagentName: schema.requests.reagentName, id: schema.requests.id, requestId: schema.requests.id });
 
 			await server.notificationsService.addNotification({
 				requestId: result[0].id,
 				message: `New request for '${result[0].reagentName}' created.`
 			});
 
+			if (result.length) {
+				await server.requestsService.insertStatusInHistory(
+					result[0].requestId,
+					{ status: RequestStatus.PENDING },
+					userId
+				);
+			}
 			return result.length ? result[0].reagentName : null;
 		},
 
@@ -225,7 +232,7 @@ async function requestsService(server) {
 		},
 
 		handleRequestSoftDelete: async requestData => {
-			const { requestId, requestStatus } = requestData;
+			const { requestId, requestStatus, userId } = requestData;
 
 			if (requestStatus !== RequestStatus.PENDING) {
 				return {
@@ -237,6 +244,13 @@ async function requestsService(server) {
 
 			const reagentName = await server.requestsService.updateRequest(requestId, {
 				deleted: 'true'
+			});
+
+			await server.db.insert(schema.statusesHistory).values({
+				userId,
+				requestId,
+				status: requestStatus,
+				isDeleted: true
 			});
 
 			return {
@@ -293,6 +307,28 @@ async function requestsService(server) {
 				status: data.status,
 				changeReason: data?.poComment
 			});
+		},
+
+		getHistoryChanges: async requestId => {
+			const histories = await server.db
+				.select({
+					id: sql`${schema.statusesHistory.id}`.as('historyId'),
+					user: {
+						userId: schema.users.id,
+						userFirstName: schema.users.firstName,
+						userLastName: schema.users.lastName
+					},
+					status: schema.statusesHistory.status,
+					changeReason: schema.statusesHistory.changeReason,
+					isDeleted: schema.statusesHistory.isDeleted,
+					modifiedDate: schema.statusesHistory.createdAt
+				})
+				.from(schema.statusesHistory)
+				.innerJoin(schema.users, eq(schema.statusesHistory.userId, schema.users.id))
+				.where(eq(schema.statusesHistory.requestId, requestId))
+				.orderBy(schema.statusesHistory.createdAt, 'asc');
+
+			return { histories };
 		}
 	});
 }

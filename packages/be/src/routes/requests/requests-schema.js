@@ -1,5 +1,7 @@
 import S from 'fluent-json-schema';
 import { getOrderSchema } from '../orders/orders-schema.js';
+import { RequestStatus } from '../../lib/db/schema/requests.js';
+import { User } from '../users/users-schema.js';
 
 const statusMessage = S.object()
 	.prop('status', S.string().required())
@@ -116,4 +118,34 @@ const cancelRequest = {
 	}
 };
 
-export { createRequest, getRequest, getRequests, deleteRequest, updateRequest, cancelRequest };
+const HistorySchema = S.object()
+	.prop('id', S.string().format(S.FORMATS.UUID).required())
+	.prop('user', {
+		userId: User.id,
+		userFirstName: User.firstName,
+		userLastName: User.lastName
+	})
+	.required()
+	.prop('status', S.string().enum(Object.values(RequestStatus)).required())
+	.prop('changeReason', S.anyOf([S.string(), S.null()]))
+	.prop('isDeleted', S.boolean())
+	.prop('modifiedDate', S.string().format(S.FORMATS.DATE_TIME).required());
+
+const getRequestsHistorySchema = {
+	security: [{ Session: [] }],
+	params: S.object().prop('id', S.string()),
+	response: {
+		200: S.object().prop('histories', S.array().items(HistorySchema)),
+		500: statusMessage
+	}
+};
+
+export {
+	createRequest,
+	getRequest,
+	getRequests,
+	deleteRequest,
+	updateRequest,
+	cancelRequest,
+	getRequestsHistorySchema
+};
