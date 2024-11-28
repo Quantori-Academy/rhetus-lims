@@ -164,7 +164,8 @@ async function orderItemsService(server) {
 						await server.requestsService.insertStatusInHistory(
 							requestId,
 							{ status: RequestStatus.ORDERED },
-							userId
+							userId,
+							tx
 						);
 					}
 
@@ -238,7 +239,8 @@ async function orderItemsService(server) {
 							server.requestsService.insertStatusInHistory(
 								requestId,
 								{ status: RequestStatus.PENDING },
-								userId
+								userId,
+								tx
 							)
 						)
 					);

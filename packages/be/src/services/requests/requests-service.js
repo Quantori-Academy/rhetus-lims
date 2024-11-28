@@ -46,19 +46,20 @@ async function requestsService(server) {
 				})
 				.returning({ reagentName: schema.requests.reagentName, id: schema.requests.id });
 
+			if (!result.length) return null;
+
 			await server.notificationsService.addNotification({
 				requestId: result[0].id,
 				message: `New request for '${result[0].reagentName}' created.`
 			});
 
-			if (result.length) {
-				await server.requestsService.insertStatusInHistory(
-					result[0].id,
-					{ status: RequestStatus.PENDING },
-					userId
-				);
-			}
-			return result.length ? result[0].reagentName : null;
+			await server.requestsService.insertStatusInHistory(
+				result[0].id,
+				{ status: RequestStatus.PENDING },
+				userId
+			);
+
+			return result[0].reagentName;
 		},
 
 		getRequestsQuery: () => {
@@ -266,7 +267,12 @@ async function requestsService(server) {
 				.set({ requestStatus: newStatus })
 				.where(eq(schema.requests.orderId, orderId))
 				.returning({ requestId: schema.requests.id });
-			await server.requestsService.insertStatusInHistory(requestId, { status: newStatus }, userId);
+			await server.requestsService.insertStatusInHistory(
+				requestId,
+				{ status: newStatus },
+				userId,
+				tx
+			);
 			return requestId;
 		},
 
@@ -300,8 +306,9 @@ async function requestsService(server) {
 			return result.length ? result[0].reagentName : null;
 		},
 
-		insertStatusInHistory: async (requestId, data, userId) => {
-			return await server.db.insert(schema.statusesHistory).values({
+		insertStatusInHistory: async (requestId, data, userId, tx = null) => {
+			const target = tx ?? server.db;
+			return await target.insert(schema.statusesHistory).values({
 				userId,
 				requestId,
 				status: data.status,

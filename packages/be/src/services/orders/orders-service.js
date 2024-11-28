@@ -173,7 +173,7 @@ async function ordersService(server) {
 
 				await server.ordersService.resetOrdersItems(id, tx, userId);
 
-				await server.db.insert(schema.statusesHistory).values({
+				await tx.insert(schema.statusesHistory).values({
 					userId,
 					orderId: id,
 					status: OrderStatus.PENDING,
@@ -187,8 +187,6 @@ async function ordersService(server) {
 		},
 
 		updateOrderStatus: async (orderId, nextStatus, userId, tx = null) => {
-			await server.ordersService.insertStatusInHistory(orderId, nextStatus, userId);
-
 			const target = tx ?? server.db;
 			const [{ orderTitle }] = await target
 				.update(schema.orders)
@@ -197,6 +195,8 @@ async function ordersService(server) {
 				})
 				.where(eq(schema.orders.id, orderId))
 				.returning({ orderTitle: schema.orders.title });
+
+			await server.ordersService.insertStatusInHistory(orderId, nextStatus, userId, tx);
 
 			return orderTitle;
 		},
@@ -404,7 +404,8 @@ async function ordersService(server) {
 						server.requestsService.insertStatusInHistory(
 							requestId,
 							{ status: RequestStatus.PENDING },
-							userId
+							userId,
+							tx
 						)
 					)
 				);
@@ -413,8 +414,9 @@ async function ordersService(server) {
 			await tx.delete(schema.ordersItems).where(eq(schema.ordersItems.orderId, orderId));
 		},
 
-		insertStatusInHistory: async (orderId, status, userId) => {
-			return await server.db.insert(schema.statusesHistory).values({
+		insertStatusInHistory: async (orderId, status, userId, tx = null) => {
+			const target = tx ?? server.db;
+			return await target.insert(schema.statusesHistory).values({
 				userId,
 				orderId,
 				status
