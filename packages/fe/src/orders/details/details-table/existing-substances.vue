@@ -27,7 +27,6 @@ const props = defineProps({
 	},
 	linkedRequests: { type: Array, default: null }
 });
-<<<<<<< HEAD
 const emit = defineEmits(['set-order']);
 const createChangeTrackerEntry = item => {
 	return Object.keys(item).reduce((acc, field) => {
@@ -46,14 +45,6 @@ watch(
 		}
 	},
 	{ deep: true }
-=======
-
-const isOrderValid = computed(() => props.order.reagents.length > 0);
-const changeTracker = ref(
-	props.order.reagents.map(request =>
-		Object.fromEntries(Object.keys(request).map(key => [key, false]))
-	)
->>>>>>> 037952c (emit passed functions)
 );
 const changes = computed(() => {
 	return getChangedItems();
@@ -77,10 +68,6 @@ const createPropertyWatcher = (request, key, index) => {
 	);
 };
 
-const emit = defineEmits(['set-order']);
-const setOrder = id => {
-	emit('set-order', id);
-};
 const watchRequestProperties = (request, index) => {
 	Object.keys(request).forEach(key => createPropertyWatcher(request, key, index));
 };
@@ -98,29 +85,6 @@ const getChangedItems = () => {
 		return Object.values(changeTracker.value[index]).includes(true);
 	});
 };
-<<<<<<< HEAD
-=======
-const updateReagents = async () => {
-	if (!checkForChanges()) {
-		// temporary
-		setOrder(props.order.id);
-		return;
-	}
-	let changedSubstances = getChangedItems();
-	try {
-		const body = {
-			orderItems: [...changedSubstances]
-		};
-		console.log(body);
-		// const response = await $api.orders.updateItemInOrder(props.order.id, body);
-		// if (response.status === 'success') {
-		// 	await props.setOrder(props.order.id);
-		// }
-	} catch (error) {
-		$notifyUserAboutError(error);
-	}
-};
->>>>>>> 037952c (emit passed functions)
 
 const removeReagent = async selectedReagent => {
 	try {
@@ -128,18 +92,14 @@ const removeReagent = async selectedReagent => {
 		const body = { reagentRequests: [], reagents: [selectedReagent.tempId] };
 		const response = await $api.orders.removeItemFromOrder(props.order.id, body);
 		if (response.status === 'success') {
-<<<<<<< HEAD
-			setOrder();
-=======
 			setOrder(props.order.id);
->>>>>>> 037952c (emit passed functions)
 		}
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
 };
-const setOrder = () => {
-	emit('set-order', props.order.id);
+const setOrder = id => {
+	emit('set-order', id);
 };
 </script>
 
@@ -210,13 +170,5 @@ const setOrder = () => {
 			</div>
 		</div>
 		<new-substances :order="props.order" :is-edit="props.isEdit" @set-order="setOrder" />
-<<<<<<< HEAD
-=======
-		<div v-if="isEdit" class="btn-container">
-			<el-button type="primary" :disabled="!isOrderValid" @click="updateReagents"
-				>Update Reagents</el-button
-			>
-		</div>
->>>>>>> 037952c (emit passed functions)
 	</el-form>
 </template>

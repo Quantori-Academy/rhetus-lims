@@ -45,10 +45,7 @@ const props = defineProps({
 		default: false
 	}
 });
-<<<<<<< HEAD
 
-=======
->>>>>>> 037952c (emit passed functions)
 const order = toRef(props, 'order');
 const emit = defineEmits(['set-order']);
 watch(searchQuery, newValue => {
@@ -125,11 +122,7 @@ const onReagentSelect = async selectedRequest => {
 		// test id on prod
 		const response = await $api.orders.addItemToOrder(order.value.id, body);
 		if (response.status === 'success') {
-<<<<<<< HEAD
-			emit('set-order', props.order.id);
-=======
 			setOrder(order.value.id);
->>>>>>> 037952c (emit passed functions)
 		}
 		searchQuery.value = '';
 	} catch (error) {
@@ -162,7 +155,7 @@ const addNewReagent = async () => {
 	};
 	const response = await $api.orders.addItemToOrder(order.value.id, body);
 	if (response.status === 'success') {
-		emit('set-order', props.order.id);
+		setOrder(props.order.id);
 	}
 	searchQuery.value = '';
 	substanceFormEl.value.resetFields();

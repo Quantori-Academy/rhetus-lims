@@ -169,12 +169,8 @@ const removeLinkedRequest = async selectedRequest => {
 				:is-edit="isEdit"
 				:linked-requests="linkedRequests"
 				@set-order="setOrder"
-<<<<<<< HEAD
-				@toggle-edit="handleToggleEdit"
-				@remove-linked-request="removeLinkedRequest"
-=======
 				@toggle-off-edit="toggleOffEdit"
->>>>>>> 037952c (emit passed functions)
+				@remove-linked-request="removeLinkedRequest"
 			/>
 		</div>
 

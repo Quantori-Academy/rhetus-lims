@@ -16,7 +16,6 @@ const props = defineProps({
 		type: Boolean,
 		default: false
 	},
-<<<<<<< HEAD
 	toggleEdit: { type: Function, default: null },
 	linkedRequests: { type: Array, default: null }
 });
@@ -25,9 +24,15 @@ const childTwoRef = ref(null);
 const isOrderValid = computed(
 	() => [...props.order.reagents, ...props.order.reagentRequests].length > 0
 );
-const emit = defineEmits(['remove-linked-request', 'set-order']);
+const emit = defineEmits(['remove-linked-request', 'set-order', 'toggle-off-edit']);
 const removeLinkedRequest = selectedRequest => {
 	emit('remove-linked-request', selectedRequest);
+};
+const toggleOffEdit = () => {
+	emit('toggle-off-edit');
+};
+const setOrder = id => {
+	emit('set-order', id);
 };
 const updateReagents = async () => {
 	const changesFromChildOne = childOneRef.value.getChanges();
@@ -47,28 +52,11 @@ const updateReagents = async () => {
 		};
 		const response = await $api.orders.updateItemInOrder(props.order.id, body);
 		if (response.status === 'success') {
-			setOrder();
+			setOrder(props.order.id);
 		}
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
-};
-
-const setOrder = () => {
-	emit('set-order', props.order.id);
-=======
-	// setOrder: { type: Function, default: null },
-	linkedRequests: { type: Array, default: null }
-});
-
-const emit = defineEmits(['toggle-off-edit', 'set-order']);
-
-const toggleOffEdit = () => {
-	emit('toggle-off-edit');
-};
-const setOrder = id => {
-	emit('set-order', id);
->>>>>>> 037952c (emit passed functions)
 };
 </script>
 
@@ -88,13 +76,9 @@ const setOrder = id => {
 				:order="props.order"
 				:is-edit="props.isEdit"
 				:linked-requests="linkedRequests"
-<<<<<<< HEAD
-				@toggle-edit="toggleEdit"
 				@remove-linked-request="removeLinkedRequest"
-=======
-				:set-order="setOrder"
+				@set-order="setOrder"
 				@toggle-off-edit="toggleOffEdit"
->>>>>>> 037952c (emit passed functions)
 			/>
 			<existing-substances
 				ref="childTwoRef"
@@ -102,10 +86,7 @@ const setOrder = id => {
 				:is-edit="props.isEdit"
 				:linked-requests="linkedRequests"
 				@set-order="setOrder"
-<<<<<<< HEAD
-				@toggle-edit="toggleEdit"
-=======
->>>>>>> 037952c (emit passed functions)
+				@toggle-off-edit="toggleOffEdit"
 			/>
 			<div v-if="isEdit" class="btn-container">
 				<el-button type="primary" :disabled="!isOrderValid" @click="updateReagents"
