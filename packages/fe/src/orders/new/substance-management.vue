@@ -200,6 +200,7 @@ const handleInputChange = (index, field, newValue) => {
 					<span class="desktop">Quantity</span>
 					<el-input-number
 						v-model="singleItem.quantity"
+						:min="1"
 						placeholder="Enter quantity"
 						@input="() => handleInputChange(index, 'quantity', singleItem.quantity)"
 					/>
@@ -208,6 +209,7 @@ const handleInputChange = (index, field, newValue) => {
 					<span class="desktop">Amount</span>
 					<el-input-number
 						v-model="singleItem.amount"
+						:min="1"
 						placeholder="Enter amount"
 						@input="() => handleInputChange(index, 'amount', singleItem.amount)"
 					/>
