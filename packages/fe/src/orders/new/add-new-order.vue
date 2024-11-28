@@ -138,6 +138,16 @@ const bulkUpdate = async newOrders => {
 	submit();
 	console.log('ITEMS ADDED', form.value);
 };
+
+const handleUpdateItem = ({ index, type, field, newValue }) => {
+	if (type === 'reagentRequests') {
+		form.value.reagentRequests[index][field] = newValue;
+	} else if (type === 'reagents') {
+		form.value.reagents[index][field] = newValue;
+	} else if (type === 'newReagents') {
+		form.value.newReagents[index][field] = newValue;
+	}
+};
 </script>
 
 <template>
@@ -160,6 +170,7 @@ const bulkUpdate = async newOrders => {
 				@link-request="linkRequest"
 				@bulk-update="bulkUpdate"
 				@cancel-form="cancelForm"
+				@update-item="handleUpdateItem"
 			/>
 		</el-form>
 	</div>
