@@ -44,7 +44,7 @@ async function requestsService(server) {
 					quantityUnit: formatMapping.quantityUnit(quantityUnit),
 					amount
 				})
-				.returning({ reagentName: schema.requests.reagentName, id: schema.requests.id, requestId: schema.requests.id });
+				.returning({ reagentName: schema.requests.reagentName, id: schema.requests.id });
 
 			await server.notificationsService.addNotification({
 				requestId: result[0].id,
@@ -53,7 +53,7 @@ async function requestsService(server) {
 
 			if (result.length) {
 				await server.requestsService.insertStatusInHistory(
-					result[0].requestId,
+					result[0].id,
 					{ status: RequestStatus.PENDING },
 					userId
 				);

@@ -47,9 +47,7 @@ async function ordersService(server) {
 						})
 						.returning({ orderId: schema.orders.id, orderTitle: schema.orders.title });
 
-				await server.orderItemsService.orderItemsInsert(orderId, formattedOrderItems, tx, userId);
-
-				await server.ordersService.insertStatusInHistory(orderId, OrderStatus.PENDING, userId);
+					await server.orderItemsService.orderItemsInsert(orderId, formattedOrderItems, tx, userId);
 
 					return { orderTitle, orderId };
 				});
@@ -58,6 +56,8 @@ async function ordersService(server) {
 				orderId: createdOrderId,
 				message: `New order '${createdOrderTitle}' created for ${formattedOrderItems.length} item${formattedOrderItems.length > 1 ? 's' : ''} that includes your requests.`
 			});
+
+			await server.ordersService.insertStatusInHistory(createdOrderId, OrderStatus.PENDING, userId);
 
 			return createdOrderTitle;
 		},
