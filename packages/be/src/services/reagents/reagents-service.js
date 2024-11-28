@@ -121,7 +121,7 @@ async function reagentsService(server) {
 					)
 				})
 				.from(schema.reagents)
-				.leftJoin(schema.storages, eq(schema.storages.id, schema.reagents.storageId))
+				.innerJoin(schema.storages, eq(schema.storages.id, schema.reagents.storageId))
 				.leftJoin(schema.ordersReagents, eq(schema.ordersReagents.reagentId, schema.reagents.id))
 				.where(eq(schema.reagents.deleted, false));
 		},
@@ -295,8 +295,7 @@ async function reagentsService(server) {
 		getReagentsFromOrder: async orderId => {
 			const reagents = await server.db
 				.select({
-					reagentId: schema.reagents.id,
-					storageId: schema.reagents.storageId
+					reagentId: schema.reagents.id
 				})
 				.from(schema.reagents)
 				.leftJoin(schema.ordersReagents, eq(schema.ordersReagents.reagentId, schema.reagents.id))
@@ -347,6 +346,63 @@ async function reagentsService(server) {
 				.leftJoin(newStorage, eq(newStorage.id, schema.substancesHistory.targetStorageId))
 				.where(eq(schema.substancesHistory.reagentId, substanceId))
 				.orderBy(schema.substancesHistory.createdAt, 'asc');
+		},
+
+		addStorageToReagentFromOrder: async (reagentId, storageId, userId) => {
+			const storage = await server.storagesService.getStorageById(storageId);
+			if (!storage) {
+				const error = new Error(`No such storage location with id: ${storageId} found`);
+				error.statusCode = 404;
+				throw error;
+			}
+
+			await server.db.transaction(async tx => {
+				await tx
+					.update(schema.reagents)
+					.set({ storageId })
+					.where(eq(schema.reagents.id, reagentId));
+
+				await tx.insert(schema.substancesHistory).values({
+					reagentId,
+					userId,
+					previousStorageId: null,
+					targetStorageId: storageId,
+					actionType: 'storage-update'
+				});
+			});
+		},
+
+		getReagentsQueryForOrders: (extras = {}) => {
+			return server.db
+				.select({
+					id: schema.reagents.id,
+					name: schema.reagents.name,
+					quantityUnit: schema.reagents.quantityUnit,
+					quantity: schema.reagents.quantity,
+					quantityLeft: schema.reagents.quantityLeft,
+					expirationDate: schema.reagents.expirationDate,
+					storageLocation: {
+						id: sql`${schema.storages.id}`.as('storageId'),
+						name: sql`${schema.storages.name}`.as('storageName'),
+						room: sql`${schema.storages.room}`.as('storageRoom'),
+						description: sql`${schema.storages.description}`.as('storageDescription')
+					},
+					structure: schema.reagents.structure,
+					description: schema.reagents.description,
+					category: sql`'reagent'`.as('category'),
+					createdAt: schema.reagents.createdAt,
+					orderId: schema.ordersReagents.orderId,
+					...Object.fromEntries(
+						Object.entries(extras).map(([col, query]) => [
+							col,
+							query === 'schema' ? schema.reagents[col] : query
+						])
+					)
+				})
+				.from(schema.reagents)
+				.leftJoin(schema.storages, eq(schema.storages.id, schema.reagents.storageId))
+				.leftJoin(schema.ordersReagents, eq(schema.ordersReagents.reagentId, schema.reagents.id))
+				.where(eq(schema.reagents.deleted, false));
 		}
 	});
 }

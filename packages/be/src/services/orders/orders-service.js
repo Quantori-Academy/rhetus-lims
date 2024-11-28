@@ -197,8 +197,8 @@ async function ordersService(server) {
 			});
 		},
 
-		orderStatusChange: async (orderId, statusData) => {
-			const { action, orderStatus: currentStatus } = statusData;
+		orderStatusChange: async (orderId, statusDataUpdate, userId) => {
+			const { action, orderStatus: currentStatus, reagents = [] } = statusDataUpdate;
 
 			const nextStatus = server.ordersService.getNextOrderStatus(currentStatus);
 			if (!nextStatus) {
@@ -210,7 +210,12 @@ async function ordersService(server) {
 			let orderTitle;
 
 			if (action === OrderStatusActions.NEXT) {
-				orderTitle = await server.ordersService.handleNextStatus(orderId, nextStatus);
+				orderTitle = await server.ordersService.handleNextStatus(
+					orderId,
+					nextStatus,
+					reagents,
+					userId
+				);
 			}
 
 			if (action === OrderStatusActions.CANCEL) {
@@ -225,9 +230,10 @@ async function ordersService(server) {
 			return orderTitle;
 		},
 
-		handleNextStatus: async (orderId, nextStatus) => {
+		handleNextStatus: async (orderId, nextStatus, reagentsStorageUpdates, userId) => {
 			let updatedOrderTitle;
 			let orderedReagents;
+			const reagentsStoragesUpdateMap = new Map();
 
 			switch (nextStatus) {
 				case OrderStatus.ORDERED:
@@ -235,7 +241,7 @@ async function ordersService(server) {
 					break;
 				case OrderStatus.FULFILLED:
 					updatedOrderTitle = await server.db.transaction(async tx => {
-						const [{ orderTitle }] = await server.ordersService.updateOrderStatus(
+						const orderTitle = await server.ordersService.updateOrderStatus(
 							orderId,
 							nextStatus,
 							tx
@@ -263,16 +269,39 @@ async function ordersService(server) {
 				case OrderStatus.COMPLETED:
 					orderedReagents = await server.reagentsService.getReagentsFromOrder(orderId);
 
-					if (orderedReagents.some(({ storageId }) => !storageId)) {
+					if (!reagentsStorageUpdates.length) {
 						const error = new Error(
-							'You cannot mark this order as completed. There is no storage information in some reagents from this order. Please add storage info.'
+							'There is no information about storages for new reagents. Please check sending values in reagents array!'
 						);
-						error.statusCode = 409;
+						error.statusCode = 403;
 						throw error;
 					}
 
+					if (orderedReagents.length !== reagentsStorageUpdates.length) {
+						const error = new Error(
+							'There is a mismatch between count of created reagents and count in storage updating list. Please check sending values!'
+						);
+						error.statusCode = 403;
+						throw error;
+					}
+
+					reagentsStorageUpdates.forEach(({ id, storageId }) => {
+						reagentsStoragesUpdateMap.set(id, storageId);
+					});
+
+					await Promise.all(
+						orderedReagents.map(async ({ reagentId }) => {
+							const storageId = reagentsStoragesUpdateMap.get(reagentId);
+							return server.reagentsService.addStorageToReagentFromOrder(
+								reagentId,
+								storageId,
+								userId
+							);
+						})
+					);
+
 					updatedOrderTitle = await server.db.transaction(async tx => {
-						const [{ orderTitle }] = await server.ordersService.updateOrderStatus(
+						const orderTitle = await server.ordersService.updateOrderStatus(
 							orderId,
 							nextStatus,
 							tx
@@ -288,10 +317,12 @@ async function ordersService(server) {
 					});
 					break;
 			}
+
 			await server.notificationsService.addNotification({
 				orderId,
 				message: `Statuses for order '${updatedOrderTitle}' and its requests were updated to '${nextStatus}'.`
 			});
+
 			return updatedOrderTitle;
 		},
 

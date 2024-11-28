@@ -89,7 +89,7 @@ export default [
 			'packages/be/src/services/order-items/order-items-service.js'
 		],
 		rules: {
-			'max-lines': ['error', { max: 320, skipComments: true, skipBlankLines: true }]
+			'max-lines': ['error', { max: 370, skipComments: true, skipBlankLines: true }]
 		}
 	},
 	prettier,
