@@ -66,7 +66,7 @@ export const routes = [
 			breadcrumb: route => [
 				{ name: 'Home', path: '/' },
 				{ name: 'Users', path: '/users/list' },
-				{ name: `${route.params.id}`, path: '' }
+				{ name: 'User', path: '' }
 			]
 		}
 	},
@@ -81,7 +81,7 @@ export const routes = [
 			breadcrumb: route => [
 				{ name: 'Home', path: '/' },
 				{ name: 'Users', path: '/users/list' },
-				{ name: `${route.params.id}`, path: '' }
+				{ name: 'User', path: '' }
 			]
 		}
 	},
@@ -132,7 +132,8 @@ export const routes = [
 			title: 'Sample Details',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },
-				{ name: 'Substances', path: '/substances/list' }
+				{ name: 'Substances', path: '/substances/list' },
+				{ name: 'Sample', path: '' }
 			]
 		}
 	},
@@ -145,7 +146,8 @@ export const routes = [
 			title: 'Edit Sample Details',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },
-				{ name: 'Substances', path: '/substances/list' }
+				{ name: 'Substances', path: '/substances/list' },
+				{ name: 'Sample', path: '' }
 			]
 		}
 	},
@@ -170,7 +172,8 @@ export const routes = [
 			title: 'Storage Details',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },
-				{ name: 'Storages', path: '/storages/list' }
+				{ name: 'Storages', path: '/storages/list' },
+				{ name: 'Storage', path: '' }
 			]
 		}
 	},
@@ -184,7 +187,8 @@ export const routes = [
 			title: 'Edit Storage Details',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },
-				{ name: 'Storages', path: '/storages/list' }
+				{ name: 'Storages', path: '/storages/list' },
+				{ name: 'Storage', path: '' }
 			]
 		}
 	},
@@ -223,7 +227,8 @@ export const routes = [
 			title: 'Reagent Details',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },
-				{ name: 'Substances', path: '/substances/list' }
+				{ name: 'Substances', path: '/substances/list' },
+				{ name: 'Reagent', path: '' }
 			]
 		}
 	},
@@ -236,7 +241,8 @@ export const routes = [
 			title: 'Edit Reagent Details',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },
-				{ name: 'Substances', path: '/substances/list' }
+				{ name: 'Substances', path: '/substances/list' },
+				{ name: 'Reagent', path: '' }
 			]
 		}
 	},
@@ -314,7 +320,8 @@ export const routes = [
 			title: 'Request Details',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },
-				{ name: 'Requests', path: '/requests/list' }
+				{ name: 'Requests', path: '/requests/list' },
+				{ name: 'Request', path: '' }
 			]
 		}
 	},
@@ -327,7 +334,8 @@ export const routes = [
 			title: 'Edit Request',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },
-				{ name: 'Requests', path: '/requests/list' }
+				{ name: 'Requests', path: '/requests/list' },
+				{ name: 'Request', path: '' }
 			]
 		}
 	},
@@ -340,7 +348,8 @@ export const routes = [
 			title: 'Order Details',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },
-				{ name: 'Orders', path: '/orders/list' }
+				{ name: 'Orders', path: '/orders/list' },
+				{ name: 'Order', path: '' }
 			]
 		}
 	},
@@ -366,7 +375,8 @@ export const routes = [
 			title: 'Edit Order Details',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },
-				{ name: 'Orders', path: '/orders/list' }
+				{ name: 'Orders', path: '/orders/list' },
+				{ name: 'Order', path: '' }
 			]
 		}
 	},
