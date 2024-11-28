@@ -16,6 +16,7 @@ const props = defineProps({
 		type: Boolean,
 		default: false
 	},
+<<<<<<< HEAD
 	toggleEdit: { type: Function, default: null },
 	linkedRequests: { type: Array, default: null }
 });
@@ -55,6 +56,19 @@ const updateReagents = async () => {
 
 const setOrder = () => {
 	emit('set-order', props.order.id);
+=======
+	// setOrder: { type: Function, default: null },
+	linkedRequests: { type: Array, default: null }
+});
+
+const emit = defineEmits(['toggle-off-edit', 'set-order']);
+
+const toggleOffEdit = () => {
+	emit('toggle-off-edit');
+};
+const setOrder = id => {
+	emit('set-order', id);
+>>>>>>> 037952c (emit passed functions)
 };
 </script>
 
@@ -74,8 +88,13 @@ const setOrder = () => {
 				:order="props.order"
 				:is-edit="props.isEdit"
 				:linked-requests="linkedRequests"
+<<<<<<< HEAD
 				@toggle-edit="toggleEdit"
 				@remove-linked-request="removeLinkedRequest"
+=======
+				:set-order="setOrder"
+				@toggle-off-edit="toggleOffEdit"
+>>>>>>> 037952c (emit passed functions)
 			/>
 			<existing-substances
 				ref="childTwoRef"
@@ -83,7 +102,10 @@ const setOrder = () => {
 				:is-edit="props.isEdit"
 				:linked-requests="linkedRequests"
 				@set-order="setOrder"
+<<<<<<< HEAD
 				@toggle-edit="toggleEdit"
+=======
+>>>>>>> 037952c (emit passed functions)
 			/>
 			<div v-if="isEdit" class="btn-container">
 				<el-button type="primary" :disabled="!isOrderValid" @click="updateReagents"

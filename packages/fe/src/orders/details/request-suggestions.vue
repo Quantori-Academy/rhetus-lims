@@ -14,6 +14,17 @@ const suggestedRequests = ref([]);
 const loading = ref(false);
 const order = toRef(props, 'order');
 const emit = defineEmits(['update-linked-requests', 'set-order']);
+watch(linkedRequests, newVal => {
+	emit('update-linked-requests', newVal);
+});
+
+watch(
+	() => props.order?.reagentRequests,
+	newReagentRequests => {
+		linkedRequests.value = [...newReagentRequests];
+	},
+	{ immediate: true }
+);
 
 onMounted(() => {
 	fetchRequests();
@@ -68,7 +79,7 @@ const linkRequest = async selectedRequest => {
 		};
 		const response = await $api.orders.addItemToOrder(order.value.id, body);
 		if (response.status === 'success') {
-			emit('set-order', order.value.id);
+			setOrder(order.value.id);
 		}
 	} catch (error) {
 		$notifyUserAboutError(error);
@@ -85,6 +96,10 @@ watch(
 	},
 	{ immediate: true }
 );
+
+const setOrder = id => {
+	emit('set-order', id);
+};
 </script>
 
 <template>

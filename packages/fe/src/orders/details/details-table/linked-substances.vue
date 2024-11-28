@@ -25,6 +25,7 @@ const props = defineProps({
 	},
 	linkedRequests: { type: Array, default: null }
 });
+<<<<<<< HEAD
 const emit = defineEmits(['remove-linked-request']);
 const removeLinkedRequest = selectedRequest => {
 	emit('remove-linked-request', selectedRequest);
@@ -47,6 +48,21 @@ watch(
 		}
 	},
 	{ deep: true }
+=======
+
+const isOrderValid = computed(() => props.order.reagentRequests.length > 0);
+const emit = defineEmits(['toggle-off-edit', 'set-order']);
+const toggleOffEdit = () => {
+	emit('toggle-off-edit', false);
+};
+const setOrder = id => {
+	emit('set-order', id);
+};
+const changeTracker = ref(
+	props.order.reagentRequests.map(request =>
+		Object.fromEntries(Object.keys(request).map(key => [key, false]))
+	)
+>>>>>>> 037952c (emit passed functions)
 );
 const changes = computed(() => {
 	return getChangedItems();
@@ -87,6 +103,42 @@ const getChangedItems = () => {
 		return Object.values(changeTracker.value[index]).includes(true);
 	});
 };
+<<<<<<< HEAD
+=======
+const updateRequests = async () => {
+	if (!checkForChanges()) {
+		toggleOffEdit();
+		return;
+	}
+	let changedSubstances = getChangedItems();
+	try {
+		const body = {
+			orderItems: [...changedSubstances]
+		};
+		console.log(body);
+		// const response = await $api.orders.updateItemInOrder(props.order.id, body);
+		// if (response.status === 'success') {
+		// 	await props.setOrder(props.order.id);
+		// }
+	} catch (error) {
+		$notifyUserAboutError(error);
+	}
+};
+
+const removeLinkedRequest = async selectedRequest => {
+	console.log(props.order.id);
+	try {
+		const body = { reagentRequests: [selectedRequest.tempId], reagents: [] };
+		const response = await $api.orders.removeItemFromOrder(props.order.id, body);
+		if (response.status === 'success') {
+			setOrder(props.order.id);
+		}
+	} catch (error) {
+		$notifyUserAboutError(error);
+	}
+};
+
+>>>>>>> 037952c (emit passed functions)
 function viewRequestDetails(request) {
 	const target = $router.resolve({ name: 'request-details', params: { id: request.id } }).href;
 	window.open(target, '_blank');

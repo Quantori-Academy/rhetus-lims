@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 <script setup>
 import { ElForm, ElInput, ElButton, ElFormItem, ElDatePicker, ElTag } from 'element-plus';
 import { $notifyUserAboutError, $notify } from '../../lib/utils/feedback/notify-msg';
@@ -37,7 +38,7 @@ const handleLinkedRequestsUpdate = updatedRequests => {
 onMounted(() => {
 	setOrder(props.id);
 });
-const handleToggleEdit = newState => {
+const toggleOffEdit = newState => {
 	if (newState === false) {
 		$router.push({ name: 'order-details', params: { id: order.value.id } });
 	}
@@ -168,8 +169,12 @@ const removeLinkedRequest = async selectedRequest => {
 				:is-edit="isEdit"
 				:linked-requests="linkedRequests"
 				@set-order="setOrder"
+<<<<<<< HEAD
 				@toggle-edit="handleToggleEdit"
 				@remove-linked-request="removeLinkedRequest"
+=======
+				@toggle-off-edit="toggleOffEdit"
+>>>>>>> 037952c (emit passed functions)
 			/>
 		</div>
 
