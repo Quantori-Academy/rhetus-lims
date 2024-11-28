@@ -1,4 +1,4 @@
-import { pgTable, timestamp, uuid, integer, pgEnum, text } from 'drizzle-orm/pg-core';
+import { pgTable, timestamp, uuid, integer, pgEnum, text, boolean } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { users } from './users.js';
 import { orders } from './orders.js';
@@ -26,6 +26,7 @@ export const statusesHistory = pgTable('status_history', {
 		.references(() => requests.id)
 		.default(null),
 	status: statusEnum('status').notNull(),
+	isDeleted: boolean('deleted').default(false),
 	changeReason: text('change_reason').default(null),
 	createdAt: timestamp('created_at').notNull().defaultNow()
 });
