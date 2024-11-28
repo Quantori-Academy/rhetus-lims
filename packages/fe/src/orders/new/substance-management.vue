@@ -1,6 +1,15 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { ElInput, ElForm, ElButton, ElFormItem, ElInputNumber, ElTag } from 'element-plus';
+import {
+	ElInput,
+	ElForm,
+	ElButton,
+	ElFormItem,
+	ElInputNumber,
+	ElTag,
+	ElOption,
+	ElSelect
+} from 'element-plus';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import RequestsManagement from './requests-management.vue';
 import { $router } from '../../lib/router/router.js';
@@ -8,6 +17,7 @@ import { $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $api } from '../../lib/api/index.js';
 import NewSubstance from './new-substance.vue';
 import { generateSubstanceRules } from './constants.js';
+import { quantityUnits } from '../../lib/constants/quantity-units.js';
 
 const props = defineProps({
 	form: { type: Object, default: null },
@@ -98,39 +108,6 @@ const fetchRequestSuggestions = async (queryString, callback) => {
 };
 const substanceRules = computed(() => generateSubstanceRules(combinedItems.value));
 
-// const substanceRules = computed(() => {
-// 	const rules = {};
-// 	combinedItems.value.forEach((item, index) => {
-// 		rules[`combinedItems[${index}].reagentName`] = [
-// 			{ required: true, message: `Reagent name for item ${index + 1} is required`, trigger: 'blur' }
-// 		];
-// 		rules[`combinedItems[${index}].quantity`] = [
-// 			{
-// 				type: 'number',
-// 				required: true,
-// 				message: `Quantity for item ${index + 1} is required`,
-// 				trigger: 'blur'
-// 			}
-// 		];
-// 		rules[`combinedItems[${index}].quantityUnit`] = [
-// 			{
-// 				required: true,
-// 				message: `Quantity Unit for item ${index + 1} is required`,
-// 				trigger: 'blur'
-// 			}
-// 		];
-// 		rules[`combinedItems[${index}].amount`] = [
-// 			{
-// 				type: 'number',
-// 				required: true,
-// 				message: `Amount for item ${index + 1} is required`,
-// 				trigger: 'blur'
-// 			}
-// 		];
-// 	});
-// 	return rules;
-// });
-
 const bulkUpdate = async () => {
 	const newOrders = combinedItems.value.map(item => ({
 		...item,
@@ -191,7 +168,9 @@ const bulkUpdate = async () => {
 				</el-form-item>
 				<el-form-item :prop="`combinedItems.${index}.quantityUnit`">
 					<span class="desktop">Unit</span>
-					<el-input v-model="singleItem.quantityUnit" placeholder="Enter unit" />
+					<el-select v-model="singleItem.quantityUnit" filterable placeholder="Enter unit">
+						<el-option v-for="unit of quantityUnits" :key="unit" :label="unit" :value="unit" />
+					</el-select>
 				</el-form-item>
 				<el-form-item :prop="`combinedItems.${index}.quantity`">
 					<span class="desktop">Quantity</span>
@@ -202,7 +181,10 @@ const bulkUpdate = async () => {
 					<el-input-number v-model="singleItem.amount" placeholder="Enter amount" />
 				</el-form-item>
 				<el-button
-					:disabled="props.form.reagentRequests.includes(singleItem)"
+					:disabled="
+						(singleItem && singleItem.type === 'reagentRequests') ||
+						props.form.reagentRequests.includes(singleItem)
+					"
 					type="danger"
 					circle
 					@click="() => removeReagent(index, singleItem)"

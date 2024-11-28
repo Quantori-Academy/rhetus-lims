@@ -19,7 +19,7 @@ import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 const props = defineProps({
 	form: { type: Object, default: null }
 });
-const newSubstanceEl = useTemplateRef('substance-form-el');
+const newSubstanceEl = useTemplateRef('new-substance');
 const newSubstance = ref(newSubstanceRef);
 const rules = ref(newSubstanceRules);
 const searchQuery = ref('');
@@ -97,7 +97,7 @@ const fetchSubstanceSuggestions = async (queryString, callback) => {
 </script>
 
 <template>
-	<el-form ref="substance-form-el" :model="newSubstance" class="row" :rules="rules">
+	<el-form ref="new-substance" :model="newSubstance" class="row" :rules="rules">
 		<el-form-item prop="name">
 			<span class="desktop">Name</span>
 			<el-autocomplete

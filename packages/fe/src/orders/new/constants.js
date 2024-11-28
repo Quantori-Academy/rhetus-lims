@@ -16,11 +16,8 @@ export const numberFieldRule = fieldName => {
 
 export const generateSubstanceRules = combinedItems => {
 	const rules = {};
-
 	combinedItems.forEach((item, index) => {
-		const itemIndex = index + 1; // For human-readable index (1-based)
-
-		// Reusable rules for each field
+		const itemIndex = index + 1;
 		rules[`combinedItems[${index}].reagentName`] = [
 			requiredRule(`Reagent name for item ${itemIndex}`)
 		];
@@ -30,7 +27,6 @@ export const generateSubstanceRules = combinedItems => {
 		];
 		rules[`combinedItems[${index}].amount`] = [numberFieldRule(`Amount for item ${itemIndex}`)];
 	});
-
 	return rules;
 };
 
