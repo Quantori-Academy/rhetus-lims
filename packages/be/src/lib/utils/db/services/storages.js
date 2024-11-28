@@ -24,6 +24,12 @@ const storages = {
 		creationdate: {
 			property: schema.storages.createdAt
 		},
+		name: {
+			property: schema.storages.name
+		},
+		room: {
+			property: schema.storages.room
+		},
 		default: {
 			property: schema.storages.createdAt
 		}
