@@ -277,7 +277,7 @@ export const routes = [
 		name: 'orders-list',
 		component: () => import('../../orders/list/order-list.vue'),
 		meta: {
-			// roles: [roles.PROCUREMENT_OFFICER],
+			roles: [roles.PROCUREMENT_OFFICER],
 			title: 'Orders List',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },
@@ -345,6 +345,7 @@ export const routes = [
 		component: () => import('../../orders/details/order-details.vue'),
 		props: true,
 		meta: {
+			roles: [roles.PROCUREMENT_OFFICER],
 			title: 'Order Details',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },
@@ -358,6 +359,7 @@ export const routes = [
 		name: 'new-order-request',
 		component: () => import('../../orders/new/add-new-order.vue'),
 		meta: {
+			roles: [roles.PROCUREMENT_OFFICER],
 			title: 'New Order',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },
@@ -372,6 +374,7 @@ export const routes = [
 		component: () => import('../../orders/details/order-details.vue'),
 		props: true,
 		meta: {
+			roles: [roles.PROCUREMENT_OFFICER],
 			title: 'Edit Order Details',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },
@@ -385,6 +388,7 @@ export const routes = [
 		name: 'new-order-substance',
 		component: () => import('../../orders/new/add-new-order.vue'),
 		meta: {
+			roles: [roles.PROCUREMENT_OFFICER],
 			title: 'New Order',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },
@@ -398,6 +402,7 @@ export const routes = [
 		name: 'complete-order',
 		component: () => import('../../orders/complete-order/complete-order.vue'),
 		meta: {
+			roles: [roles.PROCUREMENT_OFFICER],
 			title: 'New Order',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },
