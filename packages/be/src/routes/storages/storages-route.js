@@ -50,10 +50,8 @@ async function storages(server, options) {
 	async function onGetStorage(req, reply) {
 		try {
 			const storageId = req.params.id;
+			await server.validationService.validateStorageLocation(storageId);
 			const storage = await server.storagesService.getStorageById(storageId);
-			if (!storage) {
-				return reply.code(404).send({ status: 'error', message: `No such storage location found` });
-			}
 			return reply.code(200).send(storage);
 		} catch (err) {
 			return reply.code(500).send(err);
@@ -71,10 +69,7 @@ async function storages(server, options) {
 	async function onUpdateStorage(req, reply) {
 		try {
 			const storageId = req.params.id;
-			const storage = await server.storagesService.getStorageById(storageId);
-			if (!storage) {
-				return reply.code(404).send({ status: 'error', message: `No such storage location found` });
-			}
+			await server.validationService.validateStorageLocation(storageId);
 			const name = await server.storagesService.updateStorage(storageId, req.body);
 			return reply.code(200).send({ status: 'success', message: `Storage '${name}' was updated` });
 		} catch (err) {
@@ -93,11 +88,7 @@ async function storages(server, options) {
 	async function onDeleteStorage(req, reply) {
 		try {
 			const storageId = req.params.id;
-			const storage = await server.storagesService.getStorageById(storageId);
-			if (!storage) {
-				return reply.code(404).send({ status: 'error', message: `No such storage location found` });
-			}
-
+			await server.validationService.validateStorageLocation(storageId);
 			const isStorageEmpty = await server.storagesService.isStorageEmpty(storageId);
 
 			if (!isStorageEmpty) {

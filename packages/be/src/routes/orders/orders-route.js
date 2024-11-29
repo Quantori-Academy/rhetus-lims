@@ -54,11 +54,9 @@ async function orders(server, options) {
 	async function onGetOrder(req, reply) {
 		try {
 			const orderId = req.params.id;
-			const order = await server.ordersService.getOrderById(orderId);
 
-			if (!order) {
-				return reply.code(404).send({ status: 'error', message: `No such order` });
-			}
+			await server.validationService.validateOrder(orderId);
+			const order = await server.ordersService.getOrderById(orderId);
 
 			return reply.code(200).send(order);
 		} catch (err) {
@@ -96,11 +94,9 @@ async function orders(server, options) {
 		try {
 			const orderId = req.params.id;
 
-			const order = await server.ordersService.getOrderById(orderId);
+			await server.validationService.validateOrder(orderId);
 
-			if (!order) {
-				return reply.code(404).send({ status: 'error', message: `No such order` });
-			}
+			const order = await server.ordersService.getOrderById(orderId);
 
 			if (order.status !== OrderStatus.PENDING) {
 				return reply
@@ -128,11 +124,8 @@ async function orders(server, options) {
 	async function onDeleteOrder(req, reply) {
 		try {
 			const orderId = req.params.id;
+			await server.validationService.validateOrder(orderId);
 			const order = await server.ordersService.getOrderById(orderId);
-
-			if (!order) {
-				return reply.code(404).send({ status: 'error', message: `No such order` });
-			}
 
 			if (order.status !== OrderStatus.PENDING) {
 				const message =
@@ -165,11 +158,8 @@ async function orders(server, options) {
 		try {
 			const orderId = req.params.id;
 
+			await server.validationService.validateOrder(orderId);
 			const order = await server.ordersService.getOrderById(orderId);
-
-			if (!order) {
-				return reply.code(404).send({ status: 'error', message: `No such order` });
-			}
 
 			if (order.status !== OrderStatus.PENDING) {
 				return reply.code(403).send({
@@ -213,11 +203,9 @@ async function orders(server, options) {
 		try {
 			const orderId = req.params.id;
 
-			const order = await server.ordersService.getOrderById(orderId);
+			await server.validationService.validateOrder(orderId);
 
-			if (!order) {
-				return reply.code(404).send({ status: 'error', message: `No such order` });
-			}
+			const order = await server.ordersService.getOrderById(orderId);
 
 			if (order.status !== OrderStatus.PENDING) {
 				return reply.code(403).send({
@@ -256,12 +244,9 @@ async function orders(server, options) {
 
 	async function onChangeStatus(req, reply) {
 		const orderId = req.params.id;
+		await server.validationService.validateOrder(orderId);
 		const order = await server.ordersService.getOrderById(orderId);
 		const authenticatedUserId = Number(req.session.user.id);
-
-		if (!order) {
-			return reply.code(404).send({ status: 'error', message: `No such order` });
-		}
 
 		if (order.status === OrderStatus.COMPLETED || order.status === OrderStatus.CANCELED) {
 			return reply.code(403).send({
@@ -303,11 +288,9 @@ async function orders(server, options) {
 				});
 			}
 
-			const order = await server.ordersService.getOrderById(orderId);
+			await server.validationService.validateOrder(orderId);
 
-			if (!order) {
-				return reply.code(404).send({ status: 'error', message: `No such order` });
-			}
+			const order = await server.ordersService.getOrderById(orderId);
 
 			if (order.status !== OrderStatus.PENDING) {
 				return reply.code(403).send({

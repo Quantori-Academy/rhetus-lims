@@ -45,12 +45,7 @@ async function substances(server, options) {
 				return reply.code(200).send({ status: 'info', message: 'Nothing to update' });
 			}
 			const substanceId = req.params.id;
-			const substance = await server.substancesService.getSubstanceById(substanceId, category);
-			if (!substance) {
-				return reply
-					.code(404)
-					.send({ status: 'error', message: `No such ${helpers.lowercase(category)}` });
-			}
+			await server.validationService.validateSubstance(substanceId, category);
 
 			const { isValid, codeStatus, errorMessage, updatedData } =
 				await server.substancesService.validateSubstanceUpdateInput(
@@ -87,10 +82,7 @@ async function substances(server, options) {
 	async function onGetSubstancesHistory(req, reply) {
 		try {
 			const { category, id } = req.params;
-			const substance = await server.substancesService.getSubstanceById(id, category);
-			if (!substance) {
-				return reply.code(404).send({ status: 'error', message: `No such ${category}` });
-			}
+			await server.validationService.validateSubstance(id, category);
 
 			const data = await server.substancesService.getHistoryChanges(id, category);
 			return reply.code(200).send(data);
@@ -112,17 +104,9 @@ async function substances(server, options) {
 			const authenticatedUserId = req.session.user.id;
 			const { category, storageId, structure, components } = req.body;
 
-			const storage = await server.storagesService.getStorageById(storageId);
+			await server.validationService.validateStorageLocation(storageId);
 
-			if (!storage) {
-				return reply.code(400).send({ status: 'error', message: `No such storage location` });
-			}
-
-			const isStructureValid = await server.substancesService.isStructureValid(structure || '');
-
-			if (!isStructureValid) {
-				return reply.code(400).send({ status: 'error', message: `Invalid structure` });
-			}
+			await server.validationService.validateStructure(structure || '');
 
 			const areComponentsInsufficient = await server.substancesService.areComponentsInsufficient(
 				components,
@@ -159,13 +143,7 @@ async function substances(server, options) {
 		try {
 			const { category, id } = req.params;
 
-			const substance = await server.substancesService.getSubstanceById(id, category);
-
-			if (!substance) {
-				return reply
-					.code(404)
-					.send({ status: 'error', message: `No such ${helpers.lowercase(category)}` });
-			}
+			await server.validationService.validateSubstance(id, category);
 
 			const substanceName = await server.substancesService.softDeleteSubstance(id, category);
 
@@ -189,13 +167,8 @@ async function substances(server, options) {
 	async function onGetSubstance(req, reply) {
 		try {
 			const { category, id } = req.params;
+			await server.validationService.validateSubstance(id, category);
 			const substance = await server.substancesService.getSubstanceById(id, category);
-
-			if (!substance) {
-				return reply
-					.code(404)
-					.send({ status: 'error', message: `No such ${helpers.lowercase(category)}` });
-			}
 
 			return reply.code(200).send(substance);
 		} catch (err) {

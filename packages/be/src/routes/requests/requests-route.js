@@ -19,13 +19,7 @@ async function requests(server, options) {
 		try {
 			const authenticatedUserId = Number(req.session.user.id);
 
-			const isStructureValid = await server.substancesService.isStructureValid(
-				req.body.structure || ''
-			);
-
-			if (!isStructureValid) {
-				return reply.code(400).send({ status: 'error', message: `Invalid structure` });
-			}
+			await server.validationService.validateStructure(req.body.structure || '');
 
 			const reagentName = await server.requestsService.createRequest({
 				...req.body,
@@ -52,11 +46,7 @@ async function requests(server, options) {
 		try {
 			const authenticatedUserId = req.session.user.id;
 			const requestId = req.params.id;
-			const request = await server.requestsService.getRequestById(requestId);
-
-			if (!request) {
-				return reply.code(404).send({ status: 'error', message: `No such reagent request` });
-			}
+			await server.validationService.validateRequest(requestId);
 
 			const isOwnerOrOfficer = await server.requestsService.isOwnerOrOfficer(
 				requestId,
@@ -69,6 +59,8 @@ async function requests(server, options) {
 					message: `Sorry. You have no permissions to view this reagent request`
 				});
 			}
+
+			const request = await server.requestsService.getRequestById(requestId);
 
 			return reply.code(200).send(request);
 		} catch (err) {
@@ -107,11 +99,7 @@ async function requests(server, options) {
 		try {
 			const authenticatedUserId = req.session.user.id;
 			const requestId = req.params.id;
-			const request = await server.requestsService.getRequestById(requestId);
-
-			if (!request) {
-				return reply.code(404).send({ status: 'error', message: `No such reagent request` });
-			}
+			await server.validationService.validateRequest(requestId);
 
 			const isOwnerOrOfficer = await server.requestsService.isOwnerOrOfficer(
 				requestId,
@@ -125,13 +113,9 @@ async function requests(server, options) {
 				});
 			}
 
-			const isStructureValid = await server.substancesService.isStructureValid(
-				req.body.structure || ''
-			);
+			await server.validationService.validateStructure(req.body.structure || '');
 
-			if (!isStructureValid) {
-				return reply.code(400).send({ status: 'error', message: `Invalid structure` });
-			}
+			const request = await server.requestsService.getRequestById(requestId);
 
 			const { code, status, message } = await server.requestsService.handleRequestUpdate(
 				{ requestId, existingRequest: request },
@@ -156,11 +140,7 @@ async function requests(server, options) {
 		try {
 			const authenticatedUserId = req.session.user.id;
 			const requestId = req.params.id;
-			const request = await server.requestsService.getRequestById(requestId);
-
-			if (!request) {
-				return reply.code(404).send({ status: 'error', message: `No such reagent request` });
-			}
+			await server.validationService.validateRequest(requestId);
 
 			const isOwnerOrOfficer = await server.requestsService.isOwnerOrOfficer(
 				requestId,
@@ -173,6 +153,8 @@ async function requests(server, options) {
 					message: `Sorry. You have no permissions to delete this reagent request`
 				});
 			}
+
+			const request = await server.requestsService.getRequestById(requestId);
 
 			const { code, status, message } = await server.requestsService.handleRequestSoftDelete({
 				requestId,
@@ -197,11 +179,8 @@ async function requests(server, options) {
 		try {
 			const authenticatedUserId = req.session.user.id;
 			const requestId = req.params.id;
+			await server.validationService.validateRequest(requestId);
 			const request = await server.requestsService.getRequestById(requestId);
-
-			if (!request) {
-				return reply.code(404).send({ status: 'error', message: `No such reagent request` });
-			}
 
 			if (request.status !== RequestStatus.PENDING) {
 				return reply.code(403).send({

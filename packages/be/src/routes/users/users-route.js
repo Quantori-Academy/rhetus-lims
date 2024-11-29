@@ -2,9 +2,11 @@ import fp from 'fastify-plugin';
 
 import * as schema from './users-schema.js';
 import usersService from '../../services/users/users-service.js';
+import validationService from '../../services/validation/validation-service.js';
 
 async function users(server, options) {
 	await server.register(usersService);
+	await server.register(validationService);
 
 	server.route({
 		method: 'POST',
@@ -24,11 +26,7 @@ async function users(server, options) {
 					.send({ status: 'error', message: `Sorry. User '${req.body.username}' already exists` });
 			}
 
-			const isRoleExist = await server.rolesService.getRoleById(req.body.roleId);
-
-			if (!isRoleExist) {
-				return reply.code(409).send({ status: 'error', message: `No such role` });
-			}
+			await server.validationService.validateRole(req.body.roleId);
 
 			const username = await server.usersService.createUser(req.body);
 
@@ -59,11 +57,9 @@ async function users(server, options) {
 					.send({ status: 'error', message: `Sorry. You have no permissions to view this user` });
 			}
 
-			const user = await server.usersService.getUserById(userId);
+			await server.validationService.validateUser(userId);
 
-			if (!user) {
-				return reply.code(404).send({ status: 'error', message: `No such user` });
-			}
+			const user = await server.usersService.getUserById(userId);
 
 			return reply.code(200).send(user);
 		} catch (err) {
@@ -110,11 +106,7 @@ async function users(server, options) {
 					.send({ status: 'error', message: `Sorry. You have no permissions to change this user` });
 			}
 
-			const user = await server.usersService.getUserById(userId);
-
-			if (!user) {
-				return reply.code(404).send({ status: 'error', message: `No such user` });
-			}
+			await server.validationService.validateUser(userId);
 
 			if ('roleId' in req.body) {
 				const { code, status, message } = await server.usersService.handleUserUpdateWithRole(
@@ -147,11 +139,7 @@ async function users(server, options) {
 			const userId = Number(req.params.id);
 			const isOwner = authenticatedUserId === userId;
 
-			const user = await server.usersService.getUserById(userId);
-
-			if (!user) {
-				return reply.code(404).send({ status: 'error', message: `No such user` });
-			}
+			await server.validationService.validateUser(userId);
 
 			const isLastAdmin = await server.usersService.isLastAdmin(userId);
 
@@ -183,11 +171,9 @@ async function users(server, options) {
 		try {
 			const authenticatedUserId = req.session.user.id;
 
-			const user = await server.usersService.getUserById(authenticatedUserId);
+			await server.validationService.validateUser(authenticatedUserId);
 
-			if (!user) {
-				return reply.code(404).send({ status: 'error', message: `No such user` });
-			}
+			const user = await server.usersService.getUserById(authenticatedUserId);
 
 			return reply.code(200).send(user);
 		} catch (err) {

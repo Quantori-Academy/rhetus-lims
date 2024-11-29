@@ -44,11 +44,8 @@ async function passwordResetRequests(server, options) {
 	async function onSetTemporaryPassword(req, reply) {
 		try {
 			const userId = req.params.id;
+			await server.validationService.validateUser(userId);
 			const user = await server.usersService.getUserById(userId);
-
-			if (!user) {
-				return reply.code(400).send({ status: 'error', message: `User not found.` });
-			}
 
 			if (user.passwordResetStatus !== Status.ACTIVE) {
 				return reply.code(400).send({
@@ -87,15 +84,11 @@ async function passwordResetRequests(server, options) {
 	async function onResetPassword(req, reply) {
 		try {
 			const userId = req.session.user.id;
-			const user = await server.usersService.getUserById(userId);
-
-			if (!user) {
-				return reply.code(400).send({ status: 'error', message: `User not found.` });
-			}
+			await server.validationService.validateUser(userId);
 
 			const { password } = req.body;
 
-			await server.usersService.updateUser(user.id, {
+			await server.usersService.updateUser(userId, {
 				password,
 				passwordResetStatus: Status.NONE,
 				temporaryPassword: null
