@@ -1,28 +1,30 @@
 <script setup>
 import { ElTable, ElTableColumn, ElSelect, ElOption, ElButton, ElForm, ElTag } from 'element-plus';
-import { $notifyUserAboutError, $notify } from '../../lib/utils/feedback/notify-msg';
+import { $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg';
 import { computed, onMounted, ref } from 'vue';
 import { $api } from '../../lib/api/index.js';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { $router } from '../../lib/router/router.js';
-// const props = defineProps({
-// 	id: {
-// 		type: String,
-// 		default: null
-// 	}
-// });
-const orderId = '0c2243be-8325-41fd-bb47-3372be2eec04';
-const storageAssignments = ref({}); // Separate state for storage locations
+
+const props = defineProps({
+	id: {
+		type: String,
+		default: null
+		// default: '19ef336f-494c-4ed6-ae52-4830752a472e' // use this for testing
+	}
+});
+const storageAssignments = ref([]);
 const order = ref(null);
 const storages = ref([]);
 const fulfilledReagents = ref([]);
-const hasStorage = computed(
-	() => fulfilledReagents.value.filter(item => item.storageLocation?.id) // Filter items with a non-empty id in storageLocation
-);
 const loading = ref(false);
+const saveDisabled = computed(() => {
+	return !fulfilledReagents.value.every(item => item.selectedStorage);
+});
+
 onMounted(() => {
 	setSubstances();
-	setOrder(orderId);
+	setOrder(props.id);
 	setStorages();
 });
 
@@ -32,7 +34,7 @@ const setOrder = async id => {
 		const response = await $api.orders.fetchOrder(id);
 		order.value = response;
 	} catch (error) {
-		$notifyUserAboutError(error.message || 'Error updating order');
+		$notifyUserAboutError(error.message || 'Error updating storages');
 	} finally {
 		loading.value = false;
 	}
@@ -40,22 +42,21 @@ const setOrder = async id => {
 
 const setSubstances = async () => {
 	loading.value = true;
-
 	try {
 		const params = {
 			limiit: 200,
 			options: {
-				order: orderId,
+				order: props.id,
 				category: 'reagent'
 			}
 		};
 		const response = await $api.substances.fetchSubstances(params);
 		const filteredSubstances = response.substances.filter(
-			substance => substance.orderId === orderId
+			substance => substance.orderId === props.id
 		);
 		fulfilledReagents.value = filteredSubstances;
 	} catch (error) {
-		$notifyUserAboutError(error.message || 'Error updating order');
+		$notifyUserAboutError(error.message || 'Error updating storages');
 	} finally {
 		loading.value = false;
 	}
@@ -64,7 +65,6 @@ async function setStorages() {
 	loading.value = true;
 	try {
 		const data = await $api.storages.fetchStorages();
-		console.log(data.storages);
 		storages.value = data.storages;
 	} catch (error) {
 		$notifyUserAboutError(error);
@@ -72,56 +72,41 @@ async function setStorages() {
 		loading.value = false;
 	}
 }
-// const saveChanges = async () => {
-// 	const updatedReagents = fulfilledReagents.value.filter(
-// 		item => item.storageLocation.id.length > 0
-// 	);
-// 	console.log('Updated Substances:', updatedReagents);
-// 	try {
-// 		const item = {
-// 			...updatedReagents
-// 		};
-// 		const data = await $api.substances.updateSubstance(item.id, item);
-// 		$notify({
-// 			title: 'Success',
-// 			message: 'Storage locations updated successfully',
-// 			type: 'success'
-// 		});
-// 	} catch (error) {
-// 		$notifyUserAboutError(error.message || 'Error updating storage locations');
-// 	}
-// };
-const saveChanges = async () => {
-	const updatedReagents = fulfilledReagents.value.filter(item => item.storageLocation?.id);
-	try {
-		const updateRequests = updatedReagents.map(item => {
-			const updatePayload = {
-				name: item.name,
-				category: item.category,
-				storageId: item.storageLocation.id
-			};
-			return $api.substances.updateSubstance(item.id, updatePayload);
-		});
-		console.log(updateRequests);
-		await Promise.all(updateRequests);
 
-		$notify({
-			title: 'Success',
-			message: 'All storage locations updated successfully',
-			type: 'success'
-		});
+const saveChanges = async () => {
+	try {
+		const body = {
+			action: 'next',
+			reagents: storageAssignments.value
+		};
+		const res = await $api.orders.changeOrderStatus(props.id, body);
+		if (res.message === 'success') {
+			$router.push({ name: 'order-details', params: { id: props.id } });
+		}
 	} catch (error) {
-		$notifyUserAboutError(error.message || 'Error updating storage locations');
+		$notifyUserAboutError(error.message || 'Failed to update order status');
 	}
 };
 
+const handleStorageChange = (row, selectedStorageId) => {
+	const index = storages.value.findIndex(item => item.id === selectedStorageId);
+	storageAssignments.value.push({
+		id: row.id,
+		storageId: selectedStorageId
+	});
+	row.selectedStorage = storages.value[index];
+};
+const clearStorage = row => {
+	const index = storageAssignments.value.findIndex(item => item.id === row.id);
+	if (index !== -1) {
+		storageAssignments.value.splice(index, 1);
+	}
+};
+const isStorageAssigned = row => {
+	return storageAssignments.value.find(item => item.id === row.id && row.selectedStorage);
+};
 const cancelChanges = () => {
 	$router.push({ name: 'order-details', params: { id: order.value.id } });
-};
-const handleStorageChange = row => {
-	console.log(
-		`Storage location changed for reagent: ${row.name}, New Location: ${row.storageLocationId}`
-	);
 };
 </script>
 
@@ -144,11 +129,13 @@ const handleStorageChange = row => {
 				<el-table-column label="Storage Location" width="200">
 					<template #default="{ row }">
 						<el-select
-							v-model="storageAssignments[row.id]"
-							placeholder="Select storage location"
+							v-model="row.selectedStorage"
 							:loading="loading"
 							filterable
-							@change="() => handleStorageChange(row)"
+							clearable
+							placeholder="Select storage"
+							@clear="() => clearStorage(row)"
+							@change="(value, key) => handleStorageChange(row, value, key)"
 						>
 							<el-option
 								v-for="storage of storages"
@@ -159,15 +146,19 @@ const handleStorageChange = row => {
 						</el-select>
 					</template>
 				</el-table-column>
-				<el-table-column label="Status" width="150">
-					<el-tag size="large" :type="hasStorage ? `info` : `success`" effect="light">{{
-						hasStorage ? `NOT ASSIGNED` : `ASSIGNED`
-					}}</el-tag>
+				<el-table-column width="50">
+					<template #default="{ row }">
+						<el-tag size="default" circle :type="isStorageAssigned(row) ? `success` : `danger`">
+							<rh-icon color="white" :name="isStorageAssigned(row) ? `check` : `warning`"
+						/></el-tag>
+					</template>
 				</el-table-column>
 			</el-table>
 			<div class="btn-container">
 				<el-button @click="cancelChanges">Cancel</el-button>
-				<el-button type="primary" @click="saveChanges">Save Changes</el-button>
+				<el-button type="primary" :disabled="saveDisabled" @click="saveChanges"
+					>Save Changes</el-button
+				>
 			</div>
 		</el-form>
 	</div>
