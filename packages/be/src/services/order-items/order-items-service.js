@@ -4,6 +4,7 @@ import { schema } from '../../lib/db/schema/index.js';
 import { helpers } from '../../lib/utils/common/helpers.js';
 import { RequestStatus } from '../../lib/db/schema/requests.js';
 import { ItemTypes } from '../../lib/db/schema/orders-items.js';
+import { Category } from '../../routes/substances/substances-schema.js';
 
 const formatMapping = {
 	quantityUnit: string => helpers.lowercase(string),
@@ -21,13 +22,8 @@ async function orderItemsService(server) {
 
 			const formattedRequests = await Promise.all(
 				requests.map(async ({ id, amount, quantityUnit, quantity }) => {
+					await server.validationService.validateRequest(id);
 					const request = await server.requestsService.getRequestById(id);
-
-					if (!request) {
-						const error = new Error('No such request');
-						error.statusCode = 404;
-						throw error;
-					}
 
 					const {
 						status,
@@ -73,13 +69,8 @@ async function orderItemsService(server) {
 
 			const formattedReagents = await Promise.all(
 				reagents.map(async ({ id, amount, quantityUnit, quantity }) => {
+					await server.validationService.validateSubstance(id, Category.REAGENT);
 					const reagent = await server.reagentsService.getReagentById(id);
-
-					if (!reagent) {
-						const error = new Error('No such reagent');
-						error.statusCode = 404;
-						throw error;
-					}
 
 					const { name, structure, casNumber, producer, catalogId, catalogLink, unitPrice } =
 						reagent ?? {};
@@ -112,13 +103,7 @@ async function orderItemsService(server) {
 				reagents.map(async reagent => {
 					const { name, casNumber, quantityUnit, structure, ...restProperties } = reagent;
 
-					const isStructureValid = await server.substancesService.isStructureValid(structure || '');
-
-					if (!isStructureValid) {
-						const error = new Error('Invalid structure');
-						error.statusCode = 400;
-						throw error;
-					}
+					await server.validationService.validateStructure(structure || '');
 
 					return {
 						reagentName: formatMapping.name(name),
@@ -266,15 +251,7 @@ async function orderItemsService(server) {
 						throw error;
 					}
 
-					const isStructureValid = await server.substancesService.isStructureValid(
-						item.structure || ''
-					);
-
-					if (!isStructureValid) {
-						const error = new Error('Invalid structure');
-						error.statusCode = 400;
-						throw error;
-					}
+					await server.validationService.validateStructure(item.structure || '');
 
 					const dataForItemUpdate = Object.fromEntries(
 						Object.entries(item)

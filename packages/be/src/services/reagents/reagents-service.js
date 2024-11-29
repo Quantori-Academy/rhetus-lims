@@ -349,12 +349,7 @@ async function reagentsService(server) {
 		},
 
 		addStorageToReagentFromOrder: async (reagentId, storageId, userId) => {
-			const storage = await server.storagesService.getStorageById(storageId);
-			if (!storage) {
-				const error = new Error(`No such storage location with id: ${storageId} found`);
-				error.statusCode = 404;
-				throw error;
-			}
+			await server.validationService.validateStorageLocation(storageId);
 
 			await server.db.transaction(async tx => {
 				await tx

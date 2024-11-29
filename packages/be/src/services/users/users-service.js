@@ -162,15 +162,10 @@ async function usersService(server) {
 					message: 'Sorry. You have no permissions to change role'
 				};
 			}
-			const targetRole = await server.rolesService.getRoleById(data.roleId);
 
-			if (!targetRole) {
-				return {
-					code: 404,
-					status: 'error',
-					message: 'No such role'
-				};
-			}
+			await server.validationService.validateRole(data.roleId);
+
+			const targetRole = await server.rolesService.getRoleById(data.roleId);
 
 			const isRoleDowngrading = targetRole.name !== 'administrator';
 			const isLastAdmin = await server.usersService.isLastAdmin(userId);

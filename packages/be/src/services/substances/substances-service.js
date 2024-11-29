@@ -72,12 +72,9 @@ async function substancesService(server) {
 
 		validateStorageUpdateInput: async data => {
 			const { storageId } = data;
-			const storage = await server.storagesService.getStorageById(storageId);
-			if (!storage) {
-				const error = new Error(`No such storage with id: ${storageId}`);
-				error.statusCode = 404;
-				throw error;
-			}
+
+			await server.validationService.validateStorageLocation(storageId);
+
 			return { storageId };
 		},
 
