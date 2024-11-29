@@ -19,6 +19,7 @@ import { emptyRequest, Statuses } from './constants.js';
 import { getButtonType } from '../orders/details/constants.js';
 import { quantityUnits } from '../lib/constants/quantity-units.js';
 import KetcherEditor from '../ketcher-editor/ketcher-editor.vue';
+import { __ } from '../lib/locales/index.js';
 
 const props = defineProps({ id: { type: String, default: null } });
 
@@ -105,12 +106,13 @@ onMounted(() => {
 				</span>
 			</h2>
 			<div v-if="!isEdit && request.status !== Statuses.CANCELED" class="top-button-container">
-				<el-button type="primary" @click="toggleEdit">Edit</el-button>
-				<el-button type="danger" @click="deleteRequest"> Cancel Request </el-button>
+				<el-button type="primary" @click="toggleEdit">{{ __('Edit') }}</el-button>
+				<el-button type="danger" @click="deleteRequest"> {{ __('Cancel Request') }} </el-button>
 			</div>
 		</div>
 		<div v-if="showPoMessage" class="po-message">
-			<span class="po-message-prefix">Procurement Officer comment:</span> {{ request.poComment }}
+			<span class="po-message-prefix">{{ __('Procurement Officer comment') }}:</span>
+			{{ request.poComment }}
 		</div>
 		<el-form
 			ref="form-ref"
@@ -119,53 +121,53 @@ onMounted(() => {
 			:model="request"
 			@submit="handleSubmit"
 		>
-			<el-form-item label="Reagent Name" prop="reagentName">
+			<el-form-item :label="__('Reagent name')" prop="reagentName">
 				<el-input v-model="request.reagentName" :disabled="!isEdit" />
 			</el-form-item>
-			<el-form-item label="Structure" prop="structure">
+			<el-form-item :label="__('Structure')" prop="structure">
 				<ketcher-editor
 					v-model:smiles="request.structure"
 					:disabled="!isEdit"
-					placeholder="Enter structure"
+					:placeholder="__('Enter structure')"
 				/>
 			</el-form-item>
-			<el-form-item label="CAS number" prop="casNumber">
+			<el-form-item :label="__('CAS number')" prop="casNumber">
 				<el-input
 					v-model="request.casNumber"
 					:disabled="!isEdit"
-					placeholder="Indicate CAS number"
+					:placeholder="__('Indicate CAS number')"
 				/>
 			</el-form-item>
 			<div class="align-horizontal">
-				<el-form-item label="Quantity" prop="quantity">
+				<el-form-item :label="__('Quantity')" prop="quantity">
 					<el-input-number v-model="request.quantity" :min="1" :disabled="!isEdit" />
 				</el-form-item>
-				<el-form-item label="Quantity Unit" prop="quantityUnit">
+				<el-form-item :label="__('Quantity unit')" prop="quantityUnit">
 					<el-select
 						v-model="request.quantityUnit"
 						:disabled="!isEdit"
 						filterable
-						placeholder="Select a unit"
+						:placeholder="__('Select unit')"
 					>
 						<el-option v-for="unit of quantityUnits" :key="unit" :label="unit" :value="unit" />
 					</el-select>
 				</el-form-item>
-				<el-form-item label="Amount" prop="status">
+				<el-form-item :label="__('Amount')" prop="status">
 					<el-input-number v-model="request.amount" :min="1" :disabled="!isEdit" />
 				</el-form-item>
 			</div>
-			<el-form-item label="User Comments" prop="userComment">
+			<el-form-item :label="__('User Comments')" prop="userComment">
 				<el-input
 					v-model="request.userComment"
 					type="textarea"
 					:disabled="!isEdit || isResearcher"
 				/>
 			</el-form-item>
-			<el-form-item label="Procurement Comments" prop="poComment">
+			<el-form-item :label="__('Procurement Comments')" prop="poComment">
 				<el-input v-model="request.poComment" type="textarea" :disabled="!isEdit || isOfficer" />
 			</el-form-item>
 			<div class="align-horizontal">
-				<el-form-item label="Date Created" prop="createdAt">
+				<el-form-item :label="__('Creation Date')" prop="createdAt">
 					<el-date-picker
 						v-model="request.createdAt"
 						type="datetime"
@@ -173,7 +175,7 @@ onMounted(() => {
 						:disabled="true"
 					/>
 				</el-form-item>
-				<el-form-item label="Update Date" prop="updatedAt">
+				<el-form-item :label="__('Update Date')" prop="updatedAt">
 					<el-date-picker
 						v-model="request.updatedAt"
 						type="datetime"
@@ -183,8 +185,8 @@ onMounted(() => {
 				</el-form-item>
 			</div>
 			<div v-if="isEdit" class="btn-container">
-				<el-button type="primary" @click="handleSubmit">Save</el-button>
-				<el-button @click="cancelEdit">Cancel</el-button>
+				<el-button type="primary" @click="handleSubmit">{{ __('Save') }}</el-button>
+				<el-button @click="cancelEdit">{{ __('Cancel') }}</el-button>
 			</div>
 		</el-form>
 	</div>
