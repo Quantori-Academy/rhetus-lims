@@ -1,11 +1,12 @@
 <script setup>
 import { format } from 'date-fns';
 import { inject, onMounted, ref } from 'vue';
-const { user } = inject('user');
 import RhIcon from '../lib/components/rh-icon.vue';
 import { ElTag } from 'element-plus';
 import { $api } from '../lib/api';
+import SubstancesAnalytics from './substances-analytics.vue';
 
+const { user } = inject('user');
 const notifications = ref({ notifications: [], count: 0 });
 
 async function setNotifications() {
@@ -54,7 +55,12 @@ onMounted(() => {
 			</div>
 		</div>
 		<div class="stats-notification-container">
-			<div class="stats">stats</div>
+			<div class="stats">
+
+						<substances-analytics />
+
+
+			</div>
 			<div class="notifications-container">
 				<div class="title">
 					<rh-icon name="notifications" color="#4c8fd2" size="18" />
@@ -85,6 +91,19 @@ onMounted(() => {
 
 .container > * + * {
 	margin-top: 20px;
+}
+
+.stats-notification-container {
+	display: flex;
+	gap: 16px;
+}
+
+.stats {
+	display: flex;
+	flex: 3;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
 }
 
 .header {
@@ -130,13 +149,9 @@ onMounted(() => {
 	justify-content: space-between;
 }
 
-.stats {
-	flex: 3;
-}
-
 .notifications-container {
 	flex: 2;
-	max-height: 540px;
+	max-height: 500px;
 	overflow: auto;
 	border-radius: 12px;
 	background-color: var(--rh-color-neutral-250);
