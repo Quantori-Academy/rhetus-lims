@@ -6,6 +6,7 @@ import { ElTag } from 'element-plus';
 import { $api } from '../lib/api';
 import SubstancesAnalytics from './substances-analytics.vue';
 import RequestsAnalytics from './requests-analytics.vue';
+import OrdersAnalytics from './orders-analytics.vue';
 
 const { user } = inject('user');
 const notifications = ref({ notifications: [], count: 0 });
@@ -84,7 +85,7 @@ onMounted(() => {
 				<requests-analytics />
 			</div>
 			<div class="stats">
-				<substances-analytics />
+				<orders-analytics />
 			</div>
 		</div>
 	</div>

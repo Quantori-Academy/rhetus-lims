@@ -8,9 +8,7 @@ const chartRef = ref(null);
 const analytics = ref({
 	total: 0,
 	pending: 0,
-	ordered: 0,
-	fulfilled: 0,
-	cancelled: 0
+	fulfilled: 0
 });
 
 function initChart() {
@@ -19,7 +17,7 @@ function initChart() {
 	const options = {
 		xAxis: {
 			type: 'category',
-			data: ['Pending', 'Ordered', 'Fulfilled', 'Cancelled']
+			data: ['Pending', 'Fulfilled']
 		},
 		yAxis: {
 			type: 'value'
@@ -30,14 +28,9 @@ function initChart() {
 					{
 						value: analytics.value.pending
 					},
-					{ value: analytics.value.ordered, itemStyle: { color: '#fac858' } },
 					{
 						value: analytics.value.fulfilled,
 						itemStyle: { color: '#91cc75' }
-					},
-					{
-						value: analytics.value.cancelled,
-						itemStyle: { color: '#ee6666' }
 					}
 				],
 				type: 'bar'
@@ -48,28 +41,18 @@ function initChart() {
 }
 
 async function getAnalytics() {
-	const { count: total } = await $api.requests.fetchRequests({});
+	const { count: total } = await $api.orders.fetchOrders({});
 	analytics.value.total = total;
 
-	const { count: pending } = await $api.requests.fetchRequests({
+	const { count: pending } = await $api.orders.fetchOrders({
 		options: { status: 'pending' }
 	});
 	analytics.value.pending = pending;
 
-	const { count: ordered } = await $api.requests.fetchRequests({
-		options: { status: 'ordered' }
-	});
-	analytics.value.ordered = ordered;
-
-	const { count: fulfilled } = await $api.requests.fetchRequests({
+	const { count: fulfilled } = await $api.orders.fetchOrders({
 		options: { status: 'fulfilled' }
 	});
 	analytics.value.fulfilled = fulfilled;
-
-	const { count: cancelled } = await $api.requests.fetchRequests({
-		options: { status: 'canceled' }
-	});
-	analytics.value.cancelled = cancelled;
 }
 
 onMounted(() => {
@@ -81,7 +64,7 @@ onMounted(() => {
 	<div class="container">
 		<div class="chart-container">
 			<div class="chart-title">
-				<div>Requests Analytics</div>
+				<div>Orders Analytics</div>
 				<rh-icon name="arrow-right" />
 			</div>
 			<div ref="chartRef" class="chart-container"></div>
@@ -100,24 +83,10 @@ onMounted(() => {
 			</div>
 			<div class="value">
 				<div>
-					<span class="legend legend-ordered" />
-					<span>Ordered</span>
-				</div>
-				<div class="value-number">{{ analytics.ordered }}</div>
-			</div>
-			<div class="value">
-				<div>
 					<span class="legend legend-fulfilled" />
 					<span>Fulfilled</span>
 				</div>
 				<div class="value-number">{{ analytics.fulfilled }}</div>
-			</div>
-			<div class="value">
-				<div>
-					<span class="legend legend-cancelled" />
-					<span>Cancelled</span>
-				</div>
-				<div class="value-number">{{ analytics.cancelled }}</div>
 			</div>
 		</div>
 	</div>
