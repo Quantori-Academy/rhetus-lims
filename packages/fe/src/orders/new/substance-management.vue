@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import {
 	ElInput,
 	ElForm,
@@ -16,23 +16,23 @@ import { $router } from '../../lib/router/router.js';
 import { $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $api } from '../../lib/api/index.js';
 import NewSubstance from './new-substance.vue';
-import { generateSubstanceRules } from './constants.js';
 import { quantityUnits } from '../../lib/constants/quantity-units.js';
-
+import { fieldRules, numberFieldRules } from './constants.js';
 const props = defineProps({
 	form: { type: Object, default: null },
 	isRequest: { type: Boolean, default: false },
 	linkedRequests: { type: Array, default: null }
 });
-
 const loading = ref(false);
 const incomingRequests = ref([]);
-const substanceRules = computed(() => generateSubstanceRules(combinedItems.value));
-const combinedItems = computed(() => [
-	...props.form.reagentRequests.map(item => ({ ...item, type: 'reagentRequests' })),
-	...props.form.reagents.map(item => ({ ...item, type: 'reagents' })),
-	...props.form.newReagents.map(item => ({ ...item, type: 'newReagents' }))
-]);
+const combinedItems = computed(() => {
+	return [
+		...props.form.reagentRequests.map(item => ({ ...item, type: 'reagentRequests' })),
+		...props.form.reagents.map(item => ({ ...item, type: 'reagents' })),
+		...props.form.newReagents.map(item => ({ ...item, type: 'newReagents' }))
+	];
+});
+
 const isReagentAdded = computed(() => {
 	return (
 		props.form.reagents.length > 0 ||
@@ -47,7 +47,7 @@ const emit = defineEmits([
 	'link-request',
 	'remove-request',
 	'add-existing-reagent',
-	'bulk-update',
+	'submit',
 	'cancel-form',
 	'update-item'
 ]);
@@ -56,8 +56,8 @@ onMounted(() => {
 	fetchRequests();
 });
 
-function removeReagent(index) {
-	emit('remove-reagent', index);
+function removeReagent(id, type) {
+	emit('remove-reagent', id, type);
 }
 const addNewReagent = async newReagent => {
 	emit('add-new-reagent', newReagent);
@@ -73,6 +73,17 @@ const linkRequest = selectedRequest => {
 };
 const cancel = () => {
 	emit('cancel-form');
+};
+const submit = async () => {
+	emit('submit');
+};
+const handleInputChange = async (id, type, field, newValue) => {
+	emit('update-item', {
+		id,
+		type,
+		field,
+		newValue
+	});
 };
 
 function viewRequestDetails(request) {
@@ -112,27 +123,6 @@ const fetchRequestSuggestions = async (queryString, callback) => {
 		callback(filteredRequests);
 	}
 };
-
-const bulkUpdate = async () => {
-	const newOrders = combinedItems.value.map(item => ({
-		...item,
-		quantity: item.quantity,
-		amount: item.amount,
-		quantityUnit: item.quantityUnit
-	}));
-	emit('bulk-update', newOrders);
-};
-
-const handleInputChange = (index, field, newValue) => {
-	console.log(newValue);
-	const item = combinedItems.value[index];
-	emit('update-item', {
-		index,
-		type: item.type,
-		field,
-		newValue
-	});
-};
 </script>
 
 <template>
@@ -143,9 +133,7 @@ const handleInputChange = (index, field, newValue) => {
 		@fetch-suggestions="fetchRequestSuggestions"
 	/>
 	<div class="data-table">
-		<h2 class="el-form-item__label">
-			{{ props.isRequest ? `Requests to Order` : `Substances to Order` }}
-		</h2>
+		<h2 class="el-form-item__label">Substances to Order</h2>
 		<div class="orders-container" max-height="350">
 			<div class="row">
 				<span class="mobile">Name</span>
@@ -156,11 +144,10 @@ const handleInputChange = (index, field, newValue) => {
 
 			<el-form
 				v-for="(singleItem, index) of combinedItems"
+				:key="singleItem.id"
 				ref="substanceFormEl"
-				:key="index"
 				class="row"
-				:model="singleItem"
-				:rules="substanceRules"
+				:model="combinedItems[index]"
 			>
 				<div class="linked desktop">
 					<el-tag
@@ -178,41 +165,62 @@ const handleInputChange = (index, field, newValue) => {
 						{{ request.quantityUnit }} ({{ request.amount }})
 					</el-tag>
 				</div>
-				<el-form-item :prop="`combinedItems.${index}.name`">
+				<el-form-item prop="reagentName" :rules="fieldRules">
 					<span class="desktop">Name</span>
 					<el-input
-						v-model="singleItem.name"
+						v-model="singleItem.reagentName"
 						placeholder="Enter name"
-						@input="() => handleInputChange(index, 'name', singleItem.name)"
+						@input="
+							() =>
+								handleInputChange(
+									singleItem.id,
+									singleItem.type,
+									'reagentName',
+									singleItem.reagentName
+								)
+						"
 					/>
 				</el-form-item>
-				<el-form-item :prop="`combinedItems.${index}.quantityUnit`">
+				<el-form-item prop="quantityUnit" :rules="fieldRules">
 					<span class="desktop">Unit</span>
 					<el-select
 						v-model="singleItem.quantityUnit"
 						filterable
 						placeholder="Enter unit"
-						@change="() => handleInputChange(index, 'quantityUnit', singleItem.quantityUnit)"
+						@change="
+							() =>
+								handleInputChange(
+									singleItem.id,
+									singleItem.type,
+									'quantityUnit',
+									singleItem.quantityUnit
+								)
+						"
 					>
 						<el-option v-for="unit of quantityUnits" :key="unit" :label="unit" :value="unit" />
 					</el-select>
 				</el-form-item>
-				<el-form-item :prop="`combinedItems.${index}.quantity`">
+				<el-form-item prop="quantity" :rules="numberFieldRules">
 					<span class="desktop">Quantity</span>
 					<el-input-number
 						v-model="singleItem.quantity"
 						:min="1"
 						placeholder="Enter quantity"
-						@input="() => handleInputChange(index, 'quantity', singleItem.quantity)"
+						@change="
+							() =>
+								handleInputChange(singleItem.id, singleItem.type, 'quantity', singleItem.quantity)
+						"
 					/>
 				</el-form-item>
-				<el-form-item :prop="`combinedItems.${index}.amount`">
+				<el-form-item prop="amount" :rules="numberFieldRules">
 					<span class="desktop">Amount</span>
 					<el-input-number
 						v-model="singleItem.amount"
 						:min="1"
 						placeholder="Enter amount"
-						@input="() => handleInputChange(index, 'amount', singleItem.amount)"
+						@change="
+							() => handleInputChange(singleItem.id, singleItem.type, 'amount', singleItem.amount)
+						"
 					/>
 				</el-form-item>
 				<el-button
@@ -222,7 +230,7 @@ const handleInputChange = (index, field, newValue) => {
 					"
 					type="danger"
 					circle
-					@click="() => removeReagent(index, singleItem)"
+					@click="() => removeReagent(singleItem.id, singleItem.type)"
 				>
 					<rh-icon color="white" name="remove"
 				/></el-button>
@@ -251,9 +259,7 @@ const handleInputChange = (index, field, newValue) => {
 		</div>
 		<div class="btn-container">
 			<el-button @click="cancel">Cancel</el-button>
-			<el-button type="primary" :disabled="!isReagentAdded" @click="bulkUpdate"
-				>Add Order</el-button
-			>
+			<el-button type="primary" :disabled="!isReagentAdded" @click="submit">Add Order</el-button>
 		</div>
 	</div>
 </template>

@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { ElAutocomplete, ElFormItem } from 'element-plus';
-
+import RhIcon from '../../lib/components/rh-icon.vue';
 const props = defineProps({
 	form: { type: Object, default: null },
 	isRequest: { type: Boolean, default: false }
@@ -27,7 +27,11 @@ const linkRequest = selectedRequest => {
 			@select="linkRequest"
 		>
 			<template #default="{ item }">
-				<div>{{ item.reagentName }}</div>
+				<div>
+					<rh-icon color="#1785be" name="pod" />
+					{{ item.reagentName }}: {{ item.quantity }}{{ item.quantityUnit }} | Amount:
+					{{ item.amount }}
+				</div>
 			</template>
 		</el-autocomplete>
 	</el-form-item>

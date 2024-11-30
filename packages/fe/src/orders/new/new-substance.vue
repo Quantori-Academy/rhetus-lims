@@ -1,5 +1,5 @@
 <script setup>
-import { ref, useTemplateRef, onMounted, watch, computed } from 'vue';
+import { ref, useTemplateRef, onMounted, computed } from 'vue';
 import {
 	ElForm,
 	ElButton,
@@ -11,7 +11,7 @@ import {
 } from 'element-plus';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { quantityUnits } from '../../lib/constants/quantity-units.js';
-import { newSubstanceRef, generateNewSubstanceRules } from './constants.js';
+import { newSubstanceRef, newSubstanceRules } from './constants.js';
 import { $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $api } from '../../lib/api/index.js';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
@@ -21,14 +21,14 @@ const props = defineProps({
 });
 const newSubstanceEl = useTemplateRef('new-substance');
 const newSubstance = ref(newSubstanceRef);
-const rules = computed(() => generateNewSubstanceRules());
+const rules = ref(newSubstanceRules);
 const searchQuery = ref('');
 const suggestedSubstances = ref([]);
-watch(searchQuery, newVal => {
-	newSubstance.value.name = newVal;
-});
 const emit = defineEmits(['add-new-reagent', 'add-existing-reagent']);
-
+const reagentName = computed({
+	get: () => searchQuery.value,
+	set: value => (searchQuery.value = newSubstance.value.reagentName = value)
+});
 onMounted(() => {
 	fetchSubstances();
 });
@@ -51,7 +51,14 @@ const addNewReagent = async () => {
 		reagentName: newSubstance.value.reagentName,
 		quantity: newSubstance.value.quantity,
 		amount: newSubstance.value.amount,
-		quantityUnit: newSubstance.value.quantityUnit
+		quantityUnit: newSubstance.value.quantityUnit,
+		casNumber: '',
+		producer: '',
+		catalogId: '',
+		catalogLink: '',
+		unitPrice: null,
+		description: '',
+		structure: ''
 	};
 	emit('add-new-reagent', newReagent);
 	searchQuery.value = '';
@@ -64,7 +71,6 @@ const addExistingReagent = async selectedRequest => {
 	if (isReagentAdded) {
 		return;
 	}
-
 	let newReagent = {
 		...selectedRequest,
 		reagentName: selectedRequest.name,
@@ -74,6 +80,7 @@ const addExistingReagent = async selectedRequest => {
 		quantityUnit: selectedRequest.quantityUnit
 		// tempId: selectedRequest.id // use for msw
 	};
+	delete newReagent.name;
 	emit('add-existing-reagent', newReagent);
 	newSubstanceEl.value.resetFields();
 };
@@ -101,7 +108,7 @@ const fetchSubstanceSuggestions = async (queryString, callback) => {
 		<el-form-item prop="reagentName">
 			<span class="desktop">Name</span>
 			<el-autocomplete
-				v-model="searchQuery"
+				v-model="reagentName"
 				placeholder="Search for reagents"
 				popper-class="my-autocomplete"
 				:fetch-suggestions="fetchSubstanceSuggestions"

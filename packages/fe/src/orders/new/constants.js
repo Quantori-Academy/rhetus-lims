@@ -1,3 +1,6 @@
+export const isEmpty = value => value === null || value === undefined || value.length === 0;
+export const isNumberEmpty = value => value === null || value === undefined;
+
 export const requiredRule = fieldName => {
 	return {
 		required: true,
@@ -13,32 +16,25 @@ export const numberFieldRule = fieldName => {
 		trigger: ['blur', 'change']
 	};
 };
-
-export const generateSubstanceRules = combinedItems => {
-	const rules = {};
-	combinedItems.forEach((item, index) => {
-		const itemIndex = index + 1;
-		rules[`combinedItems[${index}].reagentName`] = [
-			requiredRule(`Reagent name for item ${itemIndex}`)
-		];
-		rules[`combinedItems[${index}].quantity`] = [numberFieldRule(`Quantity for item ${itemIndex}`)];
-		rules[`combinedItems[${index}].quantityUnit`] = [
-			requiredRule(`Quantity Unit for item ${itemIndex}`)
-		];
-		rules[`combinedItems[${index}].amount`] = [numberFieldRule(`Amount for item ${itemIndex}`)];
-	});
-	return rules;
+export const fieldRules = {
+	required: true,
+	message: `Input can't be empty`,
+	trigger: 'blur'
 };
-export const generateNewSubstanceRules = () => {
-	return {
-		reagentName: [requiredRule('Name')],
-		quantity: [numberFieldRule('Quantity')],
-		quantityUnit: [requiredRule('Unit')],
-		amount: [numberFieldRule('Amount')]
-	};
+export const numberFieldRules = {
+	type: 'number',
+	required: true,
+	message: `Input must be a valid number`,
+	trigger: ['blur', 'change']
+};
+export const newSubstanceRules = {
+	reagentName: [requiredRule('Name')],
+	quantity: [numberFieldRule('Quantity')],
+	quantityUnit: [requiredRule('Unit')],
+	amount: [numberFieldRule('Amount')]
 };
 export const notEmptyArrayRule = {
-	validator: (rule, value) => {
+	validator: (_, value) => {
 		if (value.length === 0) {
 			return Promise.reject(new Error('This array cannot be empty'));
 		}
@@ -46,6 +42,30 @@ export const notEmptyArrayRule = {
 	},
 	trigger: ['blur', 'change']
 };
+
+// export const generateSubstanceRules = combinedItems => {
+// 	const rules = {};
+
+// 	combinedItems.forEach((item, index) => {
+// 		if (isEmpty(item.reagentName)) {
+// 			rules[`combinedItems[${index}].reagentName`] = [
+// 				{ required: true, message: 'Name is required', trigger: 'blur' }
+// 			];
+// 		}
+// 		if (isEmpty(item.quantityUnit)) {
+// 			rules[`combinedItems[${index}].quantityUnit`] = [requiredRule('Unit')];
+// 		}
+// 		if (isNumberEmpty(item.quantity)) {
+// 			rules[`combinedItems[${index}].quantity`] = [numberFieldRule('Quantity')];
+// 		}
+// 		if (isNumberEmpty(item.amount)) {
+// 			rules[`combinedItems[${index}].amount`] = [numberFieldRule('Amount')];
+// 		}
+// 	});
+// 	console.log(rules);
+// 	return rules;
+// };
+
 export const formRef = {
 	title: '',
 	seller: '',
@@ -60,30 +80,7 @@ export const newSubstanceRef = {
 	quantity: 1,
 	amount: 1
 };
-export const newSubstanceRules = {
-	reagentName: [requiredRule('dd')],
-	quantityUnit: [requiredRule('Unit')],
-	quantity: [requiredRule('Quantity')],
-	amount: [requiredRule('Amount')]
-};
-export const requestRules = {
-	name: [requiredRule('Name')],
-	quantityUnit: [requiredRule('Unit')],
-	quantity: [requiredRule('Quantity')],
-	amount: [requiredRule('Amount')]
-};
-export const reagentRules = {
-	name: [requiredRule('Name')],
-	quantityUnit: [requiredRule('Unit')],
-	quantity: [requiredRule('Quantity')],
-	amount: [requiredRule('Amount')]
-};
-export const substanceRules = {
-	reagentName: [requiredRule('Name')],
-	quantityUnit: [requiredRule('Unit')],
-	quantity: [requiredRule('Quantity')],
-	amount: [requiredRule('Amount')]
-};
+
 export const formRules = {
 	title: [requiredRule('Title')],
 	seller: [requiredRule('Seller')],

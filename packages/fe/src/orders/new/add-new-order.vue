@@ -43,11 +43,12 @@ const fetchSubstances = async id => {
 const linkRequest = selectedRequest => {
 	if (!linkedRequests.value.find(req => req.id === selectedRequest.id)) {
 		const selected = {
-			...selectedRequest,
-			name: selectedRequest.reagentName
+			...selectedRequest
 		};
 		linkedRequests.value.push(selected);
-		form.value.reagentRequests.push(selected);
+		form.value.reagentRequests.push({
+			...selected
+		});
 	}
 };
 const removeLinkedRequest = async selectedReagent => {
@@ -60,88 +61,44 @@ const removeLinkedRequest = async selectedReagent => {
 		linkedRequests.value.splice(linkedIndex, 1);
 	}
 };
-const addNewReagent = async newSubstance => {
-	form.value.newReagents.push({
-		reagentName: newSubstance.name,
-		quantityUnit: newSubstance.quantityUnit,
-		quantity: newSubstance.quantity,
-		amount: newSubstance.amount,
-		casNumber: '',
-		producer: '',
-		catalogId: '',
-		catalogLink: '',
-		unitPrice: null,
-		description: '',
-		structure: ''
-	});
+const addNewReagent = async substance => {
+	const newSub = {
+		...substance,
+		name: substance.reagentName
+	};
+	form.value.newReagents = [...form.value.newReagents, newSub];
 };
-const addExistingReagent = async newSubstance => {
-	form.value.reagents.push({
-		...newSubstance,
-		id: newSubstance.id,
-		quantityUnit: newSubstance.quantityUnit,
-		quantity: newSubstance.quantity,
-		amount: newSubstance.amount
-	});
+const addExistingReagent = async substance => {
+	form.value.reagents = [...form.value.reagents, substance];
 };
-function removeReagent(index) {
-	if (index !== -1) {
-		form.value.reagents.splice(index, 1);
+const removeReagent = (id, type) => {
+	let target;
+	if (type === 'reagents') {
+		target = form.value.reagents;
+	} else if (type === 'newReagents') {
+		target = form.value.newReagents;
 	}
-}
-const extractRelevantProperties = () => {
-	const selectedReagents = form.value.reagents.map(({ id, amount, quantity, quantityUnit }) => ({
-		id,
-		amount,
-		quantity,
-		quantityUnit
-	}));
-	return selectedReagents;
+	if (target) {
+		const index = target.findIndex(item => item.id === id);
+		if (index !== -1) {
+			target.splice(index, 1);
+		} else {
+			$notifyUserAboutError(`Item not found`);
+		}
+	} else {
+		$notifyUserAboutError(`Array for type '${type}' not found`);
+	}
 };
-
-const extractNewReagentProperties = () => {
-	const selectedNewReagents = form.value.newReagents.map(
-		({
-			reagentName,
-			casNumber,
-			producer,
-			catalogId,
-			catalogLink,
-			unitPrice,
-			quantityUnit,
-			quantity,
-			description,
-			structure,
-			amount
-		}) => ({
-			name: reagentName,
-			casNumber,
-			producer,
-			catalogId,
-			catalogLink,
-			unitPrice,
-			quantityUnit,
-			quantity,
-			description,
-			structure,
-			amount
-		})
-	);
-	return selectedNewReagents;
-};
-
 async function submit() {
 	if (!(await $isFormValid(formEl))) return;
 	isSaving.value = true;
-	const relevantData = extractRelevantProperties();
-	const relevantDataNew = extractNewReagentProperties();
 	try {
 		const body = {
 			title: form.value.title,
 			seller: form.value.seller,
-			reagents: [...relevantData],
+			reagents: [...form.value.reagents],
 			reagentRequests: [...form.value.reagentRequests],
-			newReagents: [...relevantDataNew]
+			newReagents: [...form.value.newReagents]
 		};
 		const response = await $api.orders.addOrder(body);
 		$notify({ message: response.message, type: 'success' });
@@ -162,32 +119,19 @@ function cancelForm() {
 		$router.push({ name: 'substances-list' });
 	}
 }
-
-form.value.reagents.forEach(item => (item.type = 'reagent'));
-form.value.newReagents.forEach(item => (item.type = 'newReagent'));
-form.value.reagentRequests.forEach(item => (item.type = 'reagentRequest'));
-
-const bulkUpdate = async newOrders => {
-	if (!(await $isFormValid(formEl))) return;
-	newOrders.forEach(group => {
-		const type = group.type;
-		const addedItems = form.value[type];
-		const index = addedItems.findIndex(item => item.id === group.id);
-		if (index !== -1) {
-			addedItems[index] = { ...addedItems[index], ...group };
-		}
-	});
-	submit();
-	console.log('ITEMS ADDED', form.value.reagents);
-};
-
-const handleUpdateItem = ({ index, type, field, newValue }) => {
+const updateItem = ({ id, type, field, newValue }) => {
+	let reagentToUpdate;
 	if (type === 'reagentRequests') {
-		form.value.reagentRequests[index][field] = newValue;
+		reagentToUpdate = form.value.reagentRequests.find(item => item.id === id);
 	} else if (type === 'reagents') {
-		form.value.reagents[index][field] = newValue;
+		reagentToUpdate = form.value.reagents.find(item => item.id === id);
 	} else if (type === 'newReagents') {
-		form.value.newReagents[index][field] = newValue;
+		reagentToUpdate = form.value.newReagents.find(item => item.id === id);
+	}
+	if (reagentToUpdate) {
+		reagentToUpdate[field] = newValue;
+	} else {
+		$notifyUserAboutError(`Item not found`);
 	}
 };
 </script>
@@ -210,9 +154,9 @@ const handleUpdateItem = ({ index, type, field, newValue }) => {
 				@remove-reagent="removeReagent"
 				@remove-request="removeLinkedRequest"
 				@link-request="linkRequest"
-				@bulk-update="bulkUpdate"
+				@submit="submit"
 				@cancel-form="cancelForm"
-				@update-item="handleUpdateItem"
+				@update-item="updateItem"
 			/>
 		</el-form>
 	</div>
@@ -224,13 +168,15 @@ const handleUpdateItem = ({ index, type, field, newValue }) => {
 	margin-top: 20px;
 }
 .el-form,
-.add-btn {
+.add-btn,
+.el-input-number {
 	width: 100%;
 }
 
 .orders-container,
 .requests,
-.linked-requests-container {
+.linked-requests-container,
+.el-form {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
@@ -240,19 +186,6 @@ const handleUpdateItem = ({ index, type, field, newValue }) => {
 .linked-requests-container,
 .el-form-item__content {
 	gap: 10px;
-}
-.el-form {
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-}
-.el-input-number {
-	width: 100%;
-}
-.orders-container {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
 }
 
 .el-form-item__content {
