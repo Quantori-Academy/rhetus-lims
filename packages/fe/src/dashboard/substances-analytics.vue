@@ -123,6 +123,7 @@ onMounted(() => {
 	display: flex;
 	align-items: center;
 	width: 100%;
+	height: 100%;
 	border-radius: 12px;
 	background-color: var(--rh-color-neutral-250);
 }

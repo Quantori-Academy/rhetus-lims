@@ -5,6 +5,7 @@ import RhIcon from '../lib/components/rh-icon.vue';
 import { ElTag } from 'element-plus';
 import { $api } from '../lib/api';
 import SubstancesAnalytics from './substances-analytics.vue';
+import RequestsAnalytics from './requests-analytics.vue';
 
 const { user } = inject('user');
 const notifications = ref({ notifications: [], count: 0 });
@@ -56,10 +57,7 @@ onMounted(() => {
 		</div>
 		<div class="stats-notification-container">
 			<div class="stats">
-
-						<substances-analytics />
-
-
+				<substances-analytics />
 			</div>
 			<div class="notifications-container">
 				<div class="title">
@@ -81,10 +79,23 @@ onMounted(() => {
 				</div>
 			</div>
 		</div>
+		<div class="row">
+			<div class="stats">
+				<requests-analytics />
+			</div>
+			<div class="stats">
+				<substances-analytics />
+			</div>
+		</div>
 	</div>
 </template>
 
 <style>
+.row {
+	display: flex;
+	gap: 12px;
+}
+
 .container {
 	padding: 16px;
 }
@@ -96,6 +107,7 @@ onMounted(() => {
 .stats-notification-container {
 	display: flex;
 	gap: 16px;
+	height: 300px;
 }
 
 .stats {
@@ -104,6 +116,7 @@ onMounted(() => {
 	justify-content: center;
 	align-items: center;
 	width: 100%;
+	height: 100%;
 }
 
 .header {
@@ -151,7 +164,7 @@ onMounted(() => {
 
 .notifications-container {
 	flex: 2;
-	max-height: 500px;
+	height: 100%;
 	overflow: auto;
 	border-radius: 12px;
 	background-color: var(--rh-color-neutral-250);
