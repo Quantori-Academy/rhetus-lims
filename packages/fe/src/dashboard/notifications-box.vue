@@ -5,11 +5,14 @@ import { onMounted, ref } from 'vue';
 import { $api } from '../lib/api';
 import { __ } from '../lib/locales';
 
+const loading = ref(false);
 const notifications = ref({ notifications: [], count: 0 });
 
 async function setNotifications() {
+	loading.value = true;
 	const data = await $api.notifications.fetchNotifications({ createdat: 'desc' });
 	notifications.value = data;
+	loading.value = false;
 }
 
 onMounted(() => {
@@ -18,7 +21,7 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="notifications-container">
+	<div v-loading="loading" class="notifications-container">
 		<div class="title">{{ __('Notifications') }}</div>
 		<div class="content">
 			<div v-for="n of notifications.notifications" :key="n.id" class="list-item">

@@ -6,6 +6,7 @@ import { __ } from '../lib/locales';
 import RhIcon from '../lib/components/rh-icon.vue';
 import { RouterLink } from 'vue-router';
 
+const loading = ref(false);
 const chartRef = ref(null);
 const analytics = ref({
 	total: 0,
@@ -70,34 +71,47 @@ function initChart() {
 }
 
 async function getAnalytics() {
-	const { count: total } = await $api.substances.fetchSubstances({});
-	analytics.value.total = total;
+	loading.value = true;
+
+	const categoryParams = { options: { category: 'reagent' } };
 	const expiredParams = {
 		options: {
 			expirationDate: [new Date('0001-01-01T00:00:00.000Z'), new Date()]
 		}
 	};
 
-	const { count: expired } = await $api.substances.fetchSubstances(expiredParams);
-	analytics.value.expired = expired;
-	analytics.value.notExpired = total - expired;
+	const promises = [
+		$api.substances.fetchSubstances({}).then(({ count: total }) => (analytics.value.total = total)),
+		$api.substances
+			.fetchSubstances(expiredParams)
+			.then(({ count: expired }) => (analytics.value.expired = expired)),
+		$api.substances
+			.fetchSubstances(categoryParams)
+			.then(({ count: reagents }) => (analytics.value.reagents = reagents)),
+		$api.substances
+			.fetchSubstances({
+				options: { ...expiredParams.options, category: 'reagent' }
+			})
+			.then(({ count: expiredReagents }) => (analytics.value.expiredReagents = expiredReagents)),
+		$api.substances
+			.fetchSubstances({
+				options: { ...expiredParams.options, category: 'sample' }
+			})
+			.then(({ count: expiredSamples }) => (analytics.value.expiredSamples = expiredSamples))
+	];
 
-	const categoryParams = { options: { category: 'reagent' } };
-	const { count: reagents } = await $api.substances.fetchSubstances(categoryParams);
-	analytics.value.reagents = reagents;
-	analytics.value.samples = total - reagents;
-	analytics.value.reagentsPercent = ((reagents / total) * 100).toFixed(2);
+	await Promise.all(promises);
+
+	analytics.value.notExpired = analytics.value.total - analytics.value.expired;
+
+	analytics.value.samples = analytics.value.total - analytics.value.reagents;
+	analytics.value.reagentsPercent = (
+		(analytics.value.reagents / analytics.value.total) *
+		100
+	).toFixed(2);
 	analytics.value.samplesPercent = (100 - analytics.value.reagentsPercent).toFixed(2);
 
-	const { count: expiredReagents } = await $api.substances.fetchSubstances({
-		options: { ...expiredParams.options, category: 'reagent' }
-	});
-	analytics.value.expiredReagents = expiredReagents;
-
-	const { count: expiredSamples } = await $api.substances.fetchSubstances({
-		options: { ...expiredParams.options, category: 'sample' }
-	});
-	analytics.value.expiredSamples = expiredSamples;
+	loading.value = false;
 }
 
 onMounted(() => {
@@ -106,7 +120,7 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="container">
+	<div v-loading="loading" class="container">
 		<div class="chart-container">
 			<router-link class="chart-title" to="/substances/list">
 				{{ __('Expired substances') }}

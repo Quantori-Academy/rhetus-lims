@@ -5,54 +5,73 @@ import RhIcon from '../lib/components/rh-icon.vue';
 import { $api } from '../lib/api';
 import { __ } from '../lib/locales';
 import { $router } from '../lib/router/router';
+import { defaultInfoCard } from './constants';
 
 const { isAdmin, isOfficer } = inject('user');
 
-const analytics = ref([]);
-
+const analytics = ref(Array(3).fill(defaultInfoCard));
 async function getAnalytics() {
-	const { count: substances } = await $api.substances.fetchSubstances({});
-	analytics.value.push({
-		value: substances,
-		icon: 'issue-type-test-case',
-		text: __('Total substances'),
-		redirect: '/substances/list'
-	});
+	const promises = [
+		$api.substances.fetchSubstances({}).then(({ count: substances }) => {
+			analytics.value[0] = {
+				value: substances,
+				icon: 'issue-type-test-case',
+				text: __('Total substances'),
+				redirect: '/substances/list',
+				loading: false
+			};
+		})
+	];
 
 	if (isAdmin.value) {
-		const users = await $api.users.fetchUsers({ limit: 1000 });
-		analytics.value.push({
-			value: users.count,
-			icon: 'user',
-			text: __('Total users'),
-			redirect: '/users/list'
-		});
+		promises.push(
+			$api.users.fetchUsers({ limit: 1000 }).then(users => {
+				analytics.value[1] = {
+					value: users.count,
+					icon: 'user',
+					text: __('Total users'),
+					redirect: '/users/list',
+					loading: false
+				};
 
-		analytics.value.push({
-			value: users.users.reduce((acc, u) => (u.hasPasswordResetRequests ? acc + 1 : acc), 0),
-			icon: 'approval',
-			text: __('Password reset requests'),
-			redirect: '/users/list'
-		});
+				analytics.value[2] = {
+					value: users.users.reduce((acc, u) => (u.hasPasswordResetRequests ? acc + 1 : acc), 0),
+					icon: 'approval',
+					text: __('Password reset requests'),
+					redirect: '/users/list',
+					loading: false
+				};
+			})
+		);
 	}
 
 	if (isOfficer.value) {
-		const { count: orders } = await $api.orders.fetchOrders({});
-		analytics.value.push({
-			value: orders,
-			icon: 'container-image',
-			text: __('Total orders'),
-			redirect: '/orders/list'
-		});
+		promises.push(
+			$api.orders.fetchOrders({}).then(({ count: orders }) => {
+				analytics.value[1] = {
+					value: orders,
+					icon: 'container-image',
+					text: __('Total orders'),
+					redirect: '/orders/list',
+					loading: false
+				};
+			})
+		);
 
-		const { count: requests } = await $api.requests.fetchRequests({});
-		analytics.value.push({
-			value: requests,
-			icon: 'book',
-			text: __('Total requests'),
-			redirect: '/requests/list'
-		});
+		promises.push(
+			$api.requests.fetchRequests({}).then(({ count: requests }) => {
+				analytics.value[2] = {
+					value: requests,
+					icon: 'book',
+					text: __('Total requests'),
+					redirect: '/requests/list',
+					loading: false
+				};
+			})
+		);
 	}
+
+	await Promise.all(promises);
 }
 
 onMounted(() => {
@@ -62,7 +81,13 @@ onMounted(() => {
 
 <template>
 	<div class="info-box-container">
-		<div v-for="x of analytics" :key="x.text" class="box" @click="() => $router.push(x.redirect)">
+		<div
+			v-for="x of analytics"
+			:key="x.text"
+			v-loading="x.loading"
+			class="box"
+			@click="() => $router.push(x.redirect)"
+		>
 			<div class="icon">
 				<el-badge :value="x.value" type="primary" :max="1000">
 					<rh-icon :name="x.icon" color="#36386e" size="32" class="icon" />

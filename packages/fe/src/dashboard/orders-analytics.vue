@@ -6,6 +6,7 @@ import { __ } from '../lib/locales';
 import RhIcon from '../lib/components/rh-icon.vue';
 import { RouterLink } from 'vue-router';
 
+const loading = ref(false);
 const chartRef = ref(null);
 const analytics = ref({
 	total: 0,
@@ -43,18 +44,26 @@ function initChart() {
 }
 
 async function getAnalytics() {
-	const { count: total } = await $api.orders.fetchOrders({});
-	analytics.value.total = total;
+	loading.value = true;
 
-	const { count: pending } = await $api.orders.fetchOrders({
-		options: { status: 'pending' }
-	});
-	analytics.value.pending = pending;
+	const promises = [
+		$api.orders.fetchOrders({}).then(({ count: total }) => (analytics.value.total = total)),
+		$api.orders
+			.fetchOrders({
+				options: { status: 'pending' }
+			})
+			.then(({ count: pending }) => (analytics.value.pending = pending)),
 
-	const { count: fulfilled } = await $api.orders.fetchOrders({
-		options: { status: 'fulfilled' }
-	});
-	analytics.value.fulfilled = fulfilled;
+		$api.orders
+			.fetchOrders({
+				options: { status: 'fulfilled' }
+			})
+			.then(({ count: fulfilled }) => (analytics.value.fulfilled = fulfilled))
+	];
+
+	await Promise.all(promises);
+
+	loading.value = false;
 }
 
 onMounted(() => {
@@ -63,7 +72,7 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="container">
+	<div v-loading="loading" class="container">
 		<div class="chart-container">
 			<router-link class="chart-title" to="/orders/list">
 				{{ __('Order analytics') }}

@@ -7,6 +7,7 @@ import { differenceInDays } from 'date-fns';
 import { __ } from '../lib/locales';
 import { RouterLink } from 'vue-router';
 
+const loading = ref(false);
 const analytics = ref({
 	total: 0,
 	reagents: 0,
@@ -17,22 +18,33 @@ const analytics = ref({
 });
 
 async function getAnalytics() {
-	const { substances, count: total } = await $api.substances.fetchSubstances({ limit: 1000 });
-	analytics.value.total = total;
-
-	const now = new Date();
-	const totalAge = substances.reduce(
-		(sum, substance) => sum + differenceInDays(new Date(substance.expirationDate), now),
-		0
-	);
-	analytics.value.averageAge = Math.round(totalAge / substances.length);
+	loading.value = true;
 
 	const categoryParams = { options: { category: 'reagent' } };
-	const { count: reagents } = await $api.substances.fetchSubstances(categoryParams);
-	analytics.value.reagents = reagents;
-	analytics.value.samples = total - reagents;
-	analytics.value.reagentsPercent = ((reagents / total) * 100).toFixed(2);
+	const promises = [
+		$api.substances.fetchSubstances({ limit: 1000 }).then(({ substances, count: total }) => {
+			analytics.value.total = total;
+			const now = new Date();
+			const totalAge = substances.reduce(
+				(sum, substance) => sum + differenceInDays(new Date(substance.expirationDate), now),
+				0
+			);
+			analytics.value.averageAge = Math.round(totalAge / substances.length);
+		}),
+		$api.substances.fetchSubstances(categoryParams).then(({ count: reagents }) => {
+			analytics.value.reagents = reagents;
+		})
+	];
+
+	await Promise.all(promises);
+
+	analytics.value.samples = analytics.value.total - analytics.value.reagents;
+	analytics.value.reagentsPercent = (
+		(analytics.value.reagents / analytics.value.total) *
+		100
+	).toFixed(2);
 	analytics.value.samplesPercent = (100 - analytics.value.reagentsPercent).toFixed(2);
+	loading.value = false;
 }
 
 onMounted(() => {
@@ -41,7 +53,7 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="container">
+	<div v-loading="loading" class="container">
 		<router-link class="title" to="/substances/list">
 			{{ __('Substances analytics') }}
 			<rh-icon name="arrow-right" />
