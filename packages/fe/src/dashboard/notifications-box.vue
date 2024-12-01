@@ -43,44 +43,38 @@ onMounted(() => {
 	overflow: auto;
 	border-radius: 12px;
 	background-color: var(--rh-color-neutral-250);
-}
 
-.notifications-container .title {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	padding: 20px 20px 0px 20px;
-	font-size: 16px;
-}
+	.title {
+		padding: 20px 20px 0px 20px;
+		font-weight: 500;
+		font-size: 16px;
+	}
 
-.notifications-container .content {
-	padding: 24px;
-}
+	.content {
+		padding: 24px;
+	}
 
-.notifications-container .content > * + * {
-	margin-top: 12px;
-}
+	.list-item {
+		margin-bottom: 12px;
+		padding: 12px;
+		border-radius: 10px;
+		background-color: var(--rh-color-neutral-200);
 
-.notifications-container .list-item {
-	padding: 12px;
-	border-radius: 10px;
-	background-color: var(--rh-color-neutral-200);
-}
+		.footer {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-top: 8px;
+		}
 
-.notifications-container .list-item:hover {
-	background-color: var(--rh-color-neutral-300);
-}
-
-.notifications-container .list-item .footer {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-top: 8px;
-}
-
-.notifications-container .list-item .time {
-	opacity: 0.6;
-	text-align: end;
-	font-size: smaller;
+		.time {
+			opacity: 0.6;
+			text-align: end;
+			font-size: smaller;
+		}
+	}
+	.list-item:hover {
+		background-color: var(--rh-color-neutral-300);
+	}
 }
 </style>

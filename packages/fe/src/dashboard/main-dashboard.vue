@@ -38,10 +38,10 @@ const { user, isResearcher, isOfficer } = inject('user');
 			<notifications-box />
 		</div>
 		<div class="row">
-			<div v-if="isOfficer" class="orders">
+			<div v-if="isOfficer" class="stats">
 				<orders-analytics />
 			</div>
-			<div v-else class="orders">
+			<div v-else class="stats">
 				<substances-analytics />
 			</div>
 			<div class="stats">
@@ -54,10 +54,30 @@ const { user, isResearcher, isOfficer } = inject('user');
 <style>
 .container {
 	padding: 16px;
+
+	> * + * {
+		margin-top: 20px;
+	}
 }
 
-.container > * + * {
-	margin-top: 20px;
+.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.date-time {
+	display: flex;
+	gap: 16px;
+
+	.box {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		padding: 8px 16px;
+		border-radius: 8px;
+		background-color: var(--rh-color-neutral-250);
+	}
 }
 
 .row {
@@ -73,34 +93,5 @@ const { user, isResearcher, isOfficer } = inject('user');
 	align-items: center;
 	width: 100%;
 	height: 100%;
-}
-
-.orders {
-	display: flex;
-	flex: 3;
-	justify-content: center;
-	align-items: center;
-	width: 100%;
-	height: 100%;
-}
-
-.header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-}
-
-.date-time {
-	display: flex;
-	gap: 16px;
-}
-
-.date-time .box {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-	padding: 8px 16px;
-	border-radius: 8px;
-	background-color: var(--rh-color-neutral-250);
 }
 </style>

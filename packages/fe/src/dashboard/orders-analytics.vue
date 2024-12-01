@@ -64,28 +64,28 @@ onMounted(() => {
 	<div class="container">
 		<div class="chart-container">
 			<div class="chart-title">
-				<div>{{ __('Order analytics') }}</div>
+				{{ __('Order analytics') }}
 			</div>
 			<div ref="chartRef" class="chart-container"></div>
 		</div>
-		<div class="values-container">
+		<div class="stat-value-container">
 			<div class="value">
 				{{ __('Total') }}
-				<div class="value-number">{{ analytics.total }}</div>
+				<div class="number">{{ analytics.total }}</div>
 			</div>
 			<div class="value">
 				<div>
 					<span class="legend legend-pending" />
 					<span>{{ __('Pending') }}</span>
 				</div>
-				<div class="value-number">{{ analytics.pending }}</div>
+				<div class="number">{{ analytics.pending }}</div>
 			</div>
 			<div class="value">
 				<div>
 					<span class="legend legend-fulfilled" />
 					<span>{{ __('Fulfilled') }}</span>
 				</div>
-				<div class="value-number">{{ analytics.fulfilled }}</div>
+				<div class="number">{{ analytics.fulfilled }}</div>
 			</div>
 		</div>
 	</div>
@@ -114,15 +114,19 @@ onMounted(() => {
 	height: 280px;
 }
 
-.values-container {
+.stat-value-container {
 	width: 100%;
-}
 
-.value {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin: 12px 0px;
+	.value {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin: 12px 0px;
+
+		.number {
+			font-weight: 600;
+		}
+	}
 }
 
 .legend {
@@ -147,9 +151,5 @@ onMounted(() => {
 
 .legend-cancelled {
 	background-color: #ee6666;
-}
-
-.value-number {
-	font-weight: 600;
 }
 </style>

@@ -107,36 +107,36 @@ onMounted(() => {
 	<div class="container">
 		<div class="chart-container">
 			<div class="chart-title">
-				<div>{{ __('Expired substances') }}</div>
+				{{ __('Expired substances') }}
 			</div>
 			<div ref="chartRef" class="chart-container"></div>
 		</div>
-		<div class="values-container">
+		<div class="stat-value-container">
 			<div class="value">
 				<div>
 					<span class="legend legend-blue" />
 					<span>{{ __('Expired') }}</span>
 				</div>
-				<div class="value-number">{{ analytics.expired }}</div>
+				<div class="number">{{ analytics.expired }}</div>
 			</div>
 			<div class="value">
 				<div>
 					<span class="legend legend-green" />
 					<span>{{ __('Not expired') }}</span>
 				</div>
-				<div class="value-number">{{ analytics.notExpired }}</div>
+				<div class="number">{{ analytics.notExpired }}</div>
 			</div>
 			<div class="value">
 				<div>
 					<span>{{ __('Expired samples') }}</span>
 				</div>
-				<div class="value-number">{{ analytics.expiredSamples }}</div>
+				<div class="number">{{ analytics.expiredSamples }}</div>
 			</div>
 			<div class="value">
 				<div>
 					<span>{{ __('Expired reagents') }}</span>
 				</div>
-				<div class="value-number">{{ analytics.expiredReagents }}</div>
+				<div class="number">{{ analytics.expiredReagents }}</div>
 			</div>
 		</div>
 	</div>
@@ -150,10 +150,6 @@ onMounted(() => {
 	height: 100%;
 	border-radius: 12px;
 	background-color: var(--rh-color-neutral-250);
-}
-
-.chart-container {
-	height: 280px;
 }
 
 .chart-title {
@@ -170,16 +166,22 @@ onMounted(() => {
 	margin-left: 0;
 	width: 100%;
 	max-width: 300px;
+	height: 280px;
 }
 
-.values-container {
+.stat-value-container {
 	width: 100%;
-}
-.value {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin: 10px 0px;
+
+	.value {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin: 10px 0px;
+
+		.number {
+			font-weight: 600;
+		}
+	}
 }
 
 .legend {
@@ -196,9 +198,5 @@ onMounted(() => {
 
 .legend-green {
 	background-color: #91cc75;
-}
-
-.value-number {
-	font-weight: 600;
 }
 </style>

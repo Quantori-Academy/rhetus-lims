@@ -60,29 +60,21 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.icon {
-	padding: 2px;
-}
-
 .info-box-container {
 	display: flex;
 	gap: 16px;
 	width: 100%;
-}
-
-.info-box-container .box {
-	flex: 1;
-	padding: 36px;
-	border-radius: 12px;
-	background-color: var(--rh-color-neutral-250);
-	text-align: center;
+	.box {
+		flex: 1;
+		padding: 36px;
+		border-radius: 12px;
+		background-color: var(--rh-color-neutral-250);
+		text-align: center;
+	}
 }
 
 .icon {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	gap: 4px;
 	margin-bottom: 8px;
+	padding: 2px;
 }
 </style>

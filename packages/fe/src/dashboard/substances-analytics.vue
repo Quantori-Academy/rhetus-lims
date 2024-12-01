@@ -42,30 +42,29 @@ onMounted(() => {
 <template>
 	<div class="container">
 		<div class="title">
-			<div>{{ __('Substances analytics') }}</div>
+			{{ __('Substances analytics') }}
 		</div>
-
 		<div class="progress-container">
-			<div class="progress-bars">
-				<div class="total">
+			<div class="progress-bar">
+				<div class="count">
 					<div>{{ __('Total') }}</div>
 					<div>{{ analytics.total }} {{ __('Substances') }}</div>
 				</div>
-				<div class="progress">
-					<div class="progress-title">
+				<div class="item">
+					<div class="title">
 						<rh-icon name="applications" />
 						<div class="label">{{ analytics.samples }} {{ __('Samples') }}</div>
 					</div>
-					<el-progress :percentage="analytics.samplesPercent" class="progress-bars" />
+					<el-progress :percentage="analytics.samplesPercent" class="progress-bar" />
 				</div>
-				<div class="progress">
-					<div class="progress-title">
+				<div class="item">
+					<div class="title">
 						<rh-icon name="pod" />
 						<div class="label">{{ analytics.reagents }} {{ __('Reagents') }}</div>
 					</div>
-					<el-progress :percentage="analytics.reagentsPercent" class="progress-bars" />
+					<el-progress :percentage="analytics.reagentsPercent" class="progress-bar" />
 				</div>
-				<div class="total">
+				<div class="count">
 					<div>{{ __('Average age') }}</div>
 					<div>{{ analytics.averageAge }} {{ __('Days') }}</div>
 				</div>
@@ -83,24 +82,23 @@ onMounted(() => {
 	height: 100%;
 	border-radius: 12px;
 	background-color: var(--rh-color-neutral-250);
-}
 
-.total {
-	display: flex;
-	justify-content: space-between;
-	margin-bottom: 24px;
+	.count {
+		display: flex;
+		justify-content: space-between;
+		margin-bottom: 24px;
 
-	div {
-		font-weight: 700;
+		div {
+			font-weight: 700;
+		}
 	}
-}
 
-.title {
-	align-self: flex-start;
-	padding: 4px 4px 0px 4px;
-	white-space: nowrap;
-	font-weight: 500;
-	font-size: 16px;
+	.title {
+		padding: 4px 4px 0px 4px;
+		white-space: nowrap;
+		font-weight: 500;
+		font-size: 16px;
+	}
 }
 
 .progress-container {
@@ -110,26 +108,25 @@ onMounted(() => {
 	padding: 0px 12px 12px 12px;
 	width: 100%;
 	height: 100%;
-}
 
-.progress-bars {
-	width: 100%;
-}
+	.item {
+		display: flex;
+		gap: 8px;
+		margin-bottom: 24px;
+		width: 100%;
 
-.label {
-	white-space: nowrap;
-}
+		.title {
+			display: flex;
+			align-items: center;
+			gap: 8px;
 
-.progress {
-	display: flex;
-	gap: 8px;
-	margin-bottom: 24px;
-	width: 100%;
-}
-
-.progress-title {
-	display: flex;
-	align-items: center;
-	gap: 8px;
+			.label {
+				white-space: nowrap;
+			}
+		}
+	}
+	.progress-bar {
+		width: 100%;
+	}
 }
 </style>
