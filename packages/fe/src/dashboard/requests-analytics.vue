@@ -81,7 +81,7 @@ onMounted(() => {
 	<div class="container">
 		<div class="chart-container">
 			<div class="chart-title">
-		{{ 'Request analytics' }}
+				{{ 'Request analytics' }}
 			</div>
 			<div ref="chartRef" class="chart-container"></div>
 		</div>
@@ -179,5 +179,13 @@ onMounted(() => {
 }
 .legend-cancelled {
 	background-color: #ee6666;
+}
+
+@media (max-width: 600px) {
+	.stat-value-container {
+		.value {
+			display: none;
+		}
+	}
 }
 </style>

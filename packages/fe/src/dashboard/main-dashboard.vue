@@ -87,11 +87,27 @@ const { user, isResearcher, isOfficer } = inject('user');
 }
 
 .stats {
-	display: flex;
 	flex: 3;
-	justify-content: center;
-	align-items: center;
 	width: 100%;
 	height: 100%;
+}
+
+@media (max-width: 600px) {
+	.container {
+		padding: 8px;
+	}
+
+	.date-time {
+		display: none;
+	}
+
+	.row {
+		display: block;
+		height: 100%;
+
+		> * + * {
+			margin-top: 20px;
+		}
+	}
 }
 </style>

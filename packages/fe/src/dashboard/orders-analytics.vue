@@ -152,4 +152,12 @@ onMounted(() => {
 .legend-cancelled {
 	background-color: #ee6666;
 }
+
+@media (max-width: 600px) {
+	.stat-value-container {
+		.value {
+			display: none;
+		}
+	}
+}
 </style>

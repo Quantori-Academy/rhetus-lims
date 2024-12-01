@@ -77,4 +77,15 @@ onMounted(() => {
 	margin-bottom: 8px;
 	padding: 2px;
 }
+
+@media (max-width: 600px) {
+	.info-box-container {
+		display: block;
+
+		.box {
+			margin-bottom: 12px;
+			padding: 18px;
+		}
+	}
+}
 </style>
