@@ -10,6 +10,7 @@ import { formatDate } from '../lib/utils/datetime/date-format';
 import RhFilters from '../lib/components/rh-filters/rh-filters.vue';
 import RequestsFilters from './requests-filters.vue';
 import RhPagination from '../lib/components/rh-pagination/rh-pagination.vue';
+import { __ } from '../lib/locales';
 
 const isLoading = ref(false);
 const requests = ref([]);
@@ -112,7 +113,7 @@ onMounted(() => {
 	<div class="margin-table">
 		<rh-filters>
 			<template #action-buttons>
-				<el-button type="primary" @click="addNewRequest">Create New Request</el-button>
+				<el-button type="primary" @click="addNewRequest">{{ __('Create New Request') }}</el-button>
 			</template>
 			<template #filters>
 				<requests-filters v-model:filters="filters" />
@@ -124,33 +125,33 @@ onMounted(() => {
 			@sort-change="setRequests"
 			@row-click="viewRequestDetails"
 		>
-			<el-table-column prop="status" width="90" label="Status" sortable />
-			<el-table-column prop="reagentName" min-width="120" label="Reagent Name" sortable />
-			<el-table-column prop="quantity" label="Quantity" sortable>
+			<el-table-column prop="status" width="90" :label="__('Status')" sortable />
+			<el-table-column prop="reagentName" min-width="120" :label="__('Reagent name')" sortable />
+			<el-table-column prop="quantity" :label="__('Quantity')" sortable>
 				<template #default="{ row }"> {{ row.quantity }} {{ row.quantityUnit }} </template>
 			</el-table-column>
-			<el-table-column prop="amount" label="Amount" sortable />
-			<el-table-column prop="author.username" label="Created by" sortable />
+			<el-table-column prop="amount" :label="__('Amount')" sortable />
+			<el-table-column prop="author.username" :label="__('Created by')" sortable />
 			<el-table-column
 				prop="createdAt"
-				label="Creation Date"
+				:label="__('Creation Date')"
 				:formatter="data => formatDate(data.createdAt)"
 				sortable
 			/>
 			<el-table-column
 				prop="updatedAt"
-				label="Update Date"
+				:label="__('Update Date')"
 				:formatter="data => formatDate(data.updatedAt)"
 				sortable
 			/>
-			<el-table-column v-if="user?.user?.value?.role.name === 'procurement officer'" width="100">
+			<el-table-column v-if="user?.user?.value?.role.name === 'procurement officer'" width="110">
 				<template #default="{ row }">
 					<el-button
 						type="danger"
 						:disabled="row.status !== 'pending'"
 						@click.stop="() => cancelRequest(row.id)"
 					>
-						Cancel
+						{{ __('Cancel') }}
 					</el-button>
 				</template>
 			</el-table-column>
