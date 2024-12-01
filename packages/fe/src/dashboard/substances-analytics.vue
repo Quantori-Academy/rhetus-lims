@@ -5,6 +5,7 @@ import RhIcon from '../lib/components/rh-icon.vue';
 import { $api } from '../lib/api';
 import { differenceInDays } from 'date-fns';
 import { __ } from '../lib/locales';
+import { RouterLink } from 'vue-router';
 
 const analytics = ref({
 	total: 0,
@@ -41,9 +42,10 @@ onMounted(() => {
 
 <template>
 	<div class="container">
-		<div class="title">
+		<router-link class="title" to="/substances/list">
 			{{ __('Substances analytics') }}
-		</div>
+			<rh-icon name="arrow-right" />
+		</router-link>
 		<div class="progress-container">
 			<div class="progress-bar">
 				<div class="count">
@@ -94,10 +96,21 @@ onMounted(() => {
 	}
 
 	.title {
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		gap: 8px;
 		padding: 4px 4px 0px 4px;
+		color: var(--rh-color-black);
+		text-decoration: none;
 		white-space: nowrap;
 		font-weight: 500;
 		font-size: 16px;
+	}
+
+	.title:hover {
+		color: var(--rh-color-primary-700);
+		transition: all 300ms ease-in-out;
 	}
 }
 

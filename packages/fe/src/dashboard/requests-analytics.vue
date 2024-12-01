@@ -3,6 +3,8 @@ import { onMounted, ref } from 'vue';
 import * as echarts from 'echarts';
 import { $api } from '../lib/api';
 import { __ } from '../lib/locales';
+import RhIcon from '../lib/components/rh-icon.vue';
+import { RouterLink } from 'vue-router';
 
 const chartRef = ref(null);
 const analytics = ref({
@@ -80,9 +82,10 @@ onMounted(() => {
 <template>
 	<div class="container">
 		<div class="chart-container">
-			<div class="chart-title">
+			<router-link class="chart-title" to="/requests/list">
 				{{ 'Request analytics' }}
-			</div>
+				<rh-icon name="arrow-right" />
+			</router-link>
 			<div ref="chartRef" class="chart-container"></div>
 		</div>
 		<div class="stat-value-container">
@@ -133,9 +136,20 @@ onMounted(() => {
 }
 
 .chart-title {
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	gap: 8px;
 	padding: 4px 4px 0px 4px;
+	color: var(--rh-color-black);
+	text-decoration: none;
 	font-weight: 500;
 	font-size: 16px;
+}
+
+.chart-title:hover {
+	color: var(--rh-color-primary-700);
+	transition: all 300ms ease-in-out;
 }
 
 .chart-container {
