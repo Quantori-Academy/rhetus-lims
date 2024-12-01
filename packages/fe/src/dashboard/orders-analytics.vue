@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue';
 import * as echarts from 'echarts';
 import { $api } from '../lib/api';
+import { __ } from '../lib/locales';
 
 const chartRef = ref(null);
 const analytics = ref({
@@ -16,7 +17,7 @@ function initChart() {
 	const options = {
 		xAxis: {
 			type: 'category',
-			data: ['Pending', 'Fulfilled']
+			data: [__('Pending'), __('Fulfilled')]
 		},
 		yAxis: {
 			type: 'value'
@@ -63,26 +64,26 @@ onMounted(() => {
 	<div class="container">
 		<div class="chart-container">
 			<div class="chart-title">
-				<div>Order Analytics</div>
+				<div>{{ __('Order analytics') }}</div>
 			</div>
 			<div ref="chartRef" class="chart-container"></div>
 		</div>
 		<div class="values-container">
 			<div class="value">
-				Total
+				{{ __('Total') }}
 				<div class="value-number">{{ analytics.total }}</div>
 			</div>
 			<div class="value">
 				<div>
 					<span class="legend legend-pending" />
-					<span>Pending</span>
+					<span>{{ __('Pending') }}</span>
 				</div>
 				<div class="value-number">{{ analytics.pending }}</div>
 			</div>
 			<div class="value">
 				<div>
 					<span class="legend legend-fulfilled" />
-					<span>Fulfilled</span>
+					<span>{{ __('Fulfilled') }}</span>
 				</div>
 				<div class="value-number">{{ analytics.fulfilled }}</div>
 			</div>

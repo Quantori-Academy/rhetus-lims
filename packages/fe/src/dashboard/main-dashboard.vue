@@ -8,6 +8,7 @@ import RequestsAnalytics from './requests-analytics.vue';
 import OrdersAnalytics from './orders-analytics.vue';
 import InfoCards from './info-cards.vue';
 import NotificationsBox from './notifications-box.vue';
+import { __ } from '../lib/locales';
 
 const { user, isResearcher, isOfficer } = inject('user');
 </script>
@@ -15,11 +16,11 @@ const { user, isResearcher, isOfficer } = inject('user');
 <template>
 	<div class="container">
 		<div class="header">
-			<h1>Welcome, {{ user.firstName }}</h1>
+			<h1>{{ __('Welcome') }}, {{ user.firstName }}</h1>
 			<div class="date-time">
 				<div class="box">
 					<rh-icon name="calendar" />
-					{{ format(new Date(), "'Today, 'dd MMM") }}
+					{{ format(new Date(), `'${__('Today')}, 'dd MMM`) }}
 				</div>
 				<div class="box">
 					<rh-icon name="clock" />

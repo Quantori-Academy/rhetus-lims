@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue';
 import * as echarts from 'echarts';
 import { $api } from '../lib/api';
+import { __ } from '../lib/locales';
 
 const chartRef = ref(null);
 const analytics = ref({
@@ -16,8 +17,8 @@ function initChart() {
 	const chartInstance = echarts.init(chartRef.value);
 
 	const data = [
-		{ value: analytics.value.expired, name: 'Expired' },
-		{ value: analytics.value.notExpired, name: 'Not expired' }
+		{ value: analytics.value.expired, name: __('Expired') },
+		{ value: analytics.value.notExpired, name: __('Not expired') }
 	];
 
 	const options = {
@@ -30,7 +31,7 @@ function initChart() {
 		},
 		series: [
 			{
-				name: 'Substances',
+				name: __('Substances'),
 				type: 'pie',
 				radius: ['30%', '50%'],
 				center: ['30%', '50%'],
@@ -46,14 +47,20 @@ function initChart() {
 				label: {
 					position: 'center',
 					show: true,
-					formatter: () => `${analytics.value.total}\nSubstances`,
+					formatter: () => `${analytics.value.total}\n${__('Substances')}`,
 					fontSize: 14,
 					fontWeight: 'bold'
 				},
 				labelLine: {
 					show: false
 				},
-				data: [{ value: analytics.value.total, name: 'Total', itemStyle: { color: 'transparent' } }]
+				data: [
+					{
+						value: analytics.value.total,
+						name: __('Total'),
+						itemStyle: { color: 'transparent' }
+					}
+				]
 			}
 		]
 	};
@@ -100,7 +107,7 @@ onMounted(() => {
 	<div class="container">
 		<div class="chart-container">
 			<div class="chart-title">
-				<div>Expired Substances</div>
+				<div>{{ __('Expired substances') }}</div>
 			</div>
 			<div ref="chartRef" class="chart-container"></div>
 		</div>
@@ -108,26 +115,26 @@ onMounted(() => {
 			<div class="value">
 				<div>
 					<span class="legend legend-blue" />
-					<span>Expired</span>
+					<span>{{ __('Expired') }}</span>
 				</div>
 				<div class="value-number">{{ analytics.expired }}</div>
 			</div>
 			<div class="value">
 				<div>
 					<span class="legend legend-green" />
-					<span>Not expired</span>
+					<span>{{ __('Not expired') }}</span>
 				</div>
 				<div class="value-number">{{ analytics.notExpired }}</div>
 			</div>
 			<div class="value">
 				<div>
-					<span>Expired Samples</span>
+					<span>{{ __('Expired samples') }}</span>
 				</div>
 				<div class="value-number">{{ analytics.expiredSamples }}</div>
 			</div>
 			<div class="value">
 				<div>
-					<span>Expired Reagents</span>
+					<span>{{ __('Expired reagents') }}</span>
 				</div>
 				<div class="value-number">{{ analytics.expiredReagents }}</div>
 			</div>

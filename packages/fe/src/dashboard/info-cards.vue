@@ -3,6 +3,7 @@ import { inject, onMounted, ref } from 'vue';
 import { ElBadge } from 'element-plus';
 import RhIcon from '../lib/components/rh-icon.vue';
 import { $api } from '../lib/api';
+import { __ } from '../lib/locales';
 
 const { isAdmin, isOfficer } = inject('user');
 
@@ -13,26 +14,30 @@ async function getAnalytics() {
 	analytics.value.push({
 		value: substances,
 		icon: 'issue-type-test-case',
-		text: 'Total substances'
+		text: __('Total substances')
 	});
 
 	if (isAdmin.value) {
 		const users = await $api.users.fetchUsers({});
-		analytics.value.push({ value: users.count, icon: 'user', text: 'Total users' });
+		analytics.value.push({ value: users.count, icon: 'user', text: __('Total users') });
 
 		analytics.value.push({
 			value: users.users.reduce((acc, u) => (u.hasPasswordResetRequests ? acc + 1 : acc), 0),
 			icon: 'approval',
-			text: 'Password reset requests'
+			text: __('Password reset requests')
 		});
 	}
 
 	if (isOfficer.value) {
 		const orders = await $api.orders.fetchOrders({});
-		analytics.value.push({ value: orders.count, icon: 'container-image', text: 'Total orders' });
+		analytics.value.push({
+			value: orders.count,
+			icon: 'container-image',
+			text: __('Total orders')
+		});
 
 		const requests = await $api.requests.fetchRequests({});
-		analytics.value.push({ value: requests.count, icon: 'book', text: 'Total requests' });
+		analytics.value.push({ value: requests.count, icon: 'book', text: __('Total requests') });
 	}
 }
 
@@ -58,6 +63,7 @@ onMounted(() => {
 .icon {
 	padding: 2px;
 }
+
 .info-box-container {
 	display: flex;
 	gap: 16px;

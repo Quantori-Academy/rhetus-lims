@@ -4,6 +4,7 @@ import { ElProgress } from 'element-plus';
 import RhIcon from '../lib/components/rh-icon.vue';
 import { $api } from '../lib/api';
 import { differenceInDays } from 'date-fns';
+import { __ } from '../lib/locales';
 
 const analytics = ref({
 	total: 0,
@@ -41,32 +42,32 @@ onMounted(() => {
 <template>
 	<div class="container">
 		<div class="title">
-			<div>Substances Analytics</div>
+			<div>{{ __('Substances analytics') }}</div>
 		</div>
 
 		<div class="progress-container">
 			<div class="progress-bars">
 				<div class="total">
-					<div>Total</div>
-					<div>{{ analytics.total }} substances</div>
+					<div>{{ __('Total') }}</div>
+					<div>{{ analytics.total }} {{ __('Substances') }}</div>
 				</div>
 				<div class="progress">
 					<div class="progress-title">
 						<rh-icon name="applications" />
-						<div class="label">{{ analytics.samples }} samples</div>
+						<div class="label">{{ analytics.samples }} {{ __('Samples') }}</div>
 					</div>
 					<el-progress :percentage="analytics.samplesPercent" class="progress-bars" />
 				</div>
 				<div class="progress">
 					<div class="progress-title">
 						<rh-icon name="pod" />
-						<div class="label">{{ analytics.reagents }} reagents</div>
+						<div class="label">{{ analytics.reagents }} {{ __('Reagents') }}</div>
 					</div>
 					<el-progress :percentage="analytics.reagentsPercent" class="progress-bars" />
 				</div>
 				<div class="total">
-					<div>Average age</div>
-					<div>{{ analytics.averageAge }} days</div>
+					<div>{{ __('Average age') }}</div>
+					<div>{{ analytics.averageAge }} {{ __('Days') }}</div>
 				</div>
 			</div>
 		</div>

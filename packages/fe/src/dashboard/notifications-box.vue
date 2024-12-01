@@ -3,6 +3,8 @@ import { format } from 'date-fns';
 import { ElTag } from 'element-plus';
 import { onMounted, ref } from 'vue';
 import { $api } from '../lib/api';
+import { __ } from '../lib/locales';
+
 const notifications = ref({ notifications: [], count: 0 });
 
 async function setNotifications() {
@@ -17,7 +19,7 @@ onMounted(() => {
 
 <template>
 	<div class="notifications-container">
-		<div class="title">Notifications</div>
+		<div class="title">{{ __('Notifications') }}</div>
 		<div class="content">
 			<div v-for="n of notifications.notifications" :key="n.id" class="list-item">
 				<p>{{ n.message }}</p>
@@ -26,7 +28,7 @@ onMounted(() => {
 						{{ format(new Date(n.createdAt), 'dd MMM yyyy, HH:mm') }}
 					</div>
 					<el-tag size="small" :type="n.requestId !== '' ? 'primary' : 'success'">
-						{{ n.requestId !== '' ? 'New request update' : 'New order update' }}
+						{{ n.requestId !== '' ? __('New request update') : __('New order update') }}
 					</el-tag>
 				</div>
 			</div>

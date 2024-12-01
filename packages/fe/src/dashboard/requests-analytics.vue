@@ -1,7 +1,8 @@
 <script setup>
-import { inject, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import * as echarts from 'echarts';
 import { $api } from '../lib/api';
+import { __ } from '../lib/locales';
 
 const chartRef = ref(null);
 const analytics = ref({
@@ -12,15 +13,13 @@ const analytics = ref({
 	cancelled: 0
 });
 
-const { isOfficer } = inject('user');
-
 function initChart() {
 	const chartInstance = echarts.init(chartRef.value);
 
 	const options = {
 		xAxis: {
 			type: 'category',
-			data: ['Pending', 'Ordered', 'Fulfilled', 'Cancelled']
+			data: [__('Pending'), __('Ordered'), __('Fulfilled'), __('Cancelled')]
 		},
 		yAxis: {
 			type: 'value'
@@ -82,40 +81,40 @@ onMounted(() => {
 	<div class="container">
 		<div class="chart-container">
 			<div class="chart-title">
-				<div>{{ isOfficer ? '' : 'My ' }}Request Analytics</div>
+				<div>{{ 'Request analytics' }}</div>
 			</div>
 			<div ref="chartRef" class="chart-container"></div>
 		</div>
 		<div class="values-container">
 			<div class="value">
-				Total
+				{{ __('Total') }}
 				<div class="value-number">{{ analytics.total }}</div>
 			</div>
 			<div class="value">
 				<div>
 					<span class="legend legend-pending" />
-					<span>Pending</span>
+					<span>{{ __('Pending') }}</span>
 				</div>
 				<div class="value-number">{{ analytics.pending }}</div>
 			</div>
 			<div class="value">
 				<div>
 					<span class="legend legend-ordered" />
-					<span>Ordered</span>
+					<span>{{ __('Ordered') }}</span>
 				</div>
 				<div class="value-number">{{ analytics.ordered }}</div>
 			</div>
 			<div class="value">
 				<div>
 					<span class="legend legend-fulfilled" />
-					<span>Fulfilled</span>
+					<span>{{ __('Fulfilled') }}</span>
 				</div>
 				<div class="value-number">{{ analytics.fulfilled }}</div>
 			</div>
 			<div class="value">
 				<div>
 					<span class="legend legend-cancelled" />
-					<span>Cancelled</span>
+					<span>{{ __('Cancelled') }}</span>
 				</div>
 				<div class="value-number">{{ analytics.cancelled }}</div>
 			</div>
