@@ -1,7 +1,6 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { inject, onMounted, ref } from 'vue';
 import * as echarts from 'echarts';
-import RhIcon from '../lib/components/rh-icon.vue';
 import { $api } from '../lib/api';
 
 const chartRef = ref(null);
@@ -12,6 +11,8 @@ const analytics = ref({
 	fulfilled: 0,
 	cancelled: 0
 });
+
+const { isOfficer } = inject('user');
 
 function initChart() {
 	const chartInstance = echarts.init(chartRef.value);
@@ -81,8 +82,7 @@ onMounted(() => {
 	<div class="container">
 		<div class="chart-container">
 			<div class="chart-title">
-				<div>Requests Analytics</div>
-				<rh-icon name="arrow-right" />
+				<div>{{ isOfficer ? '' : 'My ' }}Request Analytics</div>
 			</div>
 			<div ref="chartRef" class="chart-container"></div>
 		</div>
@@ -134,9 +134,6 @@ onMounted(() => {
 }
 
 .chart-title {
-	display: flex;
-	align-items: center;
-	gap: 8px;
 	padding: 4px 4px 0px 4px;
 	font-weight: 500;
 	font-size: 16px;

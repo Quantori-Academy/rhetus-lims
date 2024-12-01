@@ -1,7 +1,6 @@
 <script setup>
 import { format } from 'date-fns';
 import { ElTag } from 'element-plus';
-import RhIcon from '../lib/components/rh-icon.vue';
 import { onMounted, ref } from 'vue';
 import { $api } from '../lib/api';
 const notifications = ref({ notifications: [], count: 0 });
@@ -18,10 +17,7 @@ onMounted(() => {
 
 <template>
 	<div class="notifications-container">
-		<div class="title">
-			<rh-icon name="notifications" color="#4c8fd2" size="18" />
-			Notifications
-		</div>
+		<div class="title">Notifications</div>
 		<div class="content">
 			<div v-for="n of notifications.notifications" :key="n.id" class="list-item">
 				<p>{{ n.message }}</p>
@@ -52,7 +48,6 @@ onMounted(() => {
 	align-items: center;
 	gap: 8px;
 	padding: 20px 20px 0px 20px;
-	font-weight: 500;
 	font-size: 16px;
 }
 

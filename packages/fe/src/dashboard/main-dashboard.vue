@@ -2,6 +2,7 @@
 import { format } from 'date-fns';
 import { inject } from 'vue';
 import RhIcon from '../lib/components/rh-icon.vue';
+import ExpiredSubstancesAnalytics from './expired-substances-analytics.vue';
 import SubstancesAnalytics from './substances-analytics.vue';
 import RequestsAnalytics from './requests-analytics.vue';
 import OrdersAnalytics from './orders-analytics.vue';
@@ -39,8 +40,11 @@ const { user, isResearcher, isOfficer } = inject('user');
 			<div v-if="isOfficer" class="orders">
 				<orders-analytics />
 			</div>
-			<div class="stats">
+			<div v-else class="orders">
 				<substances-analytics />
+			</div>
+			<div class="stats">
+				<expired-substances-analytics />
 			</div>
 		</div>
 	</div>
@@ -72,13 +76,12 @@ const { user, isResearcher, isOfficer } = inject('user');
 
 .orders {
 	display: flex;
-	flex: 2;
+	flex: 3;
 	justify-content: center;
 	align-items: center;
 	width: 100%;
 	height: 100%;
 }
-
 
 .header {
 	display: flex;

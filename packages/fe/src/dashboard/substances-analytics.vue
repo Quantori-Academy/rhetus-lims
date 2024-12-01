@@ -1,81 +1,29 @@
 <script setup>
 import { onMounted, ref } from 'vue';
-import * as echarts from 'echarts';
 import { ElProgress } from 'element-plus';
 import RhIcon from '../lib/components/rh-icon.vue';
 import { $api } from '../lib/api';
+import { differenceInDays } from 'date-fns';
 
-const chartRef = ref(null);
 const analytics = ref({
 	total: 0,
-	expired: 0,
-	notExpired: 0,
 	reagents: 0,
 	samples: 0,
 	reagentsPercent: 0,
-	samplesPercent: 0
+	samplesPercent: 0,
+	averageAge: 0
 });
 
-function initChart() {
-	const chartInstance = echarts.init(chartRef.value);
-
-	const data = [
-		{ value: analytics.value.expired, name: 'Expired' },
-		{ value: analytics.value.notExpired, name: 'Not expired' }
-	];
-
-	const options = {
-		tooltip: {
-			trigger: 'item'
-		},
-		legend: {
-			right: '10%',
-			top: '10%'
-		},
-		series: [
-			{
-				name: 'Substances',
-				type: 'pie',
-				radius: ['30%', '50%'],
-				center: ['30%', '50%'],
-				label: {
-					show: false
-				},
-				data: data
-			},
-			{
-				type: 'pie',
-				radius: ['0%', '30%'],
-				center: ['30%', '50%'],
-				label: {
-					position: 'center',
-					show: true,
-					formatter: () => `${analytics.value.total}\nSubstances`,
-					fontSize: 14,
-					fontWeight: 'bold'
-				},
-				labelLine: {
-					show: false
-				},
-				data: [{ value: analytics.value.total, name: 'Total', itemStyle: { color: 'transparent' } }]
-			}
-		]
-	};
-	chartInstance.setOption(options);
-}
-
 async function getAnalytics() {
-	const { count: total } = await $api.substances.fetchSubstances({});
+	const { substances, count: total } = await $api.substances.fetchSubstances({ limit: 1000 });
 	analytics.value.total = total;
-	const expiredParams = {
-		options: {
-			expirationDate: [new Date('0001-01-01T00:00:00.000Z'), new Date()]
-		}
-	};
 
-	const { count: expired } = await $api.substances.fetchSubstances(expiredParams);
-	analytics.value.expired = expired;
-	analytics.value.notExpired = total - expired;
+	const now = new Date();
+	const totalAge = substances.reduce(
+		(sum, substance) => sum + differenceInDays(new Date(substance.expirationDate), now),
+		0
+	);
+	analytics.value.averageAge = Math.round(totalAge / substances.length);
 
 	const categoryParams = { options: { category: 'reagent' } };
 	const { count: reagents } = await $api.substances.fetchSubstances(categoryParams);
@@ -86,33 +34,40 @@ async function getAnalytics() {
 }
 
 onMounted(() => {
-	getAnalytics().then(() => initChart());
+	getAnalytics();
 });
 </script>
 
 <template>
 	<div class="container">
-		<div class="chart-container">
-			<div class="chart-title">
-				<div>Substances Analytics</div>
-				<rh-icon name="arrow-right" />
-			</div>
-			<div ref="chartRef" class="chart-container"></div>
+		<div class="title">
+			<div>Substances Analytics</div>
 		</div>
+
 		<div class="progress-container">
-			<div class="progress">
-				<div class="progress-title">
-					<rh-icon name="applications" />
-					<div>{{ analytics.samples }} samples</div>
+			<div class="progress-bars">
+				<div class="total">
+					<div>Total</div>
+					<div>{{ analytics.total }} substances</div>
 				</div>
-				<el-progress :percentage="analytics.samplesPercent" />
-			</div>
-			<div>
-				<div class="progress-title">
-					<rh-icon name="pod" />
-					<div>{{ analytics.reagents }} reagents</div>
+				<div class="progress">
+					<div class="progress-title">
+						<rh-icon name="applications" />
+						<div class="label">{{ analytics.samples }} samples</div>
+					</div>
+					<el-progress :percentage="analytics.samplesPercent" class="progress-bars" />
 				</div>
-				<el-progress :percentage="analytics.reagentsPercent" />
+				<div class="progress">
+					<div class="progress-title">
+						<rh-icon name="pod" />
+						<div class="label">{{ analytics.reagents }} reagents</div>
+					</div>
+					<el-progress :percentage="analytics.reagentsPercent" class="progress-bars" />
+				</div>
+				<div class="total">
+					<div>Average age</div>
+					<div>{{ analytics.averageAge }} days</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -121,44 +76,59 @@ onMounted(() => {
 <style scoped>
 .container {
 	display: flex;
-	align-items: center;
+	flex-direction: column;
+	padding: 12px;
 	width: 100%;
 	height: 100%;
 	border-radius: 12px;
 	background-color: var(--rh-color-neutral-250);
 }
 
-.chart-container {
-	height: 280px;
+.total {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 24px;
+
+	div {
+		font-weight: 700;
+	}
 }
 
-.chart-title {
-	display: flex;
-	align-items: center;
-	gap: 8px;
+.title {
+	align-self: flex-start;
 	padding: 4px 4px 0px 4px;
+	white-space: nowrap;
 	font-weight: 500;
 	font-size: 16px;
 }
 
-.chart-container {
-	flex-grow: 1;
-	margin-left: 0;
+.progress-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 0px 12px 12px 12px;
 	width: 100%;
-	max-width: 300px;
+	height: 100%;
+}
+
+.progress-bars {
+	width: 100%;
+}
+
+.label {
+	white-space: nowrap;
+}
+
+.progress {
+	display: flex;
+	gap: 8px;
+	margin-bottom: 24px;
+	width: 100%;
 }
 
 .progress-title {
 	display: flex;
 	align-items: center;
 	gap: 8px;
-}
-
-.progress-container {
-	width: 100%;
-}
-
-.progress {
-	margin-bottom: 12px;
 }
 </style>

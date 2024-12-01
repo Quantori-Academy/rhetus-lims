@@ -1,7 +1,6 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import * as echarts from 'echarts';
-import RhIcon from '../lib/components/rh-icon.vue';
 import { $api } from '../lib/api';
 
 const chartRef = ref(null);
@@ -64,8 +63,7 @@ onMounted(() => {
 	<div class="container">
 		<div class="chart-container">
 			<div class="chart-title">
-				<div>Orders Analytics</div>
-				<rh-icon name="arrow-right" />
+				<div>Order Analytics</div>
 			</div>
 			<div ref="chartRef" class="chart-container"></div>
 		</div>
@@ -103,9 +101,6 @@ onMounted(() => {
 }
 
 .chart-title {
-	display: flex;
-	align-items: center;
-	gap: 8px;
 	padding: 4px 4px 0px 4px;
 	font-weight: 500;
 	font-size: 16px;
@@ -140,12 +135,15 @@ onMounted(() => {
 .legend-pending {
 	background-color: #5470c6;
 }
+
 .legend-ordered {
 	background-color: #fac858;
 }
+
 .legend-fulfilled {
 	background-color: #91cc75;
 }
+
 .legend-cancelled {
 	background-color: #ee6666;
 }
