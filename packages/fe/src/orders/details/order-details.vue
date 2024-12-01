@@ -111,6 +111,18 @@ const removeLinkedRequest = async selectedRequest => {
 		$notifyUserAboutError(error);
 	}
 };
+const removeReagent = async selectedReagent => {
+	try {
+		// ! test id for prod
+		const body = { reagentRequests: [], reagents: [selectedReagent.tempId] };
+		const response = await $api.orders.removeItemFromOrder(order.value.id, body);
+		if (response.status === 'success') {
+			await setOrder(order.value.id);
+		}
+	} catch (error) {
+		$notifyUserAboutError(error);
+	}
+};
 </script>
 
 <template>
@@ -171,6 +183,7 @@ const removeLinkedRequest = async selectedRequest => {
 				@set-order="setOrder"
 				@toggle-off-edit="toggleOffEdit"
 				@remove-linked-request="removeLinkedRequest"
+				@remove-reagent="removeReagent"
 			/>
 		</div>
 

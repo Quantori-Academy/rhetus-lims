@@ -12,9 +12,7 @@ import {
 import { defineProps, computed, watch, ref } from 'vue';
 import { quantityUnits } from '../../../lib/constants/quantity-units.js';
 import RhIcon from '../../../lib/components/rh-icon.vue';
-import { $notifyUserAboutError } from '../../../lib/utils/feedback/notify-msg.js';
 import NewSubstances from './new-substances.vue';
-import { $api } from '../../../lib/api/index.js';
 
 const props = defineProps({
 	order: {
@@ -27,7 +25,7 @@ const props = defineProps({
 	},
 	linkedRequests: { type: Array, default: null }
 });
-const emit = defineEmits(['set-order']);
+const emit = defineEmits(['set-order', 'remove-reagent']);
 const createChangeTrackerEntry = item => {
 	return Object.keys(item).reduce((acc, field) => {
 		acc[field] = false;
@@ -86,17 +84,8 @@ const getChangedItems = () => {
 	});
 };
 
-const removeReagent = async selectedReagent => {
-	try {
-		// ! test id for prod
-		const body = { reagentRequests: [], reagents: [selectedReagent.tempId] };
-		const response = await $api.orders.removeItemFromOrder(props.order.id, body);
-		if (response.status === 'success') {
-			setOrder(props.order.id);
-		}
-	} catch (error) {
-		$notifyUserAboutError(error);
-	}
+const removeReagent = selectedReagent => {
+	emit('remove-reagent', selectedReagent);
 };
 const setOrder = id => {
 	emit('set-order', id);

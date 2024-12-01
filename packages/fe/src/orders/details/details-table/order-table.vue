@@ -24,7 +24,12 @@ const childTwoRef = ref(null);
 const isOrderValid = computed(
 	() => [...props.order.reagents, ...props.order.reagentRequests].length > 0
 );
-const emit = defineEmits(['remove-linked-request', 'set-order', 'toggle-off-edit']);
+const emit = defineEmits([
+	'remove-linked-request',
+	'set-order',
+	'toggle-off-edit',
+	'remove-reagent'
+]);
 const removeLinkedRequest = selectedRequest => {
 	emit('remove-linked-request', selectedRequest);
 };
@@ -33,6 +38,9 @@ const toggleOffEdit = () => {
 };
 const setOrder = id => {
 	emit('set-order', id);
+};
+const removeReagent = selectedReagent => {
+	emit('remove-reagent', selectedReagent);
 };
 const updateReagents = async () => {
 	const changesFromChildOne = childOneRef.value.getChanges();
@@ -87,6 +95,7 @@ const updateReagents = async () => {
 				:linked-requests="linkedRequests"
 				@set-order="setOrder"
 				@toggle-off-edit="toggleOffEdit"
+				@remove-reagent="removeReagent"
 			/>
 			<div v-if="isEdit" class="btn-container">
 				<el-button type="primary" :disabled="!isOrderValid" @click="updateReagents"
