@@ -17,6 +17,7 @@ import { $route, $router } from '../../lib/router/router';
 import { formRules, emptyReagent, confirmNotify } from './constants.js';
 import { checkEditedFields } from '../../substances/constants';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
+import TimelineHistory from '../../timeline/timeline-history.vue';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { __ } from '../../lib/locales/index.js';
 
@@ -234,6 +235,7 @@ onMounted(() => {
 				</div>
 			</div>
 		</el-form>
+		<timeline-history :id="props.id" category="reagent" />
 	</div>
 </template>
 

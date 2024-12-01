@@ -20,6 +20,7 @@ import { checkEditedFields } from '../../../substances/constants';
 import RhIcon from '../../../lib/components/rh-icon.vue';
 import SubstancesUsed from './substances-used.vue';
 import { __ } from '../../../lib/locales';
+import TimelineHistory from '../../../timeline/timeline-history.vue';
 
 const props = defineProps({ id: { type: String, default: null } });
 const storages = ref([]);
@@ -231,5 +232,6 @@ watch(
 				</div>
 			</div>
 		</el-form>
+		<timeline-history :id="props.id" category="sample" />
 	</div>
 </template>
