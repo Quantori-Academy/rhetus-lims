@@ -179,6 +179,7 @@
 		"Samples": ["Samples"],
 		"Reagents": ["Reagent"],
 		"Average age": ["Average age"],
-		"Days": ["Days"]
+		"Days": ["Days"],
+		"No notifications": ["No notifications"]
 	}
 }

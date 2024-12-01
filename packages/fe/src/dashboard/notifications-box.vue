@@ -32,6 +32,7 @@ onMounted(() => {
 					</el-tag>
 				</div>
 			</div>
+			<div v-if="notifications.count === 0">{{ __('No notifications') }}</div>
 		</div>
 	</div>
 </template>
