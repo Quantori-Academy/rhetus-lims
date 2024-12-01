@@ -7,6 +7,7 @@ import { $api } from '../../lib/api/index.js';
 import { formRef, formRules } from './constants.js';
 import SubstanceManagement from './substance-management.vue';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
+import { onBeforeRouteLeave } from 'vue-router';
 
 const formEl = useTemplateRef('form-el');
 const isSaving = ref(false);
@@ -130,6 +131,10 @@ const cancelForm = async () => {
 		$router.push({ name: 'substances-list' });
 	}
 };
+onBeforeRouteLeave((to, from, next) => {
+	resetForm();
+	next();
+});
 const updateItem = ({ id, type, field, newValue }) => {
 	let reagentToUpdate;
 	if (type === 'reagentRequests') {

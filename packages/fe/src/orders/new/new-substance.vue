@@ -17,7 +17,8 @@ import { $api } from '../../lib/api/index.js';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 
 const props = defineProps({
-	form: { type: Object, default: null }
+	form: { type: Object, default: null },
+	combinedItems: { type: Array, default: null }
 });
 const newSubstanceEl = useTemplateRef('new-substance');
 const newSubstance = ref(newSubstanceRef);
@@ -104,6 +105,7 @@ const fetchSubstanceSuggestions = async (queryString, callback) => {
 </script>
 
 <template>
+	<h2 v-if="combinedItems.length > 0" class="el-form-item__label">Add Substances</h2>
 	<el-form ref="new-substance" :model="newSubstance" class="row" :rules="rules">
 		<el-form-item prop="reagentName">
 			<span class="desktop">Name</span>
@@ -138,3 +140,11 @@ const fetchSubstanceSuggestions = async (queryString, callback) => {
 		/></el-button>
 	</el-form>
 </template>
+
+<style scoped>
+.el-form-item__label {
+	display: flex;
+	justify-content: left;
+	max-width: 100%;
+}
+</style>

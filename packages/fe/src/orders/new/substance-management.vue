@@ -233,6 +233,7 @@ const fetchRequestSuggestions = async (queryString, callback) => {
 			</el-form>
 			<new-substance
 				:form="props.form"
+				:combined-items="combinedItems"
 				@add-new-reagent="addNewReagent"
 				@add-existing-reagent="addExistingReagent"
 			/>
