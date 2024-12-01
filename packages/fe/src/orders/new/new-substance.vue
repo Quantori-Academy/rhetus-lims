@@ -42,7 +42,7 @@ const fetchSubstances = async () => {
 			substance => substance.category === 'reagent'
 		);
 	} catch (error) {
-		$notifyUserAboutError(error.message || 'Error retrieving substances');
+		$notifyUserAboutError(error);
 	}
 };
 const addNewReagent = async () => {

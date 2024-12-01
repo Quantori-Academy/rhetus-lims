@@ -1,6 +1,3 @@
-export const isEmpty = value => value === null || value === undefined || value.length === 0;
-export const isNumberEmpty = value => value === null || value === undefined;
-
 export const requiredRule = fieldName => {
 	return {
 		required: true,
@@ -42,29 +39,6 @@ export const notEmptyArrayRule = {
 	},
 	trigger: ['blur', 'change']
 };
-
-// export const generateSubstanceRules = combinedItems => {
-// 	const rules = {};
-
-// 	combinedItems.forEach((item, index) => {
-// 		if (isEmpty(item.reagentName)) {
-// 			rules[`combinedItems[${index}].reagentName`] = [
-// 				{ required: true, message: 'Name is required', trigger: 'blur' }
-// 			];
-// 		}
-// 		if (isEmpty(item.quantityUnit)) {
-// 			rules[`combinedItems[${index}].quantityUnit`] = [requiredRule('Unit')];
-// 		}
-// 		if (isNumberEmpty(item.quantity)) {
-// 			rules[`combinedItems[${index}].quantity`] = [numberFieldRule('Quantity')];
-// 		}
-// 		if (isNumberEmpty(item.amount)) {
-// 			rules[`combinedItems[${index}].amount`] = [numberFieldRule('Amount')];
-// 		}
-// 	});
-// 	console.log(rules);
-// 	return rules;
-// };
 
 export const formRef = {
 	title: '',

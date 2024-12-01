@@ -56,28 +56,14 @@ onMounted(() => {
 	fetchRequests();
 });
 
-function removeReagent(id, type) {
-	emit('remove-reagent', id, type);
-}
-const addNewReagent = async newReagent => {
-	emit('add-new-reagent', newReagent);
-};
-const addExistingReagent = async selectedReagent => {
-	emit('add-existing-reagent', selectedReagent);
-};
-const removeLinkedRequest = async selectedReagent => {
-	emit('remove-request', selectedReagent);
-};
-const linkRequest = selectedRequest => {
-	emit('link-request', selectedRequest);
-};
-const cancel = () => {
-	emit('cancel-form');
-};
-const submit = async () => {
-	emit('submit');
-};
-const handleInputChange = async (id, type, field, newValue) => {
+const removeReagent = (id, type) => emit('remove-reagent', id, type);
+const addNewReagent = newReagent => emit('add-new-reagent', newReagent);
+const addExistingReagent = selectedReagent => emit('add-existing-reagent', selectedReagent);
+const removeLinkedRequest = selectedReagent => emit('remove-request', selectedReagent);
+const linkRequest = selectedRequest => emit('link-request', selectedRequest);
+const cancel = () => emit('cancel-form');
+const submit = () => emit('submit');
+const handleInputChange = (id, type, field, newValue) => {
 	emit('update-item', {
 		id,
 		type,
@@ -96,32 +82,27 @@ const fetchRequests = async () => {
 		const data = await $api.requests.fetchRequests();
 		incomingRequests.value = {
 			...data,
-			requests: [...data.requests.filter(request => request.status === 'pending')]
+			requests: data.requests.filter(request => request.status === 'pending')
 		};
 	} catch (error) {
-		$notifyUserAboutError(error.message || 'Error retrieving request');
+		$notifyUserAboutError(error);
 	} finally {
 		loading.value = false;
 	}
 };
 const fetchRequestSuggestions = async (queryString, callback) => {
 	const existingReagentIds = props.form.reagents.map(reagent => reagent.id);
-	if (!queryString) {
-		const filteredRequests = incomingRequests.value.requests.filter(
-			request =>
-				!props.linkedRequests.some(linkedRequest => linkedRequest.id === request.id) &&
-				!existingReagentIds.includes(request.id)
+	const filteredRequests = incomingRequests.value.requests.filter(request => {
+		const isNotLinkedOrExisting =
+			!props.linkedRequests.some(linkedRequest => linkedRequest.id === request.id) &&
+			!existingReagentIds.includes(request.id);
+
+		return (
+			isNotLinkedOrExisting &&
+			(!queryString || request.reagentName.toLowerCase().includes(queryString.toLowerCase()))
 		);
-		callback(filteredRequests);
-	} else {
-		const filteredRequests = incomingRequests.value.requests.filter(
-			request =>
-				request.reagentName.toLowerCase().includes(queryString.toLowerCase()) &&
-				!props.linkedRequests.some(linkedRequest => linkedRequest.id === request.id) &&
-				!existingReagentIds.includes(request.id)
-		);
-		callback(filteredRequests);
-	}
+	});
+	callback(filteredRequests);
 };
 </script>
 
@@ -141,7 +122,6 @@ const fetchRequestSuggestions = async (queryString, callback) => {
 				<span class="mobile">Quantity</span>
 				<span class="mobile">Amount</span>
 			</div>
-
 			<el-form
 				v-for="(singleItem, index) of combinedItems"
 				:key="singleItem.id"

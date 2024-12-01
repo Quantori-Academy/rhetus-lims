@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref, useTemplateRef } from 'vue';
+import { computed, nextTick, onMounted, ref, useTemplateRef } from 'vue';
 import { ElInput, ElForm, ElFormItem } from 'element-plus';
 import { $route, $router } from '../../lib/router/router.js';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
@@ -35,7 +35,7 @@ const fetchSubstances = async id => {
 		};
 		form.value.reagents = [...form.value.reagents, newReagent];
 	} catch (error) {
-		$notifyUserAboutError(error.message || 'Error fetching reagent');
+		$notifyUserAboutError(error);
 	} finally {
 		loading.value = false;
 	}
@@ -104,21 +104,32 @@ async function submit() {
 		$notify({ message: response.message, type: 'success' });
 		$router.push({ name: 'orders-list' });
 	} catch (error) {
-		$notifyUserAboutError(error.statusText);
+		$notifyUserAboutError(error);
 	} finally {
 		isSaving.value = false;
-		formEl.value.resetFields();
-		form.value = { ...formRef };
+		resetForm();
 	}
 }
-function cancelForm() {
-	formEl.value.resetFields();
+const resetForm = () => {
+	form.value.reagents = [];
+	form.value.reagentRequests = [];
+	form.value.newReagents = [];
+	linkedRequests.value = [];
+	form.value = { ...formRef };
+	if (formEl.value) {
+		formEl.value.resetFields();
+	}
+};
+
+const cancelForm = async () => {
+	resetForm();
+	await nextTick();
 	if (isRequest.value) {
 		$router.push({ name: 'orders-list' });
 	} else {
 		$router.push({ name: 'substances-list' });
 	}
-}
+};
 const updateItem = ({ id, type, field, newValue }) => {
 	let reagentToUpdate;
 	if (type === 'reagentRequests') {
