@@ -1,14 +1,17 @@
 /* eslint-disable max-lines */
 <script setup>
-import { ElForm, ElInput, ElButton, ElFormItem, ElDatePicker, ElTag } from 'element-plus';
+import { ElForm, ElInput, ElFormItem, ElDatePicker, ElTag } from 'element-plus';
 import { $notifyUserAboutError, $notify } from '../../lib/utils/feedback/notify-msg';
-import { computed, onMounted, useTemplateRef, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { $api } from '../../lib/api/index.js';
 import { $route, $router } from '../../lib/router/router';
-import { findUpdatedItems, getButtonType, orderFormRules, orderRef } from './constants.js';
-import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
-import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
-import RhIcon from '../../lib/components/rh-icon.vue';
+import {
+	findUpdatedItems,
+	getButtonType,
+	orderFormRules,
+	orderRef,
+	updatedItemsRef
+} from './constants.js';
 import TimelineStatuses from '../../timeline/timeline-statuses.vue';
 import OrderTable from './details-table/order-table.vue';
 import RequestSuggestions from './request-suggestions.vue';
@@ -20,12 +23,14 @@ const props = defineProps({
 		default: null
 	}
 });
-const orderForm = useTemplateRef('form-ref');
 const rules = ref(orderFormRules);
 const order = ref(orderRef);
+const updatedItems = ref(updatedItemsRef);
 const originalOrder = ref({});
 const linkedRequests = ref([]);
+const suggestedRequests = ref([]);
 const loading = ref(true);
+const apiCalls = ref([]);
 const isEdit = computed(() => $route.value.name === 'order-details-edit');
 const isOrderValid = computed(
 	() => order.value.reagents.length > 0 || order.value.reagentRequests.length > 0
@@ -34,44 +39,88 @@ const statusesHistory = ref(null);
 const isReagentAdded = computed(() => {
 	return order.value.reagents.length > 0 || order.value.reagentRequests.length > 0;
 });
-const updatedItems = ref([]);
 
+onMounted(() => {
+	fetchRequests();
+	setOrder(props.id);
+});
 const getUpdatedFields = async (original, current) => {
-	findUpdatedItems(original.reagentRequests, current.reagentRequests, updatedItems.value);
-	findUpdatedItems(original.reagents, current.reagents, updatedItems.value);
+	findUpdatedItems(
+		'requests',
+		original.reagentRequests,
+		current.reagentRequests,
+		updatedItems.value
+	);
+	findUpdatedItems('reagents', original.reagents, current.reagents, updatedItems.value);
 };
+
+const updateOrderItems = () => {
+	if (updatedItems.value.updates.length > 0) {
+		const body = { orderItems: updatedItems.value.updates };
+		apiCalls.value.push($api.orders.updateItemInOrder(order.value.id, body));
+	}
+};
+
+const updateNewItems = () => {
+	if (
+		updatedItems.value.reagents.length > 0 ||
+		updatedItems.value.reagentRequests.length > 0 ||
+		updatedItems.value.newReagents.length > 0
+	) {
+		const body = {
+			reagentRequests: updatedItems.value.reagentRequests,
+			reagents: updatedItems.value.reagents,
+			newReagents: updatedItems.value.newReagents
+		};
+		apiCalls.value.push($api.orders.addItemToOrder(order.value.id, body));
+	}
+};
+
+const updateOrderIfo = () => {
+	const updatedFields = {
+		title: order.value.title,
+		seller: order.value.seller
+	};
+	if (updatedFields.title || updatedFields.seller) {
+		apiCalls.value.push($api.orders.updateOrder(order.value.id, updatedFields));
+	}
+};
+
 const submitSubstances = async () => {
 	await getUpdatedFields({ ...originalOrder.value }, { ...order.value });
-	if (updatedItems.value.length === 0) {
+	updateOrderItems();
+	updateNewItems();
+	updateOrderIfo();
+	if (apiCalls.value.length === 0) {
 		$router.push({ name: 'order-details', params: { id: order.value.id } });
+		return;
 	}
 	try {
-		const body = {
-			orderItems: updatedItems.value
-		};
-		const response = await $api.orders.updateItemInOrder(order.value.id, body);
-		if (response.status === 'success') {
+		const responses = await Promise.all(apiCalls.value);
+		const success = responses.every(response => response.status === 'success');
+		if (success) {
+			await setOrder(order.value.id);
 			$router.push({ name: 'order-details', params: { id: order.value.id } });
 		}
 	} catch (error) {
 		$notifyUserAboutError(error);
+	} finally {
+		resetDataChanges();
 	}
-	updatedItems.value = [];
 };
-
-const handleLinkedRequestsUpdate = updatedRequests => {
-	linkedRequests.value = updatedRequests;
+const resetDataChanges = () => {
+	updatedItems.value.reagents = [];
+	updatedItems.value.reagentRequests = [];
+	updatedItems.value.updates = [];
+	updatedItems.value.newReagents = [];
+	order.value.newReagents = [];
+	apiCalls.value = [];
 };
-
-onMounted(() => {
-	setOrder(props.id);
-});
-
 const setOrder = async id => {
 	loading.value = true;
 	try {
 		const fetchedOrder = await $api.orders.fetchOrder(id);
-		order.value = { ...fetchedOrder };
+		order.value = { ...fetchedOrder, newReagents: [] };
 		originalOrder.value = JSON.parse(JSON.stringify(fetchedOrder));
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating order');
@@ -79,36 +128,28 @@ const setOrder = async id => {
 		loading.value = false;
 	}
 };
-const cancelEdit = () => {
+const cancelEdit = async () => {
+	order.value = {
+		...JSON.parse(JSON.stringify(originalOrder.value)),
+		newReagents: []
+	};
 	$router.push({ name: 'order-details', params: { id: order.value.id } });
 	$notify({
 		title: 'Canceled',
 		message: 'Order editing canceled',
 		type: 'info'
 	});
-	order.value = { ...originalOrder.value };
-	orderForm.value.resetFields();
 };
 
-const updateOrder = async () => {
+const fetchRequests = async () => {
 	try {
-		if (!(await $isFormValid(orderForm))) return;
-		const updatedFields = {
-			title: order.value.title,
-			seller: order.value.seller
+		const data = await $api.requests.fetchRequests();
+		suggestedRequests.value = {
+			...data,
+			requests: data.requests.filter(request => request.status === 'pending')
 		};
-		const response = await $api.orders.updateOrder(order.value.id, updatedFields);
-		$notify({
-			title: 'Success',
-			message: response.message,
-			type: 'success'
-		});
-		if (response.status === 'success') {
-			await setOrder(props.id);
-		}
-		$router.push({ name: 'order-details' });
 	} catch (error) {
-		$notifyUserAboutError(error.message || 'Error updating order');
+		$notifyUserAboutError(error.message || 'Error retrieving request');
 	}
 };
 
@@ -123,9 +164,18 @@ const setStatusesHistory = async () => {
 		loading.value = false;
 	}
 };
-const removeLinkedRequest = async selectedRequest => {
+watch(
+	() => order.value.reagentRequests,
+	newReagentRequests => {
+		linkedRequests.value = [...newReagentRequests];
+		fetchRequests();
+	},
+	{ deep: true, immediate: true }
+);
+
+const removeLinkedRequest = async selected => {
 	try {
-		const body = { reagentRequests: [selectedRequest.tempId], reagents: [] };
+		const body = { reagentRequests: [selected.tempId], reagents: [] };
 		const response = await $api.orders.removeItemFromOrder(order.value.id, body);
 		if (response.status === 'success') {
 			await setOrder(props.id);
@@ -134,10 +184,19 @@ const removeLinkedRequest = async selectedRequest => {
 		$notifyUserAboutError(error);
 	}
 };
-const removeReagent = async selectedReagent => {
+const removeReagent = async selected => {
+	if (selected.type === 'newReagents') {
+		order.value.newReagents = order.value.newReagents.filter(
+			reagent => reagent.tempId !== selected.tempId
+		);
+		updatedItems.value.newReagents = updatedItems.value.newReagents.filter(
+			reagent => reagent.tempId !== selected.tempId
+		);
+		return;
+	}
 	try {
 		// ! test id for prod
-		const body = { reagentRequests: [], reagents: [selectedReagent.tempId] };
+		const body = { reagentRequests: [], reagents: [selected.tempId] };
 		const response = await $api.orders.removeItemFromOrder(order.value.id, body);
 		if (response.status === 'success') {
 			await setOrder(props.id);
@@ -160,39 +219,15 @@ const updateItem = (tempId, type, field, newValue) => {
 		$notifyUserAboutError(`Item not found`);
 	}
 };
-const addNewReagent = async selected => {
-	const newSub = {
-		...selected,
-		name: selected.reagentName
-	};
-	try {
-		const body = {
-			reagentRequests: [],
-			reagents: [],
-			newReagents: [{ ...newSub }]
-		};
-		const response = await $api.orders.addItemToOrder(order.value.id, body);
-		if (response.status === 'success') {
-			setOrder(props.id);
-		}
-	} catch (error) {
-		$notifyUserAboutError(error);
-	}
+const linkRequest = async selected => {
+	order.value.reagentRequests.push({ ...selected, tempId: selected.id });
 };
 const addExistingReagent = async selected => {
-	try {
-		const body = {
-			reagentRequests: [],
-			reagents: [{ ...selected }],
-			newReagents: []
-		};
-		const response = await $api.orders.addItemToOrder(order.value.id, body);
-		if (response.status === 'success') {
-			setOrder(props.id);
-		}
-	} catch (error) {
-		$notifyUserAboutError(error);
-	}
+	order.value.reagents.push({ ...selected, tempId: selected.id });
+};
+const addNewReagent = async selected => {
+	updatedItems.value.newReagents.push({ ...selected });
+	order.value.newReagents.push({ ...selected });
 };
 </script>
 
@@ -213,13 +248,7 @@ const addExistingReagent = async selected => {
 					@cancel-edit="cancelEdit"
 				/>
 			</div>
-			<el-form
-				ref="form-ref"
-				label-position="top"
-				:model="order"
-				:rules="rules"
-				@submit="updateOrder"
-			>
+			<el-form ref="form-ref" label-position="top" :model="order" :rules="rules">
 				<el-form-item label="Title" prop="title">
 					<el-input v-model="order.title" :disabled="!isEdit" />
 				</el-form-item>
@@ -235,19 +264,16 @@ const addExistingReagent = async selected => {
 				<el-form-item label="Updated at" prop="updatedAt">
 					<el-date-picker v-model="order.updatedAt" type="date" format="YYYY-MM-DD" disabled />
 				</el-form-item>
-				<div v-if="isEdit" class="btn-container">
-					<el-button type="primary" :disabled="!isReagentAdded" @click="updateOrder"
-						>Save</el-button
-					>
-				</div>
 			</el-form>
 		</div>
 		<div v-if="order.status !== 'canceled'" class="wrapper">
 			<request-suggestions
 				:order="order"
 				:is-edit="isEdit"
+				:suggested-requests="suggestedRequests"
+				:linked-requests="linkedRequests"
 				@set-order="setOrder"
-				@update-linked-requests="handleLinkedRequestsUpdate"
+				@link-request="linkRequest"
 			/>
 			<order-table
 				:order="order"

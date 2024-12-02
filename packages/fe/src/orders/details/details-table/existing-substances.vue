@@ -29,7 +29,8 @@ const props = defineProps({
 const combinedItems = computed(() => {
 	return [
 		...props.order.reagentRequests.map(item => ({ ...item, type: 'reagentRequests' })),
-		...props.order.reagents.map(item => ({ ...item, type: 'reagents' }))
+		...props.order.reagents.map(item => ({ ...item, type: 'reagents' })),
+		...props.order.newReagents.map(item => ({ ...item, type: 'newReagents' }))
 	];
 });
 

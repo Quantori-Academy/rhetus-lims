@@ -74,7 +74,8 @@ export const orderRef = {
 	createdAt: '',
 	updatedAt: '',
 	reagentRequests: [],
-	reagents: []
+	reagents: [],
+	newReagents: []
 };
 export const orderFormRules = {
 	title: [requiredRule('Title')],
@@ -82,17 +83,40 @@ export const orderFormRules = {
 	reagentRequests: [notEmptyArrayRule],
 	reagents: [notEmptyArrayRule]
 };
+export const updatedItemsRef = {
+	reagents: [],
+	reagentRequests: [],
+	newReagents: [],
+	updates: []
+};
 
-export const findUpdatedItems = (originalArray, currentArray, updatedItems) => {
+export const findUpdatedItems = (type, originalArray, currentArray, updatedItems) => {
+	const handleNewItem = currentItem => {
+		if (type === 'requests') {
+			if (!updatedItems.reagentRequests.some(item => item.tempId === currentItem.tempId)) {
+				updatedItems.reagentRequests.push({ ...currentItem });
+			}
+		} else if (type === 'reagents') {
+			if (!updatedItems.reagents.some(item => item.tempId === currentItem.tempId)) {
+				updatedItems.reagents.push({ ...currentItem });
+			}
+		}
+	};
+
+	const handleUpdatedItem = (currentItem, originalItem) => {
+		const isUpdated = Object.keys(currentItem).some(key => currentItem[key] !== originalItem[key]);
+		if (isUpdated && !updatedItems.updates.some(item => item.tempId === currentItem.tempId)) {
+			updatedItems.updates.push({ ...currentItem });
+		}
+	};
+
 	currentArray.forEach(currentItem => {
 		const originalItem = originalArray.find(item => item.tempId === currentItem.tempId);
-		if (
-			!originalItem ||
-			Object.keys(currentItem).some(key => currentItem[key] !== originalItem[key])
-		) {
-			if (!updatedItems.some(item => item.tempId === currentItem.tempId)) {
-				updatedItems.push({ ...currentItem });
-			}
+
+		if (!originalItem) {
+			handleNewItem(currentItem);
+		} else {
+			handleUpdatedItem(currentItem, originalItem);
 		}
 	});
 };

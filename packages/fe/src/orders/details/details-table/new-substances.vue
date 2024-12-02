@@ -59,23 +59,6 @@ const fetchSubstances = async () => {
 		$notifyUserAboutError(error);
 	}
 };
-// const fetchSubstanceSuggestions = async (queryString, callback) => {
-// 	const query = searchQuery.value;
-// 	const selectedReagents = props.order.reagents.map(reagent => reagent.reagentName);
-// 	if (!queryString) {
-// 		const filteredSuggestions = suggestedSubstances.value.filter(
-// 			suggest => !selectedReagents.includes(suggest.name)
-// 		);
-// 		callback(filteredSuggestions);
-// 	} else {
-// 		const filteredRequests = suggestedSubstances.value.filter(
-// 			suggest =>
-// 				suggest.name.toLowerCase().includes(query.toLowerCase()) &&
-// 				!selectedReagents.includes(suggest.name)
-// 		);
-// 		callback(filteredRequests);
-// 	}
-// };
 const fetchSubstanceSuggestions = async (queryString, callback) => {
 	const query = searchQuery.value;
 	const selectedReagents = props.order.reagents.map(reagent => reagent.reagentName);
@@ -111,6 +94,7 @@ const addNewReagent = async () => {
 	if (!(await $isFormValid(newReagentEl))) return;
 	const newReagent = {
 		...newSubstance.value,
+		name: newSubstance.value.reagentName,
 		casNumber: '',
 		producer: '',
 		catalogId: '',
