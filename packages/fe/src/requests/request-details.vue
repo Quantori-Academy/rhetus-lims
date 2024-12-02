@@ -10,7 +10,7 @@ import {
 	ElSelect,
 	ElOption
 } from 'element-plus';
-import { computed, ref, onMounted, inject } from 'vue';
+import { computed, ref, onMounted, inject, provide } from 'vue';
 import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg.js';
 import { $confirm } from '../lib/utils/feedback/confirm-msg.js';
 import { $api } from '../lib/api/index.js';
@@ -33,7 +33,7 @@ const isEdit = computed(() => $route.value.name === 'request-details-edit');
 const showPoMessage = computed(
 	() => request.value.status === Statuses.CANCELED && request.value.poComment && !isEdit.value
 );
-
+const statusesHistory = ref(null);
 const toggleEdit = () => {
 	$router.push({ name: 'request-details-edit', params: { id: request.value.id } });
 };
@@ -83,12 +83,30 @@ const deleteRequest = async () => {
 			type: 'success'
 		});
 		$router.push({ name: 'requests-list' });
+		setStatusesHistory();
 	} catch (error) {
 		if (!['cancel', 'close'].includes(error)) {
 			$notifyUserAboutError(error);
 		}
 	}
 };
+
+const setStatusesHistory = async () => {
+	loading.value = true;
+	try {
+		const data = await $api.requests.fetchRequestsHistory(props.id);
+		statusesHistory.value = data.histories;
+	} catch (error) {
+		$notifyUserAboutError(error.message || 'Error getting history');
+	} finally {
+		loading.value = false;
+	}
+};
+
+provide('history-update', {
+	statusesHistory,
+	setStatusesHistory
+});
 
 onMounted(() => {
 	setRequest(props.id);
@@ -190,7 +208,7 @@ onMounted(() => {
 				<el-button @click="cancelEdit">{{ __('Cancel') }}</el-button>
 			</div>
 		</el-form>
-		<timeline-statuses :id="props.id" />
+		<timeline-statuses v-if="!isEdit" />
 	</div>
 </template>
 

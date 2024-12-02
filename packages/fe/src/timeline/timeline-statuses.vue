@@ -1,40 +1,22 @@
 <script setup>
 import { ElTimeline, ElTimelineItem, ElTag, ElText, ElSpace } from 'element-plus';
-import { ref, onMounted } from 'vue';
-import { $api } from '../lib/api';
-import { $notifyUserAboutError } from '../lib/utils/feedback/notify-msg';
+import { ref, onMounted, inject } from 'vue';
 import { convertToCustomDate } from '../lib/utils/datetime/date-format';
 import { getButtonType } from '../orders/details/constants';
-const props = defineProps({
-	id: {
-		type: String,
-		default: null
-	}
-});
+
 const loading = ref(false);
-const requestHistory = ref(null);
-const setRequest = async () => {
-	loading.value = true;
-	try {
-		const data = await $api.requests.fetchRequestsHistory(props.id);
-		console.log('data', data);
-		requestHistory.value = data.histories;
-	} catch (error) {
-		$notifyUserAboutError(error.message || 'Error getting history');
-	} finally {
-		loading.value = false;
-	}
-};
+const { statusesHistory, setStatusesHistory } = inject('history-update');
 
 onMounted(() => {
-	setRequest();
+	setStatusesHistory();
 });
 </script>
 
 <template>
+	<el-text class="bold title">History</el-text>
 	<el-timeline>
 		<el-timeline-item
-			v-for="(history, index) of requestHistory"
+			v-for="(history, index) of statusesHistory"
 			:key="index"
 			v-loading="loading"
 			:type="getButtonType(history.status)"
@@ -73,11 +55,8 @@ onMounted(() => {
 	margin-bottom: 0;
 }
 
-:deep(.el-timeline) {
-	margin-top: 40px;
-}
-
 ul {
+	margin-top: 20px;
 	padding-inline-start: 2px;
 }
 </style>
