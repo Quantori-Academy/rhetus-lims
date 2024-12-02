@@ -9,8 +9,8 @@ import { $router } from '../../lib/router/router.js';
 const props = defineProps({
 	id: {
 		type: String,
-		// default: null
-		default: '19ef336f-494c-4ed6-ae52-4830752a472e' // use this for testing
+		default: null
+		// default: '19ef336f-494c-4ed6-ae52-4830752a472e' // use this for testing
 	}
 });
 const storageAssignments = ref([]);
