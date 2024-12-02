@@ -7,6 +7,7 @@ import { $api } from '../lib/api/index.js';
 import { $route } from '../lib/router/router';
 import { $isFormValid } from '../lib/utils/form-validation/is-form-valid.js';
 import { emptyUser, passwordFormRules } from './constants';
+import { __ } from '../lib/locales/index.js';
 
 const props = defineProps({ id: { type: String, default: null } });
 const user = ref(emptyUser);
@@ -37,7 +38,7 @@ const setUser = async id => {
 			roleId: role.id
 		};
 	} catch (error) {
-		$notifyUserAboutError(error.message || 'Error updating user');
+		$notifyUserAboutError(error.message || __('Error updating user'));
 	} finally {
 		loading.value = false;
 	}
@@ -47,8 +48,8 @@ const changePassword = async () => {
 	if (!(await $isFormValid(resetPassForm))) return;
 	try {
 		await $confirm(
-			'This will set a temporary password that the user can log in with.',
-			'Password Change?',
+			__('This will set a temporary password that the user can log in with.'),
+			__('Password Change?'),
 			{ type: 'warning' }
 		);
 		const res = await $api.auth.setTemporaryPassword(user.value.id, {
@@ -74,7 +75,7 @@ watch(isEdit, () => {
 
 <template>
 	<div class="wrapper">
-		<div class="section-header">Manage password</div>
+		<div class="section-header">{{ __('Manage password') }}</div>
 		<el-form
 			ref="reset-pass-form"
 			:model="passwords"
@@ -82,26 +83,26 @@ watch(isEdit, () => {
 			:rules="passwordRules"
 			@submit="changePassword"
 		>
-			<el-form-item label="New password" prop="password">
+			<el-form-item :label="__('New password')" prop="password">
 				<el-input
 					v-model="passwords.password"
 					:disabled="!isEdit"
-					placeholder="Input password"
+					:placeholder="__('Input password')"
 					type="password"
 					show-password
 				/>
 			</el-form-item>
-			<el-form-item label="Confirm password" prop="confirmPassword">
+			<el-form-item :label="__('Confirm password')" prop="confirmPassword">
 				<el-input
 					v-model="passwords.confirmPassword"
 					:disabled="!isEdit"
-					placeholder="Confirm password"
+					:placeholder="__('Confirm password')"
 					type="password"
 					show-password
 				/>
 			</el-form-item>
 			<div v-if="isEdit" class="btn-container">
-				<el-button type="primary" @click="changePassword">Reset password</el-button>
+				<el-button type="primary" @click="changePassword">{{ __('Reset password') }}</el-button>
 			</div>
 		</el-form>
 	</div>

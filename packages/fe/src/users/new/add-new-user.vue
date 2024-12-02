@@ -5,6 +5,7 @@ import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-
 import { $router } from '../../lib/router/router.js';
 import { $api } from '../../lib/api/index.js';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
+import { __ } from '../../lib/locales/index.js';
 
 const roles = ref([]);
 const isSaving = ref(false);
@@ -18,13 +19,17 @@ const form = ref({
 	roleId: ''
 });
 
-const requiredRule = { required: true, message: 'Required field', trigger: ['blur', 'change'] };
+const requiredRule = { required: true, message: __('Required field'), trigger: ['blur', 'change'] };
 const rules = ref({
 	username: [requiredRule],
-	email: [{ required: true, type: 'email', message: 'Required field' }],
+	email: [{ required: true, type: 'email', message: __('Required field') }],
 	password: [
 		requiredRule,
-		{ min: 8, message: 'Password must be at least 8 characters long', trigger: ['blur', 'change'] }
+		{
+			min: 8,
+			message: __('Password must be at least 8 characters long'),
+			trigger: ['blur', 'change']
+		}
 	],
 	roleId: [requiredRule]
 });
@@ -81,28 +86,28 @@ const cancelHandler = () => {
 <template>
 	<div class="wrapper">
 		<el-form ref="form-ref" :rules="rules" label-position="top" :model="form">
-			<el-form-item label="Username" prop="username">
-				<el-input v-model="form.username" placeholder="Enter username"></el-input>
+			<el-form-item :label="__('Username')" prop="username">
+				<el-input v-model="form.username" :placeholder="__('Enter username')"></el-input>
 			</el-form-item>
-			<el-form-item label="First Name" prop="name">
-				<el-input v-model="form.firstName" placeholder="Enter first name"></el-input>
+			<el-form-item :label="__('First name')" prop="name">
+				<el-input v-model="form.firstName" :placeholder="__('Enter first name')"></el-input>
 			</el-form-item>
-			<el-form-item label="Last Name" prop="lastname">
-				<el-input v-model="form.lastName" placeholder="Enter last name"></el-input>
+			<el-form-item :label="__('Last name')" prop="lastname">
+				<el-input v-model="form.lastName" :placeholder="__('Enter last name')"></el-input>
 			</el-form-item>
-			<el-form-item label="Email" prop="email">
-				<el-input v-model="form.email" placeholder="Enter email"></el-input>
+			<el-form-item :label="__('Email')" prop="email">
+				<el-input v-model="form.email" :placeholder="__('Enter email')"></el-input>
 			</el-form-item>
-			<el-form-item label="Password" prop="password">
+			<el-form-item :label="__('Password')" prop="password">
 				<el-input
 					v-model="form.password"
-					placeholder="Enter password"
+					:placeholder="__('Enter password')"
 					type="password"
 					show-password
 				></el-input>
 			</el-form-item>
-			<el-form-item label="Role" prop="role">
-				<el-select v-model="form.roleId" placeholder="Select role">
+			<el-form-item :label="__('Role')" prop="role">
+				<el-select v-model="form.roleId" :placeholder="__('Select role')">
 					<el-option
 						v-for="role of roles"
 						:key="role.id"
@@ -112,8 +117,10 @@ const cancelHandler = () => {
 				</el-select>
 			</el-form-item>
 			<div class="btn-container">
-				<el-button @click="cancelHandler">Cancel</el-button>
-				<el-button :loading="isSaving" type="primary" @click="addUser">Add User</el-button>
+				<el-button @click="cancelHandler">{{ __('Cancel') }}</el-button>
+				<el-button :loading="isSaving" type="primary" @click="addUser">{{
+					__('Add User')
+				}}</el-button>
 			</div>
 		</el-form>
 	</div>
