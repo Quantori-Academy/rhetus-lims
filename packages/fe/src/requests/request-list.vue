@@ -42,7 +42,6 @@ const setRequests = debounce(async (event = null) => {
 		sort: sort.value,
 		options: { ...filters.value }
 	};
-	console.log(params);
 	try {
 		const { requests: requestsData, count } = await $api.requests.fetchRequests(params);
 		requests.value = requestsData;
