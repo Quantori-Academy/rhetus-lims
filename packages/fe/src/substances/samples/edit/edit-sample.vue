@@ -232,6 +232,6 @@ watch(
 				</div>
 			</div>
 		</el-form>
-		<timeline-history :id="props.id" category="sample" />
+		<timeline-history v-if="!isEdit" :id="props.id" category="sample" />
 	</div>
 </template>

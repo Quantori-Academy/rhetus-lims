@@ -36,6 +36,7 @@ onMounted(() => {
 </script>
 
 <template>
+	<el-text v-if="substanceHistory?.length" class="bold">History</el-text>
 	<el-timeline>
 		<el-timeline-item
 			v-for="(history, index) of substanceHistory"
@@ -54,15 +55,15 @@ onMounted(() => {
 					<el-tag effect="light" round>storage location</el-tag>
 					from
 					<el-text class="bold">
-						{{ history.newStorageLocation.newStorageRoom }}
-						{{ '-' }}
-						{{ history.newStorageLocation.newStorageName }}
-					</el-text>
-					to
-					<el-text class="bold">
 						{{ history.prevStorageLocation.prevStorageRoom }}
 						{{ '-' }}
 						{{ history.prevStorageLocation.prevStorageName }}
+					</el-text>
+					to
+					<el-text class="bold">
+						{{ history.newStorageLocation.newStorageRoom }}
+						{{ '-' }}
+						{{ history.newStorageLocation.newStorageName }}
 					</el-text>
 				</el-text>
 			</el-space>
@@ -101,9 +102,6 @@ onMounted(() => {
 	font-weight: bold;
 }
 
-:deep(.el-timeline) {
-	margin-top: 40px;
-}
 :deep(.el-timeline-item__node) {
 	width: 25px;
 	height: 25px;
@@ -120,6 +118,7 @@ onMounted(() => {
 }
 
 ul {
+	margin-top: 20px;
 	padding-inline-start: 2px;
 }
 </style>

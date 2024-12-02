@@ -235,7 +235,7 @@ onMounted(() => {
 				</div>
 			</div>
 		</el-form>
-		<timeline-history :id="props.id" category="reagent" />
+		<timeline-history v-if="!isEdit" :id="props.id" category="reagent" />
 	</div>
 </template>
 
