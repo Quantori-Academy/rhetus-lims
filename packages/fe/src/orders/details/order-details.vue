@@ -8,6 +8,7 @@ import { $route, $router } from '../../lib/router/router';
 import {
 	findUpdatedItems,
 	getButtonType,
+	itemsToRemoveRef,
 	orderFormRules,
 	orderRef,
 	updatedItemsRef
@@ -26,6 +27,7 @@ const props = defineProps({
 const rules = ref(orderFormRules);
 const order = ref(orderRef);
 const updatedItems = ref(updatedItemsRef);
+const itemsToRemove = ref(itemsToRemoveRef);
 const originalOrder = ref({});
 const linkedRequests = ref([]);
 const suggestedRequests = ref([]);
@@ -91,6 +93,7 @@ const submitSubstances = async () => {
 	updateOrderItems();
 	updateNewItems();
 	updateOrderIfo();
+	removeSubstances();
 	if (apiCalls.value.length === 0) {
 		$router.push({ name: 'order-details', params: { id: order.value.id } });
 		return;
@@ -109,10 +112,16 @@ const submitSubstances = async () => {
 	}
 };
 const resetDataChanges = () => {
-	updatedItems.value.reagents = [];
-	updatedItems.value.reagentRequests = [];
-	updatedItems.value.updates = [];
-	updatedItems.value.newReagents = [];
+	updatedItems.value = {
+		reagents: [],
+		reagentRequests: [],
+		updates: [],
+		newReagents: []
+	};
+	itemsToRemove.value = {
+		reagents: [],
+		reagentRequests: []
+	};
 	order.value.newReagents = [];
 	apiCalls.value = [];
 };
@@ -172,19 +181,23 @@ watch(
 	},
 	{ deep: true, immediate: true }
 );
-
-const removeLinkedRequest = async selected => {
-	try {
-		const body = { reagentRequests: [selected.tempId], reagents: [] };
-		const response = await $api.orders.removeItemFromOrder(order.value.id, body);
-		if (response.status === 'success') {
-			await setOrder(props.id);
-		}
-	} catch (error) {
-		$notifyUserAboutError(error);
+const removeSubstances = () => {
+	if (itemsToRemove.value.reagents.length > 0 || itemsToRemove.value.reagentRequests.length > 0) {
+		const body = {
+			reagentRequests: [...itemsToRemove.value.reagentRequests],
+			reagents: [...itemsToRemove.value.reagents]
+		};
+		apiCalls.value.push($api.orders.removeItemFromOrder(order.value.id, body));
 	}
 };
-const removeReagent = async selected => {
+const removeLinkedRequest = selected => {
+	order.value.reagentRequests = order.value.reagentRequests.filter(
+		request => request.tempId !== selected.tempId
+	);
+	itemsToRemove.value.reagentRequests.push(selected.tempId);
+};
+
+const removeReagent = selected => {
 	if (selected.type === 'newReagents') {
 		order.value.newReagents = order.value.newReagents.filter(
 			reagent => reagent.tempId !== selected.tempId
@@ -192,17 +205,9 @@ const removeReagent = async selected => {
 		updatedItems.value.newReagents = updatedItems.value.newReagents.filter(
 			reagent => reagent.tempId !== selected.tempId
 		);
-		return;
-	}
-	try {
-		// ! test id for prod
-		const body = { reagentRequests: [], reagents: [selected.tempId] };
-		const response = await $api.orders.removeItemFromOrder(order.value.id, body);
-		if (response.status === 'success') {
-			await setOrder(props.id);
-		}
-	} catch (error) {
-		$notifyUserAboutError(error);
+	} else {
+		order.value.reagents = order.value.reagents.filter(item => item.tempId !== selected.tempId);
+		itemsToRemove.value.reagents.push(selected.tempId);
 	}
 };
 

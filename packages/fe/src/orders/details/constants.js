@@ -89,7 +89,10 @@ export const updatedItemsRef = {
 	newReagents: [],
 	updates: []
 };
-
+export const itemsToRemoveRef = {
+	reagents: [],
+	reagentRequests: []
+};
 export const findUpdatedItems = (type, originalArray, currentArray, updatedItems) => {
 	const handleNewItem = currentItem => {
 		if (type === 'requests') {
