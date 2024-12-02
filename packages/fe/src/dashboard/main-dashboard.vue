@@ -9,6 +9,7 @@ import OrdersAnalytics from './orders-analytics.vue';
 import InfoCards from './info-cards.vue';
 import NotificationsBox from './notifications-box.vue';
 import { __ } from '../lib/locales';
+import CurrentTime from './current-time.vue';
 
 const { user, isResearcher, isOfficer } = inject('user');
 </script>
@@ -24,7 +25,7 @@ const { user, isResearcher, isOfficer } = inject('user');
 				</div>
 				<div class="box">
 					<rh-icon name="clock" />
-					{{ format(new Date(), 'HH:mm') }}
+					<current-time />
 				</div>
 			</div>
 		</div>
