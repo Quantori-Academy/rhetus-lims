@@ -64,6 +64,37 @@
 		"Cancel Request": ["Cancel Request"],
 		"Procurement Officer comment": ["Procurement Officer comment"],
 		"User Comments": ["User Comments"],
-		"Procurement Comments": ["Procurement Comments"]
+		"Procurement Comments": ["Procurement Comments"],
+		"Add New User": ["Add New User"],
+		"Select role": ["Select role"],
+		"Logged in from": ["Logged in from"],
+		"Last login": ["Last login"],
+		"Enter username": ["Enter username"],
+		"Enter first name": ["Enter first name"],
+		"Enter last name": ["Enter last name"],
+		"Enter email": ["Enter email"],
+		"Password": ["Password"],
+		"Enter password": ["Enter password"],
+		"Add User": ["Add User"],
+		"Do you want to delete this user?": ["Do you want to delete this user?"],
+		"Required field": ["Required field"],
+		"Password must be at least 8 characters long": ["Password must be at least 8 characters long"],
+		"Error updating user": ["Error updating user"],
+		"User editing canceled": ["User editing canceled"],
+		"User has been updated": ["User has been updated"],
+		"Yes, Change Role": ["Yes, Change Role"],
+		"Profile": ["Profile"],
+		"Delete user": ["Delete user"],
+		"Password Change?": ["Password Change?"],
+		"This will set a temporary password that the user can log in with.": [
+			"This will set a temporary password that the user can log in with."
+		],
+		"Manage password": ["Manage password"],
+		"Please enter a value": ["Please enter a value"],
+		"First name can't be empty": ["First name can't be empty"],
+		"Last name can't be empty": ["Last name can't be empty"],
+		"Email can't be empty": ["Email can't be empty"],
+		"Please input a valid email address": ["Please input a valid email address"],
+		"Passwords must match": ["Passwords must match"]
 	}
 }

@@ -15,6 +15,7 @@ import { $api } from '../lib/api/index.js';
 import { $route, $router } from '../lib/router/router.js';
 import { $isFormValid } from '../lib/utils/form-validation/is-form-valid.js';
 import { formRules, emptyUser } from './constants.js';
+import { __ } from '../lib/locales/index.js';
 
 const props = defineProps({ id: { type: String, default: null } });
 
@@ -57,7 +58,7 @@ const setUser = async id => {
 			roleId: role.id
 		};
 	} catch (error) {
-		$notifyUserAboutError(error.message || 'Error updating user');
+		$notifyUserAboutError(error.message || __('Error updating user'));
 	} finally {
 		loading.value = false;
 	}
@@ -71,7 +72,7 @@ const cancelEdit = () => {
 	$router.push({ name: 'user-details', params: { id: user.value.id } });
 	$notify({
 		title: 'Canceled',
-		message: 'User editing canceled',
+		message: __('User editing canceled'),
 		type: 'info'
 	});
 	user.value = { ...originalUser.value };
@@ -85,12 +86,12 @@ const handleSubmit = async () => {
 		user.value = updatedUser;
 		$notify({
 			title: 'Success',
-			message: 'User has been updated',
+			message: __('User has been updated'),
 			type: 'success'
 		});
 		$router.push({ name: 'user-details', params: { id: user.value.id } });
 	} catch (error) {
-		$notifyUserAboutError(error.message || 'Error updating user');
+		$notifyUserAboutError(error.message || __('Error updating user'));
 	}
 };
 
@@ -100,8 +101,8 @@ const confirmRoleChange = async () => {
 			`Are you sure you want to change the role to ${roleName.value}?`,
 			'Confirm Role Change',
 			{
-				confirmButtonText: 'Yes, Change Role',
-				cancelButtonText: 'Cancel',
+				confirmButtonText: __('Yes, Change Role'),
+				cancelButtonText: __('Cancel'),
 				type: 'warning'
 			}
 		);
@@ -117,7 +118,7 @@ const confirmRoleChange = async () => {
 
 const deleteUser = async () => {
 	try {
-		await $confirm('Do you want to delete this user?', 'Warning', {
+		await $confirm(__('Do you want to delete this user?'), 'Warning', {
 			confirmButtonText: 'OK',
 			type: 'warning'
 		});
@@ -143,8 +144,8 @@ const deleteUser = async () => {
 <template>
 	<div class="wrapper">
 		<div class="editing-header">
-			Profile
-			<el-button v-if="!isEdit" type="primary" @click="toggleEdit">{{ 'Edit profile' }}</el-button>
+			{{ __('Profile') }}
+			<el-button v-if="!isEdit" type="primary" @click="toggleEdit">{{ __('Edit') }}</el-button>
 		</div>
 		<el-form
 			ref="form-ref"
@@ -154,32 +155,32 @@ const deleteUser = async () => {
 			:rules="rules"
 			@submit="handleSubmit"
 		>
-			<el-form-item label="Username" prop="username">
+			<el-form-item :label="__('Username')" prop="username">
 				<el-input v-model="user.username" :disabled="true" />
 			</el-form-item>
-			<el-form-item label="First name" prop="firstName">
+			<el-form-item :label="__('First name')" prop="firstName">
 				<el-input v-model="user.firstName" :disabled="!isEdit" />
 			</el-form-item>
-			<el-form-item label="Last name" prop="lastName">
+			<el-form-item :label="__('Last name')" prop="lastName">
 				<el-input v-model="user.lastName" :disabled="!isEdit" />
 			</el-form-item>
-			<el-form-item label="Email" prop="email">
+			<el-form-item :label="__('Email')" prop="email">
 				<el-input v-model="user.email" :disabled="!isEdit" />
 			</el-form-item>
-			<el-form-item label="Role" prop="role">
+			<el-form-item :label="__('Role')" prop="role">
 				<el-select v-model="user.roleId" :disabled="!isEdit" @change="confirmRoleChange">
 					<el-option v-for="role of roles" :key="role.id" :label="role.name" :value="role.id" />
 				</el-select>
 			</el-form-item>
-			<el-form-item label="Creation date" prop="creationDate">
+			<el-form-item :label="__('Creation Date')" prop="creationDate">
 				<el-date-picker v-model="user.createdAt" type="date" format="YYYY-MM-DD" :disabled="true" />
 			</el-form-item>
 			<div v-if="isEdit" class="btn-container">
-				<el-button type="primary" @click="handleSubmit">Save</el-button>
-				<el-button @click="cancelEdit">Cancel</el-button>
+				<el-button type="primary" @click="handleSubmit">{{ __('Save') }}</el-button>
+				<el-button @click="cancelEdit">{{ __('Cancel') }}</el-button>
 			</div>
 			<div v-else class="btn-container">
-				<el-button type="danger" @click="deleteUser">Delete user</el-button>
+				<el-button type="danger" @click="deleteUser">{{ __('Delete user') }}</el-button>
 			</div>
 		</el-form>
 	</div>

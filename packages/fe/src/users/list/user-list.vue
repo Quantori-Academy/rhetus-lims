@@ -10,6 +10,7 @@ import { $router } from '../../lib/router/router.js';
 import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
 import UsersFilters from '../users-filters.vue';
 import { debounce } from '../../lib/utils/debounce/debounce.js';
+import { __ } from '../../lib/locales/index.js';
 
 const users = ref([]);
 const isLoading = ref(false);
@@ -35,9 +36,9 @@ function editUser(id) {
 
 const deleteUser = async id => {
 	try {
-		await $confirm('Do you want to delete this user?', 'Warning', {
+		await $confirm(__('Do you want to delete this user?'), 'Warning', {
 			confirmButtonText: 'OK',
-			cancelButtonText: 'Cancel',
+			cancelButtonText: __('Cancel'),
 			type: 'warning'
 		});
 		try {
@@ -87,7 +88,7 @@ onMounted(() => {
 	<div class="margin-table">
 		<rh-filters>
 			<template #action-buttons>
-				<el-button type="primary" @click="addNewUser">Add New User</el-button>
+				<el-button type="primary" @click="addNewUser">{{ __('Add New User') }}</el-button>
 			</template>
 
 			<template #filters>
@@ -106,19 +107,19 @@ onMounted(() => {
 					</el-tooltip>
 				</template>
 			</el-table-column>
-			<el-table-column prop="username" min-width="150" label="User name" />
-			<el-table-column prop="firstName" min-width="150" label="First Name" />
-			<el-table-column prop="lastName" min-width="150" label="Last Name" />
-			<el-table-column prop="email" min-width="150" label="Email" />
+			<el-table-column prop="username" min-width="150" :label="__('Username')" />
+			<el-table-column prop="firstName" min-width="150" :label="__('First name')" />
+			<el-table-column prop="lastName" min-width="150" :label="__('Last name')" />
+			<el-table-column prop="email" min-width="150" :label="__('Email')" />
 			<el-table-column
 				prop="role"
 				min-width="150"
-				label="Role"
+				:label="__('Role')"
 				:formatter="data => data.role.name"
 			/>
 			<el-table-column
 				prop="lastLogin"
-				label="Last login"
+				:label="__('Last login')"
 				width="120"
 				:formatter="data => formatDate(data.lastLogin)"
 			/>
