@@ -67,6 +67,7 @@ const setOrder = async id => {
 		loading.value = false;
 	}
 };
+
 const deleteOrder = async () => {
 	try {
 		await $confirm('Do you want to delete this order?', 'Warning', {
@@ -160,6 +161,12 @@ const updateOrder = async () => {
 				</el-dropdown>
 			</div>
 		</div>
+		<div>
+			<el-button v-if="!isEdit && order.status === `pending`" @click="toggleEdit">Edit</el-button>
+		</div>
+
+		<div></div>
+
 		<el-form
 			ref="form-ref"
 			v-loading="loading || !order"
@@ -177,7 +184,11 @@ const updateOrder = async () => {
 			<el-form-item label="Author" prop="author.username">
 				<el-input v-model="order.author.username" :disabled="true" />
 			</el-form-item>
-			<el-form-item label="Substances to order" prop="reagentRequests">
+
+			<el-form-item label="Author" prop="author.username">
+				<el-input v-model="order.author.username" :disabled="true" />
+			</el-form-item>
+			<el-form-item label="Requests to order" prop="reagentRequests">
 				<el-table :data="order.reagentRequests">
 					<el-table-column prop="reagentName" label="Name" />
 					<el-table-column prop="quantityUnit" label="Quantity Unit" />

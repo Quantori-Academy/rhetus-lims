@@ -36,10 +36,11 @@ export const substancesHandler = [
 		const limit = parseInt(url.searchParams.get('limit')) || 10;
 		const start = (page - 1) * limit;
 		const end = start + limit;
-
 		const options = url.searchParams.get('options');
 		const parsedOptions = JSON.parse(options);
-
+		const targetOrder =
+			parseInt(url.searchParams.get('order')) || 'b3909999-ae20-45a9-81be-4e6346ebf5a7';
+		console.log('TARGET ORDER:', targetOrder);
 		if (parsedOptions === null) {
 			const paginatedSubstances = substances.slice(start, end);
 			return HttpResponse.json({
