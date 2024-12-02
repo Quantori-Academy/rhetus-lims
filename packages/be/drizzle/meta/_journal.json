@@ -260,6 +260,13 @@
       "when": 1732693035403,
       "tag": "0036_organic_iron_patriot",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1732816026436,
+      "tag": "0037_lame_lord_tyger",
+      "breakpoints": true
     }
   ]
 }

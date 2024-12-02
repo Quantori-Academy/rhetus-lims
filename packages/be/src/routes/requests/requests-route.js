@@ -176,7 +176,8 @@ async function requests(server, options) {
 
 			const { code, status, message } = await server.requestsService.handleRequestSoftDelete({
 				requestId,
-				requestStatus: request.status
+				requestStatus: request.status,
+				userId: authenticatedUserId
 			});
 
 			return reply.code(code).send({ status, message });
@@ -221,13 +222,38 @@ async function requests(server, options) {
 
 			const reagentName = await server.requestsService.cancelRequest(requestId, {
 				...req.body,
-				currentPoComment: request.poComment
+				currentPoComment: request.poComment,
+				userId: authenticatedUserId
 			});
 
 			return reply.code(200).send({
 				status: 'success',
 				message: `Request for reagent '${reagentName}' was marked as canceled`
 			});
+		} catch (err) {
+			return reply.code(500).send(err);
+		}
+	}
+
+	server.route({
+		method: 'GET',
+		path: options.prefix + 'requests/history/:id',
+		preValidation: [server.authenticate],
+		schema: schema.getRequestsHistorySchema,
+		handler: onGetRequestHistory
+	});
+
+	async function onGetRequestHistory(req, reply) {
+		try {
+			const requestId = req.params.id;
+			const request = await server.requestsService.getRequestById(requestId);
+
+			if (!request) {
+				return reply.code(404).send({ status: 'error', message: `No such reagent request` });
+			}
+
+			const data = await server.requestsService.getHistoryChanges(requestId);
+			return reply.code(200).send(data);
 		} catch (err) {
 			return reply.code(500).send(err);
 		}

@@ -129,6 +129,7 @@ async function orders(server, options) {
 		try {
 			const orderId = req.params.id;
 			const order = await server.ordersService.getOrderById(orderId);
+			const authenticatedUserId = Number(req.session.user.id);
 
 			if (!order) {
 				return reply.code(404).send({ status: 'error', message: `No such order` });
@@ -143,7 +144,7 @@ async function orders(server, options) {
 				return reply.code(403).send({ status: 'error', message });
 			}
 
-			const orderTitle = await server.ordersService.softDeleteOrder(orderId);
+			const orderTitle = await server.ordersService.softDeleteOrder(orderId, authenticatedUserId);
 
 			return reply
 				.code(200)
@@ -212,6 +213,7 @@ async function orders(server, options) {
 	async function onRemoveItem(req, reply) {
 		try {
 			const orderId = req.params.id;
+			const authenticatedUserId = Number(req.session.user.id);
 
 			const order = await server.ordersService.getOrderById(orderId);
 
@@ -236,7 +238,8 @@ async function orders(server, options) {
 
 			const orderTitle = await server.orderItemsService.removeItemsFromOrder({
 				...req.body,
-				orderTitle: order.title
+				orderTitle: order.title,
+				userId: authenticatedUserId
 			});
 			return reply
 				.code(200)
@@ -325,6 +328,31 @@ async function orders(server, options) {
 				status: 'success',
 				message: `Order items with tempIds '${updatedOrderItemsIds.join(', ')}' were updated`
 			});
+		} catch (err) {
+			return reply.code(500).send(err);
+		}
+	}
+
+	server.route({
+		method: 'GET',
+		path: options.prefix + 'orders/history/:id',
+		preValidation: [server.authenticate, server.officer],
+		schema: schema.getOrdersHistorySchema,
+		handler: onGetOrderHistory
+	});
+
+	async function onGetOrderHistory(req, reply) {
+		try {
+			const orderId = req.params.id;
+
+			const order = await server.ordersService.getOrderById(orderId);
+
+			if (!order) {
+				return reply.code(404).send({ status: 'error', message: `No such order` });
+			}
+
+			const data = await server.ordersService.getHistoryChanges(orderId);
+			return reply.code(200).send(data);
 		} catch (err) {
 			return reply.code(500).send(err);
 		}

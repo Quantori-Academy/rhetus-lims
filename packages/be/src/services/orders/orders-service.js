@@ -47,7 +47,7 @@ async function ordersService(server) {
 						})
 						.returning({ orderId: schema.orders.id, orderTitle: schema.orders.title });
 
-					await server.orderItemsService.orderItemsInsert(orderId, formattedOrderItems, tx);
+					await server.orderItemsService.orderItemsInsert(orderId, formattedOrderItems, tx, userId);
 
 					return { orderTitle, orderId };
 				});
@@ -56,6 +56,8 @@ async function ordersService(server) {
 				orderId: createdOrderId,
 				message: `New order '${createdOrderTitle}' created for ${formattedOrderItems.length} item${formattedOrderItems.length > 1 ? 's' : ''} that includes your requests.`
 			});
+
+			await server.ordersService.insertStatusInHistory(createdOrderId, OrderStatus.PENDING, userId);
 
 			return createdOrderTitle;
 		},
@@ -159,7 +161,7 @@ async function ordersService(server) {
 			return result.length ? result[0].orderTitle : null;
 		},
 
-		softDeleteOrder: async id => {
+		softDeleteOrder: async (id, userId) => {
 			const deletedOrderTitle = await server.db.transaction(async tx => {
 				const [{ orderTitle }] = await tx
 					.update(schema.orders)
@@ -169,7 +171,14 @@ async function ordersService(server) {
 					.where(eq(schema.orders.id, id))
 					.returning({ orderTitle: schema.orders.title });
 
-				await server.ordersService.resetOrdersItems(id, tx);
+				await server.ordersService.resetOrdersItems(id, tx, userId);
+
+				await tx.insert(schema.statusesHistory).values({
+					userId,
+					orderId: id,
+					status: OrderStatus.PENDING,
+					isDeleted: true
+				});
 
 				return orderTitle;
 			});
@@ -177,7 +186,7 @@ async function ordersService(server) {
 			return deletedOrderTitle;
 		},
 
-		updateOrderStatus: async (orderId, nextStatus, tx = null) => {
+		updateOrderStatus: async (orderId, nextStatus, userId, tx = null) => {
 			const target = tx ?? server.db;
 			const [{ orderTitle }] = await target
 				.update(schema.orders)
@@ -186,6 +195,8 @@ async function ordersService(server) {
 				})
 				.where(eq(schema.orders.id, orderId))
 				.returning({ orderTitle: schema.orders.title });
+
+			await server.ordersService.insertStatusInHistory(orderId, nextStatus, userId, tx);
 
 			return orderTitle;
 		},
@@ -224,7 +235,11 @@ async function ordersService(server) {
 					error.statusCode = 409;
 					throw error;
 				}
-				orderTitle = await server.ordersService.handleCancelOrder(orderId, OrderStatus.CANCELED);
+				orderTitle = await server.ordersService.handleCancelOrder(
+					orderId,
+					OrderStatus.CANCELED,
+					userId
+				);
 			}
 
 			return orderTitle;
@@ -237,13 +252,18 @@ async function ordersService(server) {
 
 			switch (nextStatus) {
 				case OrderStatus.ORDERED:
-					updatedOrderTitle = await server.ordersService.updateOrderStatus(orderId, nextStatus);
+					updatedOrderTitle = await server.ordersService.updateOrderStatus(
+						orderId,
+						nextStatus,
+						userId
+					);
 					break;
 				case OrderStatus.FULFILLED:
 					updatedOrderTitle = await server.db.transaction(async tx => {
 						const orderTitle = await server.ordersService.updateOrderStatus(
 							orderId,
 							nextStatus,
+							userId,
 							tx
 						);
 
@@ -257,7 +277,8 @@ async function ordersService(server) {
 						await server.requestsService.updateRequestStatusByOrder(
 							orderId,
 							RequestStatus.FULFILLED,
-							tx
+							tx,
+							userId
 						);
 
 						await server.orderItemsService.disableOrderItems(orderId, tx);
@@ -304,13 +325,15 @@ async function ordersService(server) {
 						const orderTitle = await server.ordersService.updateOrderStatus(
 							orderId,
 							nextStatus,
+							userId,
 							tx
 						);
 
 						await server.requestsService.updateRequestStatusByOrder(
 							orderId,
 							RequestStatus.COMPLETED,
-							tx
+							tx,
+							userId
 						);
 
 						return orderTitle;
@@ -326,10 +349,15 @@ async function ordersService(server) {
 			return updatedOrderTitle;
 		},
 
-		handleCancelOrder: async (orderId, nextStatus) => {
+		handleCancelOrder: async (orderId, nextStatus, userId) => {
 			const canceledOrderTitle = await server.db.transaction(async tx => {
-				const orderTitle = await server.ordersService.updateOrderStatus(orderId, nextStatus, tx);
-				await server.ordersService.resetOrdersItems(orderId, tx);
+				const orderTitle = await server.ordersService.updateOrderStatus(
+					orderId,
+					nextStatus,
+					userId,
+					tx
+				);
+				await server.ordersService.resetOrdersItems(orderId, tx, userId);
 				return orderTitle;
 			});
 			await server.notificationsService.addNotification({
@@ -352,7 +380,7 @@ async function ordersService(server) {
 			}
 		},
 
-		resetOrdersItems: async (orderId, tx) => {
+		resetOrdersItems: async (orderId, tx, userId) => {
 			const requestsIds = await tx
 				.delete(schema.ordersItems)
 				.where(
@@ -370,9 +398,51 @@ async function ordersService(server) {
 					.update(schema.requests)
 					.set({ requestStatus: RequestStatus.PENDING, orderId: null })
 					.where(inArray(schema.requests.id, requestIdsForUpdate));
+
+				await Promise.all(
+					requestIdsForUpdate.map(requestId =>
+						server.requestsService.insertStatusInHistory(
+							requestId,
+							{ status: RequestStatus.PENDING },
+							userId,
+							tx
+						)
+					)
+				);
 			}
 
 			await tx.delete(schema.ordersItems).where(eq(schema.ordersItems.orderId, orderId));
+		},
+
+		insertStatusInHistory: async (orderId, status, userId, tx = null) => {
+			const target = tx ?? server.db;
+			return await target.insert(schema.statusesHistory).values({
+				userId,
+				orderId,
+				status
+			});
+		},
+
+		getHistoryChanges: async orderId => {
+			const histories = await server.db
+				.select({
+					id: sql`${schema.statusesHistory.id}`.as('historyId'),
+					user: {
+						userId: schema.users.id,
+						userFirstName: schema.users.firstName,
+						userLastName: schema.users.lastName
+					},
+					status: schema.statusesHistory.status,
+					changeReason: schema.statusesHistory.changeReason,
+					isDeleted: schema.statusesHistory.isDeleted,
+					modifiedDate: schema.statusesHistory.createdAt
+				})
+				.from(schema.statusesHistory)
+				.innerJoin(schema.users, eq(schema.statusesHistory.userId, schema.users.id))
+				.where(eq(schema.statusesHistory.orderId, orderId))
+				.orderBy(schema.statusesHistory.createdAt, 'asc');
+
+			return { histories };
 		}
 	});
 }

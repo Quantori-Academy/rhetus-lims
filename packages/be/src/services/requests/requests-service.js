@@ -1,4 +1,4 @@
-import { eq, and, aliasedTable } from 'drizzle-orm';
+import { eq, and, aliasedTable, sql } from 'drizzle-orm';
 import fp from 'fastify-plugin';
 import { schema } from '../../lib/db/schema/index.js';
 import { RequestStatus } from '../../lib/db/schema/requests.js';
@@ -46,12 +46,20 @@ async function requestsService(server) {
 				})
 				.returning({ reagentName: schema.requests.reagentName, id: schema.requests.id });
 
+			if (!result.length) return null;
+
 			await server.notificationsService.addNotification({
 				requestId: result[0].id,
 				message: `New request for '${result[0].reagentName}' created.`
 			});
 
-			return result.length ? result[0].reagentName : null;
+			await server.requestsService.insertStatusInHistory(
+				result[0].id,
+				{ status: RequestStatus.PENDING },
+				userId
+			);
+
+			return result[0].reagentName;
 		},
 
 		getRequestsQuery: () => {
@@ -225,7 +233,7 @@ async function requestsService(server) {
 		},
 
 		handleRequestSoftDelete: async requestData => {
-			const { requestId, requestStatus } = requestData;
+			const { requestId, requestStatus, userId } = requestData;
 
 			if (requestStatus !== RequestStatus.PENDING) {
 				return {
@@ -239,6 +247,13 @@ async function requestsService(server) {
 				deleted: 'true'
 			});
 
+			await server.db.insert(schema.statusesHistory).values({
+				userId,
+				requestId,
+				status: requestStatus,
+				isDeleted: true
+			});
+
 			return {
 				code: 200,
 				status: 'success',
@@ -246,15 +261,23 @@ async function requestsService(server) {
 			};
 		},
 
-		updateRequestStatusByOrder: async (orderId, newStatus, tx) => {
-			return tx
+		updateRequestStatusByOrder: async (orderId, newStatus, tx, userId) => {
+			const [{ requestId }] = await tx
 				.update(schema.requests)
 				.set({ requestStatus: newStatus })
-				.where(eq(schema.requests.orderId, orderId));
+				.where(eq(schema.requests.orderId, orderId))
+				.returning({ requestId: schema.requests.id });
+			await server.requestsService.insertStatusInHistory(
+				requestId,
+				{ status: newStatus },
+				userId,
+				tx
+			);
+			return requestId;
 		},
 
 		cancelRequest: async (requestId, data) => {
-			const { reason, currentPoComment } = data ?? {};
+			const { reason, currentPoComment, userId } = data ?? {};
 
 			const cancellationTemplate = `Cancellation reason: ${reason}`;
 			const newPoComment = currentPoComment
@@ -275,7 +298,44 @@ async function requestsService(server) {
 				message: `Request for '${result[0].reagentName}' cancelled for the following reason: '${reason}'.`
 			});
 
+			await server.requestsService.insertStatusInHistory(
+				requestId,
+				{ status: RequestStatus.CANCELED, poComment: newPoComment },
+				userId
+			);
 			return result.length ? result[0].reagentName : null;
+		},
+
+		insertStatusInHistory: async (requestId, data, userId, tx = null) => {
+			const target = tx ?? server.db;
+			return await target.insert(schema.statusesHistory).values({
+				userId,
+				requestId,
+				status: data.status,
+				changeReason: data?.poComment
+			});
+		},
+
+		getHistoryChanges: async requestId => {
+			const histories = await server.db
+				.select({
+					id: sql`${schema.statusesHistory.id}`.as('historyId'),
+					user: {
+						userId: schema.users.id,
+						userFirstName: schema.users.firstName,
+						userLastName: schema.users.lastName
+					},
+					status: schema.statusesHistory.status,
+					changeReason: schema.statusesHistory.changeReason,
+					isDeleted: schema.statusesHistory.isDeleted,
+					modifiedDate: schema.statusesHistory.createdAt
+				})
+				.from(schema.statusesHistory)
+				.innerJoin(schema.users, eq(schema.statusesHistory.userId, schema.users.id))
+				.where(eq(schema.statusesHistory.requestId, requestId))
+				.orderBy(schema.statusesHistory.createdAt, 'asc');
+
+			return { histories };
 		}
 	});
 }
