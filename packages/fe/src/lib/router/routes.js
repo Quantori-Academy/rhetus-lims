@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+
 import LoginLayout from './layout/login-layout.vue';
 import { roles } from '../constants/roles.js';
 import Dashboard from '../../dashboard/main-dashboard.vue';
@@ -402,7 +403,7 @@ export const routes = [
 		name: 'complete-order',
 		component: () => import('../../orders/complete-order/complete-order.vue'),
 		meta: {
-			roles: [roles.PROCUREMENT_OFFICER],
+			// roles: [roles.PROCUREMENT_OFFICER],
 			title: 'Complete Order',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },

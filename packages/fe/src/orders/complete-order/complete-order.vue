@@ -9,8 +9,8 @@ import { $router } from '../../lib/router/router.js';
 const props = defineProps({
 	id: {
 		type: String,
-		default: null
-		// default: '19ef336f-494c-4ed6-ae52-4830752a472e' // use this for testing
+		// default: null
+		default: '19ef336f-494c-4ed6-ae52-4830752a472e' // use this for testing
 	}
 });
 const storageAssignments = ref([]);
@@ -65,7 +65,7 @@ async function setStorages() {
 	loading.value = true;
 	try {
 		const data = await $api.storages.fetchStorages();
-		storages.value = data.storages;
+		storages.value = data;
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
@@ -88,20 +88,16 @@ const saveChanges = async () => {
 	}
 };
 
-const handleStorageChange = (row, selectedStorageId) => {
-	const index = storages.value.findIndex(item => item.id === selectedStorageId);
+const handleStorageChange = (row, index, storageId) => {
 	storageAssignments.value.push({
 		id: row.id,
-		storageId: selectedStorageId
+		storageId: storageId
 	});
-	row.selectedStorage = storages.value[index];
+	fulfilledReagents.value[index].selectedStorage = storages.value.find(
+		storage => storage.id === storageId
+	);
 };
-const clearStorage = row => {
-	const index = storageAssignments.value.findIndex(item => item.id === row.id);
-	if (index !== -1) {
-		storageAssignments.value.splice(index, 1);
-	}
-};
+
 const isStorageAssigned = row => {
 	return storageAssignments.value.find(item => item.id === row.id && row.selectedStorage);
 };
@@ -127,15 +123,14 @@ const cancelChanges = () => {
 				<el-table-column label="Quantity" prop="quantity" width="100" />
 				<el-table-column label="Quantity Unit" prop="quantityUnit" width="150" />
 				<el-table-column label="Storage Location" width="200">
-					<template #default="{ row }">
+					<template #default="{ row, $index }">
 						<el-select
 							v-model="row.selectedStorage"
 							:loading="loading"
 							filterable
 							clearable
 							placeholder="Select storage"
-							@clear="() => clearStorage(row)"
-							@change="(value, key) => handleStorageChange(row, value, key)"
+							@change="value => handleStorageChange(row, $index, value)"
 						>
 							<el-option
 								v-for="storage of storages"
