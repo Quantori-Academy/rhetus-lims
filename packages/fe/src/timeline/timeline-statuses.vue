@@ -1,14 +1,24 @@
 <script setup>
 import { ElTimeline, ElTimelineItem, ElTag, ElText, ElSpace } from 'element-plus';
-import { ref, onMounted, inject } from 'vue';
+import { ref, onMounted } from 'vue';
 import { convertToCustomDate } from '../lib/utils/datetime/date-format';
 import { getButtonType } from '../orders/details/constants';
 
 const loading = ref(false);
-const { statusesHistory, setStatusesHistory } = inject('history-update');
+
+const props = defineProps({
+	statusesHistory: {
+		type: Array,
+		default: null
+	}
+});
+
+const emit = defineEmits(['set-statuses-history']);
+
+const updateStatusesHistory = () => emit('set-statuses-history');
 
 onMounted(() => {
-	setStatusesHistory();
+	updateStatusesHistory();
 });
 </script>
 
@@ -16,7 +26,7 @@ onMounted(() => {
 	<el-text class="bold title">History</el-text>
 	<el-timeline>
 		<el-timeline-item
-			v-for="(history, index) of statusesHistory"
+			v-for="(history, index) of props.statusesHistory"
 			:key="index"
 			v-loading="loading"
 			:type="getButtonType(history.status)"

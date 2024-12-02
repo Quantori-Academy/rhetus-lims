@@ -13,7 +13,7 @@ import {
 	ElTag
 } from 'element-plus';
 import { $notifyUserAboutError, $notify } from '../../lib/utils/feedback/notify-msg';
-import { computed, onMounted, useTemplateRef, ref, provide } from 'vue';
+import { computed, onMounted, useTemplateRef, ref } from 'vue';
 import { $api } from '../../lib/api/index.js';
 import { $route, $router } from '../../lib/router/router';
 import { getButtonType, requiredRule } from './constants.js';
@@ -145,11 +145,6 @@ const setStatusesHistory = async () => {
 		loading.value = false;
 	}
 };
-
-provide('history-update', {
-	statusesHistory,
-	setStatusesHistory
-});
 </script>
 
 <template>
@@ -228,7 +223,11 @@ provide('history-update', {
 				<el-button type="primary" @click="updateOrder">Save</el-button>
 			</div>
 		</el-form>
-		<timeline-statuses v-if="!isEdit" />
+		<timeline-statuses
+			v-if="!isEdit"
+			:statuses-history="statusesHistory"
+			@set-statuses-history="setStatusesHistory"
+		/>
 	</div>
 </template>
 

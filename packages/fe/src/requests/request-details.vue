@@ -10,7 +10,7 @@ import {
 	ElSelect,
 	ElOption
 } from 'element-plus';
-import { computed, ref, onMounted, inject, provide } from 'vue';
+import { computed, ref, onMounted, inject } from 'vue';
 import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg.js';
 import { $confirm } from '../lib/utils/feedback/confirm-msg.js';
 import { $api } from '../lib/api/index.js';
@@ -102,11 +102,6 @@ const setStatusesHistory = async () => {
 		loading.value = false;
 	}
 };
-
-provide('history-update', {
-	statusesHistory,
-	setStatusesHistory
-});
 
 onMounted(() => {
 	setRequest(props.id);
@@ -208,7 +203,11 @@ onMounted(() => {
 				<el-button @click="cancelEdit">{{ __('Cancel') }}</el-button>
 			</div>
 		</el-form>
-		<timeline-statuses v-if="!isEdit" />
+		<timeline-statuses
+			v-if="!isEdit"
+			:statuses-history="statusesHistory"
+			@set-statuses-history="setStatusesHistory"
+		/>
 	</div>
 </template>
 
