@@ -2,7 +2,7 @@
 <script setup>
 import { ElForm, ElInput, ElFormItem, ElDatePicker, ElTag } from 'element-plus';
 import { $notifyUserAboutError, $notify } from '../../lib/utils/feedback/notify-msg';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, useTemplateRef, watch } from 'vue';
 import { $api } from '../../lib/api/index.js';
 import { $route, $router } from '../../lib/router/router';
 import {
@@ -11,12 +11,14 @@ import {
 	itemsToRemoveRef,
 	orderFormRules,
 	orderRef,
-	updatedItemsRef
+	updatedItemsRef,
+	validateSubstances
 } from './constants.js';
 import TimelineStatuses from '../../timeline/timeline-statuses.vue';
 import OrderTable from './details-table/order-table.vue';
 import RequestSuggestions from './request-suggestions.vue';
 import OrderActions from './order-actions.vue';
+import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 
 const props = defineProps({
 	id: {
@@ -26,6 +28,7 @@ const props = defineProps({
 });
 const rules = ref(orderFormRules);
 const order = ref(orderRef);
+const formRef = useTemplateRef('form-ref');
 const updatedItems = ref(updatedItemsRef);
 const itemsToRemove = ref(itemsToRemoveRef);
 const originalOrder = ref({});
@@ -89,6 +92,7 @@ const updateOrderIfo = () => {
 };
 
 const submitSubstances = async () => {
+	if (!(await validateSubstances(localrefs.value)) || !(await $isFormValid(formRef))) return;
 	await getUpdatedFields({ ...originalOrder.value }, { ...order.value });
 	updateOrderItems();
 	updateNewItems();
@@ -234,6 +238,10 @@ const addNewReagent = async selected => {
 	updatedItems.value.newReagents.push({ ...selected });
 	order.value.newReagents.push({ ...selected });
 };
+const localrefs = ref({});
+const handleSubstanceRefs = refs => {
+	localrefs.value = refs;
+};
 </script>
 
 <template>
@@ -292,6 +300,7 @@ const addNewReagent = async selected => {
 				@submit-substances="submitSubstances"
 				@add-new-reagent="addNewReagent"
 				@add-existing-reagent="addExistingReagent"
+				@substance-refs="handleSubstanceRefs"
 			/>
 		</div>
 

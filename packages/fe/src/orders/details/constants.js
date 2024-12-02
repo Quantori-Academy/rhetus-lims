@@ -123,3 +123,13 @@ export const findUpdatedItems = (type, originalArray, currentArray, updatedItems
 		}
 	});
 };
+export async function validateSubstances(forms) {
+	const validations = Object.keys(forms).map(key => forms[key]?.validate?.());
+	Promise.all(validations)
+		.then(() => {
+			return true;
+		})
+		.catch(() => {
+			return false;
+		});
+}

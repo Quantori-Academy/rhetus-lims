@@ -27,8 +27,14 @@ const emit = defineEmits([
 	'update-item',
 	'submit-substances',
 	'add-new-reagent',
-	'add-existing-reagent'
+	'add-existing-reagent',
+	'substance-refs'
 ]);
+
+// Receive the formRefs from the child and forward it to the grandparent
+const handleSubstanceRefs = refs => {
+	emit('substance-refs', refs);
+};
 const removeLinkedRequest = selectedRequest => emit('remove-linked-request', selectedRequest);
 const setOrder = id => emit('set-order', id);
 const removeReagent = selectedReagent => emit('remove-reagent', selectedReagent);
@@ -57,6 +63,7 @@ const updateItem = (tempId, type, field, newValue) =>
 				@remove-reagent="removeReagent"
 				@remove-linked-request="removeLinkedRequest"
 				@update-item="updateItem"
+				@substance-refs="handleSubstanceRefs"
 			/>
 			<new-substances
 				:order="props.order"

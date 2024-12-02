@@ -9,7 +9,7 @@ import {
 	ElTag,
 	ElForm
 } from 'element-plus';
-import { defineProps, computed } from 'vue';
+import { defineProps, computed, onMounted } from 'vue';
 import { quantityUnits } from '../../../lib/constants/quantity-units.js';
 import RhIcon from '../../../lib/components/rh-icon.vue';
 import { $router } from '../../../lib/router/router.js';
@@ -33,8 +33,19 @@ const combinedItems = computed(() => {
 		...props.order.newReagents.map(item => ({ ...item, type: 'newReagents' }))
 	];
 });
+const formRefs = {};
 
-const emit = defineEmits(['set-order', 'remove-reagent', 'update-item', 'remove-linked-request']);
+onMounted(() => {
+	emit('substance-refs', formRefs);
+});
+
+const emit = defineEmits([
+	'set-order',
+	'remove-reagent',
+	'update-item',
+	'remove-linked-request',
+	'substance-refs'
+]);
 const removeReagent = selectedReagent => emit('remove-reagent', selectedReagent);
 const updateItem = (tempId, type, field, newValue) =>
 	emit('update-item', tempId, type, field, newValue);
@@ -49,6 +60,7 @@ function viewRequestDetails(request) {
 <template>
 	<el-form
 		v-for="(singleOrder, index) of combinedItems"
+		:ref="el => (formRefs[`form-${index}`] = el)"
 		:key="singleOrder.tempId"
 		class="row"
 		label-position="top"
