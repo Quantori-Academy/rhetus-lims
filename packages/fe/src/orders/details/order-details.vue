@@ -61,29 +61,10 @@ const setOrder = async id => {
 	loading.value = true;
 	try {
 		order.value = await $api.orders.fetchOrder(id);
-		if (order.value.status === 'fulfilled') {
-			await moveInventory();
-		}
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating order');
 	} finally {
 		loading.value = false;
-	}
-};
-
-const moveInventory = async () => {
-	const incomingReagents = order.value.reagents;
-
-	try {
-		const response = await $api.reagents.addReagent(
-			incomingReagents.map(reagent => ({
-				...reagent,
-				quantityLeft: reagent.quantity
-			}))
-		);
-		console.log(`All reagents added successfully:`, response);
-	} catch (error) {
-		console.error('Error adding reagents:', error.message);
 	}
 };
 
@@ -182,7 +163,6 @@ const updateOrder = async () => {
 		</div>
 		<div>
 			<el-button v-if="!isEdit && order.status === `pending`" @click="toggleEdit">Edit</el-button>
-			<el-button type="primary">Make Order</el-button>
 		</div>
 
 		<div></div>

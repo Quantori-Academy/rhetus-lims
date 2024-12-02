@@ -113,7 +113,7 @@ const cancelChanges = () => {
 <template>
 	<div v-if="fulfilledReagents && order" v-loading="loading" class="wrapper">
 		<h2>Move substances to storages - {{ order?.title }}</h2>
-		<el-form ref="form-ref" :model="fulfilledReagents" @submit.prevent="saveChanges">
+		<el-form ref="form-ref" :model="fulfilledReagents">
 			<el-table :data="fulfilledReagents">
 				<el-table-column width="50">
 					<template #default="{ row }">
