@@ -20,6 +20,7 @@ import { getButtonType } from '../orders/details/constants.js';
 import { quantityUnits } from '../lib/constants/quantity-units.js';
 import KetcherEditor from '../ketcher-editor/ketcher-editor.vue';
 import { __ } from '../lib/locales/index.js';
+import TimelineStatuses from '../timeline/timeline-statuses.vue';
 
 const props = defineProps({ id: { type: String, default: null } });
 
@@ -189,6 +190,7 @@ onMounted(() => {
 				<el-button @click="cancelEdit">{{ __('Cancel') }}</el-button>
 			</div>
 		</el-form>
+		<timeline-statuses :id="props.id" />
 	</div>
 </template>
 

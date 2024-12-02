@@ -75,6 +75,50 @@ const requestInfo = {
 	count: 3
 };
 
+const histories = [
+	{
+		requestId: 'c10cb7e2-8b8d-4d89-a284-e703e369ca64',
+		histories: [
+			{
+				id: 'e913ab97-de47-467c-83c9-3aa7b2886d7b',
+				user: {
+					userId: 2,
+					userFirstName: 'Officer1',
+					userLastName: 'Officer1'
+				},
+				status: 'pending',
+				modifiedDate: '2024-11-27T21:02:43.140Z',
+				changeReason: null,
+				isDeleted: false
+			},
+			{
+				id: '88f9a1ff-3342-4e49-9405-64c7ff4d3458',
+				user: {
+					userId: 2,
+					userFirstName: 'Officer1',
+					userLastName: 'Officer1'
+				},
+				status: 'ordered',
+				modifiedDate: '2024-11-27T21:04:03.682Z',
+				changeReason: 'experiment 2',
+				isDeleted: false
+			},
+			{
+				id: '95940a8b-067c-4c68-bab4-bb570d990b29',
+				user: {
+					userId: 2,
+					userFirstName: 'Officer1',
+					userLastName: 'Officer1'
+				},
+				status: 'fulfilled',
+				modifiedDate: '2024-11-27T21:07:49.928Z',
+				changeReason: null,
+				isDeleted: false
+			}
+		]
+	}
+];
+
 function dateFilter(request, parsedDate) {
 	if (parsedDate && parsedDate.length === 2) {
 		const [startDate, endDate] = parsedDate;
@@ -184,6 +228,24 @@ export const requestHandlers = [
 		return HttpResponse.json({
 			status: 'success',
 			message: 'Request was deleted'
+		});
+	}),
+	http.get(api('/requests/history/:id'), async req => {
+		const { id } = req.params;
+		const requestIndex = requestInfo.requests.findIndex(request => request.id === id);
+		if (requestIndex === -1) {
+			return HttpResponse.json(
+				{
+					status: 'error',
+					message: `Request not found`
+				},
+				{ status: 404 }
+			);
+		}
+		const filteredHistory = histories.find(request => request.requestId === id);
+		console.log('filtered history', filteredHistory, histories[0].requestId, id);
+		return HttpResponse.json({
+			histories: filteredHistory.histories.length ? filteredHistory.histories : []
 		});
 	})
 ];
