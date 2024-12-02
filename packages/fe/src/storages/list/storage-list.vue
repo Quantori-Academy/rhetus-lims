@@ -72,7 +72,6 @@ const setStorages = debounce(async (event = null) => {
 		sort: sort.value,
 		options: { ...filters.value }
 	};
-	console.log(params);
 	try {
 		const { storages: storagesData, count } = await $api.storages.fetchStoragesWithCount(params);
 		storages.value = storagesData;

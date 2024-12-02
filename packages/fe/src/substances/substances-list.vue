@@ -80,35 +80,29 @@ const deleteSingleSubstance = async row => {
 	}
 };
 
-/*const addStructureSort = sortQuery => {
+const addStructureSort = sortQuery => {
 	if (filters.value.smiles) {
 		sortQuery.sort = { ...(sortQuery.sort ?? {}), relevance: 'desc' };
 	}
-	if (sortQuery.sort && sortQuery.sort.structure) {
-		const { structure, ...rest } = sortQuery.sort;
-		sortQuery.sort = { ...rest, relevance: structure };
-	}
-};*/
+};
 
 const setSubstances = debounce(async (event = null) => {
 	isLoading.value = true;
-	/* if (event) {
+	if (event) {
 		const sortQuery = createQuery(event);
 		sort.value = sortQuery;
-	} */
-	const sortQuery = createQuery(event);
+		addStructureSort(sortQuery);
+	}
 	const { expired, ...rest } = filters.value;
-	/* addStructureSort(sortQuery); */
 	const params = {
 		page: paginationData.value.page,
 		limit: paginationData.value.size,
-		sort: { ...sortQuery.sort },
+		sort: sort.value,
 		options: {
 			...rest,
 			expirationDate: expired ? [new Date('0001-01-01T00:00:00.000Z'), new Date()] : []
 		}
 	};
-	console.log(params);
 	try {
 		const { substances: substancesData, count } = await $api.substances.fetchSubstances(params);
 		substances.value = substancesData;
@@ -123,11 +117,16 @@ const setSubstances = debounce(async (event = null) => {
 function createQuery(event) {
 	let query = {};
 	if (event && event.prop && event.order) {
-		const order = event.order === 'ascending' ? 'desc' : 'asc';
-		query.sort = { [event.prop]: order };
+		const order = event.order === 'ascending' ? 'asc' : 'desc';
+		query = { [event.prop]: order };
 	}
 	return query;
 }
+const handleSortChange = event => {
+	const sortQuery = createQuery(event);
+	sort.value = sortQuery;
+	setSubstances(event);
+};
 
 watch(paginationData.value, () => setSubstances());
 watch(
@@ -162,8 +161,8 @@ onMounted(() => {
 		<el-table
 			v-loading="isLoading"
 			:data="substances"
-			@sort-change="setSubstances"
 			@row-click="viewSubstance"
+			@sort-change="handleSortChange"
 		>
 			<el-table-column width="50">
 				<template #default="{ row }">
