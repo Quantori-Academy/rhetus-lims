@@ -267,6 +267,12 @@ async function substancesService(server) {
 				: server.reagentsService.getReagentsQuery({
 						relevance: getRelevanceScore('structure', options?.smiles || '').as('relevance')
 					});
+		},
+
+		getDeletedSubstanceById: async (id, category) => {
+			return category === Category.REAGENT
+				? await server.reagentsService.getDeletedReagentById(id)
+				: await server.samplesService.getDeletedSampleById(id);
 		}
 	});
 }

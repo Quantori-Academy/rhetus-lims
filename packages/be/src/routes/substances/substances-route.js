@@ -202,6 +202,31 @@ async function substances(server, options) {
 			return reply.code(500).send(err);
 		}
 	}
+
+	server.route({
+		method: 'GET',
+		path: options.prefix + 'substances/:category/:id/deleted',
+		preValidation: [server.authenticate],
+		schema: schema.getSubstance,
+		handler: onGetDeletedSubstance
+	});
+
+	async function onGetDeletedSubstance(req, reply) {
+		try {
+			const { category, id } = req.params;
+			const substance = await server.substancesService.getDeletedSubstanceById(id, category);
+
+			if (!substance) {
+				return reply
+					.code(404)
+					.send({ status: 'error', message: `No such deleted ${helpers.lowercase(category)}` });
+			}
+
+			return reply.code(200).send(substance);
+		} catch (err) {
+			return reply.code(500).send(err);
+		}
+	}
 }
 
 export default fp(substances);

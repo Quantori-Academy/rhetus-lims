@@ -65,65 +65,15 @@ async function samplesService(server) {
 		},
 
 		getSampleById: async id => {
-			const sample = await server.db
-				.select({
-					id: schema.samples.id,
-					name: schema.samples.name,
-					quantityUnit: schema.samples.quantityUnit,
-					quantityLeft: schema.samples.quantityLeft,
-					quantity: schema.samples.quantity,
-					expirationDate: schema.samples.expirationDate,
-					description: schema.samples.description,
-					structure: schema.samples.structure,
-					storageLocation: {
-						id: schema.storages.id,
-						name: schema.storages.name,
-						room: schema.storages.room,
-						description: schema.storages.description
-					},
-					category: sql`'sample'`.as('category')
-				})
-				.from(schema.samples)
-				.innerJoin(schema.storages, eq(schema.storages.id, schema.samples.storageId))
+			const baseQuery = server.samplesService.getBaseSampleQuery();
+			const sample = await baseQuery
 				.where(and(eq(id, schema.samples.id), eq(schema.samples.deleted, false)))
 				.limit(1);
 
 			if (!sample[0]) return null;
 
-			const components = await server.db
-				.select({
-					id: schema.components.reagentId,
-					name: schema.reagents.name,
-					quantityUsed: schema.components.quantityUsed,
-					quantityUnit: schema.reagents.quantityUnit,
-					quantity: schema.reagents.quantity,
-					quantityLeft: schema.reagents.quantityLeft,
-					expirationDate: schema.reagents.expirationDate,
-					description: schema.reagents.description,
-					structure: schema.reagents.structure,
-					category: sql`'reagent'`.as('category')
-				})
-				.from(schema.components)
-				.innerJoin(schema.reagents, eq(schema.reagents.id, schema.components.reagentId))
-				.where(eq(id, schema.components.id))
-				.union(
-					server.db
-						.select({
-							id: schema.components.sampleId,
-							name: schema.samples.name,
-							quantityUsed: schema.components.quantityUsed,
-							quantityUnit: schema.samples.quantityUnit,
-							quantity: schema.samples.quantity,
-							quantityLeft: schema.samples.quantityLeft,
-							expirationDate: schema.samples.expirationDate,
-							description: schema.samples.description,
-							structure: schema.samples.structure,
-							category: sql`'sample'`.as('category')
-						})
-						.from(schema.components)
-						.innerJoin(schema.samples, eq(schema.samples.id, schema.components.sampleId))
-						.where(eq(id, schema.components.id))
-				);
+			const componentsQuery = server.samplesService.getComponentsQuery(id);
+			const components = await componentsQuery;
 
 			return {
 				...sample[0],
@@ -329,6 +279,83 @@ async function samplesService(server) {
 				.leftJoin(newStorage, eq(newStorage.id, schema.substancesHistory.targetStorageId))
 				.where(eq(schema.substancesHistory.sampleId, substanceId))
 				.orderBy(schema.substancesHistory.createdAt, 'asc');
+		},
+
+		getComponentsQuery: sampleId => {
+			return server.db
+				.select({
+					id: schema.components.reagentId,
+					name: schema.reagents.name,
+					quantityUsed: schema.components.quantityUsed,
+					quantityUnit: schema.reagents.quantityUnit,
+					quantity: schema.reagents.quantity,
+					quantityLeft: schema.reagents.quantityLeft,
+					expirationDate: schema.reagents.expirationDate,
+					description: schema.reagents.description,
+					structure: schema.reagents.structure,
+					category: sql`'reagent'`.as('category')
+				})
+				.from(schema.components)
+				.innerJoin(schema.reagents, eq(schema.reagents.id, schema.components.reagentId))
+				.where(eq(sampleId, schema.components.id))
+				.union(
+					server.db
+						.select({
+							id: schema.components.sampleId,
+							name: schema.samples.name,
+							quantityUsed: schema.components.quantityUsed,
+							quantityUnit: schema.samples.quantityUnit,
+							quantity: schema.samples.quantity,
+							quantityLeft: schema.samples.quantityLeft,
+							expirationDate: schema.samples.expirationDate,
+							description: schema.samples.description,
+							structure: schema.samples.structure,
+							category: sql`'sample'`.as('category')
+						})
+						.from(schema.components)
+						.innerJoin(schema.samples, eq(schema.samples.id, schema.components.sampleId))
+						.where(eq(sampleId, schema.components.id))
+				);
+		},
+
+		getBaseSampleQuery: () => {
+			return server.db
+				.select({
+					id: schema.samples.id,
+					name: schema.samples.name,
+					quantityUnit: schema.samples.quantityUnit,
+					quantityLeft: schema.samples.quantityLeft,
+					quantity: schema.samples.quantity,
+					expirationDate: schema.samples.expirationDate,
+					description: schema.samples.description,
+					structure: schema.samples.structure,
+					storageLocation: {
+						id: schema.storages.id,
+						name: schema.storages.name,
+						room: schema.storages.room,
+						description: schema.storages.description
+					},
+					category: sql`'sample'`.as('category')
+				})
+				.from(schema.samples)
+				.innerJoin(schema.storages, eq(schema.storages.id, schema.samples.storageId));
+		},
+
+		getDeletedSampleById: async id => {
+			const baseQuery = server.samplesService.getBaseSampleQuery();
+			const sample = await baseQuery
+				.where(and(eq(id, schema.samples.id), eq(schema.samples.deleted, true)))
+				.limit(1);
+
+			if (!sample[0]) return null;
+
+			const componentsQuery = server.samplesService.getComponentsQuery(id);
+			const components = await componentsQuery;
+
+			return {
+				...sample[0],
+				components
+			};
 		}
 	});
 }
