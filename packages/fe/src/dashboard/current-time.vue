@@ -25,7 +25,7 @@ onMounted(() => {
 	<span class="time">{{ currentTime }}</span>
 </template>
 
-<style>
+<style scoped>
 .time {
 	width: 64px;
 }
