@@ -32,7 +32,6 @@ async function substancesService(server) {
 			query = applySorting(query, sort, 'substances');
 
 			const count = await query;
-			console.log({ QUERY: query.toSQL() });
 			const substances = await query.limit(limit).offset(offset);
 
 			return {
