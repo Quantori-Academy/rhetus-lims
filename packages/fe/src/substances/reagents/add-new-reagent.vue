@@ -18,6 +18,7 @@ import { quantityUnits } from '../../lib/constants/quantity-units.js';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import KetcherEditor from '../../ketcher-editor/ketcher-editor.vue';
 import { requiredRule } from '../../lib/utils/form-validation/requiredRule.js';
+import { __ } from '../../lib/locales/index.js';
 
 const formEl = useTemplateRef('form-el');
 const isSaving = ref(false);
@@ -39,14 +40,14 @@ const form = ref({
 });
 
 const rules = ref({
-	name: [requiredRule('Name')],
-	quantityUnit: [requiredRule('Quantity unit')],
+	name: [requiredRule(__('Name'))],
+	quantityUnit: [requiredRule(__('Quantity unit'))],
 	quantity: [
-		requiredRule('Quantity'),
-		{ type: 'number', min: 1, message: 'Quantity cannot be zero', trigger: ['blur', 'change'] }
+		requiredRule(__('Quantity')),
+		{ type: 'number', min: 1, message: __('Quantity cannot be zero'), trigger: ['blur', 'change'] }
 	],
-	storageId: [requiredRule('Storage location')],
-	structure: [requiredRule('Structure')]
+	storageId: [requiredRule(__('Storage location'))],
+	structure: [requiredRule(__('Structure'))]
 });
 
 onMounted(() => {
@@ -91,50 +92,50 @@ async function setStorages() {
 <template>
 	<div class="wrapper">
 		<el-form ref="form-el" :model="form" :rules="rules" label-width="auto" label-position="top">
-			<el-form-item label="Name" prop="name">
+			<el-form-item :label="__('Name')" prop="name">
 				<el-input v-model="form.name" placeholder="Enter reagent name" />
 			</el-form-item>
 			<div class="align-horizontal">
-				<el-form-item label="CAS number" prop="casNumber">
-					<el-input v-model="form.casNumber" placeholder="Indicate CAS number" />
+				<el-form-item :label="__('CAS number')" prop="casNumber">
+					<el-input v-model="form.casNumber" :placeholder="__('Indicate CAS number')" />
 				</el-form-item>
-				<el-form-item label="Producer" prop="producer">
-					<el-input v-model="form.producer" placeholder="Add producer" />
-				</el-form-item>
-			</div>
-			<div class="align-horizontal">
-				<el-form-item label="Catalog ID" prop="catalogId">
-					<el-input v-model="form.catalogId" placeholder="Add catalog id" />
-				</el-form-item>
-				<el-form-item label="Catalog link" prop="catalogLink">
-					<el-input v-model="form.catalogLink" placeholder="Add catalog link" />
+				<el-form-item :label="__('Producer')" prop="producer">
+					<el-input v-model="form.producer" :placeholder="__('Add producer')" />
 				</el-form-item>
 			</div>
 			<div class="align-horizontal">
-				<el-form-item label="Quantity unit" prop="quantityUnit">
-					<el-select v-model="form.quantityUnit" filterable placeholder="Select a unit">
+				<el-form-item :label="__('Catalog ID')" prop="catalogId">
+					<el-input v-model="form.catalogId" :placeholder="__('Add catalog id')" />
+				</el-form-item>
+				<el-form-item :label="__('Catalog link')" prop="catalogLink">
+					<el-input v-model="form.catalogLink" :placeholder="__('Add catalog link')" />
+				</el-form-item>
+			</div>
+			<div class="align-horizontal">
+				<el-form-item :label="__('Quantity unit')" prop="quantityUnit">
+					<el-select v-model="form.quantityUnit" filterable :placeholder="__('Select a unit')">
 						<el-option v-for="unit of quantityUnits" :key="unit" :label="unit" :value="unit" />
 					</el-select>
 				</el-form-item>
-				<el-form-item label="Quantity" prop="quantity">
-					<el-input-number v-model="form.quantity" placeholder="Enter amount" :min="1" />
+				<el-form-item :label="__('Quantity')" prop="quantity">
+					<el-input-number v-model="form.quantity" :placeholder="__('Enter amount')" :min="1" />
 				</el-form-item>
 			</div>
-			<el-form-item label="Price per unit" prop="unitPrice">
-				<el-input v-model="form.unitPrice" placeholder="Price per unit" />
+			<el-form-item :label="__('Price per unit')" prop="unitPrice">
+				<el-input v-model="form.unitPrice" :placeholder="__('Price per unit')" />
 			</el-form-item>
-			<el-form-item label="Expiration date" prop="expirationDate">
+			<el-form-item :label="__('Expiration date')" prop="expirationDate">
 				<el-date-picker
 					v-model="form.expirationDate"
-					placeholder="Indicate expiration date"
+					:placeholder="__('Indicate expiration date')"
 					type="date"
 					format="YYYY-MM-DD"
 				/>
 			</el-form-item>
-			<el-form-item label="Storage location" prop="storageId">
+			<el-form-item :label="__('Storage location')" prop="storageId">
 				<el-select
 					v-model="form.storageId"
-					placeholder="Select storage location"
+					:placeholder="__('Select storage location')"
 					:loading="isLoading"
 					filterable
 				>
@@ -146,17 +147,21 @@ async function setStorages() {
 					/>
 				</el-select>
 			</el-form-item>
-			<el-form-item label="Structure" prop="structure">
-				<ketcher-editor v-model:smiles="form.structure" placeholder="Enter structure" />
+			<el-form-item :label="__('Structure')" prop="structure">
+				<ketcher-editor v-model:smiles="form.structure" :placeholder="__('Enter structure')" />
 			</el-form-item>
-			<el-form-item label="Description" prop="description">
-				<el-input v-model="form.description" type="textarea" placeholder="Enter description" />
+			<el-form-item :label="__('Description')" prop="description">
+				<el-input
+					v-model="form.description"
+					type="textarea"
+					:placeholder="__('Enter description')"
+				/>
 			</el-form-item>
 			<div class="btn-container">
-				<el-button @click="cancel">Cancel</el-button>
-				<el-button :loading="isSaving" type="primary" @click="submit"
-					><rh-icon color="#7DCDEA" name="pod" class="icon" />Create</el-button
-				>
+				<el-button @click="cancel">{{ __('Cancel') }}</el-button>
+				<el-button :loading="isSaving" type="primary" @click="submit">
+					<rh-icon color="#7DCDEA" name="pod" class="icon" />{{ __('Create') }}
+				</el-button>
 			</div>
 		</el-form>
 	</div>

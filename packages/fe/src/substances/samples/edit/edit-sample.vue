@@ -19,6 +19,7 @@ import { confirmNotify, emptySample, formRules } from './constants';
 import { checkEditedFields } from '../../../substances/constants';
 import RhIcon from '../../../lib/components/rh-icon.vue';
 import SubstancesUsed from './substances-used.vue';
+import { __ } from '../../../lib/locales';
 
 const props = defineProps({ id: { type: String, default: null } });
 const storages = ref([]);
@@ -45,11 +46,11 @@ watch(
 );
 async function deleteSample() {
 	try {
-		await confirmNotify('Are you sure you want to delete this sample?', 'Delete Sample?');
+		await confirmNotify(__('Are you sure you want to delete this sample?'), __('Delete sample?'));
 		try {
 			const response = await $api.substances.deleteSubstance('sample', props.id);
 			$notify({
-				title: 'Success',
+				title: __('Success'),
 				message: response.message,
 				type: 'success'
 			});
@@ -71,14 +72,14 @@ async function submit() {
 		await checkSampleZero();
 		const response = await $api.substances.updateSubstance(props.id, updatedSampleValues.value);
 		$notify({
-			title: response.status.charAt(0).toUpperCase() + response.status.slice(1),
-			message: response.message || 'Sample has been updated',
+			title: __(response.status.charAt(0).toUpperCase() + response.status.slice(1)),
+			message: response.message || __('Sample has been updated'),
 			type: response.status
 		});
 		routerChange();
 	} catch (error) {
 		if (!['cancel', 'close'].includes(error)) {
-			$notifyUserAboutError(error.message || 'Error updating reagent');
+			$notifyUserAboutError(error.message || __('Error updating sample'));
 		}
 	} finally {
 		isSaving.value = false;
@@ -97,15 +98,15 @@ const routerChange = () => {
 
 const checkSampleZero = async () => {
 	if (isOutOfStock.value) {
-		await confirmNotify('Quantity reached 0. Do you want to delete this sample?');
+		await confirmNotify(__('Quantity reached 0. Do you want to delete this sample?'));
 	}
 };
 
 const reasonQuantityChange = async () => {
 	if (updatedSampleValues.value.quantityUsed) {
 		const reason = await $promptInputBox({
-			message: 'Please, provide a reason for quantity change',
-			error: 'Reason is required'
+			message: __('Please, provide a reason for quantity change'),
+			error: __('Reason is required')
 		});
 		updatedSampleValues.value.reason = reason.value;
 	}
@@ -162,30 +163,30 @@ watch(
 	<div v-loading="isLoading" class="wrapper">
 		<div class="editing-header">
 			<div class="category-icons">
-				<rh-icon name="applications" />{{ `${isEditing ? 'Editing ' : ''}${sample.name}` }}
+				<rh-icon name="applications" />{{ `${isEditing ? __('Editing') + ' ' : ''}${sample.name}` }}
 			</div>
-			<el-button v-if="!isEditing" @click="toggleEdit">Edit</el-button>
+			<el-button v-if="!isEditing" @click="toggleEdit">{{ __('Edit') }}</el-button>
 		</div>
 		<el-form ref="form-el" :model="sample" :rules="rules" label-position="top">
-			<el-form-item label="Name" prop="name">
+			<el-form-item :label="__('Name')" prop="name">
 				<el-input v-model="sample.name" :disabled="!isEditing" />
 			</el-form-item>
 			<substances-used :data="componentTableData" />
 			<div class="align-horizontal">
-				<el-form-item label="Quantity unit" prop="quantityUnit">
+				<el-form-item :label="__('Quantity unit')" prop="quantityUnit">
 					<el-select v-model="sample.quantityUnit" filterable disabled />
 				</el-form-item>
-				<el-form-item label="Quantity" prop="quantity">
+				<el-form-item :label="__('Quantity')" prop="quantity">
 					<el-input-number v-model="sample.quantity" disabled>
 						<template #suffix>
 							{{ sample.quantityUnit }}
 						</template>
 					</el-input-number>
 				</el-form-item>
-				<el-form-item label="Quantity left" prop="quantityLeft">
+				<el-form-item :label="__('Quantity left')" prop="quantityLeft">
 					<el-input-number
 						v-model="sample.quantityLeft"
-						placeholder="Enter amount"
+						:placeholder="__('Enter amount')"
 						:disabled="!isEditing"
 						:min="0"
 					>
@@ -195,13 +196,13 @@ watch(
 					</el-input-number>
 				</el-form-item>
 			</div>
-			<el-form-item label="Expiration date" prop="expirationDate">
+			<el-form-item :label="__('Expiration date')" prop="expirationDate">
 				<el-date-picker v-model="sample.expirationDate" type="date" disabled />
 			</el-form-item>
-			<el-form-item label="Storage location" prop="storageId">
+			<el-form-item :label="__('Storage location')" prop="storageId">
 				<el-select
 					v-model="sample.storageId"
-					placeholder="Select storage location"
+					:placeholder="__('Select storage location')"
 					:disabled="!isEditing"
 				>
 					<el-option
@@ -212,19 +213,21 @@ watch(
 					/>
 				</el-select>
 			</el-form-item>
-			<el-form-item label="Description" prop="description">
+			<el-form-item :label="__('Description')" prop="description">
 				<el-input
 					v-model="sample.description"
 					type="textarea"
-					placeholder="Enter description"
+					:placeholder="__('Enter description')"
 					:disabled="!isEditing"
 				/>
 			</el-form-item>
 			<div v-if="isEditing" class="btns-container">
-				<el-button type="danger" @click="deleteSample">Delete</el-button>
+				<el-button type="danger" @click="deleteSample">{{ __('Delete') }}</el-button>
 				<div>
-					<el-button @click="cancelEdit">Cancel</el-button>
-					<el-button :loading="isSaving" type="primary" @click="submit">Update</el-button>
+					<el-button @click="cancelEdit">{{ __('Cancel') }}</el-button>
+					<el-button :loading="isSaving" type="primary" @click="submit">
+						{{ __('Update') }}
+					</el-button>
 				</div>
 			</div>
 		</el-form>

@@ -10,6 +10,7 @@ import RhPagination from '../lib/components/rh-pagination/rh-pagination.vue';
 import RhFilters from '../lib/components/rh-filters/rh-filters.vue';
 import SubstanceFilters from './substance-filters.vue';
 import { debounce } from '../lib/utils/debounce/debounce.js';
+import { __ } from '../lib/locales/index.js';
 
 const { isOfficer } = inject('user');
 
@@ -55,9 +56,9 @@ const showNotification = (title, message, type) => {
 };
 const confirmDeleteReagent = async () => {
 	try {
-		return await $confirm('Do you want to delete this item?', 'Warning', {
-			confirmButtonText: 'OK',
-			cancelButtonText: 'Cancel',
+		return await $confirm(__('Do you want to delete this item?'), __('Warning'), {
+			confirmButtonText: __('OK'),
+			cancelButtonText: __('Cancel'),
 			type: 'warning'
 		});
 	} catch (error) {
@@ -72,10 +73,10 @@ const deleteSingleSubstance = async row => {
 	if (!(await confirmDeleteReagent())) return;
 	try {
 		await $api.substances.deleteSubstance(row.category.toLowerCase(), row.id);
-		showNotification('Success', 'Item is deleted', 'success');
+		showNotification(__('Success'), __('Item is deleted'), 'success');
 		await setSubstances();
 	} catch (error) {
-		showNotification('Error', error.message || 'Item update canceled', 'error');
+		showNotification(__('Error'), error.message || __('Item update canceled'), 'error');
 	}
 };
 
@@ -146,12 +147,12 @@ onMounted(() => {
 	<div class="margin-table">
 		<rh-filters>
 			<template #action-buttons>
-				<el-button type="primary" @click="addNewReagent"
-					><rh-icon color="#7dcdea" name="pod" class="icon" />Add New Reagent</el-button
-				>
-				<el-button type="primary" @click="addNewSample"
-					><rh-icon color="#7DCDEA" name="applications" class="icon" />Add New Sample</el-button
-				>
+				<el-button type="primary" @click="addNewReagent">
+					<rh-icon color="#7dcdea" name="pod" class="icon" />{{ __('Add New Reagent') }}
+				</el-button>
+				<el-button type="primary" @click="addNewSample">
+					<rh-icon color="#7DCDEA" name="applications" class="icon" />{{ __('Add New Sample') }}
+				</el-button>
 			</template>
 
 			<template #filters>
@@ -173,12 +174,12 @@ onMounted(() => {
 					/>
 				</template>
 			</el-table-column>
-			<el-table-column prop="name" min-width="150" label="Name" sortable />
-			<el-table-column prop="category" min-width="120" label="Category" sortable />
-			<el-table-column prop="structure" min-width="120" label="Structure" sortable />
-			<el-table-column prop="description" min-width="160" label="Description" />
-			<el-table-column prop="quantityLeft" min-width="120" label="Quantity Left" />
-			<el-table-column prop="storageLocation" min-width="140" label="Storage Location" />
+			<el-table-column prop="name" min-width="150" :label="__('Name')" sortable />
+			<el-table-column prop="category" min-width="120" :label="__('Category')" sortable />
+			<el-table-column prop="structure" min-width="120" :label="__('Structure')" sortable />
+			<el-table-column prop="description" min-width="160" :label="__('Description')" />
+			<el-table-column prop="quantityLeft" min-width="120" :label="__('Quantity left')" />
+			<el-table-column prop="storageLocation" min-width="140" :label="__('Storage location')" />
 			<el-table-column v-if="isOfficer" width="60">
 				<template #default="{ row }">
 					<el-button type="primary" @click.stop="() => orderReagent(row)">

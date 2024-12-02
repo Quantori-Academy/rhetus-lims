@@ -4,13 +4,14 @@ import RhIcon from '../lib/components/rh-icon.vue';
 import FilterItem from '../lib/components/rh-filters/filter-item.vue';
 import KetcherEditor from '../ketcher-editor/ketcher-editor.vue';
 import { defineModel } from 'vue';
+import { __ } from '../lib/locales';
 
 const filters = defineModel('filters', { type: Object });
 </script>
 
 <template>
 	<filter-item>
-		<el-input v-model="filters.name" clearable placeholder="Enter name">
+		<el-input v-model="filters.name" clearable :placeholder="__('Enter name')">
 			<template #prefix>
 				<rh-icon name="search" />
 			</template>
@@ -22,7 +23,7 @@ const filters = defineModel('filters', { type: Object });
 	</filter-item>
 
 	<filter-item>
-		<el-switch v-model="filters.expired" active-text="Expired" inactive-text="All" />
+		<el-switch v-model="filters.expired" :active-text="__('Expired')" :inactive-text="__('All')" />
 	</filter-item>
 </template>
 
