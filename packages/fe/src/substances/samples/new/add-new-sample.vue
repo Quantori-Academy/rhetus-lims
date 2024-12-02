@@ -18,6 +18,7 @@ import { $api } from '../../../lib/api';
 import { emptyComponent, formRules } from './constants';
 import RhIcon from '../../../lib/components/rh-icon.vue';
 import KetcherEditor from '../../../ketcher-editor/ketcher-editor.vue';
+import { __ } from '../../../lib/locales';
 
 const storages = ref([]);
 
@@ -78,8 +79,6 @@ const allSubstances = ref([]);
 const componentOptions = ref([]);
 
 function filterComponents(query) {
-	console.log(query);
-
 	componentOptions.value = allSubstances.value
 		.filter(component => component.label.toLowerCase().includes(query.toLowerCase()))
 		.slice(0, 50);
@@ -123,11 +122,11 @@ onMounted(() => {
 <template>
 	<div class="wrapper">
 		<el-form ref="form-el" :model="form" :rules="rules" label-width="auto" label-position="top">
-			<el-form-item label="Name" prop="name">
-				<el-input v-model="form.name" placeholder="Enter sample name" />
+			<el-form-item :label="__('Name')" prop="name">
+				<el-input v-model="form.name" :placeholder="__('Enter sample name')" />
 			</el-form-item>
 
-			<el-form-item label="Substances used" prop="components">
+			<el-form-item :label="__('Substances used')" prop="components">
 				<div
 					v-for="(component, index) of form.components"
 					:key="component.id + index"
@@ -160,15 +159,15 @@ onMounted(() => {
 						<el-input-number
 							v-model="component.quantityUsed"
 							:min="0"
-							label="Quantity used"
-							placeholder="Enter quantity used"
+							:label="__('Quantity used')"
+							:placeholder="__('Enter quantity used')"
 						>
 							<template #suffix>
 								{{ component.quantityUnit }}
 							</template>
 						</el-input-number>
 						<div class="subscript">
-							Future quantity: {{ component.quantityLeft - component.quantityUsed }}
+							{{ __('Future quantity') }}: {{ component.quantityLeft - component.quantityUsed }}
 							{{ component.quantityUnit }}
 						</div>
 					</div>
@@ -178,17 +177,17 @@ onMounted(() => {
 				</div>
 			</el-form-item>
 			<div class="add-btn">
-				<el-button @click="addComponent">Add component</el-button>
+				<el-button @click="addComponent">{{ __('Add component') }}</el-button>
 			</div>
 
 			<div class="align-horizontal">
-				<el-form-item label="Quantity unit" prop="quantityUnit">
-					<el-select v-model="form.quantityUnit" filterable placeholder="Select a unit">
+				<el-form-item :label="__('Quantity unit')" prop="quantityUnit">
+					<el-select v-model="form.quantityUnit" filterable :placeholder="__('Select a unit')">
 						<el-option v-for="item of quantityUnits" :key="item" :label="item" :value="item" />
 					</el-select>
 				</el-form-item>
-				<el-form-item label="Quantity" prop="quantity">
-					<el-input-number v-model="form.quantity" placeholder="Enter amount" :min="0">
+				<el-form-item :label="__('Quantity')" prop="quantity">
+					<el-input-number v-model="form.quantity" :placeholder="__('Enter amount')" :min="0">
 						<template #suffix>
 							<span>{{ form.quantityUnit }}</span>
 						</template>
@@ -196,12 +195,16 @@ onMounted(() => {
 				</el-form-item>
 			</div>
 
-			<el-form-item label="Expiration date" prop="expirationDate">
-				<el-date-picker v-model="form.expirationDate" type="date" placeholder="Pick a date" />
+			<el-form-item :label="__('Expiration date')" prop="expirationDate">
+				<el-date-picker
+					v-model="form.expirationDate"
+					type="date"
+					:placeholder="__('Indicate expiration date')"
+				/>
 			</el-form-item>
 
-			<el-form-item label="Storage location" prop="storageId">
-				<el-select v-model="form.storageId" filterable placeholder="Select storage location">
+			<el-form-item :label="__('Storage location')" prop="storageId">
+				<el-select v-model="form.storageId" filterable :placeholder="__('Select storage location')">
 					<el-option
 						v-for="storage of storages"
 						:key="storage.id"
@@ -210,18 +213,22 @@ onMounted(() => {
 					/>
 				</el-select>
 			</el-form-item>
-			<el-form-item label="Structure" prop="structure">
-				<ketcher-editor v-model:smiles="form.structure" placeholder="Enter structure" />
+			<el-form-item :label="__('Structure')" prop="structure">
+				<ketcher-editor v-model:smiles="form.structure" :placeholder="__('Enter structure')" />
 			</el-form-item>
-			<el-form-item label="Description" prop="description">
-				<el-input v-model="form.description" type="textarea" placeholder="Enter description" />
+			<el-form-item :label="__('Description')" prop="description">
+				<el-input
+					v-model="form.description"
+					type="textarea"
+					:placeholder="__('Enter description')"
+				/>
 			</el-form-item>
 
 			<div class="btn-container">
-				<el-button @click="cancel">Cancel</el-button>
-				<el-button :loading="isSaving" type="primary" @click="submit"
-					><rh-icon color="#7DCDEA" name="applications" class="icon" />Create</el-button
-				>
+				<el-button @click="cancel">{{ __('Cancel') }}</el-button>
+				<el-button :loading="isSaving" type="primary" @click="submit">
+					<rh-icon color="#7DCDEA" name="applications" class="icon" />{{ __('Create') }}
+				</el-button>
 			</div>
 		</el-form>
 	</div>

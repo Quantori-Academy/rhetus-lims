@@ -193,8 +193,8 @@ onMounted(() => {
 			<el-table-column prop="category" :label="__('Category')" sortable />
 			<el-table-column prop="structure" :label="__('Structure')" sortable />
 			<el-table-column prop="description" :label="__('Description')" />
-			<el-table-column prop="quantityLeft" :label="__('Quantity Left')" sortable />
-			<el-table-column width="380" :label="__('Storage Location')">
+			<el-table-column prop="quantityLeft" :label="__('Quantity left')" sortable />
+			<el-table-column width="380" :label="__('Storage location')">
 				<template #default="{ row }">
 					<el-select
 						v-model="row.storageLocationId"

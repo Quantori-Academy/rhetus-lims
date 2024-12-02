@@ -18,6 +18,8 @@ import { formRules, emptyReagent, confirmNotify } from './constants.js';
 import { checkEditedFields } from '../../substances/constants';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 import RhIcon from '../../lib/components/rh-icon.vue';
+import { __ } from '../../lib/locales/index.js';
+
 const props = defineProps({
 	id: {
 		type: String,
@@ -64,7 +66,7 @@ const setReagent = async () => {
 		reagent.value = { ...data, storageId: data.storageLocation.id };
 		originalReagent.value = { ...reagent.value };
 	} catch (error) {
-		$notifyUserAboutError(error.message || 'Error updating reagent');
+		$notifyUserAboutError(error.message || __('Error updating reagent'));
 	} finally {
 		loading.value = false;
 	}
@@ -88,14 +90,14 @@ const handleSubmit = async () => {
 			updatedReagentValues.value
 		);
 		$notify({
-			title: response.status.charAt(0).toUpperCase() + response.status.slice(1),
-			message: response.message || 'Reagent has been updated',
+			title: __(response.status.charAt(0).toUpperCase() + response.status.slice(1)),
+			message: response.message || __('Reagent has been updated'),
 			type: response.status
 		});
 		routerChange();
 	} catch (error) {
 		if (!['cancel', 'close'].includes(error)) {
-			$notifyUserAboutError(error.message || 'Error updating reagent');
+			$notifyUserAboutError(error.message || __('Error updating reagent'));
 		}
 	} finally {
 		isSaving.value = false;
@@ -115,22 +117,22 @@ const routerChange = () => {
 const reasonQuantityChange = async () => {
 	if (updatedReagentValues.value.quantityUsed) {
 		const reason = await $promptInputBox({
-			message: 'Please, provide a reason for quantity change',
-			error: 'Reason is required'
+			message: __('Please, provide a reason for quantity change'),
+			error: __('Reason is required')
 		});
 		updatedReagentValues.value.reason = reason.value;
 	}
 };
 const checkReagentZero = async () => {
 	if (isOutOfStock.value) {
-		await confirmNotify('Quantity reached 0. Do you want to delete this reagent?');
+		await confirmNotify(__('Quantity reached 0. Do you want to delete this reagent?'));
 	}
 };
 const deleteReagent = async () => {
 	try {
-		await confirmNotify('Do you want to delete this reagent?');
+		await confirmNotify(__('Do you want to delete this reagent?'));
 		const response = await $api.substances.deleteSubstance('reagent', props.id);
-		$notify({ title: 'Success', message: response.message, type: 'success' });
+		$notify({ title: __('Success'), message: response.message, type: 'success' });
 		await $router.push({ name: 'substances-list' });
 	} catch (error) {
 		if (!['cancel', 'close'].includes(error)) {
@@ -149,9 +151,9 @@ onMounted(() => {
 	<div class="wrapper">
 		<div class="editing-header">
 			<div class="category-icons">
-				<rh-icon name="pod" />{{ `${isEdit ? 'Editing ' : ''}${reagent.name}` }}
+				<rh-icon name="pod" />{{ `${isEdit ? __('Editing') + ' ' : ''}${reagent.name}` }}
 			</div>
-			<el-button v-if="!isEdit" @click="toggleEdit">{{ 'Edit' }}</el-button>
+			<el-button v-if="!isEdit" @click="toggleEdit">{{ __('Edit') }}</el-button>
 		</div>
 		<el-form
 			ref="form-ref"
@@ -161,46 +163,46 @@ onMounted(() => {
 			:rules="rules"
 			@submit="handleSubmit"
 		>
-			<el-form-item label="Name" prop="name">
+			<el-form-item :label="__('Name')" prop="name">
 				<el-input v-model="reagent.name" :disabled="!isEdit" />
 			</el-form-item>
 			<div class="align-horizontal">
-				<el-form-item label="CAS number" prop="casNumber">
+				<el-form-item :label="__('CAS number')" prop="casNumber">
 					<el-input v-model="reagent.casNumber" :disabled="true" />
 				</el-form-item>
-				<el-form-item label="Producer" prop="producer">
+				<el-form-item :label="__('Producer')" prop="producer">
 					<el-input v-model="reagent.producer" :disabled="true" />
 				</el-form-item>
 			</div>
 			<div class="align-horizontal">
-				<el-form-item label="Catalog ID" prop="catalogId">
+				<el-form-item :label="__('Catalog ID')" prop="catalogId">
 					<el-input v-model="reagent.catalogId" :disabled="true" />
 				</el-form-item>
-				<el-form-item label="Catalog link" prop="catalogLink">
+				<el-form-item :label="__('Catalog link')" prop="catalogLink">
 					<el-input v-model="reagent.catalogLink" :disabled="true" />
 				</el-form-item>
 			</div>
 			<div class="align-horizontal">
-				<el-form-item label="Quantity unit" prop="quantityUnit">
+				<el-form-item :label="__('Quantity unit')" prop="quantityUnit">
 					<el-input v-model="reagent.quantityUnit" :disabled="true" />
 				</el-form-item>
-				<el-form-item label="Quantity" prop="quantity">
+				<el-form-item :label="__('Quantity')" prop="quantity">
 					<el-input-number v-model="reagent.quantity" :disabled="true" />
 				</el-form-item>
-				<el-form-item label="Quantity left" prop="quantityLeft">
+				<el-form-item :label="__('Quantity left')" prop="quantityLeft">
 					<el-input-number
 						v-model="reagent.quantityLeft"
-						placeholder="Enter amount"
+						:placeholder="__('Enter amount')"
 						:disabled="!isEdit"
 						:min="0"
 					>
 					</el-input-number>
 				</el-form-item>
 			</div>
-			<el-form-item label="Price per unit" prop="unitPrice">
+			<el-form-item :label="__('Price per unit')" prop="unitPrice">
 				<el-input v-model="reagent.unitPrice" :disabled="true" />
 			</el-form-item>
-			<el-form-item label="Expiration date" prop="expirationDate">
+			<el-form-item :label="__('Expiration date')" prop="expirationDate">
 				<el-date-picker
 					v-model="reagent.expirationDate"
 					type="date"
@@ -209,7 +211,7 @@ onMounted(() => {
 					disabled
 				/>
 			</el-form-item>
-			<el-form-item label="Storage location" prop="storageId">
+			<el-form-item :label="__('Storage location')" prop="storageId">
 				<el-select v-model="reagent.storageId" :disabled="!isEdit" filterable>
 					<el-option
 						v-for="storage of storages"
@@ -219,15 +221,15 @@ onMounted(() => {
 					/>
 				</el-select>
 			</el-form-item>
-			<el-form-item label="Description" prop="description">
+			<el-form-item :label="__('Description')" prop="description">
 				<el-input v-model="reagent.description" type="textarea" :disabled="!isEdit" />
 			</el-form-item>
 			<div v-if="isEdit" class="btns-container">
-				<el-button type="danger" @click="deleteReagent">{{ 'Delete' }}</el-button>
+				<el-button type="danger" @click="deleteReagent">{{ __('Delete') }}</el-button>
 				<div>
-					<el-button @click="cancelEdit">Cancel</el-button>
+					<el-button @click="cancelEdit">{{ __('Cancel') }}</el-button>
 					<el-button :loading="isSaving" type="primary" @click="handleSubmit">{{
-						'Update'
+						__('Update')
 					}}</el-button>
 				</div>
 			</div>

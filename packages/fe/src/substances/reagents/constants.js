@@ -1,25 +1,26 @@
 import { $confirm } from '../../lib/utils/feedback/confirm-msg';
+import { __ } from '../../lib/locales';
 
 const requiredRule = fieldName => {
 	return {
 		required: true,
-		message: `${fieldName} can't be empty`,
+		message: `${fieldName} ${__("can't be empty")}`,
 		trigger: ['blur', 'change']
 	};
 };
 
 export const formRules = {
 	quantityLeft: [
-		requiredRule('quantityLeft'),
+		requiredRule(__('Quantity left')),
 		{
 			type: 'number',
 			min: 0,
-			message: "Quantity can't be negative",
+			message: __("Quantity can't be negative"),
 			trigger: ['blur', 'change']
 		}
 	],
-	name: [requiredRule('Name')],
-	storageId: [requiredRule('Storage location')]
+	name: [requiredRule(__('Name'))],
+	storageId: [requiredRule(__('Storage location'))]
 };
 
 export const emptyReagent = {
@@ -43,9 +44,9 @@ export const emptyReagent = {
 };
 
 export const confirmNotify = async message => {
-	return await $confirm(`${message}`, 'Warning', {
-		confirmButtonText: 'OK',
-		cancelButtonText: 'Cancel',
+	return await $confirm(`${message}`, __('Warning'), {
+		confirmButtonText: __('OK'),
+		cancelButtonText: __('Cancel'),
 		type: 'warning'
 	});
 };
