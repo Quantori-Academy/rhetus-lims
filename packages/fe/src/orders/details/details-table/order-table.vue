@@ -1,12 +1,8 @@
 <script setup>
 import { ElButton } from 'element-plus';
-import { computed, defineProps, ref } from 'vue';
-import LinkedSubstances from './linked-substances.vue';
+import { defineProps } from 'vue';
 import ExistingSubstances from './existing-substances.vue';
-import { $api } from '../../../lib/api';
-import { $notifyUserAboutError } from '../../../lib/utils/feedback/notify-msg';
-import { $router } from '../../../lib/router/router';
-
+import NewSubstances from './new-substances.vue';
 const props = defineProps({
 	order: {
 		type: Object,
@@ -16,56 +12,31 @@ const props = defineProps({
 		type: Boolean,
 		default: false
 	},
-	toggleEdit: { type: Function, default: null },
-	linkedRequests: { type: Array, default: null }
+	linkedRequests: { type: Array, default: null },
+	isReagentAdded: {
+		type: Boolean,
+		default: false
+	}
 });
-const childOneRef = ref(null);
-const childTwoRef = ref(null);
-const isOrderValid = computed(
-	() => [...props.order.reagents, ...props.order.reagentRequests].length > 0
-);
+
 const emit = defineEmits([
 	'remove-linked-request',
 	'set-order',
 	'toggle-off-edit',
-	'remove-reagent'
+	'remove-reagent',
+	'update-item',
+	'submit-substances',
+	'add-new-reagent',
+	'add-existing-reagent'
 ]);
-const removeLinkedRequest = selectedRequest => {
-	emit('remove-linked-request', selectedRequest);
-};
-const toggleOffEdit = () => {
-	emit('toggle-off-edit');
-};
-const setOrder = id => {
-	emit('set-order', id);
-};
-const removeReagent = selectedReagent => {
-	emit('remove-reagent', selectedReagent);
-};
-const updateReagents = async () => {
-	const changesFromChildOne = childOneRef.value.getChanges();
-	const trackFromChildOne = childOneRef.value.trackChange();
-	const trackFromChilTwo = childTwoRef.value.trackChange();
-	const changesFromChildTwo = childTwoRef.value.getChanges();
-	const combinedChanges = [...changesFromChildOne, ...changesFromChildTwo];
-
-	if (!trackFromChildOne || !trackFromChilTwo) {
-		$router.push({ name: 'order-details', params: { id: props.order.id } });
-		return;
-	}
-
-	try {
-		const body = {
-			orderItems: combinedChanges
-		};
-		const response = await $api.orders.updateItemInOrder(props.order.id, body);
-		if (response.status === 'success') {
-			setOrder(props.order.id);
-		}
-	} catch (error) {
-		$notifyUserAboutError(error);
-	}
-};
+const removeLinkedRequest = selectedRequest => emit('remove-linked-request', selectedRequest);
+const setOrder = id => emit('set-order', id);
+const removeReagent = selectedReagent => emit('remove-reagent', selectedReagent);
+const addNewReagent = selectedReagent => emit('add-new-reagent', selectedReagent);
+const addExistingReagent = selectedReagent => emit('add-existing-reagent', selectedReagent);
+const submitSubstances = () => emit('submit-substances');
+const updateItem = (tempId, type, field, newValue) =>
+	emit('update-item', tempId, type, field, newValue);
 </script>
 
 <template>
@@ -78,28 +49,25 @@ const updateReagents = async () => {
 				<span class="mobile">Quantity</span>
 				<span class="mobile">Amount</span>
 			</div>
-			<linked-substances
-				v-if="props.linkedRequests.length > 0"
-				ref="childOneRef"
-				:order="props.order"
-				:is-edit="props.isEdit"
-				:linked-requests="linkedRequests"
-				@remove-linked-request="removeLinkedRequest"
-				@set-order="setOrder"
-				@toggle-off-edit="toggleOffEdit"
-			/>
 			<existing-substances
-				ref="childTwoRef"
 				:order="props.order"
 				:is-edit="props.isEdit"
-				:linked-requests="linkedRequests"
+				:linked-requests="props.linkedRequests"
 				@set-order="setOrder"
-				@toggle-off-edit="toggleOffEdit"
 				@remove-reagent="removeReagent"
+				@remove-linked-request="removeLinkedRequest"
+				@update-item="updateItem"
+			/>
+			<new-substances
+				:order="props.order"
+				:is-edit="props.isEdit"
+				:is-reagent-added="isReagentAdded"
+				@add-new-reagent="addNewReagent"
+				@add-existing-reagent="addExistingReagent"
 			/>
 			<div v-if="isEdit" class="btn-container">
-				<el-button type="primary" :disabled="!isOrderValid" @click="updateReagents"
-					>Update Form</el-button
+				<el-button type="primary" :disabled="!isReagentAdded" @click="submitSubstances"
+					>Save</el-button
 				>
 			</div>
 		</div>

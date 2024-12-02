@@ -9,10 +9,11 @@ import {
 	ElTag,
 	ElForm
 } from 'element-plus';
-import { defineProps, computed, watch, ref } from 'vue';
+import { defineProps, computed } from 'vue';
 import { quantityUnits } from '../../../lib/constants/quantity-units.js';
 import RhIcon from '../../../lib/components/rh-icon.vue';
-import NewSubstances from './new-substances.vue';
+import { $router } from '../../../lib/router/router.js';
+import { existingFieldRules, existingNumberFieldRules } from '../constants.js';
 
 const props = defineProps({
 	order: {
@@ -25,139 +26,132 @@ const props = defineProps({
 	},
 	linkedRequests: { type: Array, default: null }
 });
-const emit = defineEmits(['set-order', 'remove-reagent']);
-const createChangeTrackerEntry = item => {
-	return Object.keys(item).reduce((acc, field) => {
-		acc[field] = false;
-		return acc;
-	}, {});
-};
-const changeTracker = ref(props.order.reagents.map(createChangeTrackerEntry));
-watch(
-	() => props.order.reagents,
-	reagents => {
-		if (reagents.length > changeTracker.value.length) {
-			for (let i = changeTracker.value.length; i < reagents.length; i++) {
-				changeTracker.value.push(createChangeTrackerEntry(reagents[i]));
-			}
-		}
-	},
-	{ deep: true }
-);
-const changes = computed(() => {
-	return getChangedItems();
-});
-const isChanged = computed(() => {
-	return checkForChanges();
-});
-defineExpose({
-	getChanges: () => changes.value,
-	trackChange: () => isChanged.value
+const combinedItems = computed(() => {
+	return [
+		...props.order.reagentRequests.map(item => ({ ...item, type: 'reagentRequests' })),
+		...props.order.reagents.map(item => ({ ...item, type: 'reagents' }))
+	];
 });
 
-const createPropertyWatcher = (request, key, index) => {
-	watch(
-		() => request[key],
-		(newVal, oldVal) => {
-			if (newVal !== oldVal) {
-				changeTracker.value[index][key] = true;
-			}
-		}
-	);
-};
+const emit = defineEmits(['set-order', 'remove-reagent', 'update-item', 'remove-linked-request']);
+const removeReagent = selectedReagent => emit('remove-reagent', selectedReagent);
+const updateItem = (tempId, type, field, newValue) =>
+	emit('update-item', tempId, type, field, newValue);
+const removeLinkedRequest = selectedRequest => emit('remove-linked-request', selectedRequest);
 
-const watchRequestProperties = (request, index) => {
-	Object.keys(request).forEach(key => createPropertyWatcher(request, key, index));
-};
-
-props.order.reagents.forEach((request, index) => {
-	watchRequestProperties(request, index);
-});
-
-const checkForChanges = () => {
-	return changeTracker.value.some(tracker => Object.values(tracker).includes(true));
-};
-
-const getChangedItems = () => {
-	return props.order.reagents.filter((_, index) => {
-		return Object.values(changeTracker.value[index]).includes(true);
-	});
-};
-
-const removeReagent = selectedReagent => {
-	emit('remove-reagent', selectedReagent);
-};
-const setOrder = id => {
-	emit('set-order', id);
-};
+function viewRequestDetails(request) {
+	const target = $router.resolve({ name: 'request-details', params: { id: request.tempId } }).href;
+	window.open(target, '_blank');
+}
 </script>
 
 <template>
-	<el-form label-position="top">
-		<div v-for="(singleOrder, index) of props.order.reagents" :key="index" class="row">
-			<el-form-item>
-				<span class="desktop">Name</span>
-				<el-input
-					v-model="singleOrder.reagentName"
-					placeholder="Add name"
-					:disabled="!props.isEdit"
-				/>
-			</el-form-item>
-			<el-form-item>
-				<span class="desktop">Unit</span>
-				<el-select
-					v-model="singleOrder.quantityUnit"
-					filterable
-					placeholder="Quantity unit"
-					:disabled="!props.isEdit"
-				>
-					<el-option v-for="unit of quantityUnits" :key="unit" :label="unit" :value="unit" />
-				</el-select>
-			</el-form-item>
-			<el-form-item>
-				<span class="desktop">Quantity</span>
-				<el-input-number
-					v-model="singleOrder.quantity"
-					placeholder="Quantity"
-					:min="1"
-					:disabled="!props.isEdit"
-				/>
-			</el-form-item>
-			<el-form-item>
-				<span class="desktop">Amount</span>
-				<el-input-number
-					v-model="singleOrder.amount"
-					placeholder="Amount"
-					:min="1"
-					:disabled="!props.isEdit"
-				/>
-			</el-form-item>
-			<el-button
-				v-if="props.isEdit"
-				:disabled="!props.order.reagents.includes(singleOrder)"
-				type="danger"
-				circle
-				@click="() => removeReagent(singleOrder)"
+	<el-form
+		v-for="(singleOrder, index) of combinedItems"
+		:key="singleOrder.tempId"
+		class="row"
+		label-position="top"
+		:model="combinedItems[index]"
+	>
+		<div class="linked desktop">
+			<el-tag
+				v-for="(request, reqIndex) of props.linkedRequests.filter(
+					request => request.reagentName === singleOrder.reagentName
+				)"
+				:key="reqIndex"
+				size="large"
+				type="primary"
+				:closable="props.isEdit"
+				@click="() => viewRequestDetails(request)"
+				@close="() => removeLinkedRequest(request)"
 			>
-				<rh-icon color="white" name="remove"
-			/></el-button>
-			<div
-				v-if="props.linkedRequests.some(request => request.reagentName === singleOrder.reagentName)"
-				class="linked mobile"
-			>
-				<el-tag
-					v-for="(request, reqIndex) of props.linkedRequests.filter(
-						request => request.reagentName === singleOrder.reagentName
-					)"
-					:key="reqIndex"
-					type="primary"
-					effect="dark"
-				>
-					Linked request for {{ singleOrder.reagentName }}: {{ request.quantity }}
-					{{ request.quantityUnit }} ({{ request.amount }})
-				</el-tag>
-			</div>
+				Linked request for {{ request.reagentName }}: {{ request.quantity }}
+				{{ request.quantityUnit }} ({{ request.amount }})
+			</el-tag>
 		</div>
-		<new-substances :order="props.order" :is-edit="props.isEdit" @set-order="setOrder" />
+		<el-form-item prop="reagentName" :rules="existingFieldRules">
+			<span class="desktop">Name</span>
+			<el-input
+				v-model="singleOrder.reagentName"
+				placeholder="Add name"
+				:disabled="!props.isEdit"
+				@input="
+					() =>
+						updateItem(singleOrder.tempId, singleOrder.type, 'reagentName', singleOrder.reagentName)
+				"
+			/>
+		</el-form-item>
+		<el-form-item prop="quantityUnit" :rules="existingFieldRules">
+			<span class="desktop">Unit</span>
+			<el-select
+				v-model="singleOrder.quantityUnit"
+				filterable
+				placeholder="Quantity unit"
+				:disabled="!props.isEdit"
+				@input="
+					() =>
+						updateItem(
+							singleOrder.tempId,
+							singleOrder.type,
+							'quantityUnit',
+							singleOrder.quantityUnit
+						)
+				"
+			>
+				<el-option v-for="unit of quantityUnits" :key="unit" :label="unit" :value="unit" />
+			</el-select>
+		</el-form-item>
+		<el-form-item prop="quantity" :rules="existingNumberFieldRules">
+			<span class="desktop">Quantity</span>
+			<el-input-number
+				v-model="singleOrder.quantity"
+				placeholder="Quantity"
+				:min="1"
+				:disabled="!props.isEdit"
+				@change="
+					() => updateItem(singleOrder.tempId, singleOrder.type, 'quantity', singleOrder.quantity)
+				"
+			/>
+		</el-form-item>
+		<el-form-item prop="amount" :rules="existingNumberFieldRules">
+			<span class="desktop">Amount</span>
+			<el-input-number
+				v-model="singleOrder.amount"
+				placeholder="Amount"
+				:min="1"
+				:disabled="!props.isEdit"
+				@change="
+					() => updateItem(singleOrder.tempId, singleOrder.type, 'amount', singleOrder.reagentName)
+				"
+			/>
+		</el-form-item>
+		<el-button
+			v-if="props.isEdit"
+			:disabled="
+				(singleOrder && singleOrder.type === 'reagentRequests') ||
+				props.order.reagentRequests.includes(singleOrder)
+			"
+			type="danger"
+			circle
+			@click="() => removeReagent(singleOrder)"
+		>
+			<rh-icon color="white" name="remove"
+		/></el-button>
+		<div class="linked mobile">
+			<el-tag
+				v-for="(request, reqIndex) of props.linkedRequests.filter(
+					request => request.reagentName === singleOrder.reagentName
+				)"
+				:key="reqIndex"
+				size="large"
+				type="primary"
+				:closable="props.isEdit"
+				@click="() => viewRequestDetails(request)"
+				@close="() => removeLinkedRequest(request)"
+			>
+				Linked request for {{ request.reagentName }}: {{ request.quantity }}
+				{{ request.quantityUnit }} ({{ request.amount }})
+			</el-tag>
+		</div>
 	</el-form>
 </template>

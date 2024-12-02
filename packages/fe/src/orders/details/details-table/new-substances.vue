@@ -8,32 +8,13 @@ import {
 	ElInputNumber,
 	ElAutocomplete
 } from 'element-plus';
-import { defineProps, useTemplateRef, ref, toRef, onMounted, watch } from 'vue';
+import { defineProps, useTemplateRef, ref, onMounted, computed } from 'vue';
 import { $isFormValid } from '../../../lib/utils/form-validation/is-form-valid.js';
 import RhIcon from '../../../lib/components/rh-icon.vue';
 import { quantityUnits } from '../../../lib/constants/quantity-units.js';
-import { newSubstanceRef, requiredRule } from '../constants.js';
+import { newSubstanceRef, newSubstanceRules } from '../constants.js';
 import { $notifyUserAboutError } from '../../../lib/utils/feedback/notify-msg.js';
 import { $api } from '../../../lib/api/index.js';
-
-const isAutoFilled = ref(false);
-const searchQuery = ref('');
-const newSubstance = ref(newSubstanceRef);
-const substanceRules = {
-	reagentName: [
-		{
-			required: () => !isAutoFilled.value && searchQuery.value.trim() === '',
-			message: 'Reagent name cannot be empty',
-			trigger: 'blur'
-		}
-	],
-	quantityUnit: [requiredRule('Unit')],
-	quantity: [requiredRule('Quantity')],
-	amount: [requiredRule('Amount')]
-};
-const newSubstanceRules = ref(substanceRules);
-const substanceFormEl = useTemplateRef('substance-form-el');
-const suggestedSubstances = ref([]);
 
 const props = defineProps({
 	order: {
@@ -43,30 +24,29 @@ const props = defineProps({
 	isEdit: {
 		type: Boolean,
 		default: false
+	},
+	isReagentAdded: {
+		type: Boolean,
+		default: false
 	}
 });
 
-const order = toRef(props, 'order');
-const emit = defineEmits(['set-order']);
-watch(searchQuery, newValue => {
-	try {
-		if (
-			newValue &&
-			!suggestedSubstances.value.some(suggestion =>
-				suggestion.name.toLowerCase().includes(newValue.toLowerCase())
-			)
-		) {
-			newSubstance.value.reagentName = newValue;
-		}
-	} catch (error) {
-		$notifyUserAboutError(error);
-	}
+const searchQuery = ref('');
+const newReagentEl = useTemplateRef('new-reagent-el');
+const newSubstance = ref(newSubstanceRef);
+const rules = ref(newSubstanceRules);
+const suggestedSubstances = ref([]);
+const reagentName = computed({
+	get: () => searchQuery.value,
+	set: value => (searchQuery.value = newSubstance.value.reagentName = value)
 });
+
+const emit = defineEmits(['add-new-reagent', 'add-existing-reagent']);
 
 onMounted(() => {
-	fetchRequests();
+	fetchSubstances();
 });
-const fetchRequests = async () => {
+const fetchSubstances = async () => {
 	try {
 		const params = {
 			limit: 200
@@ -76,70 +56,61 @@ const fetchRequests = async () => {
 			substance => substance.category === 'reagent'
 		);
 	} catch (error) {
-		$notifyUserAboutError(error.message || 'Error retrieving substances');
+		$notifyUserAboutError(error);
 	}
 };
+// const fetchSubstanceSuggestions = async (queryString, callback) => {
+// 	const query = searchQuery.value;
+// 	const selectedReagents = props.order.reagents.map(reagent => reagent.reagentName);
+// 	if (!queryString) {
+// 		const filteredSuggestions = suggestedSubstances.value.filter(
+// 			suggest => !selectedReagents.includes(suggest.name)
+// 		);
+// 		callback(filteredSuggestions);
+// 	} else {
+// 		const filteredRequests = suggestedSubstances.value.filter(
+// 			suggest =>
+// 				suggest.name.toLowerCase().includes(query.toLowerCase()) &&
+// 				!selectedReagents.includes(suggest.name)
+// 		);
+// 		callback(filteredRequests);
+// 	}
+// };
 const fetchSubstanceSuggestions = async (queryString, callback) => {
 	const query = searchQuery.value;
-	const selectedReagents = order.value.reagents.map(reagent => reagent.reagentName);
-	if (!queryString) {
-		const filteredSuggestions = suggestedSubstances.value.filter(
-			suggest => !selectedReagents.includes(suggest.name)
-		);
-		callback(filteredSuggestions);
-	} else {
-		const filteredRequests = suggestedSubstances.value.filter(
+	const selectedReagents = props.order.reagents.map(reagent => reagent.reagentName);
+	const filterSuggestions = suggestions =>
+		suggestions.filter(
 			suggest =>
-				suggest.name.toLowerCase().includes(query.toLowerCase()) &&
+				(!queryString || suggest.name.toLowerCase().includes(query.toLowerCase())) &&
 				!selectedReagents.includes(suggest.name)
 		);
-		callback(filteredRequests);
-	}
+	const filteredSuggestions = filterSuggestions(suggestedSubstances.value);
+	callback(filteredSuggestions);
 };
-const onReagentSelect = async selectedRequest => {
-	isAutoFilled.value = true;
-	substanceFormEl.value.resetFields();
-	const isReagentAdded = order.value.reagents.some(
+
+const addExistingReagent = async selectedRequest => {
+	const isReagentAdded = props.order.reagents.some(
 		reagent => reagent.reagentName === selectedRequest.name
 	);
 	if (isReagentAdded) {
 		return;
 	}
-
-	try {
-		let newReagent = {
-			...selectedRequest,
-			reagentName: selectedRequest.name,
-			quantity: 1,
-			amount: 1
-			// tempId: selectedRequest.id // use for msw
-		};
-		const body = {
-			reagentRequests: [],
-			reagents: [{ ...newReagent }],
-			newReagents: []
-		};
-		// test id on prod
-		const response = await $api.orders.addItemToOrder(order.value.id, body);
-		if (response.status === 'success') {
-			setOrder(order.value.id);
-		}
-		searchQuery.value = '';
-	} catch (error) {
-		$notifyUserAboutError(error);
-	} finally {
-		isAutoFilled.value = false;
-	}
+	let existingSub = {
+		...selectedRequest,
+		reagentName: selectedRequest.name,
+		quantity: 1,
+		amount: 1
+		// tempId: selectedRequest.id // use for msw
+	};
+	emit('add-existing-reagent', existingSub);
+	searchQuery.value = '';
+	newReagentEl.value.resetFields();
 };
 const addNewReagent = async () => {
-	const isValid = await $isFormValid(substanceFormEl);
-	if (!isValid) return;
-	newSubstance.value.reagentName = searchQuery.value;
+	if (!(await $isFormValid(newReagentEl))) return;
 	const newReagent = {
-		name: newSubstance.value.reagentName,
-		quantityUnit: newSubstance.value.quantityUnit,
-		quantity: newSubstance.value.quantity,
-		amount: newSubstance.value.amount,
+		...newSubstance.value,
 		casNumber: '',
 		producer: '',
 		catalogId: '',
@@ -148,40 +119,28 @@ const addNewReagent = async () => {
 		description: '',
 		structure: ''
 	};
-	const body = {
-		reagentRequests: [],
-		reagents: [],
-		newReagents: [{ ...newReagent }]
-	};
-	const response = await $api.orders.addItemToOrder(order.value.id, body);
-	if (response.status === 'success') {
-		setOrder(props.order.id);
-	}
+	emit('add-new-reagent', newReagent);
 	searchQuery.value = '';
-	substanceFormEl.value.resetFields();
-};
-
-const setOrder = id => {
-	emit('set-order', id);
+	newReagentEl.value.resetFields();
 };
 </script>
 
 <template>
+	<h2 v-if="isReagentAdded && props.isEdit" class="el-form-item__label">Add Substances</h2>
 	<el-form
 		v-if="props.isEdit"
-		ref="substance-form-el"
+		ref="new-reagent-el"
 		:model="newSubstance"
-		:rules="newSubstanceRules"
+		:rules="rules"
 		class="row"
 	>
 		<el-form-item prop="reagentName">
 			<span class="desktop">Name</span>
 			<el-autocomplete
-				v-model="searchQuery"
-				placeholder="Search for reagents"
-				popper-class="my-autocomplete"
+				v-model="reagentName"
+				placeholder="Add new reagents"
 				:fetch-suggestions="fetchSubstanceSuggestions"
-				@select="onReagentSelect"
+				@select="addExistingReagent"
 			>
 				<template #default="{ item }">
 					<div>{{ item.name }}</div>
@@ -207,3 +166,11 @@ const setOrder = id => {
 		/></el-button>
 	</el-form>
 </template>
+
+<style scoped>
+.el-form-item__label {
+	display: flex;
+	justify-content: left;
+	max-width: 100%;
+}
+</style>

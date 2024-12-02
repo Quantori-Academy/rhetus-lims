@@ -11,9 +11,9 @@ const props = defineProps({
 const searchQuery = ref('');
 const linkedRequests = ref([]);
 const suggestedRequests = ref([]);
-const loading = ref(false);
 const order = toRef(props, 'order');
 const emit = defineEmits(['update-linked-requests', 'set-order']);
+
 watch(linkedRequests, newVal => {
 	emit('update-linked-requests', newVal);
 });
@@ -31,18 +31,14 @@ onMounted(() => {
 });
 
 const fetchRequests = async () => {
-	loading.value = true;
 	try {
 		const data = await $api.requests.fetchRequests();
-
 		suggestedRequests.value = {
 			...data,
-			requests: [...data.requests.filter(request => request.status === 'pending')]
+			requests: data.requests.filter(request => request.status === 'pending')
 		};
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error retrieving request');
-	} finally {
-		loading.value = false;
 	}
 };
 
@@ -104,7 +100,6 @@ const setOrder = id => {
 
 <template>
 	<el-form-item
-		v-loading="loading"
 		:label="linkedRequests.length > 0 || props.isEdit ? 'Linked Requests' : ''"
 		class="requests"
 		:rules="[]"

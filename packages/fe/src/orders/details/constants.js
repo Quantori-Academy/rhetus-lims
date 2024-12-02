@@ -1,13 +1,4 @@
 import { STATUS } from '../../lib/constants/statuses';
-
-export const requiredRule = fieldName => {
-	return {
-		required: true,
-		message: `${fieldName} can't be empty`,
-		trigger: ['blur', 'change']
-	};
-};
-
 export const getButtonType = status => {
 	switch (status) {
 		case STATUS.PENDING:
@@ -18,16 +9,60 @@ export const getButtonType = status => {
 			return 'success';
 		case STATUS.CANCELED:
 			return 'danger';
+		case STATUS.COMPLETED:
+			return 'primary';
 		default:
 			return 'info';
 	}
 };
 
+export const requiredRule = fieldName => {
+	return {
+		required: true,
+		message: `${fieldName} can't be empty`,
+		trigger: ['blur', 'change']
+	};
+};
+export const numberFieldRule = fieldName => {
+	return {
+		type: 'number',
+		required: true,
+		message: `${fieldName} must be a valid number`,
+		trigger: ['blur', 'change']
+	};
+};
+export const existingFieldRules = {
+	required: true,
+	message: `Input can't be empty`,
+	trigger: 'blur'
+};
+export const existingNumberFieldRules = {
+	type: 'number',
+	required: true,
+	message: `Input must be a valid number`,
+	trigger: ['blur', 'change']
+};
 export const newSubstanceRef = {
 	reagentName: '',
 	quantityUnit: '',
 	quantity: 1,
 	amount: 1
+};
+
+export const newSubstanceRules = {
+	reagentName: [requiredRule('Name')],
+	quantity: [numberFieldRule('Quantity')],
+	quantityUnit: [requiredRule('Unit')],
+	amount: [numberFieldRule('Amount')]
+};
+export const notEmptyArrayRule = {
+	validator: (_, value) => {
+		if (value.length === 0) {
+			return Promise.reject(new Error('This array cannot be empty'));
+		}
+		return Promise.resolve();
+	},
+	trigger: ['blur', 'change']
 };
 export const orderRef = {
 	title: '',
@@ -39,56 +74,25 @@ export const orderRef = {
 	createdAt: '',
 	updatedAt: '',
 	reagentRequests: [],
-	reagents: [],
-	newReagents: []
+	reagents: []
 };
 export const orderFormRules = {
 	title: [requiredRule('Title')],
 	seller: [requiredRule('Seller')],
-	reagentRequests: [
-		{
-			reagentName: [requiredRule('Name')],
-			quantityUnit: [requiredRule('Unit')],
-			quantity: [requiredRule('Quantity')],
-			amount: [requiredRule('Amount')]
-		}
-	],
-	reagents: [
-		{
-			reagentName: [requiredRule('Name')],
-			quantityUnit: [requiredRule('Unit')],
-			quantity: [requiredRule('Quantity')],
-			amount: [requiredRule('Amount')]
-		}
-	],
-	newReagents: [
-		{
-			reagentName: [requiredRule('Name')],
-			quantityUnit: [requiredRule('Unit')],
-			quantity: [requiredRule('Quantity')],
-			amount: [requiredRule('Amount')]
-		}
-	]
+	reagentRequests: [notEmptyArrayRule],
+	reagents: [notEmptyArrayRule]
 };
 
-export const checkForChanges = (newOrder, baseOrder) => {
-	return (
-		newOrder.quantityUnit !== baseOrder.quantityUnit ||
-		newOrder.quantity !== baseOrder.quantity ||
-		newOrder.amount !== baseOrder.amount
-	);
-};
-
-export const processOrders = (currentOrders, previousOrders, baseStateOrders, updatedOrders) => {
-	currentOrders.forEach((newOrder, index) => {
-		const previousOrder = previousOrders[index];
-		const baseOrder = baseStateOrders[index];
-
-		if (previousOrder && checkForChanges(newOrder, baseOrder)) {
-			updatedOrders.push(newOrder);
+export const findUpdatedItems = (originalArray, currentArray, updatedItems) => {
+	currentArray.forEach(currentItem => {
+		const originalItem = originalArray.find(item => item.tempId === currentItem.tempId);
+		if (
+			!originalItem ||
+			Object.keys(currentItem).some(key => currentItem[key] !== originalItem[key])
+		) {
+			if (!updatedItems.some(item => item.tempId === currentItem.tempId)) {
+				updatedItems.push({ ...currentItem });
+			}
 		}
 	});
 };
-
-export const createTracker = request =>
-	Object.fromEntries(Object.keys(request).map(key => [key, false]));

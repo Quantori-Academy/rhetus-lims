@@ -5,7 +5,7 @@ import { $notifyUserAboutError, $notify } from '../../lib/utils/feedback/notify-
 import { computed, onMounted, useTemplateRef, ref } from 'vue';
 import { $api } from '../../lib/api/index.js';
 import { $route, $router } from '../../lib/router/router';
-import { getButtonType, orderFormRules, orderRef } from './constants.js';
+import { findUpdatedItems, getButtonType, orderFormRules, orderRef } from './constants.js';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
 import RhIcon from '../../lib/components/rh-icon.vue';
@@ -31,6 +31,34 @@ const isOrderValid = computed(
 	() => order.value.reagents.length > 0 || order.value.reagentRequests.length > 0
 );
 const statusesHistory = ref(null);
+const isReagentAdded = computed(() => {
+	return order.value.reagents.length > 0 || order.value.reagentRequests.length > 0;
+});
+const updatedItems = ref([]);
+
+const getUpdatedFields = async (original, current) => {
+	findUpdatedItems(original.reagentRequests, current.reagentRequests, updatedItems.value);
+	findUpdatedItems(original.reagents, current.reagents, updatedItems.value);
+};
+const submitSubstances = async () => {
+	await getUpdatedFields({ ...originalOrder.value }, { ...order.value });
+	if (updatedItems.value.length === 0) {
+		$router.push({ name: 'order-details', params: { id: order.value.id } });
+	}
+	try {
+		const body = {
+			orderItems: updatedItems.value
+		};
+		const response = await $api.orders.updateItemInOrder(order.value.id, body);
+		if (response.status === 'success') {
+			$router.push({ name: 'order-details', params: { id: order.value.id } });
+		}
+	} catch (error) {
+		$notifyUserAboutError(error);
+	}
+	updatedItems.value = [];
+};
+
 const handleLinkedRequestsUpdate = updatedRequests => {
 	linkedRequests.value = updatedRequests;
 };
@@ -38,19 +66,13 @@ const handleLinkedRequestsUpdate = updatedRequests => {
 onMounted(() => {
 	setOrder(props.id);
 });
-const toggleOffEdit = newState => {
-	if (newState === false) {
-		$router.push({ name: 'order-details', params: { id: order.value.id } });
-	}
-};
+
 const setOrder = async id => {
 	loading.value = true;
 	try {
 		const fetchedOrder = await $api.orders.fetchOrder(id);
 		order.value = { ...fetchedOrder };
-		if (!originalOrder.value.id) {
-			originalOrder.value = { ...fetchedOrder };
-		}
+		originalOrder.value = JSON.parse(JSON.stringify(fetchedOrder));
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating order');
 	} finally {
@@ -67,6 +89,7 @@ const cancelEdit = () => {
 	order.value = { ...originalOrder.value };
 	orderForm.value.resetFields();
 };
+
 const updateOrder = async () => {
 	try {
 		if (!(await $isFormValid(orderForm))) return;
@@ -81,7 +104,7 @@ const updateOrder = async () => {
 			type: 'success'
 		});
 		if (response.status === 'success') {
-			await setOrder(order.value.id);
+			await setOrder(props.id);
 		}
 		$router.push({ name: 'order-details' });
 	} catch (error) {
@@ -105,7 +128,7 @@ const removeLinkedRequest = async selectedRequest => {
 		const body = { reagentRequests: [selectedRequest.tempId], reagents: [] };
 		const response = await $api.orders.removeItemFromOrder(order.value.id, body);
 		if (response.status === 'success') {
-			await setOrder(order.value.id);
+			await setOrder(props.id);
 		}
 	} catch (error) {
 		$notifyUserAboutError(error);
@@ -117,7 +140,55 @@ const removeReagent = async selectedReagent => {
 		const body = { reagentRequests: [], reagents: [selectedReagent.tempId] };
 		const response = await $api.orders.removeItemFromOrder(order.value.id, body);
 		if (response.status === 'success') {
-			await setOrder(order.value.id);
+			await setOrder(props.id);
+		}
+	} catch (error) {
+		$notifyUserAboutError(error);
+	}
+};
+
+const updateItem = (tempId, type, field, newValue) => {
+	let reagentToUpdate;
+	if (type === 'reagentRequests') {
+		reagentToUpdate = order.value.reagentRequests.find(item => item.tempId === tempId);
+	} else if (type === 'reagents') {
+		reagentToUpdate = order.value.reagents.find(item => item.tempId === tempId);
+	}
+	if (reagentToUpdate) {
+		reagentToUpdate[field] = newValue;
+	} else {
+		$notifyUserAboutError(`Item not found`);
+	}
+};
+const addNewReagent = async selected => {
+	const newSub = {
+		...selected,
+		name: selected.reagentName
+	};
+	try {
+		const body = {
+			reagentRequests: [],
+			reagents: [],
+			newReagents: [{ ...newSub }]
+		};
+		const response = await $api.orders.addItemToOrder(order.value.id, body);
+		if (response.status === 'success') {
+			setOrder(props.id);
+		}
+	} catch (error) {
+		$notifyUserAboutError(error);
+	}
+};
+const addExistingReagent = async selected => {
+	try {
+		const body = {
+			reagentRequests: [],
+			reagents: [{ ...selected }],
+			newReagents: []
+		};
+		const response = await $api.orders.addItemToOrder(order.value.id, body);
+		if (response.status === 'success') {
+			setOrder(props.id);
 		}
 	} catch (error) {
 		$notifyUserAboutError(error);
@@ -165,7 +236,9 @@ const removeReagent = async selectedReagent => {
 					<el-date-picker v-model="order.updatedAt" type="date" format="YYYY-MM-DD" disabled />
 				</el-form-item>
 				<div v-if="isEdit" class="btn-container">
-					<el-button type="primary" :disabled="!isOrderValid" @click="updateOrder">Save</el-button>
+					<el-button type="primary" :disabled="!isReagentAdded" @click="updateOrder"
+						>Save</el-button
+					>
 				</div>
 			</el-form>
 		</div>
@@ -180,10 +253,14 @@ const removeReagent = async selectedReagent => {
 				:order="order"
 				:is-edit="isEdit"
 				:linked-requests="linkedRequests"
+				:is-reagent-added="isReagentAdded"
 				@set-order="setOrder"
-				@toggle-off-edit="toggleOffEdit"
 				@remove-linked-request="removeLinkedRequest"
 				@remove-reagent="removeReagent"
+				@update-item="updateItem"
+				@submit-substances="submitSubstances"
+				@add-new-reagent="addNewReagent"
+				@add-existing-reagent="addExistingReagent"
 			/>
 		</div>
 

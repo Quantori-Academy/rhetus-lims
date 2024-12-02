@@ -73,6 +73,9 @@ const changeStatus = async status => {
 const toggleEdit = () => {
 	$router.push({ name: 'order-details-edit', params: { id: props.order.id } });
 };
+const completeOrder = () => {
+	$router.push({ name: '/orders/:id/complete', params: { id: props.order.id } });
+};
 </script>
 
 <template>
@@ -99,6 +102,9 @@ const toggleEdit = () => {
 				</template>
 			</el-dropdown>
 		</div>
+	</div>
+	<div v-else class="btn-container">
+		<el-button type="primary" @click="completeOrder">Complete order</el-button>
 	</div>
 </template>
 
