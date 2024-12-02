@@ -25,10 +25,11 @@ async function getAnalytics() {
 		$api.substances.fetchSubstances({ limit: 1000 }).then(({ substances, count: total }) => {
 			analytics.value.total = total;
 			const now = new Date();
-			const totalAge = substances.reduce(
-				(sum, substance) => sum + differenceInDays(new Date(substance.expirationDate), now),
-				0
-			);
+			const totalAge = substances.reduce((sum, substance) => {
+				if (substance.expirationDate || substance.expirationDate.trim() === '')
+					return sum + differenceInDays(new Date(substance.expirationDate), now);
+				return sum;
+			}, 0);
 			analytics.value.averageAge = Math.round(totalAge / substances.length);
 		}),
 		$api.substances.fetchSubstances(categoryParams).then(({ count: reagents }) => {
