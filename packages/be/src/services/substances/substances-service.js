@@ -28,7 +28,7 @@ async function substancesService(server) {
 			let query = server.substancesService.getSubstancesQuery(options);
 			query = server.db.select().from(query.as('substances'));
 
-			query = applyFilters(query, options, 'substances');
+			query = applyFilters(query, { deleted: 'false', ...options }, 'substances');
 			query = applySorting(query, sort, 'substances');
 
 			const count = await query;

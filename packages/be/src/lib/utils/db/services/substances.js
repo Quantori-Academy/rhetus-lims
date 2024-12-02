@@ -34,6 +34,12 @@ const substances = {
 			value: string => string,
 			schema: 'union',
 			operator: 'equal'
+		},
+		deleted: {
+			property: 'deleted',
+			value: string => string === 'true',
+			schema: 'union',
+			operator: 'equal'
 		}
 	},
 	sort: {

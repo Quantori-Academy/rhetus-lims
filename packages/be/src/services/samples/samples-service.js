@@ -151,6 +151,7 @@ async function samplesService(server) {
 					category: sql`'sample'`.as('category'),
 					createdAt: schema.samples.createdAt,
 					orderId: sql`NULL`,
+					deleted: schema.samples.deleted,
 					...Object.fromEntries(
 						Object.entries(extras).map(([col, query]) => [
 							col,
@@ -159,8 +160,7 @@ async function samplesService(server) {
 					)
 				})
 				.from(schema.samples)
-				.innerJoin(schema.storages, eq(schema.storages.id, schema.samples.storageId))
-				.where(eq(schema.samples.deleted, false));
+				.innerJoin(schema.storages, eq(schema.storages.id, schema.samples.storageId));
 		},
 
 		getSamplesByStorageId: async id => {

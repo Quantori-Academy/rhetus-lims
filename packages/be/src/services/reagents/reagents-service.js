@@ -75,8 +75,7 @@ async function reagentsService(server) {
 			const baseQuery = server.reagentsService.getBaseReagentsQuery(extras);
 			return baseQuery
 				.innerJoin(schema.storages, eq(schema.storages.id, schema.reagents.storageId))
-				.leftJoin(schema.ordersReagents, eq(schema.ordersReagents.reagentId, schema.reagents.id))
-				.where(eq(schema.reagents.deleted, false));
+				.leftJoin(schema.ordersReagents, eq(schema.ordersReagents.reagentId, schema.reagents.id));
 		},
 
 		changeQuantity: async (id, data) => {
@@ -345,6 +344,7 @@ async function reagentsService(server) {
 					category: sql`'reagent'`.as('category'),
 					createdAt: schema.reagents.createdAt,
 					orderId: schema.ordersReagents.orderId,
+					deleted: schema.reagents.deleted,
 					...Object.fromEntries(
 						Object.entries(extras).map(([col, query]) => [
 							col,
@@ -359,8 +359,7 @@ async function reagentsService(server) {
 			const baseQuery = server.reagentsService.getBaseReagentsQuery(extras);
 			return baseQuery
 				.leftJoin(schema.storages, eq(schema.storages.id, schema.reagents.storageId))
-				.leftJoin(schema.ordersReagents, eq(schema.ordersReagents.reagentId, schema.reagents.id))
-				.where(eq(schema.reagents.deleted, false));
+				.leftJoin(schema.ordersReagents, eq(schema.ordersReagents.reagentId, schema.reagents.id));
 		},
 
 		getBaseReagentQuery: () => {
