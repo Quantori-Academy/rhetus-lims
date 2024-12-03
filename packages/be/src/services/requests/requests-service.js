@@ -262,18 +262,21 @@ async function requestsService(server) {
 		},
 
 		updateRequestStatusByOrder: async (orderId, newStatus, tx, userId) => {
-			const [{ requestId }] = await tx
+			const result = await tx
 				.update(schema.requests)
 				.set({ requestStatus: newStatus })
 				.where(eq(schema.requests.orderId, orderId))
 				.returning({ requestId: schema.requests.id });
+
+			if (!result.length) return null;
+
 			await server.requestsService.insertStatusInHistory(
-				requestId,
+				result[0].requestId,
 				{ status: newStatus },
 				userId,
 				tx
 			);
-			return requestId;
+			return result[0].requestId;
 		},
 
 		cancelRequest: async (requestId, data) => {

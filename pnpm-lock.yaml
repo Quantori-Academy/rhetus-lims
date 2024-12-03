@@ -100,6 +100,9 @@ importers:
 
   packages/fe:
     dependencies:
+      '@element-plus/icons-vue':
+        specifier: ^2.3.1
+        version: 2.3.1(vue@3.5.8)
       date-fns:
         specifier: ^3.6.0
         version: 3.6.0

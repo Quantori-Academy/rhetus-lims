@@ -22,5 +22,8 @@ export default http => ({
 			method: 'PATCH',
 			body: JSON.stringify(requestData)
 		});
+	},
+	async fetchRequestsHistory(id) {
+		return await http(`/requests/history/${id}`);
 	}
 });

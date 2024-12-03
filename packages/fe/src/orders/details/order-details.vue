@@ -20,6 +20,8 @@ import { getButtonType, requiredRule } from './constants.js';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
 import rhIcon from '../../lib/components/rh-icon.vue';
+import TimelineStatuses from '../../timeline/timeline-statuses.vue';
+
 const props = defineProps({
 	id: {
 		type: String,
@@ -52,6 +54,7 @@ const actionButtons = computed(() => {
 	}
 	return buttons;
 });
+const statusesHistory = ref(null);
 
 onMounted(() => {
 	setOrder(props.id);
@@ -97,6 +100,7 @@ const changeStatus = async status => {
 			type: 'success'
 		});
 		await setOrder(order.value.id);
+		await setStatusesHistory();
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Failed to update order status');
 	}
@@ -127,6 +131,18 @@ const updateOrder = async () => {
 		$router.push({ name: 'order-details' });
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating order');
+	}
+};
+
+const setStatusesHistory = async () => {
+	loading.value = true;
+	try {
+		const data = await $api.orders.fetchOrdersHistory(props.id);
+		statusesHistory.value = data.histories;
+	} catch (error) {
+		$notifyUserAboutError(error.message || 'Error getting history');
+	} finally {
+		loading.value = false;
 	}
 };
 </script>
@@ -207,6 +223,11 @@ const updateOrder = async () => {
 				<el-button type="primary" @click="updateOrder">Save</el-button>
 			</div>
 		</el-form>
+		<timeline-statuses
+			v-if="!isEdit"
+			:statuses-history="statusesHistory"
+			@set-statuses-history="setStatusesHistory"
+		/>
 	</div>
 </template>
 

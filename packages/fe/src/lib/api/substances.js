@@ -27,5 +27,8 @@ export default http => ({
 			method: 'PUT',
 			body
 		});
+	},
+	async fetchSubstanceHistory(category, id) {
+		return await http(`/substances/history/${category}/${id}`);
 	}
 });

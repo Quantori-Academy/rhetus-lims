@@ -20,6 +20,7 @@ import { getButtonType } from '../orders/details/constants.js';
 import { quantityUnits } from '../lib/constants/quantity-units.js';
 import KetcherEditor from '../ketcher-editor/ketcher-editor.vue';
 import { __ } from '../lib/locales/index.js';
+import TimelineStatuses from '../timeline/timeline-statuses.vue';
 
 const props = defineProps({ id: { type: String, default: null } });
 
@@ -32,7 +33,7 @@ const isEdit = computed(() => $route.value.name === 'request-details-edit');
 const showPoMessage = computed(
 	() => request.value.status === Statuses.CANCELED && request.value.poComment && !isEdit.value
 );
-
+const statusesHistory = ref(null);
 const toggleEdit = () => {
 	$router.push({ name: 'request-details-edit', params: { id: request.value.id } });
 };
@@ -82,10 +83,23 @@ const deleteRequest = async () => {
 			type: 'success'
 		});
 		$router.push({ name: 'requests-list' });
+		setStatusesHistory();
 	} catch (error) {
 		if (!['cancel', 'close'].includes(error)) {
 			$notifyUserAboutError(error);
 		}
+	}
+};
+
+const setStatusesHistory = async () => {
+	loading.value = true;
+	try {
+		const data = await $api.requests.fetchRequestsHistory(props.id);
+		statusesHistory.value = data.histories;
+	} catch (error) {
+		$notifyUserAboutError(error.message || 'Error getting history');
+	} finally {
+		loading.value = false;
 	}
 };
 
@@ -189,6 +203,11 @@ onMounted(() => {
 				<el-button @click="cancelEdit">{{ __('Cancel') }}</el-button>
 			</div>
 		</el-form>
+		<timeline-statuses
+			v-if="!isEdit"
+			:statuses-history="statusesHistory"
+			@set-statuses-history="setStatusesHistory"
+		/>
 	</div>
 </template>
 

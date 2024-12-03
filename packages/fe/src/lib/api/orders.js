@@ -27,5 +27,8 @@ export default http => ({
 		return await http(`/orders/${id}`, {
 			method: 'DELETE'
 		});
+	},
+	async fetchOrdersHistory(id) {
+		return await http(`/orders/history/${id}`);
 	}
 });
