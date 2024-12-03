@@ -6,6 +6,7 @@ import { authHandlers } from '../auth.js';
 import { substancesHandler } from '../substances.js';
 import { requestHandlers } from '../requests.js';
 import { orderHandlers } from '../orders.js';
+import { notificationsHandlers } from '../notifications.js';
 
 export const handlers = [
 	...authHandlers,
@@ -15,5 +16,6 @@ export const handlers = [
 	...reagentsHandlers,
 	...substancesHandler,
 	...requestHandlers,
-	...orderHandlers
+	...orderHandlers,
+	...notificationsHandlers
 ];

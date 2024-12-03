@@ -6,6 +6,7 @@ import reagents from './reagents.js';
 import substances from './substances.js';
 import orders from './orders.js';
 import requests from './requests.js';
+import notifications from './notifications.js';
 
 export const $api = {
 	users: users(http),
@@ -14,5 +15,6 @@ export const $api = {
 	reagents: reagents(http),
 	substances: substances(http),
 	orders: orders(http),
-	requests: requests(http)
+	requests: requests(http),
+	notifications: notifications(http)
 };
