@@ -49,9 +49,12 @@
 		"Created from": ["Created from"],
 		"to": ["to"],
 		"Updated from": ["Updated from"],
+		"Updated at": ["Updated at"],
+		"Created at": ["Created at"],
 		"Status": ["Status"],
 		"Title": ["Title"],
 		"Seller": ["Seller"],
+		"Author": ["Author"],
 		"Quantity": ["Quantity"],
 		"Amount": ["Amount"],
 		"Created by": ["Created by"],
@@ -195,6 +198,9 @@
 		"Search for requests": ["Search for requests"],
 		"Substances to order": ["Substances to order"],
 		"Linked request for": ["Linked request for"],
-		"Add Order": ["Add Order"]
+		"Add Order": ["Add Order"],
+		"Complete order": ["Complete order"],
+		"Add new reagents": ["Add new reagents"],
+		"Add name": ["Add name"]
 	}
 }

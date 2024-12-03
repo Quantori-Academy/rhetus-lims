@@ -18,6 +18,7 @@ import OrderTable from './details-table/order-table.vue';
 import RequestSuggestions from './request-suggestions.vue';
 import OrderActions from './order-actions.vue';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
+import { __ } from '../../lib/locales/index.js';
 
 const props = defineProps({
 	id: {
@@ -249,7 +250,7 @@ const handleSubstanceRefs = refs => {
 		<div class="wrapper">
 			<div class="header">
 				<h2>
-					{{ `${isEdit ? 'Editing ' : ''}${order.title}` }}
+					{{ `${isEdit ? __('Editing ') : ''}${order.title}` }}
 					<el-tag :type="getButtonType(order.status)" round>
 						{{ order.status }}
 					</el-tag>
@@ -263,19 +264,19 @@ const handleSubstanceRefs = refs => {
 				/>
 			</div>
 			<el-form ref="form-ref" label-position="top" :model="order" :rules="rules">
-				<el-form-item label="Title" prop="title">
+				<el-form-item :label="__('Title')" prop="title">
 					<el-input v-model="order.title" :disabled="!isEdit" />
 				</el-form-item>
-				<el-form-item label="Seller" prop="seller">
+				<el-form-item :label="__('Seller')" prop="seller">
 					<el-input v-model="order.seller" :disabled="!isEdit" />
 				</el-form-item>
-				<el-form-item label="Author" prop="author.username">
+				<el-form-item :label="__('Author')" prop="author.username">
 					<el-input v-model="order.author.username" :disabled="true" />
 				</el-form-item>
-				<el-form-item label="Created at" prop="createdAt">
+				<el-form-item :label="__('Created at')" prop="createdAt">
 					<el-date-picker v-model="order.createdAt" type="date" format="YYYY-MM-DD" disabled />
 				</el-form-item>
-				<el-form-item label="Updated at" prop="updatedAt">
+				<el-form-item :label="__('Updated at')" prop="updatedAt">
 					<el-date-picker v-model="order.updatedAt" type="date" format="YYYY-MM-DD" disabled />
 				</el-form-item>
 			</el-form>

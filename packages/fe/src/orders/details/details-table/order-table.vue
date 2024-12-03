@@ -3,6 +3,7 @@ import { ElButton } from 'element-plus';
 import { defineProps } from 'vue';
 import ExistingSubstances from './existing-substances.vue';
 import NewSubstances from './new-substances.vue';
+import { __ } from '../../../lib/locales';
 const props = defineProps({
 	order: {
 		type: Object,
@@ -46,13 +47,13 @@ const updateItem = (tempId, type, field, newValue) =>
 
 <template>
 	<div class="data-table">
-		<h2>Substances to Order</h2>
+		<h2>{{ __('Substances to order') }}</h2>
 		<div class="orders-container" max-height="350">
 			<div class="row__orders">
-				<span class="mobile">Name</span>
-				<span class="mobile">Unit</span>
-				<span class="mobile">Quantity</span>
-				<span class="mobile">Amount</span>
+				<span class="mobile">{{ __('Name') }}</span>
+				<span class="mobile">{{ __('Unit') }}</span>
+				<span class="mobile">{{ __('Quantity') }}</span>
+				<span class="mobile">{{ __('Amount') }}</span>
 			</div>
 			<existing-substances
 				:order="props.order"
@@ -72,9 +73,9 @@ const updateItem = (tempId, type, field, newValue) =>
 				@add-existing-reagent="addExistingReagent"
 			/>
 			<div v-if="isEdit" class="btn-container">
-				<el-button type="primary" :disabled="!isReagentAdded" @click="submitSubstances"
-					>Save</el-button
-				>
+				<el-button type="primary" :disabled="!isReagentAdded" @click="submitSubstances">{{
+					__('Save')
+				}}</el-button>
 			</div>
 		</div>
 	</div>

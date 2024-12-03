@@ -6,6 +6,7 @@ import { $api } from '../../lib/api';
 import { $notify, $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg';
 import { $router } from '../../lib/router/router';
 import { $confirm } from '../../lib/utils/feedback/confirm-msg';
+import { __ } from '../../lib/locales';
 
 const props = defineProps({
 	order: { type: Object, default: null },
@@ -81,7 +82,7 @@ const completeOrder = () => {
 
 <template>
 	<div v-if="props.order.status !== 'fulfilled'" class="btn-container">
-		<el-button v-if="props.isEdit" @click="cancelEdit">Cancel</el-button>
+		<el-button v-if="props.isEdit" @click="cancelEdit">{{ __('Cancel') }}</el-button>
 		<el-button v-if="!props.isEdit && isPending" @click="toggleEdit"
 			><rh-icon name="pencil"
 		/></el-button>
@@ -98,14 +99,16 @@ const completeOrder = () => {
 						<el-dropdown-item v-for="btn of dropdownBtn" :key="btn.label" @click="btn.action">
 							{{ btn.label }}
 						</el-dropdown-item>
-						<el-dropdown-item v-if="isPending" @click="deleteOrder">Delete</el-dropdown-item>
+						<el-dropdown-item v-if="isPending" @click="deleteOrder">{{
+							__('Delete')
+						}}</el-dropdown-item>
 					</el-dropdown-menu>
 				</template>
 			</el-dropdown>
 		</div>
 	</div>
 	<div v-else class="btn-container">
-		<el-button type="primary" @click="completeOrder">Complete order</el-button>
+		<el-button type="primary" @click="completeOrder">{{ __('Complete order') }}</el-button>
 	</div>
 </template>
 
