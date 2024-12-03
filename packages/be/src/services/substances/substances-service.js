@@ -28,11 +28,10 @@ async function substancesService(server) {
 			let query = server.substancesService.getSubstancesQuery(options);
 			query = server.db.select().from(query.as('substances'));
 
-			query = applyFilters(query, options, 'substances');
+			query = applyFilters(query, { deleted: 'false', ...options }, 'substances');
 			query = applySorting(query, sort, 'substances');
 
 			const count = await query;
-			console.log({ QUERY: query.toSQL() });
 			const substances = await query.limit(limit).offset(offset);
 
 			return {
@@ -267,6 +266,12 @@ async function substancesService(server) {
 				: server.reagentsService.getReagentsQuery({
 						relevance: getRelevanceScore('structure', options?.smiles || '').as('relevance')
 					});
+		},
+
+		getDeletedSubstanceById: async (id, category) => {
+			return category === Category.REAGENT
+				? await server.reagentsService.getDeletedReagentById(id)
+				: await server.samplesService.getDeletedSampleById(id);
 		}
 	});
 }
