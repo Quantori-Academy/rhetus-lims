@@ -19,7 +19,7 @@ const filters = ref({
 	room: '',
 	name: ''
 });
-const sort = ref(null);
+const sortData = ref({});
 function addNewStorageLocation() {
 	$router.push({ name: 'new-storage' });
 }
@@ -60,16 +60,11 @@ async function deleteStorageLocation(id) {
 	}
 }
 
-const setStorages = debounce(async (event = null) => {
+const setStorages = debounce(async () => {
 	isLoading.value = true;
-	if (event) {
-		const sortQuery = createQuery(event);
-		sort.value = sortQuery;
-	}
 	const params = {
-		page: paginationData.value.page,
-		limit: paginationData.value.size,
-		sort: sort.value,
+		...paginationData.value,
+		sort: sortData.value,
 		options: { ...filters.value }
 	};
 	try {
@@ -83,14 +78,13 @@ const setStorages = debounce(async (event = null) => {
 	}
 }, 200);
 
-function createQuery(event) {
-	let query = {};
-	if (event && event.prop && event.order) {
-		const order = event.order === 'ascending' ? 'asc' : 'desc';
-		query = { [event.prop]: order };
-	}
-	return query;
-}
+const handleSortChange = event => {
+	const isDescending = event.order === 'descending';
+
+	sortData.value = { [event.prop]: isDescending ? 'desc' : 'asc' };
+
+	setStorages();
+};
 const paginationData = ref({
 	page: 1,
 	size: 10,
@@ -102,7 +96,6 @@ const handlePageChange = newPage => {
 };
 
 watch(paginationData.value, () => setStorages());
-
 watch(
 	filters,
 	() => {
@@ -134,10 +127,10 @@ onMounted(() => {
 			v-loading="isLoading"
 			:data="storages"
 			@row-click="viewStorageLocation"
-			@sort-change="setStorages"
+			@sort-change="handleSortChange"
 		>
-			<el-table-column prop="room" min-width="150" :label="__('Room')" />
-			<el-table-column prop="name" min-width="150" :label="__('Name')" />
+			<el-table-column prop="room" min-width="150" :label="__('Room')" sortable />
+			<el-table-column prop="name" min-width="150" :label="__('Name')" sortable />
 			<el-table-column prop="description" min-width="200" :label="__('Description')" />
 			<el-table-column
 				prop="creationDate"
