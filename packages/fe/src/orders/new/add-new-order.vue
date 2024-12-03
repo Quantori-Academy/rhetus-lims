@@ -216,7 +216,7 @@ const updateItem = ({ id, type, field, newValue }) => {
 	display: flex;
 	gap: 1rem;
 }
-.row {
+.row__order_creation {
 	display: grid;
 	grid-template-rows: auto auto;
 	grid-template-columns: repeat(4, 1fr) 0.1fr;
@@ -234,7 +234,7 @@ const updateItem = ({ id, type, field, newValue }) => {
 	display: none;
 }
 @media (max-width: 820px) {
-	.row {
+	.row__order_creation {
 		grid-template-columns: repeat(2, 1fr);
 		.mobile {
 			display: block;

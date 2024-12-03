@@ -106,7 +106,7 @@ const fetchSubstanceSuggestions = async (queryString, callback) => {
 
 <template>
 	<h2 v-if="combinedItems.length > 0" class="el-form-item__label">Add Substances</h2>
-	<el-form ref="new-substance" :model="newSubstance" class="row" :rules="rules">
+	<el-form ref="new-substance" :model="newSubstance" class="row__order_creation" :rules="rules">
 		<el-form-item prop="reagentName">
 			<span class="desktop">Name</span>
 			<el-autocomplete

@@ -116,7 +116,7 @@ const fetchRequestSuggestions = async (queryString, callback) => {
 	<div class="data-table">
 		<h2 class="el-form-item__label">Substances to Order</h2>
 		<div class="orders-container" max-height="350">
-			<div class="row">
+			<div class="row__order_creation">
 				<span class="mobile">Name</span>
 				<span class="mobile">Unit</span>
 				<span class="mobile">Quantity</span>
@@ -126,7 +126,7 @@ const fetchRequestSuggestions = async (queryString, callback) => {
 				v-for="(singleItem, index) of combinedItems"
 				:key="singleItem.id"
 				ref="substanceFormEl"
-				class="row"
+				class="row__order_creation"
 				:model="combinedItems[index]"
 			>
 				<div class="linked desktop">
