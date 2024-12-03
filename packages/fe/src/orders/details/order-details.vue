@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 <script setup>
 import { ElForm, ElInput, ElFormItem, ElDatePicker, ElTag } from 'element-plus';
 import { $notifyUserAboutError, $notify } from '../../lib/utils/feedback/notify-msg';
