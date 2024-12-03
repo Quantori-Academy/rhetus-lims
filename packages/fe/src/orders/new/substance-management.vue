@@ -18,6 +18,8 @@ import { $api } from '../../lib/api/index.js';
 import NewSubstance from './new-substance.vue';
 import { quantityUnits } from '../../lib/constants/quantity-units.js';
 import { fieldRules, numberFieldRules } from './constants.js';
+import { __ } from '../lib/locales/index.js';
+
 const props = defineProps({
 	form: { type: Object, default: null },
 	isRequest: { type: Boolean, default: false },
@@ -114,13 +116,13 @@ const fetchRequestSuggestions = async (queryString, callback) => {
 		@fetch-suggestions="fetchRequestSuggestions"
 	/>
 	<div class="data-table">
-		<h2 class="el-form-item__label">Substances to Order</h2>
+		<h2 class="el-form-item__label">{{ __('Substances to order') }}</h2>
 		<div class="orders-container" max-height="350">
-			<div class="row__order_creation">
-				<span class="mobile">Name</span>
-				<span class="mobile">Unit</span>
-				<span class="mobile">Quantity</span>
-				<span class="mobile">Amount</span>
+			<div class="row">
+				<span class="mobile">{{ __('Name') }}</span>
+				<span class="mobile">{{ __('Unit') }}</span>
+				<span class="mobile">{{ __('Quantity') }}</span>
+				<span class="mobile">{{ __('Amount') }}</span>
 			</div>
 			<el-form
 				v-for="(singleItem, index) of combinedItems"
@@ -141,15 +143,15 @@ const fetchRequestSuggestions = async (queryString, callback) => {
 						@click="() => viewRequestDetails(request)"
 						@close="() => removeLinkedRequest(request)"
 					>
-						Linked request for {{ request.name }}: {{ request.quantity }}
+						{{ __('Linked request for') }} {{ request.name }}: {{ request.quantity }}
 						{{ request.quantityUnit }} ({{ request.amount }})
 					</el-tag>
 				</div>
 				<el-form-item prop="reagentName" :rules="fieldRules">
-					<span class="desktop">Name</span>
+					<span class="desktop">{{ __('Name') }}</span>
 					<el-input
 						v-model="singleItem.reagentName"
-						placeholder="Enter name"
+						:placeholder="__('Enter name')"
 						@input="
 							() =>
 								handleInputChange(
@@ -162,11 +164,11 @@ const fetchRequestSuggestions = async (queryString, callback) => {
 					/>
 				</el-form-item>
 				<el-form-item prop="quantityUnit" :rules="fieldRules">
-					<span class="desktop">Unit</span>
+					<span class="desktop">{{ __('Unit') }}</span>
 					<el-select
 						v-model="singleItem.quantityUnit"
 						filterable
-						placeholder="Enter unit"
+						:placeholder="__('Enter unit')"
 						@change="
 							() =>
 								handleInputChange(
@@ -181,11 +183,11 @@ const fetchRequestSuggestions = async (queryString, callback) => {
 					</el-select>
 				</el-form-item>
 				<el-form-item prop="quantity" :rules="numberFieldRules">
-					<span class="desktop">Quantity</span>
+					<span class="desktop">{{ __('Quantity') }}</span>
 					<el-input-number
 						v-model="singleItem.quantity"
 						:min="1"
-						placeholder="Enter quantity"
+						:placeholder="__('Enter quantity')"
 						@change="
 							() =>
 								handleInputChange(singleItem.id, singleItem.type, 'quantity', singleItem.quantity)
@@ -193,11 +195,11 @@ const fetchRequestSuggestions = async (queryString, callback) => {
 					/>
 				</el-form-item>
 				<el-form-item prop="amount" :rules="numberFieldRules">
-					<span class="desktop">Amount</span>
+					<span class="desktop">{{ __('Amount') }}</span>
 					<el-input-number
 						v-model="singleItem.amount"
 						:min="1"
-						placeholder="Enter amount"
+						:placeholder="__('Enter amount')"
 						@change="
 							() => handleInputChange(singleItem.id, singleItem.type, 'amount', singleItem.amount)
 						"
@@ -226,7 +228,7 @@ const fetchRequestSuggestions = async (queryString, callback) => {
 						@click="() => viewRequestDetails(request)"
 						@close="() => removeLinkedRequest(request)"
 					>
-						Linked request for {{ request.reagentName }}: {{ request.quantity }}
+						{{ __('Linked request for') }} {{ request.reagentName }}: {{ request.quantity }}
 						{{ request.quantityUnit }} ({{ request.amount }})
 					</el-tag>
 				</div>
@@ -239,8 +241,10 @@ const fetchRequestSuggestions = async (queryString, callback) => {
 			/>
 		</div>
 		<div class="btn-container">
-			<el-button @click="cancel">Cancel</el-button>
-			<el-button type="primary" :disabled="!isReagentAdded" @click="submit">Add Order</el-button>
+			<el-button @click="cancel">{{ __('Cancel') }}</el-button>
+			<el-button type="primary" :disabled="!isReagentAdded" @click="submit">{{
+				__('Add Order')
+			}}</el-button>
 		</div>
 	</div>
 </template>

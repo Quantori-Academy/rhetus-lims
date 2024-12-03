@@ -5,6 +5,7 @@ import { computed, onMounted, ref } from 'vue';
 import { $api } from '../../lib/api/index.js';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { $router } from '../../lib/router/router.js';
+import { __ } from '../lib/locales/index.js';
 
 const props = defineProps({
 	id: {
@@ -109,7 +110,7 @@ const cancelChanges = () => {
 
 <template>
 	<div v-if="fulfilledReagents && order" v-loading="loading" class="wrapper">
-		<h2>Move substances to storages - {{ order?.title }}</h2>
+		<h2>{{ __('Move substances to storages') }} - {{ order?.title }}</h2>
 		<el-form ref="form-ref" :model="fulfilledReagents">
 			<el-table :data="fulfilledReagents">
 				<el-table-column width="50">
@@ -120,17 +121,17 @@ const cancelChanges = () => {
 						/>
 					</template>
 				</el-table-column>
-				<el-table-column label="Name" prop="name" />
-				<el-table-column label="Quantity" prop="quantity" width="100" />
-				<el-table-column label="Quantity Unit" prop="quantityUnit" width="150" />
-				<el-table-column label="Storage Location" width="200">
+				<el-table-column :label="__('Name')" prop="name" />
+				<el-table-column :label="__('Quantity')" prop="quantity" width="100" />
+				<el-table-column :label="__('Quantity unit')" prop="quantityUnit" width="150" />
+				<el-table-column :label="__('Storage location')" width="200">
 					<template #default="{ row, $index }">
 						<el-select
 							v-model="row.selectedStorage"
 							:loading="loading"
 							filterable
 							clearable
-							placeholder="Select storage"
+							:placeholder="__('Select storage location')"
 							@change="value => handleStorageChange(row, $index, value)"
 						>
 							<el-option
@@ -151,10 +152,10 @@ const cancelChanges = () => {
 				</el-table-column>
 			</el-table>
 			<div class="btn-container">
-				<el-button @click="cancelChanges">Cancel</el-button>
-				<el-button type="primary" :disabled="saveDisabled" @click="saveChanges"
-					>Save Changes</el-button
-				>
+				<el-button @click="cancelChanges">{{ __('Cancel') }}</el-button>
+				<el-button type="primary" :disabled="saveDisabled" @click="saveChanges">{{
+					__('Save')
+				}}</el-button>
 			</div>
 		</el-form>
 	</div>

@@ -5,6 +5,7 @@ import FilterItem from '../lib/components/rh-filters/filter-item.vue';
 import { defineModel, onMounted, ref } from 'vue';
 import { $notifyUserAboutError } from '../lib/utils/feedback/notify-msg';
 import { $api } from '../lib/api';
+import { __ } from '../lib/locales/index.js';
 
 const filters = defineModel('filters', { type: Object });
 const statuses = ref([]);
@@ -31,14 +32,14 @@ onMounted(() => {
 <template>
 	<div>
 		<filter-item>
-			<el-input v-model="filters.title" clearable placeholder="Enter title">
+			<el-input v-model="filters.title" clearable :placeholder="__('Enter title')">
 				<template #prefix>
 					<rh-icon name="search" />
 				</template>
 			</el-input>
 		</filter-item>
 		<filter-item>
-			<el-select v-model="filters.status" filterable clearable placeholder="Enter status">
+			<el-select v-model="filters.status" filterable clearable :placeholder="__('Enter status')">
 				<el-option
 					v-for="status of statuses"
 					:key="status.value"
@@ -57,8 +58,8 @@ onMounted(() => {
 				v-model="filters.createdAt"
 				type="daterange"
 				range-separator="-"
-				start-placeholder="Created from"
-				end-placeholder="to"
+				:start-placeholder="__('Created from')"
+				:end-placeholder="__('to')"
 				format="YYYY/MM/DD"
 				value-format="YYYY-MM-DD"
 			/>
@@ -68,8 +69,8 @@ onMounted(() => {
 				v-model="filters.updatedAt"
 				type="daterange"
 				range-separator="-"
-				start-placeholder="Updated from"
-				end-placeholder="to"
+				:start-placeholder="__('Updated from')"
+				:end-placeholder="__('to')"
 				format="YYYY/MM/DD"
 				value-format="YYYY-MM-DD"
 			/>
