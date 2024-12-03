@@ -1,6 +1,5 @@
 <script setup>
-import RhIcon from '../lib/components/rh-icon.vue';
-import { ref, onMounted, watch, computed, inject } from 'vue';
+import { ref, onMounted, watch, inject } from 'vue';
 import { ElTable, ElTableColumn, ElButton } from 'element-plus';
 import { $router } from '../lib/router/router.js';
 import { $api } from '../lib/api/index.js';
@@ -11,10 +10,11 @@ import RhFilters from '../lib/components/rh-filters/rh-filters.vue';
 import SubstanceFilters from './substance-filters.vue';
 import { debounce } from '../lib/utils/debounce/debounce.js';
 import { __ } from '../lib/locales/index.js';
+import RhIcon from '../lib/components/rh-icon.vue';
 
 const { isOfficer } = inject('user');
-
-const substances = ref(null);
+const substances = ref([]);
+const sortData = ref({});
 const isLoading = ref(false);
 const filters = ref({
 	name: '',
@@ -80,44 +80,24 @@ const deleteSingleSubstance = async row => {
 	}
 };
 
-const formattedSubstances = computed(
-	() =>
-		substances.value?.map(substance => ({
-			...substance,
-			quantityLeft: `${substance.quantityLeft} ${substance.quantityUnit}`,
-			storageLocation: `${substance.storageLocation?.name}, ${substance.storageLocation?.room}`
-		})) || []
-);
-
-const addStructureSort = sortQuery => {
-	if (filters.value.smiles) {
-		sortQuery.sort = { ...(sortQuery.sort ?? {}), relevance: 'desc' };
-	}
-	if (sortQuery.sort && sortQuery.sort.structure) {
-		const { structure, ...rest } = sortQuery.sort;
-		sortQuery.sort = { ...rest, relevance: structure };
-	}
-};
-
-const setSubstances = debounce(async (event = null) => {
+const setSubstances = debounce(async () => {
 	isLoading.value = true;
-	const sortQuery = createQuery(event);
 	const { expired, ...rest } = filters.value;
-	addStructureSort(sortQuery);
-
+	if (filters.value.smiles) {
+		sortData.value = { ...sortData.value, relevance: 'desc' };
+	}
 	const params = {
-		page: paginationData.value.page,
-		limit: paginationData.value.size,
-		sort: { ...sortQuery.sort },
+		...paginationData.value,
+		sort: sortData.value,
 		options: {
 			...rest,
 			expirationDate: expired ? [new Date('0001-01-01T00:00:00.000Z'), new Date()] : []
 		}
 	};
 	try {
-		const data = await $api.substances.fetchSubstances(params);
-		substances.value = data.substances;
-		paginationData.value.totalElements = data.count;
+		const { substances: substancesData, count } = await $api.substances.fetchSubstances(params);
+		substances.value = substancesData;
+		paginationData.value.totalElements = count;
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
@@ -125,19 +105,20 @@ const setSubstances = debounce(async (event = null) => {
 	}
 }, 200);
 
-function createQuery(event) {
-	let query = {};
-	if (event && event.prop && event.order) {
-		const order = event.order === 'ascending' ? 'desc' : 'asc';
-		query.sort = { [event.prop]: order };
-	}
-	return query;
-}
+const handleSortChange = event => {
+	const isDescending = event.order === 'descending';
+	sortData.value = { [event.prop]: isDescending ? 'desc' : 'asc' };
+	setSubstances();
+};
 
 watch(paginationData.value, () => setSubstances());
-
-watch(filters.value, () => setSubstances(), { deep: true });
-
+watch(
+	filters,
+	() => {
+		setSubstances();
+	},
+	{ deep: true }
+);
 onMounted(() => {
 	setSubstances();
 });
@@ -162,9 +143,9 @@ onMounted(() => {
 
 		<el-table
 			v-loading="isLoading"
-			:data="formattedSubstances"
+			:data="substances"
 			@row-click="viewSubstance"
-			@sort-change="setSubstances"
+			@sort-change="handleSortChange"
 		>
 			<el-table-column width="50">
 				<template #default="{ row }">
@@ -178,8 +159,14 @@ onMounted(() => {
 			<el-table-column prop="category" min-width="120" :label="__('Category')" sortable />
 			<el-table-column prop="structure" min-width="120" :label="__('Structure')" sortable />
 			<el-table-column prop="description" min-width="160" :label="__('Description')" />
-			<el-table-column prop="quantityLeft" min-width="120" :label="__('Quantity left')" />
-			<el-table-column prop="storageLocation" min-width="140" :label="__('Storage location')" />
+			<el-table-column prop="quantityLeft" min-width="120" :label="__('Quantity left')">
+				<template #default="{ row }">{{ row.quantityLeft }} {{ row.quantityUnit }}</template>
+			</el-table-column>
+			<el-table-column prop="storageLocation" min-width="140" :label="__('Storage location')">
+				<template #default="{ row }"
+					>{{ row.storageLocation?.name }} {{ row.storageLocation?.room }}</template
+				>
+			</el-table-column>
 			<el-table-column v-if="isOfficer" width="60">
 				<template #default="{ row }">
 					<el-button type="primary" @click.stop="() => orderReagent(row)">
@@ -195,8 +182,8 @@ onMounted(() => {
 				</template>
 			</el-table-column>
 		</el-table>
+		<rh-pagination :pagination="paginationData" @change-page="handlePageChange" />
 	</div>
-	<rh-pagination :pagination="paginationData" @change-page="handlePageChange" />
 </template>
 
 <style scoped>
@@ -221,7 +208,6 @@ onMounted(() => {
 	height: 1rem;
 	border: none;
 }
-
 :deep(.el-table__row):hover {
 	cursor: pointer;
 }
