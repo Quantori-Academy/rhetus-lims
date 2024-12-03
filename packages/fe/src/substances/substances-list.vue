@@ -14,7 +14,7 @@ import RhIcon from '../lib/components/rh-icon.vue';
 
 const { isOfficer } = inject('user');
 const substances = ref([]);
-const sort = ref(null);
+const sortData = ref({});
 const isLoading = ref(false);
 const filters = ref({
 	name: '',
@@ -80,24 +80,15 @@ const deleteSingleSubstance = async row => {
 	}
 };
 
-const addStructureSort = sortQuery => {
-	if (filters.value.smiles) {
-		sortQuery.sort = { ...(sortQuery.sort ?? {}), relevance: 'desc' };
-	}
-};
-
-const setSubstances = debounce(async (event = null) => {
+const setSubstances = debounce(async () => {
 	isLoading.value = true;
-	if (event) {
-		const sortQuery = createQuery(event);
-		sort.value = sortQuery;
-		addStructureSort(sortQuery);
-	}
 	const { expired, ...rest } = filters.value;
+	if (filters.value.smiles) {
+		sortData.value = { ...sortData.value, relevance: 'desc' };
+	}
 	const params = {
-		page: paginationData.value.page,
-		limit: paginationData.value.size,
-		sort: sort.value,
+		...paginationData.value,
+		sort: sortData.value,
 		options: {
 			...rest,
 			expirationDate: expired ? [new Date('0001-01-01T00:00:00.000Z'), new Date()] : []
@@ -114,18 +105,10 @@ const setSubstances = debounce(async (event = null) => {
 	}
 }, 200);
 
-function createQuery(event) {
-	let query = {};
-	if (event && event.prop && event.order) {
-		const order = event.order === 'ascending' ? 'asc' : 'desc';
-		query = { [event.prop]: order };
-	}
-	return query;
-}
 const handleSortChange = event => {
-	const sortQuery = createQuery(event);
-	sort.value = sortQuery;
-	setSubstances(event);
+	const isDescending = event.order === 'descending';
+	sortData.value = { [event.prop]: isDescending ? 'desc' : 'asc' };
+	setSubstances();
 };
 
 watch(paginationData.value, () => setSubstances());
