@@ -1,10 +1,8 @@
 <script setup>
 import { ElTimeline, ElTimelineItem, ElTag, ElText, ElSpace } from 'element-plus';
-import { ref, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import { convertToCustomDate } from '../lib/utils/datetime/date-format';
 import { getButtonType } from '../orders/details/constants';
-
-const loading = ref(false);
 
 const props = defineProps({
 	statusesHistory: {
@@ -23,12 +21,11 @@ onMounted(() => {
 </script>
 
 <template>
-	<el-text class="bold title">History</el-text>
+	<el-text v-if="props.statusesHistory?.length" class="bold title">History</el-text>
 	<el-timeline>
 		<el-timeline-item
 			v-for="(history, index) of props.statusesHistory"
 			:key="index"
-			v-loading="loading"
 			:type="getButtonType(history.status)"
 			:hollow="true"
 		>
