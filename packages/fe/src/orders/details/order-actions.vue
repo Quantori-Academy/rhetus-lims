@@ -74,7 +74,7 @@ const toggleEdit = () => {
 	$router.push({ name: 'order-details-edit', params: { id: props.order.id } });
 };
 const completeOrder = () => {
-	$router.push({ name: '/orders/:id/complete', params: { id: props.order.id } });
+	$router.push({ name: 'complete-order', params: { id: props.order.id } });
 };
 </script>
 
