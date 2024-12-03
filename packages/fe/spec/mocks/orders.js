@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw';
 import { api } from './api-url.js';
-import { orderInfo } from './constants.js';
+import { orderInfo, removeOrderReagents, updateOrderReagents } from './constants.js';
 
 function matchesTitle(order, title) {
 	return title ? order.title.includes(title) : true;
@@ -146,5 +146,59 @@ export const orderHandlers = [
 			return HttpResponse.json({ message: result.message }, { status: 400 });
 		}
 		return HttpResponse.json({ status: 'success', message: result.message });
+	}),
+	http.put(api('/orders/:id/remove-item'), async ({ request, params }) => {
+		const { id } = params;
+		const body = await request.json();
+		const { reagentRequests, reagents } = body;
+		let targetOrder = orderInfo.orders.filter(order => order.id === id)[0];
+		if (!targetOrder) {
+			return HttpResponse.json({
+				status: 'error',
+				message: 'Order is not found'
+			});
+		}
+		removeOrderReagents(targetOrder, reagentRequests, reagents);
+		return HttpResponse.json({
+			status: 'success',
+			message: 'Item removed successfully'
+		});
+	}),
+	http.put(api('/orders/:id/add-item'), async ({ request, params }) => {
+		const body = await request.json();
+		const { id } = params;
+		const { reagentRequests, reagents, newReagents } = body;
+		let targetOrder = orderInfo.orders.filter(order => order.id === id)[0];
+		if (!targetOrder) {
+			return HttpResponse.json({
+				status: 'error',
+				message: 'Order is not found'
+			});
+		}
+
+		updateOrderReagents(targetOrder, reagentRequests, reagents, newReagents);
+		return HttpResponse.json({
+			status: 'success',
+			message: 'Item added successfully'
+		});
+	}),
+	http.put(api('/orders/:id/update-item'), async ({ request, params }) => {
+		const body = await request.json();
+		const { orderItems } = body;
+		const { id } = params;
+		let targetOrder = orderInfo.orders.filter(order => order.id === id)[0];
+		if (!targetOrder) {
+			return HttpResponse.json({
+				status: 'error',
+				message: 'Order is not found'
+			});
+		}
+		console.log('Items tp update:', orderItems);
+		if (orderItems.length > 0) {
+			return HttpResponse.json({
+				status: 'success',
+				message: 'Items updated successfully'
+			});
+		}
 	})
 ];

@@ -23,8 +23,9 @@ const saveDisabled = computed(() => {
 });
 
 onMounted(() => {
-	setSubstances();
 	setOrder(props.id);
+	console.log(props.id);
+	setSubstances();
 	setStorages();
 });
 

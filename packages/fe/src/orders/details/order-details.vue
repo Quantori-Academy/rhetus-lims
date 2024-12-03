@@ -1,26 +1,23 @@
 <script setup>
-import {
-	ElForm,
-	ElInput,
-	ElButton,
-	ElFormItem,
-	ElDatePicker,
-	ElTable,
-	ElTableColumn,
-	ElDropdown,
-	ElDropdownMenu,
-	ElDropdownItem,
-	ElTag
-} from 'element-plus';
+import { ElForm, ElInput, ElFormItem, ElDatePicker, ElTag } from 'element-plus';
 import { $notifyUserAboutError, $notify } from '../../lib/utils/feedback/notify-msg';
-import { computed, onMounted, useTemplateRef, ref } from 'vue';
+import { computed, onMounted, ref, useTemplateRef, watch } from 'vue';
 import { $api } from '../../lib/api/index.js';
 import { $route, $router } from '../../lib/router/router';
-import { getButtonType, requiredRule } from './constants.js';
-import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
-import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
-import rhIcon from '../../lib/components/rh-icon.vue';
+import {
+	findUpdatedItems,
+	getButtonType,
+	itemsToRemoveRef,
+	orderFormRules,
+	orderRef,
+	updatedItemsRef,
+	validateSubstances
+} from './constants.js';
 import TimelineStatuses from '../../timeline/timeline-statuses.vue';
+import OrderTable from './details-table/order-table.vue';
+import RequestSuggestions from './request-suggestions.vue';
+import OrderActions from './order-actions.vue';
+import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 
 const props = defineProps({
 	id: {
@@ -28,109 +25,143 @@ const props = defineProps({
 		default: null
 	}
 });
-const formEl = useTemplateRef('form-ref');
-const order = ref(null);
+const rules = ref(orderFormRules);
+const order = ref(orderRef);
+const formRef = useTemplateRef('form-ref');
+const updatedItems = ref(updatedItemsRef);
+const itemsToRemove = ref(itemsToRemoveRef);
+const originalOrder = ref({});
+const linkedRequests = ref([]);
+const suggestedRequests = ref([]);
 const loading = ref(true);
-const rules = ref({
-	seller: [requiredRule('Seller')],
-	title: [requiredRule('Title')]
-});
+const apiCalls = ref([]);
 const isEdit = computed(() => $route.value.name === 'order-details-edit');
-const actionButtons = computed(() => {
-	const buttons = [];
-	if (['pending', 'ordered'].includes(order.value.status)) {
-		buttons.push(
-			{
-				label: order.value.status === 'pending' ? 'Make Order' : 'Mark as Fulfilled',
-				action: () => changeStatus('next'),
-				type: 'primary'
-			},
-			{
-				label: 'Cancel Order',
-				action: () => changeStatus('cancel'),
-				type: 'danger'
-			}
-		);
-	}
-	return buttons;
-});
+const isOrderValid = computed(
+	() => order.value.reagents.length > 0 || order.value.reagentRequests.length > 0
+);
 const statusesHistory = ref(null);
+const isReagentAdded = computed(() => {
+	return order.value.reagents.length > 0 || order.value.reagentRequests.length > 0;
+});
 
 onMounted(() => {
+	fetchRequests();
 	setOrder(props.id);
 });
+const getUpdatedFields = async (original, current) => {
+	findUpdatedItems(
+		'requests',
+		original.reagentRequests,
+		current.reagentRequests,
+		updatedItems.value
+	);
+	findUpdatedItems('reagents', original.reagents, current.reagents, updatedItems.value);
+};
 
+const updateOrderItems = () => {
+	if (updatedItems.value.updates.length > 0) {
+		const body = { orderItems: updatedItems.value.updates };
+		apiCalls.value.push($api.orders.updateItemInOrder(order.value.id, body));
+	}
+};
+
+const updateNewItems = () => {
+	if (
+		updatedItems.value.reagents.length > 0 ||
+		updatedItems.value.reagentRequests.length > 0 ||
+		updatedItems.value.newReagents.length > 0
+	) {
+		const body = {
+			reagentRequests: updatedItems.value.reagentRequests,
+			reagents: updatedItems.value.reagents,
+			newReagents: updatedItems.value.newReagents
+		};
+		apiCalls.value.push($api.orders.addItemToOrder(order.value.id, body));
+	}
+};
+
+const updateOrderIfo = () => {
+	const updatedFields = {
+		title: order.value.title,
+		seller: order.value.seller
+	};
+	if (updatedFields.title || updatedFields.seller) {
+		apiCalls.value.push($api.orders.updateOrder(order.value.id, updatedFields));
+	}
+};
+
+const submitSubstances = async () => {
+	if (!(await validateSubstances(localrefs.value)) || !(await $isFormValid(formRef))) return;
+	await getUpdatedFields({ ...originalOrder.value }, { ...order.value });
+	updateOrderItems();
+	updateNewItems();
+	updateOrderIfo();
+	removeSubstances();
+	if (apiCalls.value.length === 0) {
+		$router.push({ name: 'order-details', params: { id: order.value.id } });
+		return;
+	}
+	try {
+		const responses = await Promise.all(apiCalls.value);
+		const success = responses.every(response => response.status === 'success');
+		if (success) {
+			await setOrder(order.value.id);
+			$router.push({ name: 'order-details', params: { id: order.value.id } });
+		}
+	} catch (error) {
+		$notifyUserAboutError(error);
+	} finally {
+		resetDataChanges();
+	}
+};
+const resetDataChanges = () => {
+	updatedItems.value = {
+		reagents: [],
+		reagentRequests: [],
+		updates: [],
+		newReagents: []
+	};
+	itemsToRemove.value = {
+		reagents: [],
+		reagentRequests: []
+	};
+	order.value.newReagents = [];
+	apiCalls.value = [];
+};
 const setOrder = async id => {
 	loading.value = true;
 	try {
-		order.value = await $api.orders.fetchOrder(id);
+		const fetchedOrder = await $api.orders.fetchOrder(id);
+		order.value = { ...fetchedOrder, newReagents: [] };
+		originalOrder.value = JSON.parse(JSON.stringify(fetchedOrder));
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error updating order');
 	} finally {
 		loading.value = false;
 	}
 };
-
-const deleteOrder = async () => {
-	try {
-		await $confirm('Do you want to delete this order?', 'Warning', {
-			confirmButtonText: 'OK',
-			cancelButtonText: 'Cancel',
-			type: 'warning'
-		});
-		const response = await $api.orders.deleteOrder(props.id);
-		$notify({
-			title: 'Success',
-			message: response.message,
-			type: 'success'
-		});
-		await $router.push({ name: 'orders-list' });
-	} catch (error) {
-		if (!['cancel', 'close'].includes(error)) {
-			this.$notifyUserAboutError(error);
-		}
-	}
-};
-const changeStatus = async status => {
-	try {
-		await $api.orders.changeOrderStatus(order.value.id, { action: status });
-		$notify({
-			title: 'Success',
-			message: `Order status updated`,
-			type: 'success'
-		});
-		await setOrder(order.value.id);
-		await setStatusesHistory();
-	} catch (error) {
-		$notifyUserAboutError(error.message || 'Failed to update order status');
-	}
-};
-const toggleEdit = () => {
-	$router.push({ name: 'order-details-edit', params: { id: order.value.id } });
-};
-
-const cancelEdit = () => {
+const cancelEdit = async () => {
+	order.value = {
+		...JSON.parse(JSON.stringify(originalOrder.value)),
+		newReagents: []
+	};
 	$router.push({ name: 'order-details', params: { id: order.value.id } });
 	$notify({
 		title: 'Canceled',
 		message: 'Order editing canceled',
 		type: 'info'
 	});
-	formEl.value.resetFields();
 };
 
-const updateOrder = async () => {
+const fetchRequests = async () => {
 	try {
-		if (!(await $isFormValid(formEl))) return;
-		const response = await $api.orders.updateOrder(order.value.id, order.value);
-		$notify({
-			title: 'Success',
-			message: response.message,
-			type: 'success'
-		});
-		$router.push({ name: 'order-details' });
+		const data = await $api.requests.fetchRequests();
+		suggestedRequests.value = {
+			...data,
+			requests: data.requests.filter(request => request.status === 'pending')
+		};
 	} catch (error) {
-		$notifyUserAboutError(error.message || 'Error updating order');
+		$notifyUserAboutError(error.message || 'Error retrieving request');
 	}
 };
 
@@ -145,101 +176,151 @@ const setStatusesHistory = async () => {
 		loading.value = false;
 	}
 };
+watch(
+	() => order.value.reagentRequests,
+	newReagentRequests => {
+		linkedRequests.value = [...newReagentRequests];
+		fetchRequests();
+	},
+	{ deep: true, immediate: true }
+);
+const removeSubstances = () => {
+	if (itemsToRemove.value.reagents.length > 0 || itemsToRemove.value.reagentRequests.length > 0) {
+		const body = {
+			reagentRequests: [...itemsToRemove.value.reagentRequests],
+			reagents: [...itemsToRemove.value.reagents]
+		};
+		apiCalls.value.push($api.orders.removeItemFromOrder(order.value.id, body));
+	}
+};
+const removeLinkedRequest = selected => {
+	order.value.reagentRequests = order.value.reagentRequests.filter(
+		request => request.tempId !== selected.tempId
+	);
+	itemsToRemove.value.reagentRequests.push(selected.tempId);
+};
+
+const removeReagent = selected => {
+	if (selected.type === 'newReagents') {
+		order.value.newReagents = order.value.newReagents.filter(
+			reagent => reagent.tempId !== selected.tempId
+		);
+		updatedItems.value.newReagents = updatedItems.value.newReagents.filter(
+			reagent => reagent.tempId !== selected.tempId
+		);
+	} else {
+		order.value.reagents = order.value.reagents.filter(item => item.tempId !== selected.tempId);
+		itemsToRemove.value.reagents.push(selected.tempId);
+	}
+};
+
+const updateItem = (tempId, type, field, newValue) => {
+	let reagentToUpdate;
+	if (type === 'reagentRequests') {
+		reagentToUpdate = order.value.reagentRequests.find(item => item.tempId === tempId);
+	} else if (type === 'reagents') {
+		reagentToUpdate = order.value.reagents.find(item => item.tempId === tempId);
+	}
+	if (reagentToUpdate) {
+		reagentToUpdate[field] = newValue;
+	} else {
+		$notifyUserAboutError(`Item not found`);
+	}
+};
+const linkRequest = async selected => {
+	order.value.reagentRequests.push({ ...selected, tempId: selected.id });
+};
+const addExistingReagent = async selected => {
+	order.value.reagents.push({ ...selected, tempId: selected.id });
+};
+const addNewReagent = async selected => {
+	updatedItems.value.newReagents.push({ ...selected });
+	order.value.newReagents.push({ ...selected });
+};
+const localrefs = ref({});
+const handleSubstanceRefs = refs => {
+	localrefs.value = refs;
+};
 </script>
 
 <template>
-	<div v-if="order" v-loading="loading" class="wrapper">
-		<div v-if="order" class="editing-header">
-			<h2>
-				{{ order.title }}
-				<el-tag :type="getButtonType(order.status)" round>
-					{{ order.status }}
-				</el-tag>
-			</h2>
-			<div class="btn-container">
-				<el-button v-if="!isEdit && order.status === `pending`" @click="toggleEdit"
-					><rh-icon name="pencil"
-				/></el-button>
-				<el-dropdown>
-					<el-button>More Actions<rh-icon name="arrow-down" /></el-button>
-					<template #dropdown>
-						<el-dropdown-menu>
-							<el-dropdown-item
-								v-for="button of actionButtons"
-								:key="button.label"
-								@click="button.action"
-							>
-								{{ button.label }}
-							</el-dropdown-item>
-							<el-dropdown-item @click="deleteOrder">Delete</el-dropdown-item>
-						</el-dropdown-menu>
-					</template>
-				</el-dropdown>
+	<div v-loading="loading">
+		<div class="wrapper">
+			<div class="header">
+				<h2>
+					{{ `${isEdit ? 'Editing ' : ''}${order.title}` }}
+					<el-tag :type="getButtonType(order.status)" round>
+						{{ order.status }}
+					</el-tag>
+				</h2>
+				<order-actions
+					:order="order"
+					:is-edit="isEdit"
+					@set-order="setOrder"
+					@cancel-edit="cancelEdit"
+					@set-statuses-history="setStatusesHistory"
+				/>
 			</div>
+			<el-form ref="form-ref" label-position="top" :model="order" :rules="rules">
+				<el-form-item label="Title" prop="title">
+					<el-input v-model="order.title" :disabled="!isEdit" />
+				</el-form-item>
+				<el-form-item label="Seller" prop="seller">
+					<el-input v-model="order.seller" :disabled="!isEdit" />
+				</el-form-item>
+				<el-form-item label="Author" prop="author.username">
+					<el-input v-model="order.author.username" :disabled="true" />
+				</el-form-item>
+				<el-form-item label="Created at" prop="createdAt">
+					<el-date-picker v-model="order.createdAt" type="date" format="YYYY-MM-DD" disabled />
+				</el-form-item>
+				<el-form-item label="Updated at" prop="updatedAt">
+					<el-date-picker v-model="order.updatedAt" type="date" format="YYYY-MM-DD" disabled />
+				</el-form-item>
+			</el-form>
 		</div>
-		<div>
-			<el-button v-if="!isEdit && order.status === `pending`" @click="toggleEdit">Edit</el-button>
+		<div v-if="order.status !== 'canceled'" class="wrapper">
+			<request-suggestions
+				:order="order"
+				:is-edit="isEdit"
+				:suggested-requests="suggestedRequests"
+				:linked-requests="linkedRequests"
+				@set-order="setOrder"
+				@link-request="linkRequest"
+			/>
+			<order-table
+				:order="order"
+				:is-edit="isEdit"
+				:linked-requests="linkedRequests"
+				:is-reagent-added="isReagentAdded"
+				@set-order="setOrder"
+				@remove-linked-request="removeLinkedRequest"
+				@remove-reagent="removeReagent"
+				@update-item="updateItem"
+				@submit-substances="submitSubstances"
+				@add-new-reagent="addNewReagent"
+				@add-existing-reagent="addExistingReagent"
+				@substance-refs="handleSubstanceRefs"
+			/>
 		</div>
-
-		<div></div>
-
-		<el-form
-			ref="form-ref"
-			v-loading="loading || !order"
-			label-position="top"
-			:model="order"
-			:rules="rules"
-			@submit="updateOrder"
-		>
-			<el-form-item label="Title" prop="title">
-				<el-input v-model="order.title" :disabled="!isEdit || order.status !== `pending`" />
-			</el-form-item>
-			<el-form-item label="Seller" prop="seller">
-				<el-input v-model="order.seller" :disabled="!isEdit || order.status !== `pending`" />
-			</el-form-item>
-			<el-form-item label="Author" prop="author.username">
-				<el-input v-model="order.author.username" :disabled="true" />
-			</el-form-item>
-
-			<el-form-item label="Author" prop="author.username">
-				<el-input v-model="order.author.username" :disabled="true" />
-			</el-form-item>
-			<el-form-item label="Requests to order" prop="reagentRequests">
-				<el-table :data="order.reagentRequests">
-					<el-table-column prop="reagentName" label="Name" />
-					<el-table-column prop="quantityUnit" label="Quantity Unit" />
-					<el-table-column prop="quantity" label="Quantity" />
-					<el-table-column prop="amount" label="Amount" />
-				</el-table>
-			</el-form-item>
-			<el-form-item label="Created at" prop="createdAt">
-				<el-date-picker v-model="order.createdAt" type="date" format="YYYY-MM-DD" disabled />
-			</el-form-item>
-			<el-form-item label="Updated at" prop="updatedAt">
-				<el-date-picker v-model="order.updatedAt" type="date" format="YYYY-MM-DD" disabled />
-			</el-form-item>
-			<div v-if="isEdit" class="btn-container">
-				<el-button @click="cancelEdit">Cancel</el-button>
-				<el-button type="primary" @click="updateOrder">Save</el-button>
-			</div>
-		</el-form>
-		<timeline-statuses
-			v-if="!isEdit"
-			:statuses-history="statusesHistory"
-			@set-statuses-history="setStatusesHistory"
-		/>
+		<div class="wrapper">
+			<timeline-statuses
+				v-if="!isEdit"
+				:statuses-history="statusesHistory"
+				@set-statuses-history="setStatusesHistory"
+			/>
+		</div>
 	</div>
 </template>
 
 <style scoped>
-.el-input-number {
-	width: 100%;
-}
-.editing-header h2 {
+.wrapper h2 {
 	font-size: 18px;
 }
-:deep(.el-date-editor) {
-	width: 100%;
+.wrapper .header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
 }
 .btn-container {
 	display: flex;

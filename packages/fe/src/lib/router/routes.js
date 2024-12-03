@@ -402,9 +402,10 @@ export const routes = [
 	{
 		path: '/orders/:id/complete',
 		name: 'complete-order',
+		props: true,
 		component: () => import('../../orders/complete-order/complete-order.vue'),
 		meta: {
-			// roles: [roles.PROCUREMENT_OFFICER],
+			roles: [roles.PROCUREMENT_OFFICER],
 			title: 'Complete Order',
 			breadcrumb: [
 				{ name: 'Home', path: '/' },

@@ -8,6 +8,24 @@ export default http => ({
 			body: action
 		});
 	},
+	async removeItemFromOrder(id, payload) {
+		return await http(`/orders/${id}/remove-item`, {
+			method: 'PUT',
+			body: payload
+		});
+	},
+	async addItemToOrder(id, payload) {
+		return await http(`/orders/${id}/add-item`, {
+			method: 'PUT',
+			body: payload
+		});
+	},
+	async updateItemInOrder(id, payload) {
+		return await http(`/orders/${id}/update-item`, {
+			method: 'PUT',
+			body: payload
+		});
+	},
 	async fetchOrder(id) {
 		return await http(`/orders/${id}`);
 	},
