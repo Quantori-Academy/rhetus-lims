@@ -35,6 +35,7 @@ const linkedRequests = ref([]);
 const suggestedRequests = ref([]);
 const loading = ref(true);
 const apiCalls = ref([]);
+const localrefs = ref({});
 const isEdit = computed(() => $route.value.name === 'order-details-edit');
 const isOrderValid = computed(
 	() => order.value.reagents.length > 0 || order.value.reagentRequests.length > 0
@@ -237,7 +238,7 @@ const addNewReagent = async selected => {
 	updatedItems.value.newReagents.push({ ...selected });
 	order.value.newReagents.push({ ...selected });
 };
-const localrefs = ref({});
+
 const handleSubstanceRefs = refs => {
 	localrefs.value = refs;
 };

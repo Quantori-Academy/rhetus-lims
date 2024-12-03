@@ -11,7 +11,7 @@ const props = defineProps({
 	order: { type: Object, default: null },
 	isEdit: { type: Boolean, default: false }
 });
-const emit = defineEmits(['set-order', 'cancel-edit', 'set-status-history']);
+const emit = defineEmits(['set-order', 'cancel-edit', 'set-statuses-history']);
 const isPending = computed(() => props.order && props.order.status === `pending`);
 const statusBtn = computed(() => actions.value[0] || {});
 const dropdownBtn = computed(() => actions.value.slice(1));
@@ -66,7 +66,7 @@ const changeStatus = async status => {
 			type: 'success'
 		});
 		emit('set-order', props.order.id);
-		emit('set-status-history', props.order.id);
+		emit('set-statuses-history', props.order.id);
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Failed to update order status');
 	}
