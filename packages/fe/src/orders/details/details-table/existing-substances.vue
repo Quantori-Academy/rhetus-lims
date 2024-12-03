@@ -62,7 +62,7 @@ function viewRequestDetails(request) {
 		v-for="(singleOrder, index) of combinedItems"
 		:ref="el => (formRefs[`form-${index}`] = el)"
 		:key="singleOrder.tempId"
-		class="row"
+		class="row__orders"
 		label-position="top"
 		:model="combinedItems[index]"
 	>

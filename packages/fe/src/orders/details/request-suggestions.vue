@@ -42,7 +42,7 @@ const linkRequest = async selectedRequest => {
 
 <template>
 	<el-form-item
-		:label="props.linkedRequests.length > 0 || props.isEdit ? 'Linked Requests' : ''"
+		:label="props.linkedRequests.length > 0 && props.isEdit ? 'Linked Requests' : ''"
 		class="requests"
 		:rules="[]"
 	>

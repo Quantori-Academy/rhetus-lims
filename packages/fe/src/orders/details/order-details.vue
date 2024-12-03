@@ -258,6 +258,7 @@ const handleSubstanceRefs = refs => {
 					:is-edit="isEdit"
 					@set-order="setOrder"
 					@cancel-edit="cancelEdit"
+					@set-statuses-history="setStatusesHistory"
 				/>
 			</div>
 			<el-form ref="form-ref" label-position="top" :model="order" :rules="rules">
@@ -302,12 +303,13 @@ const handleSubstanceRefs = refs => {
 				@substance-refs="handleSubstanceRefs"
 			/>
 		</div>
-
-		<timeline-statuses
-			v-if="!isEdit"
-			:statuses-history="statusesHistory"
-			@set-statuses-history="setStatusesHistory"
-		/>
+		<div class="wrapper">
+			<timeline-statuses
+				v-if="!isEdit"
+				:statuses-history="statusesHistory"
+				@set-statuses-history="setStatusesHistory"
+			/>
+		</div>
 	</div>
 </template>
 

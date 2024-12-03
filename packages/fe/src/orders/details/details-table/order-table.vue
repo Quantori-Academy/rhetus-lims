@@ -31,7 +31,6 @@ const emit = defineEmits([
 	'substance-refs'
 ]);
 
-// Receive the formRefs from the child and forward it to the grandparent
 const handleSubstanceRefs = refs => {
 	emit('substance-refs', refs);
 };
@@ -47,9 +46,9 @@ const updateItem = (tempId, type, field, newValue) =>
 
 <template>
 	<div class="data-table">
-		<h2 class="el-form-item__label">Substances to Order</h2>
+		<h2>Substances to Order</h2>
 		<div class="orders-container" max-height="350">
-			<div class="row">
+			<div class="row__orders">
 				<span class="mobile">Name</span>
 				<span class="mobile">Unit</span>
 				<span class="mobile">Quantity</span>
@@ -87,6 +86,7 @@ const updateItem = (tempId, type, field, newValue) =>
 	flex-direction: column;
 	gap: 10px;
 }
+
 .el-input-number {
 	width: 100%;
 }
@@ -104,11 +104,16 @@ const updateItem = (tempId, type, field, newValue) =>
 	margin-top: 20px;
 	width: 100%;
 }
+.data-table h2 {
+	padding-bottom: 10px;
+	font-weight: 700;
+	font-size: 14px;
+}
 .btn-container {
 	display: flex;
 	gap: 1rem;
 }
-.row {
+.row__orders {
 	display: grid;
 	grid-template-rows: auto auto;
 	grid-template-columns: repeat(4, 1fr) 0.1fr;
@@ -126,7 +131,7 @@ const updateItem = (tempId, type, field, newValue) =>
 	display: none;
 }
 @media (max-width: 820px) {
-	.row {
+	.row__orders {
 		grid-template-columns: repeat(2, 1fr);
 		.mobile {
 			display: block;

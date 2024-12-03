@@ -116,7 +116,7 @@ const addNewReagent = async () => {
 		ref="new-reagent-el"
 		:model="newSubstance"
 		:rules="rules"
-		class="row"
+		class="row__orders"
 	>
 		<el-form-item prop="reagentName">
 			<span class="desktop">Name</span>
