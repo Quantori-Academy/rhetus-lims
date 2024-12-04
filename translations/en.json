@@ -209,6 +209,13 @@
 		"Sign in with different account": ["Sign in with different account"],
 		"Rhetus Lims": ["Rhetus Lims"],
 		"Forgot your password?": ["Forgot your password?"],
-		"Sign In": ["Sign In"]
+		"Sign In": ["Sign In"],
+		"History": ["History"],
+		"changed": ["changed"],
+		"storage location": ["storage location"],
+		"from": ["from"],
+		"quantity left": ["quantity left"],
+		"due to": ["due to"],
+		"updated on": ["updated on"]
 	}
 }

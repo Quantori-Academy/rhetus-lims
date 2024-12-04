@@ -5,6 +5,7 @@ import { $api } from '../lib/api';
 import { $notifyUserAboutError } from '../lib/utils/feedback/notify-msg';
 import { convertToCustomDate } from '../lib/utils/datetime/date-format';
 import { Location, Document } from '@element-plus/icons-vue';
+import { __ } from '../lib/locales/';
 
 const props = defineProps({
 	id: {
@@ -36,7 +37,7 @@ onMounted(() => {
 </script>
 
 <template>
-	<el-text v-if="substanceHistory?.length" class="bold">History</el-text>
+	<el-text v-if="substanceHistory?.length" class="bold">{{ __('History') }}</el-text>
 	<el-timeline>
 		<el-timeline-item
 			v-for="(history, index) of substanceHistory"
@@ -51,15 +52,15 @@ onMounted(() => {
 						{{ history.user.userFirstName }}
 						{{ history.user.userLastName }}
 					</el-text>
-					changed
-					<el-tag effect="light" round>storage location</el-tag>
-					from
+					{{ __('changed') }}
+					<el-tag effect="light" round>{{ __('storage location') }}</el-tag>
+					{{ __('from') }}
 					<el-text class="bold">
 						{{ history.prevStorageLocation.prevStorageRoom }}
 						{{ '-' }}
 						{{ history.prevStorageLocation.prevStorageName }}
 					</el-text>
-					to
+					{{ __('to') }}
 					<el-text class="bold">
 						{{ history.newStorageLocation.newStorageRoom }}
 						{{ '-' }}
@@ -73,20 +74,20 @@ onMounted(() => {
 						{{ history.user.userFirstName }}
 						{{ history.user.userLastName }}
 					</el-text>
-					changed
-					<el-tag type="warning" effect="light" round>quantity left</el-tag>
-					from
+					{{ __('changed') }}
+					<el-tag type="warning" effect="light" round>{{ __('quantity left') }}</el-tag>
+					{{ __('from') }}
 					<el-text class="bold">
 						{{ history.prevQuantityLeft }}
 					</el-text>
-					to
+					{{ __('to') }}
 					<el-text class="bold">
 						{{ history.newQuantityLeft }}
 						{{}}
 					</el-text>
 					<el-text>
 						{{ history.quantityUnit }}
-						due to
+						{{ __('due to') }}
 					</el-text>
 					<el-text tag="i">
 						{{ history.changeReason }}
