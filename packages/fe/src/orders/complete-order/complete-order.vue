@@ -24,7 +24,6 @@ const saveDisabled = computed(() => {
 
 onMounted(() => {
 	setOrder(props.id);
-	console.log(props.id);
 	setSubstances();
 	setStorages();
 });
@@ -80,8 +79,9 @@ const saveChanges = async () => {
 			action: 'next',
 			reagents: storageAssignments.value
 		};
+
 		const res = await $api.orders.changeOrderStatus(props.id, body);
-		if (res.message === 'success') {
+		if (res.status === 'success') {
 			$router.push({ name: 'order-details', params: { id: props.id } });
 		}
 	} catch (error) {
