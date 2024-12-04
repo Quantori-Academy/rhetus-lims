@@ -57,11 +57,11 @@ const cancelEdit = () => {
 
 const handleSubmit = async () => {
 	try {
-		await $api.requests.updateRequest(request.value.id, request.value);
+		const response = await $api.requests.updateRequest(request.value.id, request.value);
 		$notify({
-			title: 'Success',
-			message: 'Request has been updated',
-			type: 'success'
+			title: response.status.charAt(0).toUpperCase() + response.status.slice(1),
+			message: response.message || __('Request has been updated'),
+			type: response.status
 		});
 
 		$router.push({ name: 'request-details', params: { id: request.value.id } });
@@ -84,11 +84,7 @@ const cancelRequest = async () => {
 			inputErrorMessage: 'Reason is required'
 		}).then(({ value }) => {
 			const response = $api.requests.cancelRequest(props.id, { reason: value });
-			$notify({
-				title: 'Success',
-				message: response.message,
-				type: 'success'
-			});
+			$notify({ title: 'Success', message: response.message, type: 'success' });
 		});
 		setRequest(props.id);
 		setStatusesHistory();
@@ -128,7 +124,12 @@ onMounted(() => {
 				</span>
 			</h2>
 			<div v-if="!isEdit && request.status !== Statuses.CANCELED" class="top-button-container">
-				<el-button type="primary" @click="toggleEdit">{{ __('Edit') }}</el-button>
+				<el-button
+					type="primary"
+					:disabled="request.status !== Statuses.PENDING"
+					@click="toggleEdit"
+					>{{ __('Edit') }}</el-button
+				>
 				<el-button
 					v-if="isOfficer"
 					type="danger"
@@ -253,5 +254,11 @@ onMounted(() => {
 	.po-message-prefix {
 		font-weight: 500;
 	}
+}
+
+.el-button.el-button--primary.is-disabled,
+.el-button.el-button--primary.is-disabled:hover {
+	border-color: #92d6ee;
+	background-color: #92d6ee;
 }
 </style>
