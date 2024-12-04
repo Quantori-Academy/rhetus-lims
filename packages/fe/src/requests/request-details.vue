@@ -29,6 +29,7 @@ const { isOfficer } = inject('user');
 const loading = ref(false);
 const request = ref(emptyRequest);
 const isEdit = computed(() => $route.value.name === 'request-details-edit');
+const user = inject('user');
 
 const showPoMessage = computed(
 	() => request.value.status === Statuses.CANCELED && request.value.poComment && !isEdit.value
@@ -185,7 +186,11 @@ onMounted(() => {
 				</el-form-item>
 			</div>
 			<el-form-item :label="__('User Comments')" prop="userComment">
-				<el-input v-model="request.userComment" type="textarea" :disabled="!isEdit || isOfficer" />
+				<el-input
+					v-model="request.userComment"
+					type="textarea"
+					:disabled="!isEdit || !(request.author.username === user?.user?.value?.username)"
+				/>
 			</el-form-item>
 			<el-form-item :label="__('Procurement Comments')" prop="poComment">
 				<el-input v-model="request.poComment" type="textarea" :disabled="!isEdit || !isOfficer" />
