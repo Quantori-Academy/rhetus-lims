@@ -8,7 +8,8 @@ import {
 	ElDatePicker,
 	ElInputNumber,
 	ElSelect,
-	ElOption
+	ElOption,
+	ElMessageBox
 } from 'element-plus';
 import { computed, ref, onMounted, inject } from 'vue';
 import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg.js';
@@ -24,8 +25,7 @@ import TimelineStatuses from '../timeline/timeline-statuses.vue';
 
 const props = defineProps({ id: { type: String, default: null } });
 
-const { isOfficer, isResearcher } = inject('user');
-
+const { isOfficer } = inject('user');
 const loading = ref(false);
 const request = ref(emptyRequest);
 const isEdit = computed(() => $route.value.name === 'request-details-edit');
@@ -69,20 +69,27 @@ const handleSubmit = async () => {
 	}
 };
 
-const deleteRequest = async () => {
+const cancelRequest = async () => {
 	try {
-		await $confirm('Do you want to delete this request?', 'Warning', {
-			confirmButtonText: 'OK',
-			cancelButtonText: 'Cancel',
+		await $confirm('Are you sure you want to cancel the request?', 'Please, confirm your action', {
+			confirmButtonText: 'Yes',
+			cancelButtonText: 'No',
 			type: 'warning'
 		});
-		await $api.requests.cancelRequest(props.id);
-		$notify({
-			title: 'Success',
-			message: 'Request has been deleted',
-			type: 'success'
+		await ElMessageBox.prompt('Please, provide a reason', 'Warning', {
+			confirmButtonText: 'Ok',
+			cancelButtonText: 'Cancel',
+			inputPattern: /\S+/,
+			inputErrorMessage: 'Reason is required'
+		}).then(({ value }) => {
+			const response = $api.requests.cancelRequest(props.id, { reason: value });
+			$notify({
+				title: 'Success',
+				message: response.message,
+				type: 'success'
+			});
 		});
-		$router.push({ name: 'requests-list' });
+		setRequest(props.id);
 		setStatusesHistory();
 	} catch (error) {
 		if (!['cancel', 'close'].includes(error)) {
@@ -121,7 +128,14 @@ onMounted(() => {
 			</h2>
 			<div v-if="!isEdit && request.status !== Statuses.CANCELED" class="top-button-container">
 				<el-button type="primary" @click="toggleEdit">{{ __('Edit') }}</el-button>
-				<el-button type="danger" @click="deleteRequest"> {{ __('Cancel Request') }} </el-button>
+				<el-button
+					v-if="isOfficer"
+					type="danger"
+					:disabled="request.status !== Statuses.PENDING"
+					@click="cancelRequest"
+				>
+					{{ __('Cancel Request') }}
+				</el-button>
 			</div>
 		</div>
 		<div v-if="showPoMessage" class="po-message">
@@ -171,14 +185,10 @@ onMounted(() => {
 				</el-form-item>
 			</div>
 			<el-form-item :label="__('User Comments')" prop="userComment">
-				<el-input
-					v-model="request.userComment"
-					type="textarea"
-					:disabled="!isEdit || isResearcher"
-				/>
+				<el-input v-model="request.userComment" type="textarea" :disabled="!isEdit || isOfficer" />
 			</el-form-item>
 			<el-form-item :label="__('Procurement Comments')" prop="poComment">
-				<el-input v-model="request.poComment" type="textarea" :disabled="!isEdit || isOfficer" />
+				<el-input v-model="request.poComment" type="textarea" :disabled="!isEdit || !isOfficer" />
 			</el-form-item>
 			<div class="align-horizontal">
 				<el-form-item :label="__('Creation Date')" prop="createdAt">
