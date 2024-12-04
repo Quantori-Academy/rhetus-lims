@@ -4,6 +4,7 @@ import { inject, onMounted, ref } from 'vue';
 import { $api } from '../lib/api/index.js';
 import { $notify, $notifyUserAboutError } from '../lib/utils/feedback/notify-msg.js';
 import { $router } from '../lib/router/router.js';
+import { __ } from '../lib/locales/';
 
 const { login, isAuthorized } = inject('auth');
 
@@ -45,24 +46,26 @@ onMounted(() => {
 <template>
 	<div class="logo-container">
 		<img width="56" height="56" src="../lib/assets/images/logo.svg" alt="" />
-		<div class="logo-title">Rhetus Lims</div>
+		<div class="logo-title">{{ __('Rhetus Lims') }}</div>
 	</div>
 
 	<div class="form-container">
 		<el-form :model="form" label-position="top" class="form" @keyup.enter="onSubmit">
-			<el-form-item label="Username">
+			<el-form-item :label="__('Username')">
 				<el-input v-model="form.username" class="input" />
 			</el-form-item>
-			<el-form-item label="Password">
+			<el-form-item :label="__('Password')">
 				<el-input v-model="form.password" type="password" class="input" show-password />
 			</el-form-item>
 			<el-form-item>
 				<div class="forgot-password">
-					<router-link to="/reset-password">Forgot your password?</router-link>
+					<router-link to="/reset-password">{{ __('Forgot your password?') }}</router-link>
 				</div>
 			</el-form-item>
 			<el-form-item>
-				<el-button :loading="isLoading" type="primary" @click="onSubmit"> Sign In </el-button>
+				<el-button :loading="isLoading" type="primary" @click="onSubmit">{{
+					__('Sign In')
+				}}</el-button>
 			</el-form-item>
 		</el-form>
 	</div>

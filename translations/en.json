@@ -201,6 +201,14 @@
 		"Add Order": ["Add Order"],
 		"Complete order": ["Complete order"],
 		"Add new reagents": ["Add new reagents"],
-		"Add name": ["Add name"]
+		"Add name": ["Add name"],
+		"Page not found": ["Page not found"],
+		"Make sure the address is correct and the page is not moved": ["Make sure the address is correct and the page is not moved"],
+		"Please contact your administrator if you think this is a mistake": ["Please contact your administrator if you think this is a mistake"],
+		"Go Home": ["Go Home"],
+		"Sign in with different account": ["Sign in with different account"],
+		"Rhetus Lims": ["Rhetus Lims"],
+		"Forgot your password?": ["Forgot your password?"],
+		"Sign In": ["Sign In"]
 	}
 }
