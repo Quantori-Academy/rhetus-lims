@@ -176,7 +176,7 @@ onMounted(() => {
 	background-color: #ee6666;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 900px) {
 	.stat-value-container {
 		.value {
 			display: none;
