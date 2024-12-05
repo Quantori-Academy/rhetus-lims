@@ -99,12 +99,12 @@ const setSubstances = debounce(async () => {
 			deleted: deleted ? 'true' : 'false'
 		}
 	};
-	const ketcher = ketcherFrame.value.contentWindow.ketcher;
-	const opts = { outputFormat: 'svg' };
 	try {
 		const { substances: substancesData, count } = await $api.substances.fetchSubstances(params);
 		substances.value = await Promise.all(
 			substancesData.map(async substance => {
+				const ketcher = ketcherFrame.value.contentWindow.ketcher;
+				const opts = { outputFormat: 'svg' };
 				const ketcherImage = substance.structure.length
 					? await ketcher.generateImage(substance.structure, opts)
 					: null;
@@ -115,7 +115,7 @@ const setSubstances = debounce(async () => {
 			})
 		);
 
-		paginationData.value.totalElements = count;
+		pagination.value.totalElements = count;
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
@@ -210,7 +210,7 @@ onMounted(() => {
 				</template>
 			</el-table-column>
 		</el-table>
-		<rh-pagination :pagination="paginationData" @change-page="handlePageChange" />
+		<rh-pagination :pagination="pagination" @change-page="handlePageChange" />
 		<div class="ketcher-editor">
 			<iframe
 				ref="ketcherFrame"
