@@ -5,7 +5,8 @@ export const Statuses = {
 	PENDING: 'pending',
 	ORDERED: 'ordered',
 	FULFILLED: 'fulfilled',
-	CANCELED: 'canceled'
+	CANCELED: 'canceled',
+	COMPLETED: 'completed'
 };
 
 export const rules = ref({
