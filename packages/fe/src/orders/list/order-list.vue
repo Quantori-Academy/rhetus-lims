@@ -58,15 +58,10 @@ async function deleteOrder(id) {
 	}
 }
 
-const setOrders = debounce(async (event = null) => {
+const setOrders = debounce(async () => {
 	isLoading.value = true;
-	if (event) {
-		const sortQuery = createQuery(event);
-		sort.value = sortQuery;
-	}
 	const params = {
-		page: paginationData.value.page,
-		limit: paginationData.value.size,
+		...paginationData.value,
 		sort: sort.value,
 		options: {
 			...filters.value
@@ -83,14 +78,11 @@ const setOrders = debounce(async (event = null) => {
 	}
 }, 200);
 
-function createQuery(event) {
-	let query = {};
-	if (event && event.prop && event.order) {
-		const order = event.order === 'ascending' ? 'asc' : 'desc';
-		query = { [event.prop]: order };
-	}
-	return query;
-}
+const handleSortChange = event => {
+	const isDescending = event.order === 'descending';
+	sort.value = { [event.prop]: isDescending ? 'desc' : 'asc' };
+	setOrders();
+};
 const paginationData = ref({
 	page: 1,
 	size: 10,
@@ -126,7 +118,12 @@ onMounted(() => {
 				<order-filters v-model:filters="filters" />
 			</template>
 		</rh-filters>
-		<el-table v-loading="isLoading" :data="orders" @row-click="viewOrder" @sort-change="setOrders">
+		<el-table
+			v-loading="isLoading"
+			:data="orders"
+			@row-click="viewOrder"
+			@sort-change="handleSortChange"
+		>
 			<el-table-column prop="status" min-width="150" label="Status" sortable />
 			<el-table-column prop="title" min-width="150" label="Title" sortable />
 			<el-table-column
