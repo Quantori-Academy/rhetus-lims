@@ -12,6 +12,7 @@ import { formatDate } from '../../lib/utils/datetime/date-format.js';
 import { debounce } from '../../lib/utils/debounce/debounce.js';
 import RhPagination from '../../lib/components/rh-pagination/rh-pagination.vue';
 import { Statuses } from './constants.js';
+import { __ } from '../lib/locales/index.js';
 
 const orders = ref([]);
 const isLoading = ref(false);
@@ -112,7 +113,7 @@ onMounted(() => {
 	<div class="orders-table">
 		<rh-filters>
 			<template #action-buttons>
-				<el-button type="primary" @click="addNewOrder">Add New Order </el-button>
+				<el-button type="primary" @click="addNewOrder">{{ __('Add New Order') }}</el-button>
 			</template>
 			<template #filters>
 				<order-filters v-model:filters="filters" />
@@ -124,12 +125,12 @@ onMounted(() => {
 			@row-click="viewOrder"
 			@sort-change="handleSortChange"
 		>
-			<el-table-column prop="status" min-width="150" label="Status" sortable />
-			<el-table-column prop="title" min-width="150" label="Title" sortable />
+			<el-table-column prop="status" min-width="150" :label="__('Status')" sortable />
+			<el-table-column prop="title" min-width="150" :label="__('Title')" sortable />
 			<el-table-column
 				prop="createdAt"
 				min-width="200"
-				label="Created at"
+				:label="__('Created at')"
 				width="140"
 				:formatter="data => formatDate(data.createdAt)"
 				sortable
@@ -137,12 +138,12 @@ onMounted(() => {
 			<el-table-column
 				prop="updatedAt"
 				min-width="200"
-				label="Updated at"
+				:label="__('Updated at')"
 				width="140"
 				:formatter="data => formatDate(data.updatedAt)"
 				sortable
 			/>
-			<el-table-column prop="seller" min-width="150" label="Seller" sortable />
+			<el-table-column prop="seller" min-width="150" :label="__('Seller')" sortable />
 			<el-table-column width="80">
 				<template #default="{ row }">
 					<el-button :disabled="!isPending(row.status)" @click.stop="() => editOrder(row.id)"

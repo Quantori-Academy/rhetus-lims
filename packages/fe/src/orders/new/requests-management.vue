@@ -2,6 +2,8 @@
 import { ref } from 'vue';
 import { ElAutocomplete, ElFormItem } from 'element-plus';
 import RhIcon from '../../lib/components/rh-icon.vue';
+import { __ } from '../lib/locales/index.js';
+
 const props = defineProps({
 	form: { type: Object, default: null },
 	isRequest: { type: Boolean, default: false }
@@ -18,18 +20,18 @@ const linkRequest = selectedRequest => {
 </script>
 
 <template>
-	<el-form-item v-if="props.isRequest" label="Linked Requests" class="requests" :rules="[]">
+	<el-form-item v-if="props.isRequest" :label="__('Linked Requests')" class="requests" :rules="[]">
 		<el-autocomplete
 			v-model="searchQuery"
 			:fetch-suggestions="fetchRequestSuggestions"
 			clearable
-			placeholder="Search for requests"
+			:placeholder="__('Search for requests')"
 			@select="linkRequest"
 		>
 			<template #default="{ item }">
 				<div>
 					<rh-icon color="#1785be" name="pod" />
-					{{ item.reagentName }}: {{ item.quantity }}{{ item.quantityUnit }} | Amount:
+					{{ item.reagentName }}: {{ item.quantity }}{{ item.quantityUnit }} | {{ __('Amount') }}:
 					{{ item.amount }}
 				</div>
 			</template>

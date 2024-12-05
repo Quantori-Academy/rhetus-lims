@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { ElAutocomplete, ElFormItem } from 'element-plus';
+import { __ } from '../lib/locales/index.js';
 
 const props = defineProps({
 	order: { type: Object, default: null },
@@ -42,7 +43,7 @@ const linkRequest = async selectedRequest => {
 
 <template>
 	<el-form-item
-		:label="props.linkedRequests.length > 0 && props.isEdit ? 'Linked Requests' : ''"
+		:label="props.linkedRequests.length > 0 && props.isEdit ? __('Linked Requests') : ''"
 		class="requests"
 		:rules="[]"
 	>
@@ -51,7 +52,7 @@ const linkRequest = async selectedRequest => {
 			v-model="searchQuery"
 			:fetch-suggestions="fetchRequestSuggestions"
 			clearable
-			placeholder="Search for requests"
+			:placeholder="__('Search for requests')"
 			@select="linkRequest"
 		>
 			<template #default="{ item }">

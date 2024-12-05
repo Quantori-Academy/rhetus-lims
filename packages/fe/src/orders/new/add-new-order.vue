@@ -8,6 +8,7 @@ import { formRef, formRules } from './constants.js';
 import SubstanceManagement from './substance-management.vue';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 import { onBeforeRouteLeave } from 'vue-router';
+import { __ } from '../lib/locales/index.js';
 
 const formEl = useTemplateRef('form-el');
 const isSaving = ref(false);
@@ -155,11 +156,11 @@ const updateItem = ({ id, type, field, newValue }) => {
 <template>
 	<div class="wrapper">
 		<el-form ref="form-el" :model="form" :rules="rules" label-width="auto" label-position="top">
-			<el-form-item label="Title" prop="title">
-				<el-input v-model="form.title" placeholder="Enter title" />
+			<el-form-item :label="__('Title')" prop="title">
+				<el-input v-model="form.title" :placeholder="__('Enter title')" />
 			</el-form-item>
-			<el-form-item label="Seller" prop="seller">
-				<el-input v-model="form.seller" placeholder="Enter seller name" />
+			<el-form-item :label="__('Seller')" prop="seller">
+				<el-input v-model="form.seller" :placeholder="__('Enter seller name')" />
 			</el-form-item>
 			<substance-management
 				:form="form"

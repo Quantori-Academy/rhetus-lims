@@ -15,6 +15,7 @@ import { quantityUnits } from '../../../lib/constants/quantity-units.js';
 import { newSubstanceRef, newSubstanceRules } from '../constants.js';
 import { $notifyUserAboutError } from '../../../lib/utils/feedback/notify-msg.js';
 import { $api } from '../../../lib/api/index.js';
+import { __ } from '../../../lib/locales/index.js';
 
 const props = defineProps({
 	order: {
@@ -110,7 +111,9 @@ const addNewReagent = async () => {
 </script>
 
 <template>
-	<h2 v-if="isReagentAdded && props.isEdit" class="el-form-item__label">Add Substances</h2>
+	<h2 v-if="isReagentAdded && props.isEdit" class="el-form-item__label">
+		{{ __('Add Substances') }}
+	</h2>
 	<el-form
 		v-if="props.isEdit"
 		ref="new-reagent-el"
@@ -119,10 +122,10 @@ const addNewReagent = async () => {
 		class="row__orders"
 	>
 		<el-form-item prop="reagentName">
-			<span class="desktop">Name</span>
+			<span class="desktop">{{ __('Name') }}</span>
 			<el-autocomplete
 				v-model="reagentName"
-				placeholder="Add new reagents"
+				:placeholder="__('Add new reagents')"
 				:fetch-suggestions="fetchSubstanceSuggestions"
 				@select="addExistingReagent"
 			>
@@ -132,18 +135,18 @@ const addNewReagent = async () => {
 			</el-autocomplete>
 		</el-form-item>
 		<el-form-item prop="quantityUnit">
-			<span class="desktop">Unit</span>
-			<el-select v-model="newSubstance.quantityUnit" filterable placeholder="Enter unit">
+			<span class="desktop">{{ __('Unit') }}</span>
+			<el-select v-model="newSubstance.quantityUnit" filterable :placeholder="__('Enter unit')">
 				<el-option v-for="unit of quantityUnits" :key="unit" :label="unit" :value="unit" />
 			</el-select>
 		</el-form-item>
 		<el-form-item prop="quantity">
-			<span class="desktop">Quantity</span>
-			<el-input-number v-model="newSubstance.quantity" placeholder="Quantity" :min="1" />
+			<span class="desktop">{{ __('Quantity') }}</span>
+			<el-input-number v-model="newSubstance.quantity" :placeholder="__('Quantity')" :min="1" />
 		</el-form-item>
 		<el-form-item prop="amount">
-			<span class="desktop">Amount</span>
-			<el-input-number v-model="newSubstance.amount" placeholder="Amount" :min="1" />
+			<span class="desktop">{{ __('Amount') }}</span>
+			<el-input-number v-model="newSubstance.amount" :placeholder="__('Amount')" :min="1" />
 		</el-form-item>
 		<el-button type="info" circle @click="addNewReagent">
 			<rh-icon color="white" name="plus"

@@ -14,6 +14,7 @@ import { quantityUnits } from '../../../lib/constants/quantity-units.js';
 import RhIcon from '../../../lib/components/rh-icon.vue';
 import { $router } from '../../../lib/router/router.js';
 import { existingFieldRules, existingNumberFieldRules } from '../constants.js';
+import { __ } from '../../../lib/locales/index.js';
 
 const props = defineProps({
 	order: {
@@ -78,15 +79,15 @@ function viewRequestDetails(request) {
 				@click="() => viewRequestDetails(request)"
 				@close="() => removeLinkedRequest(request)"
 			>
-				Linked request for {{ request.reagentName }}: {{ request.quantity }}
+				{{ __('Linked request for') }} {{ request.reagentName }}: {{ request.quantity }}
 				{{ request.quantityUnit }} ({{ request.amount }})
 			</el-tag>
 		</div>
 		<el-form-item prop="reagentName" :rules="existingFieldRules">
-			<span class="desktop">Name</span>
+			<span class="desktop">{{ __('Name') }}</span>
 			<el-input
 				v-model="singleOrder.reagentName"
-				placeholder="Add name"
+				:placeholder="__('Add name')"
 				:disabled="!props.isEdit"
 				@input="
 					() =>
@@ -95,11 +96,11 @@ function viewRequestDetails(request) {
 			/>
 		</el-form-item>
 		<el-form-item prop="quantityUnit" :rules="existingFieldRules">
-			<span class="desktop">Unit</span>
+			<span class="desktop">{{ __('Unit') }}</span>
 			<el-select
 				v-model="singleOrder.quantityUnit"
 				filterable
-				placeholder="Quantity unit"
+				:placeholder="__('Quantity unit')"
 				:disabled="!props.isEdit"
 				@input="
 					() =>
@@ -115,10 +116,10 @@ function viewRequestDetails(request) {
 			</el-select>
 		</el-form-item>
 		<el-form-item prop="quantity" :rules="existingNumberFieldRules">
-			<span class="desktop">Quantity</span>
+			<span class="desktop">{{ __('Quantity') }}</span>
 			<el-input-number
 				v-model="singleOrder.quantity"
-				placeholder="Quantity"
+				:placeholder="__('Quantity')"
 				:min="1"
 				:disabled="!props.isEdit"
 				@change="
@@ -127,10 +128,10 @@ function viewRequestDetails(request) {
 			/>
 		</el-form-item>
 		<el-form-item prop="amount" :rules="existingNumberFieldRules">
-			<span class="desktop">Amount</span>
+			<span class="desktop">{{ __('Amount') }}</span>
 			<el-input-number
 				v-model="singleOrder.amount"
-				placeholder="Amount"
+				:placeholder="__('Amount')"
 				:min="1"
 				:disabled="!props.isEdit"
 				@change="
@@ -162,7 +163,7 @@ function viewRequestDetails(request) {
 				@click="() => viewRequestDetails(request)"
 				@close="() => removeLinkedRequest(request)"
 			>
-				Linked request for {{ request.reagentName }}: {{ request.quantity }}
+				{{ __('Linked request for') }} {{ request.reagentName }}: {{ request.quantity }}
 				{{ request.quantityUnit }} ({{ request.amount }})
 			</el-tag>
 		</div>
