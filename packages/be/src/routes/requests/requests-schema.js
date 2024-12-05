@@ -100,6 +100,7 @@ const updateRequest = {
 	body: updateRequestSchema,
 	response: {
 		200: statusMessage,
+		205: statusMessage,
 		403: statusMessage,
 		404: statusMessage,
 		500: statusMessage

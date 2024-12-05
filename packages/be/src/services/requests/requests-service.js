@@ -188,11 +188,11 @@ async function requestsService(server) {
 			);
 
 			if (!Object.keys(updateData).length) {
-				const error = new Error(
-					'There is nothing to update. Check sending values or request state.'
-				);
-				error.statusCode = 400;
-				throw error;
+				return {
+					code: 205,
+					status: 'info',
+					message: 'There is nothing to update. Check sending values or request state'
+				};
 			}
 
 			const updatedRequestReagentName = await server.requestsService.updateRequest(
