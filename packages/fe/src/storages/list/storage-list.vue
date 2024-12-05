@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, inject } from 'vue';
 import { ElTable, ElTableColumn, ElButton, ElTooltip } from 'element-plus';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { $api } from '../../lib/api/index.js';
@@ -12,6 +12,8 @@ import { formatDate } from '../../lib/utils/datetime/date-format.js';
 import { debounce } from '../../lib/utils/debounce/debounce.js';
 import RhPagination from '../../lib/components/rh-pagination/rh-pagination.vue';
 import { __ } from '../../lib/locales/index.js';
+
+const { isAdmin } = inject('user');
 
 const storages = ref([]);
 const isLoading = ref(false);
@@ -93,16 +95,10 @@ const paginationData = ref({
 
 const handlePageChange = newPage => {
 	paginationData.value.page = newPage;
+	setStorages();
 };
 
-watch(paginationData.value, () => setStorages());
-watch(
-	filters,
-	() => {
-		setStorages();
-	},
-	{ deep: true }
-);
+watch(filters, () => setStorages(), { deep: true });
 
 onMounted(() => {
 	setStorages();
@@ -113,7 +109,7 @@ onMounted(() => {
 	<div class="margin-table">
 		<rh-filters>
 			<template #action-buttons>
-				<el-button type="primary" @click="addNewStorageLocation">
+				<el-button v-if="isAdmin" type="primary" @click="addNewStorageLocation">
 					{{ __('Add New Storage Location') }}
 				</el-button>
 			</template>

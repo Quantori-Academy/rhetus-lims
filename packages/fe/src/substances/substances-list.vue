@@ -23,14 +23,15 @@ const filters = ref({
 	smiles: ''
 });
 
-const paginationData = ref({
+const pagination = ref({
 	page: 1,
 	size: 10,
 	totalElements: 0
 });
 
 const handlePageChange = newPage => {
-	paginationData.value.page = newPage;
+	pagination.value.page = newPage;
+	setSubstances();
 };
 function addNewReagent() {
 	$router.push({ name: 'new-reagent' });
@@ -87,7 +88,7 @@ const setSubstances = debounce(async () => {
 		sortData.value = { ...sortData.value, relevance: 'desc' };
 	}
 	const params = {
-		...paginationData.value,
+		...pagination.value,
 		sort: sortData.value,
 		options: {
 			...rest,
@@ -97,7 +98,7 @@ const setSubstances = debounce(async () => {
 	try {
 		const { substances: substancesData, count } = await $api.substances.fetchSubstances(params);
 		substances.value = substancesData;
-		paginationData.value.totalElements = count;
+		pagination.value.totalElements = count;
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
@@ -111,14 +112,8 @@ const handleSortChange = event => {
 	setSubstances();
 };
 
-watch(paginationData.value, () => setSubstances());
-watch(
-	filters,
-	() => {
-		setSubstances();
-	},
-	{ deep: true }
-);
+watch(filters, () => setSubstances(), { deep: true });
+
 onMounted(() => {
 	setSubstances();
 });
@@ -182,7 +177,7 @@ onMounted(() => {
 				</template>
 			</el-table-column>
 		</el-table>
-		<rh-pagination :pagination="paginationData" @change-page="handlePageChange" />
+		<rh-pagination :pagination="pagination" @change-page="handlePageChange" />
 	</div>
 </template>
 
