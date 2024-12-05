@@ -8,7 +8,7 @@ import { formRef, formRules } from './constants.js';
 import SubstanceManagement from './substance-management.vue';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 import { onBeforeRouteLeave } from 'vue-router';
-import { __ } from '../lib/locales/index.js';
+import { __ } from '../../lib/locales/index.js';
 
 const formEl = useTemplateRef('form-el');
 const isSaving = ref(false);

@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { ElAutocomplete, ElFormItem } from 'element-plus';
 import RhIcon from '../../lib/components/rh-icon.vue';
-import { __ } from '../lib/locales/index.js';
+import { __ } from '../../lib/locales/index.js';
 
 const props = defineProps({
 	form: { type: Object, default: null },

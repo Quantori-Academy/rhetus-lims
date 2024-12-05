@@ -5,7 +5,7 @@ import { computed, onMounted, ref } from 'vue';
 import { $api } from '../../lib/api/index.js';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import { $router } from '../../lib/router/router.js';
-import { __ } from '../lib/locales/index.js';
+import { __ } from '../../lib/locales/index.js';
 
 const props = defineProps({
 	id: {

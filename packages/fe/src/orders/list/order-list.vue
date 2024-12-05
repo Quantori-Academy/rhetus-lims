@@ -12,7 +12,7 @@ import { formatDate } from '../../lib/utils/datetime/date-format.js';
 import { debounce } from '../../lib/utils/debounce/debounce.js';
 import RhPagination from '../../lib/components/rh-pagination/rh-pagination.vue';
 import { Statuses } from './constants.js';
-import { __ } from '../lib/locales/index.js';
+import { __ } from '../../lib/locales/index.js';
 
 const orders = ref([]);
 const isLoading = ref(false);

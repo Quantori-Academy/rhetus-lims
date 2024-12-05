@@ -15,7 +15,7 @@ import { newSubstanceRef, newSubstanceRules } from './constants.js';
 import { $notifyUserAboutError } from '../../lib/utils/feedback/notify-msg.js';
 import { $api } from '../../lib/api/index.js';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
-import { __ } from '../lib/locales/index.js';
+import { __ } from '../../lib/locales/index.js';
 
 const props = defineProps({
 	form: { type: Object, default: null },
@@ -107,7 +107,7 @@ const fetchSubstanceSuggestions = async (queryString, callback) => {
 
 <template>
 	<h2 v-if="combinedItems.length > 0" class="el-form-item__label">{{ __('Add Substances') }}</h2>
-	<el-form ref="new-substance" :model="newSubstance" class="row" :rules="rules">
+	<el-form ref="new-substance" :model="newSubstance" class="row__order_creation" :rules="rules">
 		<el-form-item prop="reagentName">
 			<span class="desktop">{{ __('Name') }}</span>
 			<el-autocomplete

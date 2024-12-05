@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { ElAutocomplete, ElFormItem } from 'element-plus';
-import { __ } from '../lib/locales/index.js';
+import { __ } from '../../lib/locales/index.js';
 
 const props = defineProps({
 	order: { type: Object, default: null },
