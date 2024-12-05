@@ -3,6 +3,7 @@ import { ElTimeline, ElTimelineItem, ElTag, ElText, ElSpace } from 'element-plus
 import { onMounted } from 'vue';
 import { convertToCustomDate } from '../lib/utils/datetime/date-format';
 import { getButtonType } from '../orders/details/constants';
+import { __ } from '../lib/locales/';
 
 const props = defineProps({
 	statusesHistory: {
@@ -21,7 +22,7 @@ onMounted(() => {
 </script>
 
 <template>
-	<el-text v-if="props.statusesHistory?.length" class="bold title">History</el-text>
+	<el-text v-if="props.statusesHistory?.length" class="bold title">{{ __('History') }}</el-text>
 	<el-timeline>
 		<el-timeline-item
 			v-for="(history, index) of props.statusesHistory"
@@ -37,11 +38,11 @@ onMounted(() => {
 					{{ history.user.userFirstName }} {{ history.user.userLastName }}
 				</el-text>
 				<el-text>
-					updated on
+					{{ __('updated on') }}
 					{{ convertToCustomDate(history.modifiedDate) }}
 				</el-text>
 				<el-text v-if="history.changeReason">
-					due to
+					{{ __('due to') }}
 					{{ history.changeReason }}
 				</el-text>
 			</el-space>

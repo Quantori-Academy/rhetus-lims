@@ -3,6 +3,7 @@ import { ElForm, ElInput, ElButton, ElFormItem } from 'element-plus';
 import { ref } from 'vue';
 import { $api } from '../lib/api/index.js';
 import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg.js';
+import { __ } from '../lib/locales/';
 
 function createDefaultFormValues() {
 	return {
@@ -38,7 +39,7 @@ function onSubmit() {
 <template>
 	<div class="logo-container">
 		<img width="56" height="56" src="../lib/assets/images/logo.svg" alt="" />
-		<div class="logo-title">Rhetus Lims</div>
+		<div class="logo-title">{{ __('Rhetus Lims') }}</div>
 	</div>
 
 	<div class="form-container">
@@ -49,11 +50,11 @@ function onSubmit() {
 			@submit.prevent
 			@keyup.enter="onSubmit"
 		>
-			<el-form-item label="Username">
+			<el-form-item :label="__('Username')">
 				<el-input v-model="form.username" class="input" />
 			</el-form-item>
 			<el-form-item>
-				<el-button type="primary" @click="onSubmit"> Reset Password </el-button>
+				<el-button type="primary" @click="onSubmit">{{ __('Reset password') }}</el-button>
 			</el-form-item>
 		</el-form>
 	</div>

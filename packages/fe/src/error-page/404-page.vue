@@ -1,22 +1,23 @@
 <script setup>
 import { ElButton } from 'element-plus';
+import { __ } from '../lib/locales/';
 </script>
 
 <template>
 	<div class="logo-container">
 		<img width="130" height="130" src="../lib/assets/images/logo.svg" alt="" />
 	</div>
-	<h1>404: Page not found</h1>
+	<h1>404: {{ __('Page not found') }}</h1>
 	<div class="text-box">
-		<p>Make sure the address is correct and the page is not moved.</p>
-		<p>Please contact your administrator if you think this is a mistake.</p>
+		<p>{{ __('Make sure the address is correct and the page is not moved') }}.</p>
+		<p>{{ __('Please contact your administrator if you think this is a mistake') }}.</p>
 	</div>
 
 	<router-link to="/">
-		<el-button type="primary" link>Go Home</el-button>
+		<el-button type="primary" link>{{ __('Go Home') }}</el-button>
 	</router-link>
 	<router-link to="/login">
-		<el-button type="primary" link>Sign in with different account</el-button>
+		<el-button type="primary" link>{{ __('Sign in with different account') }}</el-button>
 	</router-link>
 </template>
 
