@@ -1,16 +1,13 @@
 <script setup>
-import { ref, watch, defineProps, defineEmits, computed } from 'vue';
+import { defineProps, defineEmits, computed } from 'vue';
 import { ElPagination } from 'element-plus';
 import { defaultPaginationValues } from './constants';
 
 const props = defineProps({
 	pagination: {
 		type: Object,
-		required: true
-	},
-	pagerCount: {
-		type: Number,
-		default: 5
+		required: true,
+		default: () => defaultPaginationValues
 	},
 	layout: {
 		type: String,
@@ -18,16 +15,7 @@ const props = defineProps({
 	}
 });
 
-const page = ref(defaultPaginationValues.page);
 const needPagination = computed(() => props.pagination.totalElements > props.pagination.size);
-
-watch(
-	() => props.pagination,
-	newPagination => {
-		page.value = newPagination.page;
-	},
-	{ deep: true }
-);
 
 const emit = defineEmits(['change-page']);
 const handlePageChange = newPage => {
@@ -39,11 +27,18 @@ const handlePageChange = newPage => {
 	<div class="pagination-container">
 		<el-pagination
 			v-if="needPagination"
-			:current-page="page"
-			:page-size="pagination.size"
-			:total="pagination.totalElements"
-			:layout="layout"
+			:current-page="Number(props.pagination.page)"
+			:page-size="Number(props.pagination.size)"
+			:total="Number(props.pagination.totalElements)"
+			:layout="props.layout"
+			background
 			@update:current-page="handlePageChange"
 		/>
 	</div>
 </template>
+
+<style scoped>
+.pagination-container {
+	margin-top: 20px;
+}
+</style>
