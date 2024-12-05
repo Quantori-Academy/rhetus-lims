@@ -86,9 +86,8 @@ const paginationData = ref({
 });
 const handlePageChange = newPage => {
 	paginationData.value.page = newPage;
+	setRequests();
 };
-
-watch(paginationData.value, () => setRequests());
 
 const addNewRequest = () => {
 	$router.push({ name: 'new-request' });
@@ -97,13 +96,7 @@ const addNewRequest = () => {
 function viewRequestDetails(row) {
 	$router.push({ name: 'request-details', params: { id: row.id } });
 }
-watch(
-	filters,
-	() => {
-		setRequests();
-	},
-	{ deep: true }
-);
+watch(filters, () => setRequests(), { deep: true });
 onMounted(() => {
 	setRequests();
 });

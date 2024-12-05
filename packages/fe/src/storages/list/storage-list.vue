@@ -95,16 +95,10 @@ const paginationData = ref({
 
 const handlePageChange = newPage => {
 	paginationData.value.page = newPage;
+	setStorages();
 };
 
-watch(paginationData.value, () => setStorages());
-watch(
-	filters,
-	() => {
-		setStorages();
-	},
-	{ deep: true }
-);
+watch(filters, () => setStorages(), { deep: true });
 
 onMounted(() => {
 	setStorages();

@@ -148,14 +148,7 @@ const handleSortChange = event => {
 	sortData.value = { [event.prop]: isDescending ? 'desc' : 'asc' };
 	setSubstances();
 };
-watch(paginationData.value, () => setSubstances());
-watch(
-	filters,
-	() => {
-		setSubstances(props.id);
-	},
-	{ deep: true }
-);
+watch(filters, () => setSubstances(props.id), { deep: true });
 
 onMounted(() => {
 	setSubstances(props.id);

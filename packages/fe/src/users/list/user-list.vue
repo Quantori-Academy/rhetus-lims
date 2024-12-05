@@ -11,6 +11,7 @@ import RhFilters from '../../lib/components/rh-filters/rh-filters.vue';
 import UsersFilters from '../users-filters.vue';
 import { debounce } from '../../lib/utils/debounce/debounce.js';
 import { __ } from '../../lib/locales/index.js';
+import RhPagination from '../../lib/components/rh-pagination/rh-pagination.vue';
 
 const users = ref([]);
 const isLoading = ref(false);
@@ -18,6 +19,16 @@ const filters = ref({
 	role: '',
 	lastLogin: []
 });
+const pagination = ref({
+	page: 1,
+	size: 10,
+	totalElements: 0
+});
+
+const handlePageChange = newPage => {
+	pagination.value.page = newPage;
+	setUsers();
+};
 
 function addNewUser() {
 	$router.push({ name: 'new-user' });
@@ -71,13 +82,7 @@ const setUsers = debounce(async () => {
 	}
 }, 200);
 
-watch(
-	filters,
-	() => {
-		setUsers();
-	},
-	{ deep: true }
-);
+watch(filters, () => setUsers(), { deep: true });
 
 onMounted(() => {
 	setUsers();
@@ -136,6 +141,7 @@ onMounted(() => {
 				</template>
 			</el-table-column>
 		</el-table>
+		<rh-pagination :pagination="pagination" @change-page="handlePageChange" />
 	</div>
 </template>
 
