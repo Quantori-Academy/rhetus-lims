@@ -15,6 +15,8 @@ const analytics = ref({
 });
 
 function initChart() {
+	if (!chartRef.value) return;
+
 	const chartInstance = echarts.init(chartRef.value);
 
 	const options = {
