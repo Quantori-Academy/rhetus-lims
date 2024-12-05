@@ -8,8 +8,7 @@ import {
 	ElDatePicker,
 	ElInputNumber,
 	ElSelect,
-	ElOption,
-	ElMessageBox
+	ElOption
 } from 'element-plus';
 import { computed, ref, onMounted, inject } from 'vue';
 import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg.js';
@@ -22,7 +21,7 @@ import { quantityUnits } from '../lib/constants/quantity-units.js';
 import KetcherEditor from '../ketcher-editor/ketcher-editor.vue';
 import { __ } from '../lib/locales/index.js';
 import TimelineStatuses from '../timeline/timeline-statuses.vue';
-
+import { $promptInputBox } from '../lib/utils/feedback/prompt-box';
 const props = defineProps({ id: { type: String, default: null } });
 
 const { isOfficer } = inject('user');
@@ -77,15 +76,12 @@ const cancelRequest = async () => {
 			cancelButtonText: 'No',
 			type: 'warning'
 		});
-		await ElMessageBox.prompt('Please, provide a reason', 'Warning', {
-			confirmButtonText: 'Ok',
-			cancelButtonText: 'Cancel',
-			inputPattern: /\S+/,
-			inputErrorMessage: 'Reason is required'
-		}).then(({ value }) => {
-			const response = $api.requests.cancelRequest(props.id, { reason: value });
-			$notify({ title: 'Success', message: response.message, type: 'success' });
+		const reason = await $promptInputBox({
+			message: 'Please, provide a reason',
+			error: 'Reason is required'
 		});
+		const response = await $api.requests.cancelRequest(props.id, { reason: reason.value });
+		$notify({ title: 'Success', message: response.message, type: 'success' });
 		setRequest(props.id);
 		setStatusesHistory();
 	} catch (error) {
