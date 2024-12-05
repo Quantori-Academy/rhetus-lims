@@ -93,7 +93,7 @@ const { user, isResearcher, isOfficer } = inject('user');
 	height: 100%;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 900px) {
 	.container {
 		padding: 8px;
 	}

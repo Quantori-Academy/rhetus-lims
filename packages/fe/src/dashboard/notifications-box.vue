@@ -66,14 +66,17 @@ onMounted(() => {
 
 		.footer {
 			display: flex;
+			flex-wrap: wrap;
 			justify-content: space-between;
 			align-items: center;
+			gap: 4px;
 			margin-top: 8px;
 		}
 
 		.time {
 			opacity: 0.6;
 			text-align: end;
+			white-space: nowrap;
 			font-size: smaller;
 		}
 	}
