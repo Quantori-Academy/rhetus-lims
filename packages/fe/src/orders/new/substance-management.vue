@@ -18,7 +18,7 @@ import { $api } from '../../lib/api/index.js';
 import NewSubstance from './new-substance.vue';
 import { quantityUnits } from '../../lib/constants/quantity-units.js';
 import { fieldRules, numberFieldRules } from './constants.js';
-import { __ } from '../lib/locales/index.js';
+import { __ } from '../../lib/locales/index.js';
 
 const props = defineProps({
 	form: { type: Object, default: null },
@@ -118,7 +118,7 @@ const fetchRequestSuggestions = async (queryString, callback) => {
 	<div class="data-table">
 		<h2 class="el-form-item__label">{{ __('Substances to order') }}</h2>
 		<div class="orders-container" max-height="350">
-			<div class="row">
+			<div class="row__order_creation">
 				<span class="mobile">{{ __('Name') }}</span>
 				<span class="mobile">{{ __('Unit') }}</span>
 				<span class="mobile">{{ __('Quantity') }}</span>
