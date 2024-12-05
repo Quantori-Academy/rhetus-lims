@@ -26,7 +26,7 @@ async function getAnalytics() {
 			analytics.value.total = total;
 			const now = new Date();
 			const totalAge = substances.reduce((sum, substance) => {
-				if (substance.expirationDate || substance.expirationDate.trim() === '')
+				if (substance.expirationDate && substance.expirationDate.trim() !== '')
 					return sum + differenceInDays(new Date(substance.expirationDate), now);
 				return sum;
 			}, 0);
