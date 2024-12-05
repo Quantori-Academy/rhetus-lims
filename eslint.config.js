@@ -13,7 +13,8 @@ export default [
 			'packages/auto-mention-action',
 			'packages/fe/src/lib/router/routes.js',
 			'packages/fe/public/ketcher',
-			'packages/fe/src/orders/details/order-details.vue'
+			'packages/fe/src/orders/details/order-details.vue',
+			'packages/fe/src/orders/new/add-new-order.vue'
 		]
 	},
 	{ languageOptions: { globals: { ...globals.browser, ...globals.node } } },

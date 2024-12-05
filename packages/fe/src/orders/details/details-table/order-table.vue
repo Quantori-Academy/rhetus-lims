@@ -29,12 +29,12 @@ const emit = defineEmits([
 	'submit-substances',
 	'add-new-reagent',
 	'add-existing-reagent',
-	'substance-refs'
+	'substance-refs',
+	'validate-reagent-pending'
 ]);
 
-const handleSubstanceRefs = refs => {
-	emit('substance-refs', refs);
-};
+const handleSubstanceRefs = refs => emit('substance-refs', refs);
+const validateReagentPending = status => emit('validate-reagent-pending', status);
 const removeLinkedRequest = selectedRequest => emit('remove-linked-request', selectedRequest);
 const setOrder = id => emit('set-order', id);
 const removeReagent = selectedReagent => emit('remove-reagent', selectedReagent);
@@ -46,7 +46,7 @@ const updateItem = (tempId, type, field, newValue) =>
 </script>
 
 <template>
-	<div class="data-table">
+	<div class="order-data-table">
 		<h2>{{ __('Substances to order') }}</h2>
 		<div class="orders-container" max-height="350">
 			<div class="row__orders">
@@ -71,6 +71,7 @@ const updateItem = (tempId, type, field, newValue) =>
 				:is-reagent-added="isReagentAdded"
 				@add-new-reagent="addNewReagent"
 				@add-existing-reagent="addExistingReagent"
+				@validate-reagent-pending="validateReagentPending"
 			/>
 			<div v-if="isEdit" class="btn-container">
 				<el-button type="primary" :disabled="!isReagentAdded" @click="submitSubstances">{{
@@ -101,11 +102,12 @@ const updateItem = (tempId, type, field, newValue) =>
 	gap: 10px;
 	width: 100%;
 }
-.data-table {
+.order-data-table {
 	margin-top: 20px;
 	width: 100%;
 }
-.data-table h2 {
+
+.order-data-table h2 {
 	padding-bottom: 10px;
 	font-weight: 700;
 	font-size: 14px;

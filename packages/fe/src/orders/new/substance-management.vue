@@ -51,13 +51,14 @@ const emit = defineEmits([
 	'add-existing-reagent',
 	'submit',
 	'cancel-form',
-	'update-item'
+	'update-item',
+	'validate-reagent-pending'
 ]);
 
 onMounted(() => {
 	fetchRequests();
 });
-
+const validateReagentPending = status => emit('validate-reagent-pending', status);
 const removeReagent = (id, type) => emit('remove-reagent', id, type);
 const addNewReagent = newReagent => emit('add-new-reagent', newReagent);
 const addExistingReagent = selectedReagent => emit('add-existing-reagent', selectedReagent);
@@ -115,7 +116,7 @@ const fetchRequestSuggestions = async (queryString, callback) => {
 		@link-request="linkRequest"
 		@fetch-suggestions="fetchRequestSuggestions"
 	/>
-	<div class="data-table">
+	<div class="order-data-table">
 		<h2 class="el-form-item__label">{{ __('Substances to order') }}</h2>
 		<div class="orders-container" max-height="350">
 			<div class="row__order_creation">
@@ -238,6 +239,7 @@ const fetchRequestSuggestions = async (queryString, callback) => {
 				:combined-items="combinedItems"
 				@add-new-reagent="addNewReagent"
 				@add-existing-reagent="addExistingReagent"
+				@validate-reagent-pending="validateReagentPending"
 			/>
 		</div>
 		<div class="btn-container">

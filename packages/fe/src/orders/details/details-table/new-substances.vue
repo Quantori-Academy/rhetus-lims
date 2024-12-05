@@ -8,7 +8,7 @@ import {
 	ElInputNumber,
 	ElAutocomplete
 } from 'element-plus';
-import { defineProps, useTemplateRef, ref, onMounted, computed } from 'vue';
+import { defineProps, useTemplateRef, ref, onMounted, computed, watch } from 'vue';
 import { $isFormValid } from '../../../lib/utils/form-validation/is-form-valid.js';
 import RhIcon from '../../../lib/components/rh-icon.vue';
 import { quantityUnits } from '../../../lib/constants/quantity-units.js';
@@ -37,12 +37,30 @@ const newReagentEl = useTemplateRef('new-reagent-el');
 const newSubstance = ref(newSubstanceRef);
 const rules = ref(newSubstanceRules);
 const suggestedSubstances = ref([]);
+const isReagentPending = computed(() => newSubstance.value.reagentName.trim() !== '');
+
 const reagentName = computed({
 	get: () => searchQuery.value,
 	set: value => (searchQuery.value = newSubstance.value.reagentName = value)
 });
 
-const emit = defineEmits(['add-new-reagent', 'add-existing-reagent']);
+watch(
+	() => isReagentPending.value,
+	newVal => {
+		emit('validate-reagent-pending', newVal);
+	}
+);
+watch(
+	() => props.isEdit,
+	newVal => {
+		if (!newVal) {
+			newSubstance.value = { ...newSubstanceRef };
+			searchQuery.value = '';
+			newReagentEl.value?.resetFields?.();
+		}
+	}
+);
+const emit = defineEmits(['add-new-reagent', 'add-existing-reagent', 'validate-reagent-pending']);
 
 onMounted(() => {
 	fetchSubstances();
@@ -125,6 +143,7 @@ const addNewReagent = async () => {
 			<span class="desktop">{{ __('Name') }}</span>
 			<el-autocomplete
 				v-model="reagentName"
+				clearable
 				:placeholder="__('Add new reagents')"
 				:fetch-suggestions="fetchSubstanceSuggestions"
 				@select="addExistingReagent"

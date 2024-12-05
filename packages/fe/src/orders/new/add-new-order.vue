@@ -9,6 +9,7 @@ import SubstanceManagement from './substance-management.vue';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 import { onBeforeRouteLeave } from 'vue-router';
 import { __ } from '../../lib/locales/index.js';
+import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
 
 const formEl = useTemplateRef('form-el');
 const isSaving = ref(false);
@@ -16,6 +17,7 @@ const loading = ref(false);
 const form = ref(formRef);
 const rules = ref(formRules);
 const linkedRequests = ref([]);
+const isReagentPending = ref(false);
 const isRequest = computed(() => $route.value.name === 'new-order-request');
 
 onMounted(() => {
@@ -92,9 +94,19 @@ const removeReagent = (id, type) => {
 	}
 };
 async function submit() {
-	if (!(await $isFormValid(formEl))) return;
-	isSaving.value = true;
 	try {
+		if (!(await $isFormValid(formEl))) return;
+		if (isReagentPending.value) {
+			await $confirm(
+				__(`You didn't add the filled-out reagent to the list, are you sure you want to proceed?`),
+				'Warning',
+				{
+					confirmButtonText: 'OK',
+					type: 'warning'
+				}
+			);
+		}
+		isSaving.value = true;
 		const body = {
 			title: form.value.title,
 			seller: form.value.seller,
@@ -106,10 +118,11 @@ async function submit() {
 		$notify({ message: response.message, type: 'success' });
 		$router.push({ name: 'orders-list' });
 	} catch (error) {
-		$notifyUserAboutError(error);
+		if (!['cancel', 'close'].includes(error)) {
+			$notifyUserAboutError(error);
+		}
 	} finally {
 		isSaving.value = false;
-		resetForm();
 	}
 }
 const resetForm = () => {
@@ -151,6 +164,9 @@ const updateItem = ({ id, type, field, newValue }) => {
 		$notifyUserAboutError(`Item not found`);
 	}
 };
+const validateReagentPending = status => {
+	isReagentPending.value = status;
+};
 </script>
 
 <template>
@@ -174,6 +190,7 @@ const updateItem = ({ id, type, field, newValue }) => {
 				@submit="submit"
 				@cancel-form="cancelForm"
 				@update-item="updateItem"
+				@validate-reagent-pending="validateReagentPending"
 			/>
 		</el-form>
 	</div>
@@ -209,10 +226,7 @@ const updateItem = ({ id, type, field, newValue }) => {
 	gap: 10px;
 	width: 100%;
 }
-.data-table {
-	margin-top: 20px;
-	width: 100%;
-}
+
 .btn-container {
 	display: flex;
 	gap: 1rem;

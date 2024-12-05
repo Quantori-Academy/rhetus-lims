@@ -1,5 +1,5 @@
 <script setup>
-import { ref, useTemplateRef, onMounted, computed } from 'vue';
+import { ref, useTemplateRef, onMounted, computed, watch } from 'vue';
 import {
 	ElForm,
 	ElButton,
@@ -26,11 +26,20 @@ const newSubstance = ref(newSubstanceRef);
 const rules = ref(newSubstanceRules);
 const searchQuery = ref('');
 const suggestedSubstances = ref([]);
-const emit = defineEmits(['add-new-reagent', 'add-existing-reagent']);
+const isReagentPending = computed(() => newSubstance.value.reagentName.trim() !== '');
 const reagentName = computed({
 	get: () => searchQuery.value,
 	set: value => (searchQuery.value = newSubstance.value.reagentName = value)
 });
+const emit = defineEmits(['add-new-reagent', 'add-existing-reagent', 'validate-reagent-pending']);
+
+watch(
+	() => isReagentPending.value,
+	newVal => {
+		emit('validate-reagent-pending', newVal);
+	}
+);
+
 onMounted(() => {
 	fetchSubstances();
 });
@@ -112,6 +121,7 @@ const fetchSubstanceSuggestions = async (queryString, callback) => {
 			<span class="desktop">{{ __('Name') }}</span>
 			<el-autocomplete
 				v-model="reagentName"
+				clearable
 				:placeholder="__('Search for reagents')"
 				popper-class="my-autocomplete"
 				:fetch-suggestions="fetchSubstanceSuggestions"

@@ -40,7 +40,7 @@ const cancelEdit = () => {
 };
 const deleteOrder = async () => {
 	try {
-		await $confirm('Do you want to delete this order?', 'Warning', {
+		await $confirm(__('Are you sure you want to delete this order?'), 'Warning', {
 			confirmButtonText: 'OK',
 			cancelButtonText: 'Cancel',
 			type: 'warning'

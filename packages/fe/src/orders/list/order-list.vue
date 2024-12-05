@@ -40,11 +40,15 @@ function editOrder(id) {
 }
 async function deleteOrder(id) {
 	try {
-		await $confirm('Are you sure you want to delete this order?', 'Please, confirm your action', {
-			confirmButtonText: 'Delete',
-			cancelButtonText: 'Cancel',
-			type: 'warning'
-		});
+		await $confirm(
+			__('Are you sure you want to delete this order?'),
+			__('Please, confirm your action'),
+			{
+				confirmButtonText: 'Delete',
+				cancelButtonText: 'Cancel',
+				type: 'warning'
+			}
+		);
 		const response = await $api.orders.deleteOrder(id);
 		$notify({
 			title: 'Success',
