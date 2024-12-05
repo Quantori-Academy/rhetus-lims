@@ -15,7 +15,8 @@ import RhIcon from '../lib/components/rh-icon.vue';
 const { isOfficer } = inject('user');
 const substances = ref([]);
 const sortData = ref({});
-const isLoading = ref(false);
+const isLoading = ref(true);
+const ketcherFrame = ref(null);
 const filters = ref({
 	name: '',
 	quantity: null,
@@ -98,10 +99,23 @@ const setSubstances = debounce(async () => {
 			deleted: deleted ? 'true' : 'false'
 		}
 	};
+	const ketcher = ketcherFrame.value.contentWindow.ketcher;
+	const opts = { outputFormat: 'svg' };
 	try {
 		const { substances: substancesData, count } = await $api.substances.fetchSubstances(params);
-		substances.value = substancesData;
-		pagination.value.totalElements = count;
+		substances.value = await Promise.all(
+			substancesData.map(async substance => {
+				const ketcherImage = substance.structure.length
+					? await ketcher.generateImage(substance.structure, opts)
+					: null;
+				return {
+					...substance,
+					imageUrl: ketcherImage ? URL.createObjectURL(ketcherImage) : ''
+				};
+			})
+		);
+
+		paginationData.value.totalElements = count;
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {
@@ -162,8 +176,17 @@ onMounted(() => {
 			</el-table-column>
 			<el-table-column prop="name" min-width="150" :label="__('Name')" sortable />
 			<el-table-column prop="category" min-width="120" :label="__('Category')" sortable />
-			<el-table-column prop="structure" min-width="120" :label="__('Structure')" sortable />
-			<el-table-column prop="description" min-width="160" :label="__('Description')" />
+			<el-table-column prop="structure" min-width="120" :label="__('Structure')" sortable>
+				<template #default="{ row }">
+					<img
+						v-if="row.imageUrl"
+						:src="row.imageUrl"
+						alt="Structure Image"
+						width="80"
+						height="80"
+					/>
+				</template>
+			</el-table-column>
 			<el-table-column prop="quantityLeft" min-width="120" :label="__('Quantity left')">
 				<template #default="{ row }">{{ row.quantityLeft }} {{ row.quantityUnit }}</template>
 			</el-table-column>
@@ -187,7 +210,17 @@ onMounted(() => {
 				</template>
 			</el-table-column>
 		</el-table>
-		<rh-pagination :pagination="pagination" @change-page="handlePageChange" />
+		<rh-pagination :pagination="paginationData" @change-page="handlePageChange" />
+		<div class="ketcher-editor">
+			<iframe
+				ref="ketcherFrame"
+				src="/ketcher/index.html"
+				width="100%"
+				height="100%"
+				frameborder="0"
+				allowfullscreen
+			></iframe>
+		</div>
 	</div>
 </template>
 
@@ -199,6 +232,10 @@ onMounted(() => {
 .reagent__action-buttons {
 	display: flex;
 	flex-direction: row;
+}
+
+.ketcher-editor {
+	display: none;
 }
 
 ::v-deep .el-table__header-wrapper .cell {
