@@ -127,7 +127,6 @@ onMounted(() => {
 		>
 			<el-table-column prop="room" min-width="150" :label="__('Room')" sortable />
 			<el-table-column prop="name" min-width="150" :label="__('Name')" sortable />
-			<el-table-column prop="description" min-width="200" :label="__('Description')" />
 			<el-table-column
 				prop="creationDate"
 				min-width="200"
