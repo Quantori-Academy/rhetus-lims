@@ -19,8 +19,8 @@ const user = inject('user');
 const filters = ref({
 	reagentName: '',
 	status: '',
-	creationRange: [],
-	updateRange: []
+	createdAt: [],
+	updatedAt: []
 });
 function createQuery(event) {
 	let query = {};
@@ -118,7 +118,7 @@ onMounted(() => {
 			@sort-change="setRequests"
 			@row-click="viewRequestDetails"
 		>
-			<el-table-column prop="status" width="90" :label="__('Status')" sortable />
+			<el-table-column prop="status" width="100" :label="__('Status')" sortable />
 			<el-table-column prop="reagentName" min-width="120" :label="__('Reagent name')" sortable />
 			<el-table-column prop="quantity" :label="__('Quantity')" sortable>
 				<template #default="{ row }"> {{ row.quantity }} {{ row.quantityUnit }} </template>

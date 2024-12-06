@@ -19,7 +19,7 @@ const statuses = Object.values(Statuses);
 	</filter-item>
 	<filter-item>
 		<el-date-picker
-			v-model="filters.creationRange"
+			v-model="filters.createdAt"
 			type="daterange"
 			range-separator="-"
 			:start-placeholder="__('Created from')"
@@ -30,7 +30,7 @@ const statuses = Object.values(Statuses);
 	</filter-item>
 	<filter-item>
 		<el-date-picker
-			v-model="filters.updateRange"
+			v-model="filters.updatedAt"
 			type="daterange"
 			range-separator="-"
 			:start-placeholder="__('Updated from')"
