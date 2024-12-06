@@ -2,6 +2,7 @@
 import { ElForm, ElInput, ElButton, ElFormItem } from 'element-plus';
 import { ref } from 'vue';
 import { $api } from '../lib/api/index.js';
+import { $router } from '../lib/router/router';
 import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg.js';
 import { __ } from '../lib/locales/';
 
@@ -24,6 +25,7 @@ async function resetPassword(form) {
 			message: response.message,
 			type: 'success'
 		});
+		$router.push({ name: 'login' });
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {

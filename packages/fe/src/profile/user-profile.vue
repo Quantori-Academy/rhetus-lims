@@ -49,6 +49,8 @@ const editHandler = async () => {
 			message: 'Profile updated',
 			type: 'success'
 		});
+		resetPassForm.value.resetFields();
+		$router.push({ name: 'user-profile' });
 	} catch (err) {
 		$notifyUserAboutError(err);
 	}
@@ -61,7 +63,7 @@ const passwordChangeHandler = async () => {
 		await $confirm('Are you sure you want to reset your password?', 'Change password?', {
 			type: 'warning'
 		});
-		const res = await $api.auth.resetPassword(profile.value.id, {
+		const res = await $api.auth.resetPassword({
 			password: passwords.value.password
 		});
 		$notify({
@@ -70,6 +72,7 @@ const passwordChangeHandler = async () => {
 			type: 'success'
 		});
 		resetPassForm.value.resetFields();
+		$router.push({ name: 'user-profile' });
 	} catch (error) {
 		if (!['cancel', 'close'].includes(error)) {
 			this.$notifyUserAboutError(error);
