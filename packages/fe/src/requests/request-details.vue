@@ -21,14 +21,14 @@ import { quantityUnits } from '../lib/constants/quantity-units.js';
 import KetcherEditor from '../ketcher-editor/ketcher-editor.vue';
 import { __ } from '../lib/locales/index.js';
 import TimelineStatuses from '../timeline/timeline-statuses.vue';
-
+import { $promptInputBox } from '../lib/utils/feedback/prompt-box';
 const props = defineProps({ id: { type: String, default: null } });
 
-const { isOfficer, isResearcher } = inject('user');
-
+const { isOfficer } = inject('user');
 const loading = ref(false);
 const request = ref(emptyRequest);
 const isEdit = computed(() => $route.value.name === 'request-details-edit');
+const user = inject('user');
 
 const showPoMessage = computed(
 	() => request.value.status === Statuses.CANCELED && request.value.poComment && !isEdit.value
@@ -44,7 +44,7 @@ async function setRequest(id) {
 	try {
 		request.value = await $api.requests.fetchRequest(id);
 	} catch (error) {
-		$notifyUserAboutError(error.message || 'Error fetching request');
+		$notifyUserAboutError(error.message || __('Error fetching request'));
 	} finally {
 		loading.value = false;
 	}
@@ -56,33 +56,38 @@ const cancelEdit = () => {
 
 const handleSubmit = async () => {
 	try {
-		await $api.requests.updateRequest(request.value.id, request.value);
-		$notify({
-			title: 'Success',
-			message: 'Request has been updated',
-			type: 'success'
-		});
+		const response = await $api.requests.updateRequest(request.value.id, request.value);
+		response &&
+			$notify({
+				title: __('Success'),
+				message: __('Request has been updated'),
+				type: 'success'
+			});
 
 		$router.push({ name: 'request-details', params: { id: request.value.id } });
 	} catch (error) {
-		$notifyUserAboutError(error.message || 'Error updating request');
+		$notifyUserAboutError(error.message || __('Error updating request'));
 	}
 };
 
-const deleteRequest = async () => {
+const cancelRequest = async () => {
 	try {
-		await $confirm('Do you want to delete this request?', 'Warning', {
-			confirmButtonText: 'OK',
-			cancelButtonText: 'Cancel',
-			type: 'warning'
+		await $confirm(
+			__('Are you sure you want to cancel the request?'),
+			__('Please, confirm your action'),
+			{
+				confirmButtonText: __('Yes'),
+				cancelButtonText: __('No'),
+				type: 'warning'
+			}
+		);
+		const reason = await $promptInputBox({
+			message: __('Please, provide a reason'),
+			error: __('Reason is required')
 		});
-		await $api.requests.cancelRequest(props.id);
-		$notify({
-			title: 'Success',
-			message: 'Request has been deleted',
-			type: 'success'
-		});
-		$router.push({ name: 'requests-list' });
+		const response = await $api.requests.cancelRequest(props.id, { reason: reason.value });
+		$notify({ title: __('Success'), message: __(response.message), type: 'success' });
+		setRequest(props.id);
 		setStatusesHistory();
 	} catch (error) {
 		if (!['cancel', 'close'].includes(error)) {
@@ -97,7 +102,7 @@ const setStatusesHistory = async () => {
 		const data = await $api.requests.fetchRequestsHistory(props.id);
 		statusesHistory.value = data.histories;
 	} catch (error) {
-		$notifyUserAboutError(error.message || 'Error getting history');
+		$notifyUserAboutError(error.message || __('Error getting history'));
 	} finally {
 		loading.value = false;
 	}
@@ -120,8 +125,20 @@ onMounted(() => {
 				</span>
 			</h2>
 			<div v-if="!isEdit && request.status !== Statuses.CANCELED" class="top-button-container">
-				<el-button type="primary" @click="toggleEdit">{{ __('Edit') }}</el-button>
-				<el-button type="danger" @click="deleteRequest"> {{ __('Cancel Request') }} </el-button>
+				<el-button
+					type="primary"
+					:disabled="request.status !== Statuses.PENDING"
+					@click="toggleEdit"
+					>{{ __('Edit') }}</el-button
+				>
+				<el-button
+					v-if="isOfficer"
+					type="danger"
+					:disabled="request.status !== Statuses.PENDING"
+					@click="cancelRequest"
+				>
+					{{ __('Cancel Request') }}
+				</el-button>
 			</div>
 		</div>
 		<div v-if="showPoMessage" class="po-message">
@@ -174,11 +191,11 @@ onMounted(() => {
 				<el-input
 					v-model="request.userComment"
 					type="textarea"
-					:disabled="!isEdit || isResearcher"
+					:disabled="!isEdit || !(request.author.username === user?.user?.value?.username)"
 				/>
 			</el-form-item>
 			<el-form-item :label="__('Procurement Comments')" prop="poComment">
-				<el-input v-model="request.poComment" type="textarea" :disabled="!isEdit || isOfficer" />
+				<el-input v-model="request.poComment" type="textarea" :disabled="!isEdit || !isOfficer" />
 			</el-form-item>
 			<div class="align-horizontal">
 				<el-form-item :label="__('Creation Date')" prop="createdAt">
@@ -238,5 +255,11 @@ onMounted(() => {
 	.po-message-prefix {
 		font-weight: 500;
 	}
+}
+
+.el-button.el-button--primary.is-disabled,
+.el-button.el-button--primary.is-disabled:hover {
+	border-color: #92d6ee;
+	background-color: #92d6ee;
 }
 </style>
