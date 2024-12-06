@@ -5,10 +5,30 @@ const requiredRule = {
 	message: __('Please enter a value'),
 	trigger: ['blur', 'change']
 };
+export const notEmptyArrayRule = {
+	validator: (_, value) => {
+		if (value.length === 0) {
+			return Promise.reject(new Error(`You can't create a sample without substances`));
+		}
+		return Promise.resolve();
+	},
+	trigger: ['submit']
+};
+export const formRef = {
+	name: '',
+	components: [],
+	quantityUnit: '',
+	quantity: 1,
+	quantityLeft: 1,
+	expirationDate: '',
+	storageId: '',
+	structure: '',
+	description: ''
+};
 
 export const formRules = {
 	name: [requiredRule],
-	components: [requiredRule],
+	components: [notEmptyArrayRule],
 	quantityUnit: [requiredRule],
 	quantity: [
 		requiredRule,
@@ -25,14 +45,6 @@ export const formRules = {
 	],
 	expirationDate: [requiredRule],
 	storageId: [requiredRule],
-	structure: [requiredRule]
-};
-
-export const emptyComponent = {
-	id: '',
-	label: __('Select substance'),
-	quantityUsed: 0,
-	quantityLeft: 0,
-	quantityUnit: '',
-	category: ''
+	structure: [requiredRule],
+	expirationDate: [requiredRule]
 };

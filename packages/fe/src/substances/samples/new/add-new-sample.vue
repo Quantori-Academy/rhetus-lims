@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, useTemplateRef } from 'vue';
+import { computed, onMounted, ref, useTemplateRef } from 'vue';
 import {
 	ElInput,
 	ElForm,
@@ -15,32 +15,35 @@ import { $isFormValid } from '../../../lib/utils/form-validation/is-form-valid';
 import { $router } from '../../../lib/router/router';
 import { $notify, $notifyUserAboutError } from '../../../lib/utils/feedback/notify-msg';
 import { $api } from '../../../lib/api';
-import { emptyComponent, formRules } from './constants';
+import { formRef, formRules } from './constants';
 import RhIcon from '../../../lib/components/rh-icon.vue';
 import KetcherEditor from '../../../ketcher-editor/ketcher-editor.vue';
 import { __ } from '../../../lib/locales';
+import ComponentOptions from './component-options.vue';
+import SelectedComponents from './selected-components.vue';
 
 const storages = ref([]);
-
 const formEl = useTemplateRef('form-el');
-const form = ref({
-	name: '',
-	components: [emptyComponent],
-	quantityUnit: '',
-	quantity: 1,
-	quantityLeft: 1,
-	expirationDate: '',
-	storageId: '',
-	structure: '',
-	description: ''
-});
-
+const form = ref(formRef);
 const rules = ref(formRules);
 const isSaving = ref(false);
+const resetSelects = ref(false);
+const selectedOption = ref(null);
+const selectedQuantity = ref(0);
+const allSubstances = ref([]);
+const componentOptions = ref([]);
+const futureQuantity = computed(() => {
+	const currentQuantity = selectedOption.value?.quantityLeft || 0;
+	const quantityUsed = selectedQuantity.value || 0;
+	return Math.max(0, currentQuantity - quantityUsed);
+});
 
+onMounted(() => {
+	setComponents();
+	setStorages();
+});
 async function submit() {
 	if (!(await $isFormValid(formEl))) return;
-
 	isSaving.value = true;
 	try {
 		const response = await $api.substances.addSubstance({
@@ -72,20 +75,23 @@ const removeComponent = index => {
 };
 
 const addComponent = () => {
-	form.value.components.push(emptyComponent);
+	if (selectedOption.value && selectedQuantity.value > 0) {
+		const componentToAdd = {
+			...selectedOption.value,
+			quantityUsed: selectedQuantity.value
+		};
+		form.value.components = [...form.value.components, componentToAdd];
+		selectedOption.value = null;
+		selectedQuantity.value = 0;
+		resetSelects.value = !resetSelects.value;
+	}
 };
-
-const allSubstances = ref([]);
-const componentOptions = ref([]);
 
 function filterComponents(query) {
 	componentOptions.value = allSubstances.value
 		.filter(component => component.label.toLowerCase().includes(query.toLowerCase()))
 		.slice(0, 50);
 }
-
-const isOptionChosen = option =>
-	!form.value.components.some(component => component.id === option.id);
 
 async function setComponents() {
 	try {
@@ -94,11 +100,11 @@ async function setComponents() {
 			id: x.id,
 			label: `${x.name} (${x.storageLocation.room} ${x.storageLocation.name})`,
 			category: x.category,
+			quantity: x.quantity,
 			quantityLeft: x.quantityLeft,
 			quantityUnit: x.quantityUnit,
 			quantityUsed: 0
 		}));
-
 		componentOptions.value = allSubstances.value.slice(0, 50);
 	} catch (error) {
 		$notifyUserAboutError(error);
@@ -113,10 +119,12 @@ async function setStorages() {
 	}
 }
 
-onMounted(() => {
-	setComponents();
-	setStorages();
-});
+const getSelectedOption = val => {
+	selectedOption.value = val;
+};
+const getSelectedQuantity = val => {
+	selectedQuantity.value = val;
+};
 </script>
 
 <template>
@@ -125,61 +133,25 @@ onMounted(() => {
 			<el-form-item :label="__('Name')" prop="name">
 				<el-input v-model="form.name" :placeholder="__('Enter sample name')" />
 			</el-form-item>
-
-			<el-form-item :label="__('Substances used')" prop="components">
-				<div
-					v-for="(component, index) of form.components"
-					:key="component.id + index"
-					:prop="'components.' + index + '.id'"
-					class="align-horizontal w-full"
-				>
-					<el-select
-						v-model="form.components[index]"
-						value-key="id"
-						filterable
-						remote
-						:remote-method="filterComponents"
-					>
-						<el-option
-							v-for="item of componentOptions"
-							:key="item.id"
-							:label="`${item.label}`"
-							:value="item"
-							:disabled="!isOptionChosen(item)"
-						>
-							<div class="category-icons">
-								<rh-icon
-									:name="item.category.toLowerCase() === 'reagent' ? 'pod' : 'applications'"
-								/>
-								<span>{{ item.label }}</span>
-							</div>
-						</el-option>
-					</el-select>
-					<div class="w-full">
-						<el-input-number
-							v-model="component.quantityUsed"
-							:min="0"
-							:label="__('Quantity used')"
-							:placeholder="__('Enter quantity used')"
-						>
-							<template #suffix>
-								{{ component.quantityUnit }}
-							</template>
-						</el-input-number>
-						<div class="subscript">
-							{{ __('Future quantity') }}: {{ component.quantityLeft - component.quantityUsed }}
-							{{ component.quantityUnit }}
-						</div>
-					</div>
-					<el-button type="danger" @click="() => removeComponent(index)">
-						<rh-icon color="white" name="remove" />
-					</el-button>
-				</div>
+			<el-form-item :label="__('Add components')" prop="components">
+				<component-options
+					:future-quantity="futureQuantity"
+					:component-options="componentOptions"
+					:reset-selects="resetSelects"
+					:form="form"
+					@get-selected-option="getSelectedOption"
+					@get-selected-quantity="getSelectedQuantity"
+					@add-component="addComponent"
+					@filter-components="filterComponents"
+				/>
 			</el-form-item>
-			<div class="add-btn">
-				<el-button @click="addComponent">{{ __('Add component') }}</el-button>
-			</div>
-
+			<el-form-item
+				v-if="form.components.length > 0"
+				:label="__('Components used')"
+				prop="components"
+			>
+				<selected-components :form="form" @remove-component="removeComponent" />
+			</el-form-item>
 			<div class="align-horizontal">
 				<el-form-item :label="__('Quantity unit')" prop="quantityUnit">
 					<el-select v-model="form.quantityUnit" filterable :placeholder="__('Select a unit')">
@@ -234,22 +206,11 @@ onMounted(() => {
 	</div>
 </template>
 
-<style>
-.w-full {
+<style scoped>
+:deep(.el-input-number) {
 	width: 100%;
 }
-.subscript {
-	opacity: 0.6;
-	font-size: small;
-}
-.add-btn {
-	margin-top: -12px;
-	margin-bottom: 12px;
-	text-align: end;
-}
-@media (max-width: 768px) {
-	.w-full {
-		margin-bottom: 12px;
-	}
+.el-form-item__content {
+	gap: 10px;
 }
 </style>
