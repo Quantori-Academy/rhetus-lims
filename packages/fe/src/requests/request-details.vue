@@ -44,7 +44,7 @@ async function setRequest(id) {
 	try {
 		request.value = await $api.requests.fetchRequest(id);
 	} catch (error) {
-		$notifyUserAboutError(error.message || 'Error fetching request');
+		$notifyUserAboutError(error.message || __('Error fetching request'));
 	} finally {
 		loading.value = false;
 	}
@@ -57,31 +57,36 @@ const cancelEdit = () => {
 const handleSubmit = async () => {
 	try {
 		const response = await $api.requests.updateRequest(request.value.id, request.value);
-		$notify({
-			title: response.status.charAt(0).toUpperCase() + response.status.slice(1),
-			message: response.message || __('Request has been updated'),
-			type: response.status
-		});
+		response &&
+			$notify({
+				title: __('Success'),
+				message: __('Request has been updated'),
+				type: 'success'
+			});
 
 		$router.push({ name: 'request-details', params: { id: request.value.id } });
 	} catch (error) {
-		$notifyUserAboutError(error.message || 'Error updating request');
+		$notifyUserAboutError(error.message || __('Error updating request'));
 	}
 };
 
 const cancelRequest = async () => {
 	try {
-		await $confirm('Are you sure you want to cancel the request?', 'Please, confirm your action', {
-			confirmButtonText: 'Yes',
-			cancelButtonText: 'No',
-			type: 'warning'
-		});
+		await $confirm(
+			__('Are you sure you want to cancel the request?'),
+			__('Please, confirm your action'),
+			{
+				confirmButtonText: __('Yes'),
+				cancelButtonText: __('No'),
+				type: 'warning'
+			}
+		);
 		const reason = await $promptInputBox({
-			message: 'Please, provide a reason',
-			error: 'Reason is required'
+			message: __('Please, provide a reason'),
+			error: __('Reason is required')
 		});
 		const response = await $api.requests.cancelRequest(props.id, { reason: reason.value });
-		$notify({ title: 'Success', message: response.message, type: 'success' });
+		$notify({ title: __('Success'), message: __(response.message), type: 'success' });
 		setRequest(props.id);
 		setStatusesHistory();
 	} catch (error) {
@@ -97,7 +102,7 @@ const setStatusesHistory = async () => {
 		const data = await $api.requests.fetchRequestsHistory(props.id);
 		statusesHistory.value = data.histories;
 	} catch (error) {
-		$notifyUserAboutError(error.message || 'Error getting history');
+		$notifyUserAboutError(error.message || __('Error getting history'));
 	} finally {
 		loading.value = false;
 	}
