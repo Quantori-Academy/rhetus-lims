@@ -19,8 +19,9 @@ import { formRef, formRules } from './constants';
 import RhIcon from '../../../lib/components/rh-icon.vue';
 import KetcherEditor from '../../../ketcher-editor/ketcher-editor.vue';
 import { __ } from '../../../lib/locales';
-import ComponentOptions from './component-options.vue';
+import SuggestedComponents from './suggested-components.vue';
 import SelectedComponents from './selected-components.vue';
+import { onBeforeRouteLeave } from 'vue-router';
 
 const storages = ref([]);
 const formEl = useTemplateRef('form-el');
@@ -57,19 +58,35 @@ async function submit() {
 			}))
 		});
 		$notify({ message: response.message, type: 'success' });
+
 		$router.push({ name: 'substances-list' });
 	} catch (error) {
 		$notifyUserAboutError(error.statusText);
 	} finally {
 		isSaving.value = false;
+		resetForms();
 	}
 }
 
 function cancel() {
-	formEl.value.resetFields();
+	resetForms();
 	$router.push({ name: 'substances-list' });
 }
-
+function resetForms() {
+	form.value = { ...formRef };
+	form.value.components = [];
+	if (formEl.value) {
+		formEl.value.resetFields();
+	}
+}
+onMounted(() => {
+	console.log(form.value);
+	console.log(form.value.components);
+});
+onBeforeRouteLeave((to, from, next) => {
+	resetForms();
+	next();
+});
 const removeComponent = index => {
 	form.value.components.splice(index, 1);
 };
@@ -134,7 +151,7 @@ const getSelectedQuantity = val => {
 				<el-input v-model="form.name" :placeholder="__('Enter sample name')" />
 			</el-form-item>
 			<el-form-item :label="__('Add components')" prop="components">
-				<component-options
+				<suggested-components
 					:future-quantity="futureQuantity"
 					:component-options="componentOptions"
 					:reset-selects="resetSelects"
