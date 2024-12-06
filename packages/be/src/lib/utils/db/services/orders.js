@@ -58,7 +58,7 @@ const orders = {
 			property: schema.orders.title
 		},
 		status: {
-			property: schema.orders.orderStatus
+			property: 'orders.order_status::text'
 		},
 		default: {
 			property: schema.orders.createdAt

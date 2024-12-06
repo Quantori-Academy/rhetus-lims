@@ -56,7 +56,7 @@ const requests = {
 			property: schema.requests.reagentName
 		},
 		status: {
-			property: schema.requests.requestStatus
+			property: 'requests.request_status::text'
 		},
 		quantity: {
 			property: schema.requests.quantity
