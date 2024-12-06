@@ -70,11 +70,6 @@ const toggleEdit = () => {
 
 const cancelEdit = () => {
 	$router.push({ name: 'user-details', params: { id: user.value.id } });
-	$notify({
-		title: 'Canceled',
-		message: __('User editing canceled'),
-		type: 'info'
-	});
 	user.value = { ...originalUser.value };
 	formEl.value.resetFields();
 };
@@ -82,14 +77,14 @@ const cancelEdit = () => {
 const handleSubmit = async () => {
 	if (!(await $isFormValid(formEl))) return;
 	try {
-		const updatedUser = await $api.users.updateUser(user.value.id, user.value);
-		user.value = updatedUser;
+		await $api.users.updateUser(user.value.id, user.value);
 		$notify({
 			title: 'Success',
 			message: __('User has been updated'),
 			type: 'success'
 		});
 		$router.push({ name: 'user-details', params: { id: user.value.id } });
+		setUser(props.id);
 	} catch (error) {
 		$notifyUserAboutError(error.message || __('Error updating user'));
 	}
