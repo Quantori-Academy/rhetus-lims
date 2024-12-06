@@ -300,7 +300,7 @@ async function reagentsService(server) {
 				.orderBy(schema.substancesHistory.createdAt, 'asc');
 		},
 
-		addStorageToReagentFromOrder: async (reagentId, storageId, userId) => {
+		addStorageToReagentFromOrder: async (reagentId, storageId) => {
 			const storage = await server.storagesService.getStorageById(storageId);
 			if (!storage) {
 				const error = new Error(`No such storage location with id: ${storageId} found`);
@@ -308,20 +308,10 @@ async function reagentsService(server) {
 				throw error;
 			}
 
-			await server.db.transaction(async tx => {
-				await tx
-					.update(schema.reagents)
-					.set({ storageId })
-					.where(eq(schema.reagents.id, reagentId));
-
-				await tx.insert(schema.substancesHistory).values({
-					reagentId,
-					userId,
-					previousStorageId: null,
-					targetStorageId: storageId,
-					actionType: 'storage-update'
-				});
-			});
+			await server.db
+				.update(schema.reagents)
+				.set({ storageId })
+				.where(eq(schema.reagents.id, reagentId));
 		},
 
 		getBaseReagentsQuery: extras => {

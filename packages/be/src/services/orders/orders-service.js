@@ -313,11 +313,7 @@ async function ordersService(server) {
 					await Promise.all(
 						orderedReagents.map(async ({ reagentId }) => {
 							const storageId = reagentsStoragesUpdateMap.get(reagentId);
-							return server.reagentsService.addStorageToReagentFromOrder(
-								reagentId,
-								storageId,
-								userId
-							);
+							return server.reagentsService.addStorageToReagentFromOrder(reagentId, storageId);
 						})
 					);
 
