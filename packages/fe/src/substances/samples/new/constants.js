@@ -23,6 +23,7 @@ export const formRules = {
 			trigger: ['blur', 'change']
 		}
 	],
+	expirationDate: [requiredRule],
 	storageId: [requiredRule],
 	structure: [requiredRule]
 };
