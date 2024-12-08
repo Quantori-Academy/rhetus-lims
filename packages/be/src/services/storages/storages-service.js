@@ -137,7 +137,12 @@ async function storagesService(server) {
 			const result = await server.db
 				.select()
 				.from(schema.storages)
-				.where(and(eq(name, schema.storages.name), eq(room, schema.storages.room)))
+				.where(
+					and(
+						eq(formatMapping.name(name), schema.storages.name),
+						eq(formatMapping.room(room), schema.storages.room)
+					)
+				)
 				.limit(1);
 
 			return result.length > 0;
