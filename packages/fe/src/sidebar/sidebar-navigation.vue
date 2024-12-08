@@ -3,6 +3,7 @@ import { computed, inject } from 'vue';
 import { navigationLink } from './constants.js';
 import { routes } from '../lib/router/routes.js';
 import SidebarNavigationItem from './sidebar-navigation-item.vue';
+import { $router } from '../lib/router/router.js';
 
 const { user } = inject('user');
 
@@ -20,6 +21,17 @@ function hasPermissions(link) {
 const filteredNavigationLinks = computed(() => {
 	return navigationLink.filter(hasPermissions);
 });
+const isActive = link => {
+	if (link?.path && $router.currentRoute.value?.path) {
+		const cleanRoutePath =
+			$router.currentRoute.value.path.split('/')[0] +
+			'/' +
+			$router.currentRoute.value.path.split('/')[1];
+		const cleanLinkPath = link.path.split('/')[0] + '/' + link.path.split('/')[1];
+		return cleanRoutePath.startsWith(cleanLinkPath);
+	}
+	return false;
+};
 </script>
 
 <template>
@@ -29,7 +41,7 @@ const filteredNavigationLinks = computed(() => {
 			<sidebar-navigation-item
 				v-for="link of filteredNavigationLinks"
 				:key="link.name"
-				:is-active="$route.path === link.path"
+				:is-active="isActive(link)"
 				:link="link"
 			/>
 		</ul>
