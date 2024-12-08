@@ -29,7 +29,6 @@ const toggleFilterView = () => {
 
 .filters-container {
 	display: flex;
-	flex-wrap: wrap;
 	justify-content: start;
 	margin: 20px 0 15px 0;
 }
@@ -37,6 +36,11 @@ const toggleFilterView = () => {
 @media (max-width: 748px) {
 	.btn-container {
 		justify-content: start;
+	}
+}
+@media (max-width: 590px) {
+	.filters-container {
+		flex-wrap: wrap;
 	}
 }
 </style>
