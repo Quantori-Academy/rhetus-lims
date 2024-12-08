@@ -98,7 +98,14 @@ const handlePageChange = newPage => {
 	setStorages();
 };
 
-watch(filters, () => setStorages(), { deep: true });
+watch(
+	filters,
+	() => {
+		paginationData.value.page = 1;
+		setStorages();
+	},
+	{ deep: true }
+);
 
 onMounted(() => {
 	setStorages();

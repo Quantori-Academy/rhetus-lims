@@ -96,7 +96,14 @@ const addNewRequest = () => {
 function viewRequestDetails(row) {
 	$router.push({ name: 'request-details', params: { id: row.id } });
 }
-watch(filters, () => setRequests(), { deep: true });
+watch(
+	filters,
+	() => {
+		paginationData.value.page = 1;
+		setRequests();
+	},
+	{ deep: true }
+);
 onMounted(() => {
 	setRequests();
 });
