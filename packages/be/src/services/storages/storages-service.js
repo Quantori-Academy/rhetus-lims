@@ -131,6 +131,16 @@ async function storagesService(server) {
 				.where(eq(schema.storages.deleted, false));
 
 			return result.length ? result : [];
+		},
+
+		doesStorageExist: async (name, room) => {
+			const result = await server.db
+				.select()
+				.from(schema.storages)
+				.where(and(eq(name, schema.storages.name), eq(room, schema.storages.room)))
+				.limit(1);
+
+			return result.length > 0;
 		}
 	});
 }

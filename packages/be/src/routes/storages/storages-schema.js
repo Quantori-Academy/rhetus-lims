@@ -16,6 +16,7 @@ const createStorage = {
 	body: Storage.without(['id', 'creationDate']),
 	response: {
 		201: statusMessage,
+		400: statusMessage,
 		500: statusMessage
 	}
 };
