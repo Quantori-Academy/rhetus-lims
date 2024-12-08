@@ -119,20 +119,22 @@ onMounted(() => {
 			@row-click="viewRequestDetails"
 		>
 			<el-table-column prop="status" width="100" :label="__('Status')" sortable />
-			<el-table-column prop="reagentName" min-width="120" :label="__('Reagent name')" sortable />
-			<el-table-column prop="quantity" :label="__('Quantity')" sortable>
+			<el-table-column prop="reagentName" min-width="150" :label="__('Reagent name')" sortable />
+			<el-table-column prop="quantity" :label="__('Quantity')" min-width="120" sortable>
 				<template #default="{ row }"> {{ row.quantity }} {{ row.quantityUnit }} </template>
 			</el-table-column>
-			<el-table-column prop="amount" :label="__('Amount')" sortable />
-			<el-table-column prop="author.username" :label="__('Created by')" sortable />
+			<el-table-column prop="amount" :label="__('Amount')" min-width="100" sortable />
+			<el-table-column prop="author.username" :label="__('Created by')" min-width="150" sortable />
 			<el-table-column
 				prop="createdAt"
+				min-width="150"
 				:label="__('Creation Date')"
 				:formatter="data => formatDate(data.createdAt)"
 				sortable
 			/>
 			<el-table-column
 				prop="updatedAt"
+				min-width="150"
 				:label="__('Update Date')"
 				:formatter="data => formatDate(data.updatedAt)"
 				sortable
