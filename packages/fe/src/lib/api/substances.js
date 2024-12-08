@@ -28,7 +28,10 @@ export default http => ({
 			body
 		});
 	},
-	async fetchSubstanceHistory(category, id) {
-		return await http(`/substances/history/${category}/${id}`);
+	async fetchSubstanceHistory(category, id, isDeleted) {
+		return await http(`/substances/history/${category}/${id}`, { query: isDeleted });
+	},
+	async fetchDeletedSubstance(category, id) {
+		return await http(`/substances/${category}/${id}/deleted`);
 	}
 });
