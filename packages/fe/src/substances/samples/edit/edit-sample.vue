@@ -22,7 +22,13 @@ import SubstancesUsed from './substances-used.vue';
 import { __ } from '../../../lib/locales';
 import TimelineHistory from '../../../timeline/timeline-history.vue';
 
-const props = defineProps({ id: { type: String, default: null } });
+const props = defineProps({
+	id: { type: String, default: null },
+	deleted: {
+		type: Boolean,
+		default: false
+	}
+});
 const storages = ref([]);
 const formEl = useTemplateRef('form-el');
 const sample = ref(emptySample);
@@ -133,7 +139,9 @@ async function setStorages() {
 async function setSample(id) {
 	isLoading.value = true;
 	try {
-		const res = await $api.substances.fetchSubstance('sample', id);
+		const res = !props.deleted
+			? await $api.substances.fetchSubstance('sample', id)
+			: await $api.substances.fetchDeletedSubstance('sample', id);
 		sample.value = { ...res, storageId: res.storageLocation.id };
 		originalSample.value = {
 			...sample.value
@@ -166,7 +174,9 @@ watch(
 			<div class="category-icons">
 				<rh-icon name="applications" />{{ `${isEditing ? __('Editing') + ' ' : ''}${sample.name}` }}
 			</div>
-			<el-button v-if="!isEditing" @click="toggleEdit">{{ __('Edit') }}</el-button>
+			<el-button v-if="!isEditing && !props.deleted" @click="toggleEdit">{{
+				__('Edit')
+			}}</el-button>
 		</div>
 		<el-form ref="form-el" :model="sample" :rules="rules" label-position="top">
 			<el-form-item :label="__('Name')" prop="name">
@@ -232,6 +242,11 @@ watch(
 				</div>
 			</div>
 		</el-form>
-		<timeline-history v-if="!isEdit" :id="props.id" category="sample" />
+		<timeline-history
+			v-if="!isEditing"
+			:id="props.id"
+			category="sample"
+			:is-deleted="props.deleted"
+		/>
 	</div>
 </template>

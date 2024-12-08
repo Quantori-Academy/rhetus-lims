@@ -25,6 +25,10 @@ const props = defineProps({
 	id: {
 		type: String,
 		default: null
+	},
+	deleted: {
+		type: Boolean,
+		default: false
 	}
 });
 const formEl = useTemplateRef('form-ref');
@@ -37,7 +41,6 @@ const isOutOfStock = computed(() => reagent.value.quantityLeft === 0);
 const originalReagent = ref({});
 const rules = ref(formRules);
 const updatedReagentValues = ref({ category: 'reagent' });
-
 watch(
 	reagent,
 	reagentFields => {
@@ -63,7 +66,9 @@ async function setStorages() {
 const setReagent = async () => {
 	loading.value = true;
 	try {
-		const data = await $api.substances.fetchSubstance('reagent', props.id);
+		const data = !props.deleted
+			? await $api.substances.fetchSubstance('reagent', props.id)
+			: await $api.substances.fetchDeletedSubstance('reagent', props.id);
 		reagent.value = { ...data, storageId: data.storageLocation.id };
 		originalReagent.value = { ...reagent.value };
 	} catch (error) {
@@ -154,7 +159,7 @@ onMounted(() => {
 			<div class="category-icons">
 				<rh-icon name="pod" />{{ `${isEdit ? __('Editing') + ' ' : ''}${reagent.name}` }}
 			</div>
-			<el-button v-if="!isEdit" @click="toggleEdit">{{ __('Edit') }}</el-button>
+			<el-button v-if="!isEdit && !props.deleted" @click="toggleEdit">{{ __('Edit') }}</el-button>
 		</div>
 		<el-form
 			ref="form-ref"
@@ -235,7 +240,12 @@ onMounted(() => {
 				</div>
 			</div>
 		</el-form>
-		<timeline-history v-if="!isEdit" :id="props.id" category="reagent" />
+		<timeline-history
+			v-if="!isEdit"
+			:id="props.id"
+			category="reagent"
+			:is-deleted="props.deleted"
+		/>
 	</div>
 </template>
 
