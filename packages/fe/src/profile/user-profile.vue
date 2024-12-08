@@ -20,11 +20,13 @@ const passwords = ref({ password: '', confirmPassword: '' });
 const loading = ref(true);
 const profileRules = ref(profileFormRules);
 const passwordRules = ref(passwordFormRules(passwords));
+const originalProfile = ref(emptyProfile);
 
 const setProfile = async () => {
 	loading.value = true;
 	try {
 		profile.value = await $api.users.fetchCurrentUserInfo();
+		originalProfile.value = { ...profile.value };
 	} catch (err) {
 		$notifyUserAboutError(err);
 	} finally {
@@ -37,7 +39,7 @@ const toggleEdit = async () => {
 		resetPassForm.value.resetFields();
 		form.value.resetFields();
 		language.value = languageCode();
-		setProfile();
+		profile.value = { ...originalProfile.value };
 	}
 	$router.push({
 		name: editable.value ? 'user-profile' : 'edit-user-profile'
@@ -56,6 +58,7 @@ const editHandler = async () => {
 		});
 		resetPassForm.value.resetFields();
 		language.value = languageCode();
+		setProfile();
 		$router.push({ name: 'user-profile' });
 	} catch (err) {
 		$notifyUserAboutError(err);
@@ -79,6 +82,8 @@ const passwordChangeHandler = async () => {
 		});
 		resetPassForm.value.resetFields();
 		language.value = languageCode();
+		form.value.resetFields();
+		profile.value = { ...originalProfile.value };
 		$router.push({ name: 'user-profile' });
 	} catch (error) {
 		if (!['cancel', 'close'].includes(error)) {
@@ -90,6 +95,9 @@ const langChangeHandler = async () => {
 	try {
 		if (language.value === languageCode()) {
 			await $router.push({ name: 'user-profile' });
+			resetPassForm.value.resetFields();
+			form.value.resetFields();
+			profile.value = { ...originalProfile.value };
 			return;
 		}
 		setLocale(language.value);
