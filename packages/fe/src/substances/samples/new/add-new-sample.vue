@@ -21,7 +21,7 @@ import KetcherEditor from '../../../ketcher-editor/ketcher-editor.vue';
 import { __ } from '../../../lib/locales';
 import SuggestedComponents from './suggested-components.vue';
 import SelectedComponents from './selected-components.vue';
-import { onBeforeRouteLeave } from 'vue-router';
+import { $confirm } from '../../../lib/utils/feedback/confirm-msg';
 
 const storages = ref([]);
 const formEl = useTemplateRef('form-el');
@@ -42,11 +42,22 @@ const futureQuantity = computed(() => {
 onMounted(() => {
 	setComponents();
 	setStorages();
+	resetForms();
 });
 async function submit() {
 	if (!(await $isFormValid(formEl))) return;
 	isSaving.value = true;
 	try {
+		if (selectedOption.value) {
+			await $confirm(
+				__(`You have selected a component but did not add it, are you sure you want to proceed?`),
+				'Warning',
+				{
+					confirmButtonText: 'OK',
+					type: 'warning'
+				}
+			);
+		}
 		const response = await $api.substances.addSubstance({
 			...form.value,
 			quantityLeft: form.value.quantity,
@@ -58,13 +69,14 @@ async function submit() {
 			}))
 		});
 		$notify({ message: response.message, type: 'success' });
-
+		resetForms();
 		$router.push({ name: 'substances-list' });
 	} catch (error) {
-		$notifyUserAboutError(error.statusText);
+		if (!['cancel', 'close'].includes(error)) {
+			$notifyUserAboutError(error);
+		}
 	} finally {
 		isSaving.value = false;
-		resetForms();
 	}
 }
 
@@ -73,20 +85,15 @@ function cancel() {
 	$router.push({ name: 'substances-list' });
 }
 function resetForms() {
-	form.value = { ...formRef };
-	form.value.components = [];
+	form.value = {
+		...formRef,
+		components: JSON.parse(JSON.stringify(formRef.components))
+	};
 	if (formEl.value) {
 		formEl.value.resetFields();
 	}
 }
-onMounted(() => {
-	console.log(form.value);
-	console.log(form.value.components);
-});
-onBeforeRouteLeave((to, from, next) => {
-	resetForms();
-	next();
-});
+
 const removeComponent = index => {
 	form.value.components.splice(index, 1);
 };

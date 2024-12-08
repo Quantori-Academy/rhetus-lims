@@ -45,6 +45,5 @@ export const formRules = {
 	],
 	expirationDate: [requiredRule],
 	storageId: [requiredRule],
-	structure: [requiredRule],
-	expirationDate: [requiredRule]
+	structure: [requiredRule]
 };

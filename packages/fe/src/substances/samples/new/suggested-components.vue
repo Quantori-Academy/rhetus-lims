@@ -42,7 +42,6 @@ watch(
 );
 const addComponent = () => emit('add-component');
 const filterComponents = query => emit('filter-components', query);
-
 const isOptionChosen = option => {
 	return props.form.components.some(component => component.id === option.id);
 };
@@ -57,7 +56,7 @@ const isOptionChosen = option => {
 				filterable
 				remote
 				:remote-method="filterComponents"
-				placeholder="Select a component to add"
+				:placeholder="__('Select a component to add')"
 			>
 				<el-option
 					v-for="item of props.componentOptions"
