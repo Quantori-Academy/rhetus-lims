@@ -129,7 +129,10 @@ export const routes = [
 		path: '/samples/:id',
 		name: 'sample-details',
 		component: () => import('../../substances/samples/edit/edit-sample.vue'),
-		props: true,
+		props: route => ({
+			id: route.params.id,
+			deleted: route.query.deleted === 'true'
+		}),
 		meta: {
 			title: 'Sample Details',
 			breadcrumb: [
@@ -224,7 +227,10 @@ export const routes = [
 		path: '/reagents/:id',
 		name: 'reagent-details',
 		component: () => import('../../substances/reagents/reagent-details.vue'),
-		props: true,
+		props: route => ({
+			id: route.params.id,
+			deleted: route.query.deleted === 'true'
+		}),
 		meta: {
 			title: 'Reagent Details',
 			breadcrumb: [

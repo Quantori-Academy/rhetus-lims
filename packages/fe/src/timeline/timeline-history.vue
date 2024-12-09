@@ -4,7 +4,7 @@ import { ref, onMounted } from 'vue';
 import { $api } from '../lib/api';
 import { $notifyUserAboutError } from '../lib/utils/feedback/notify-msg';
 import { convertToCustomDate } from '../lib/utils/datetime/date-format';
-import { Location, Document } from '@element-plus/icons-vue';
+import { Location, Document, Delete } from '@element-plus/icons-vue';
 import { __ } from '../lib/locales/';
 
 const props = defineProps({
@@ -15,6 +15,10 @@ const props = defineProps({
 	category: {
 		type: String,
 		default: null
+	},
+	isDeleted: {
+		type: Boolean,
+		default: false
 	}
 });
 const loading = ref(false);
@@ -22,7 +26,9 @@ const substanceHistory = ref(null);
 const setSubstance = async () => {
 	loading.value = true;
 	try {
-		const data = await $api.substances.fetchSubstanceHistory(props.category, props.id);
+		const data = await $api.substances.fetchSubstanceHistory(props.category, props.id, {
+			deleted: props.isDeleted
+		});
 		substanceHistory.value = data.histories;
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error getting history');
@@ -43,7 +49,13 @@ onMounted(() => {
 			v-for="(history, index) of substanceHistory"
 			:key="index"
 			v-loading="loading"
-			:icon="history.actionType === 'storage-update' ? Location : Document"
+			:icon="
+				history.actionType === 'storage-update'
+					? Location
+					: history.actionType === 'quantity-update'
+						? Document
+						: Delete
+			"
 			:timestamp="convertToCustomDate(history.modifiedDate)"
 		>
 			<el-space v-if="history.actionType === 'storage-update'">
@@ -92,6 +104,16 @@ onMounted(() => {
 					<el-text tag="i">
 						{{ history.changeReason }}
 					</el-text>
+				</el-text>
+			</el-space>
+			<el-space v-if="history.actionType === 'delete'">
+				<el-text>
+					<el-text class="bold">
+						{{ history.user.userFirstName }}
+						{{ history.user.userLastName }}
+					</el-text>
+					{{ ' ' }}
+					<el-tag type="danger" effect="light" round>{{ __('deleted') }}</el-tag>
 				</el-text>
 			</el-space>
 		</el-timeline-item>

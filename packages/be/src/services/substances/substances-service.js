@@ -151,7 +151,7 @@ async function substancesService(server) {
 			if (data.quantityUsed && data.reason) {
 				const isQuantityZero = await server.substancesService.isQuantityZero(data);
 				if (isQuantityZero) {
-					await service.softDeleteReagent(data.id);
+					await server.substancesService.softDeleteSubstance(data.id, data.category, data.userId);
 				} else {
 					const quantityUpdateResult = await service.changeQuantity(data.id, {
 						quantityUsed: data.quantityUsed,
@@ -217,10 +217,10 @@ async function substancesService(server) {
 			};
 		},
 
-		softDeleteSubstance: async (id, category) => {
+		softDeleteSubstance: async (id, category, userId) => {
 			return category === Category.REAGENT
-				? server.reagentsService.softDeleteReagent(id)
-				: server.samplesService.softDeleteSample(id);
+				? server.reagentsService.softDeleteReagent(id, userId)
+				: server.samplesService.softDeleteSample(id, userId);
 		},
 
 		isStructureValid: async smiles => {

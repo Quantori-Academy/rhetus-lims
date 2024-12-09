@@ -20,7 +20,8 @@ const filters = ref({
 	name: '',
 	quantity: null,
 	expired: false,
-	smiles: ''
+	smiles: '',
+	deleted: false
 });
 
 const pagination = ref({
@@ -49,7 +50,8 @@ function orderReagent(row) {
 function viewSubstance(row) {
 	$router.push({
 		name: row.category.toLowerCase() === 'reagent' ? 'reagent-details' : 'sample-details',
-		params: { id: row.id }
+		params: { id: row.id },
+		query: filters.value.deleted ? { deleted: filters.value.deleted } : {}
 	});
 }
 const showNotification = (title, message, type) => {
@@ -83,7 +85,7 @@ const deleteSingleSubstance = async row => {
 
 const setSubstances = debounce(async () => {
 	isLoading.value = true;
-	const { expired, ...rest } = filters.value;
+	const { expired, deleted, ...rest } = filters.value;
 	if (filters.value.smiles) {
 		sortData.value = { ...sortData.value, relevance: 'desc' };
 	}
@@ -92,7 +94,8 @@ const setSubstances = debounce(async () => {
 		sort: sortData.value,
 		options: {
 			...rest,
-			expirationDate: expired ? [new Date('0001-01-01T00:00:00.000Z'), new Date()] : []
+			expirationDate: expired ? [new Date('0001-01-01T00:00:00.000Z'), new Date()] : [],
+			deleted: deleted ? 'true' : 'false'
 		}
 	};
 	try {

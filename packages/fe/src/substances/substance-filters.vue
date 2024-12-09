@@ -22,9 +22,29 @@ const filters = defineModel('filters', { type: Object });
 		<ketcher-editor v-model:smiles="filters.smiles" />
 	</filter-item>
 
-	<filter-item>
-		<el-switch v-model="filters.expired" :active-text="__('Expired')" :inactive-text="__('All')" />
-	</filter-item>
+	<div class="switch-filters">
+		<filter-item>
+			<el-switch
+				v-model="filters.expired"
+				:active-text="__('Expired')"
+				:inactive-text="__('All')"
+			/>
+		</filter-item>
+
+		<filter-item>
+			<el-switch
+				v-model="filters.deleted"
+				:active-text="__('Deleted')"
+				:inactive-text="__('Existing')"
+			/>
+		</filter-item>
+	</div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.switch-filters {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+</style>

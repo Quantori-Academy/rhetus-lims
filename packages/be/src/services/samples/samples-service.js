@@ -81,7 +81,7 @@ async function samplesService(server) {
 			};
 		},
 
-		softDeleteSample: async id => {
+		softDeleteSample: async (id, userId) => {
 			const result = await server.db
 				.update(schema.samples)
 				.set({
@@ -90,7 +90,15 @@ async function samplesService(server) {
 				.where(eq(schema.samples.id, id))
 				.returning({ name: schema.samples.name });
 
-			return result.length ? result[0].name : null;
+			if (!result.length) return null;
+
+			await server.db.insert(schema.substancesHistory).values({
+				userId,
+				sampleId: id,
+				actionType: 'delete'
+			});
+
+			return result[0].name;
 		},
 
 		changeQuantity: async (id, data) => {
@@ -121,7 +129,7 @@ async function samplesService(server) {
 				});
 
 			if (targetValue === 0) {
-				await server.samplesService.softDeleteSample(id);
+				await server.samplesService.softDeleteSample(id, userId);
 			}
 
 			return {

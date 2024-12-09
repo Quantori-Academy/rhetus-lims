@@ -87,7 +87,11 @@ async function substances(server, options) {
 	async function onGetSubstancesHistory(req, reply) {
 		try {
 			const { category, id } = req.params;
-			const substance = await server.substancesService.getSubstanceById(id, category);
+			const { deleted } = req.query;
+			const substance =
+				deleted === 'true'
+					? await server.substancesService.getDeletedSubstanceById(id, category)
+					: await server.substancesService.getSubstanceById(id, category);
 			if (!substance) {
 				return reply.code(404).send({ status: 'error', message: `No such ${category}` });
 			}
@@ -158,7 +162,7 @@ async function substances(server, options) {
 	async function onDeleteSubstance(req, reply) {
 		try {
 			const { category, id } = req.params;
-
+			const authenticatedUserId = req.session.user.id;
 			const substance = await server.substancesService.getSubstanceById(id, category);
 
 			if (!substance) {
@@ -167,7 +171,11 @@ async function substances(server, options) {
 					.send({ status: 'error', message: `No such ${helpers.lowercase(category)}` });
 			}
 
-			const substanceName = await server.substancesService.softDeleteSubstance(id, category);
+			const substanceName = await server.substancesService.softDeleteSubstance(
+				id,
+				category,
+				authenticatedUserId
+			);
 
 			return reply.code(200).send({
 				status: 'success',
