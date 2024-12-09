@@ -20,7 +20,13 @@ const removeComponent = index => emit('remove-component', index);
 		class="grid-container-samples"
 	>
 		<div class="input-row">
-			<el-input v-model="component.label" :placeholder="__('Add substance name')" disabled />
+			<el-input v-model="component.label" :placeholder="__('Add substance name')" disabled>
+				<template #prefix>
+					<rh-icon
+						:name="component.category.toLowerCase() === 'reagent' ? 'pod' : 'applications'"
+					/>
+				</template>
+			</el-input>
 			<div>
 				<el-input-number
 					v-model="component.quantityUsed"

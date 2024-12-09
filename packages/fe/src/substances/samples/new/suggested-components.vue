@@ -64,7 +64,12 @@ const isOptionChosen = option => {
 					:label="`${item.label}`"
 					:value="item"
 					:disabled="isOptionChosen(item)"
-				/>
+				>
+					<div class="category-icons">
+						<rh-icon :name="item.category.toLowerCase() === 'reagent' ? 'pod' : 'applications'" />
+						<span>{{ item.label }}</span>
+					</div>
+				</el-option>
 			</el-select>
 			<div class="w-full">
 				<el-input-number
@@ -129,6 +134,10 @@ const isOptionChosen = option => {
 .button-row {
 	grid-column: 2;
 	justify-self: end;
+}
+.category-icons {
+	display: flex;
+	align-items: center;
 }
 @media (max-width: 768px) {
 	.grid-container-samples,

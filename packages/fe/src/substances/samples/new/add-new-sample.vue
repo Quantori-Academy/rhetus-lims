@@ -105,6 +105,7 @@ const addComponent = () => {
 			quantityUsed: selectedQuantity.value
 		};
 		form.value.components = [...form.value.components, componentToAdd];
+		formEl.value.clearValidate(['components']);
 		selectedOption.value = null;
 		selectedQuantity.value = 0;
 		resetSelects.value = !resetSelects.value;
