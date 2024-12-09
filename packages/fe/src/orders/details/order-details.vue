@@ -19,6 +19,7 @@ import RequestSuggestions from './request-suggestions.vue';
 import OrderActions from './order-actions.vue';
 import { $isFormValid } from '../../lib/utils/form-validation/is-form-valid.js';
 import { __ } from '../../lib/locales/index.js';
+import { $confirm } from '../../lib/utils/feedback/confirm-msg.js';
 
 const props = defineProps({
 	id: {
@@ -35,12 +36,10 @@ const originalOrder = ref({});
 const linkedRequests = ref([]);
 const suggestedRequests = ref([]);
 const loading = ref(true);
+const isReagentPending = ref(false);
 const apiCalls = ref([]);
 const localrefs = ref({});
 const isEdit = computed(() => $route.value.name === 'order-details-edit');
-const isOrderValid = computed(
-	() => order.value.reagents.length > 0 || order.value.reagentRequests.length > 0
-);
 const statusesHistory = ref(null);
 const isReagentAdded = computed(() => {
 	return order.value.reagents.length > 0 || order.value.reagentRequests.length > 0;
@@ -93,17 +92,28 @@ const updateOrderIfo = () => {
 };
 
 const submitSubstances = async () => {
-	if (!(await validateSubstances(localrefs.value)) || !(await $isFormValid(formRef))) return;
-	await getUpdatedFields({ ...originalOrder.value }, { ...order.value });
-	updateOrderItems();
-	updateNewItems();
-	updateOrderIfo();
-	removeSubstances();
-	if (apiCalls.value.length === 0) {
-		$router.push({ name: 'order-details', params: { id: order.value.id } });
-		return;
-	}
 	try {
+		if (isReagentPending.value) {
+			await $confirm(
+				__(`You didn't add the filled-out reagent to the list, are you sure you want to proceed?`),
+				'Warning',
+				{
+					confirmButtonText: 'OK',
+					type: 'warning'
+				}
+			);
+		}
+		if (!(await validateSubstances(localrefs.value)) || !(await $isFormValid(formRef))) return;
+		await getUpdatedFields({ ...originalOrder.value }, { ...order.value });
+		updateOrderItems();
+		updateNewItems();
+		updateOrderIfo();
+		removeSubstances();
+		if (apiCalls.value.length === 0) {
+			$router.push({ name: 'order-details', params: { id: order.value.id } });
+			return;
+		}
+
 		const responses = await Promise.all(apiCalls.value);
 		const success = responses.every(response => response.status === 'success');
 		if (success) {
@@ -111,11 +121,14 @@ const submitSubstances = async () => {
 			$router.push({ name: 'order-details', params: { id: order.value.id } });
 		}
 	} catch (error) {
-		$notifyUserAboutError(error);
+		if (!['cancel', 'close'].includes(error)) {
+			$notifyUserAboutError(error);
+		}
 	} finally {
 		resetDataChanges();
 	}
 };
+
 const resetDataChanges = () => {
 	updatedItems.value = {
 		reagents: [],
@@ -243,6 +256,9 @@ const addNewReagent = async selected => {
 const handleSubstanceRefs = refs => {
 	localrefs.value = refs;
 };
+const validateReagentPending = status => {
+	isReagentPending.value = status;
+};
 </script>
 
 <template>
@@ -303,6 +319,7 @@ const handleSubstanceRefs = refs => {
 				@add-new-reagent="addNewReagent"
 				@add-existing-reagent="addExistingReagent"
 				@substance-refs="handleSubstanceRefs"
+				@validate-reagent-pending="validateReagentPending"
 			/>
 		</div>
 		<div class="wrapper">
