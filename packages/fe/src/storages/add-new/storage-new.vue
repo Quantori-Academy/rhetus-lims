@@ -14,8 +14,9 @@ const storage = ref({
 	name: '',
 	description: ''
 });
-const rules = ref(formRules);
 const rooms = ref([]);
+const uniqueRoomsNames = ref([]);
+const rules = ref(formRules(storage, uniqueRoomsNames));
 
 const resetForm = () => {
 	storage.value = {
@@ -46,9 +47,12 @@ const addStorage = async () => {
 
 const setRooms = async () => {
 	try {
-		const data = await $api.storages.fetchStoragesRooms();
-
-		rooms.value = formatRooms(data);
+		await Promise.all([
+			$api.storages.fetchStoragesRooms().then(data => (rooms.value = formatRooms(data))),
+			$api.storages
+				.fetchStoragesRoomsNames()
+				.then(data => (uniqueRoomsNames.value = data.roomsNames))
+		]);
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}

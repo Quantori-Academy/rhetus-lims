@@ -217,6 +217,13 @@
 		"quantity left": ["quantity left"],
 		"due to": ["due to"],
 		"updated on": ["updated on"],
+		"Storage location with this room and name already exists": [
+			"Storage location with this room and name already exists"
+		],
+		"Room can't be empty": ["Room can't be empty"],
+		"Room can't exceed 300 characters": ["Room can't exceed 300 characters"],
+		"Name can't be empty": ["Name can't be empty"],
+		"Name can't exceed 300 characters": ["Name can't exceed 300 characters"],
 		"You didn't add the filled-out reagent to the list, are you sure you want to proceed?": ["You didn't add the filled-out reagent to the list, are you sure you want to proceed?"],
 		"Are you sure you want to delete this order?": ["Are you sure you want to delete this order?"],
 		"Please, confirm your action": ["Please, confirm your action"],
