@@ -59,7 +59,7 @@ async function reagentsService(server) {
 			return result[0];
 		},
 
-		softDeleteReagent: async id => {
+		softDeleteReagent: async (id, userId) => {
 			const result = await server.db
 				.update(schema.reagents)
 				.set({
@@ -68,7 +68,14 @@ async function reagentsService(server) {
 				.where(eq(schema.reagents.id, id))
 				.returning({ name: schema.reagents.name });
 
-			return result.length ? result[0].name : null;
+			if (!result.length) return null;
+
+			await server.db.insert(schema.substancesHistory).values({
+				userId,
+				reagentId: id,
+				actionType: 'delete'
+			});
+			return result[0].name;
 		},
 
 		getReagentsQuery: (extras = {}) => {
@@ -106,7 +113,7 @@ async function reagentsService(server) {
 				});
 
 			if (targetValue === 0) {
-				await server.reagentsService.softDeleteReagent(id);
+				await server.reagentsService.softDeleteReagent(id, userId);
 			}
 
 			return {
