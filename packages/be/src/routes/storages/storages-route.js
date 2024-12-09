@@ -15,6 +15,11 @@ async function storages(server, options) {
 	});
 	async function onCreateStorage(req, reply) {
 		try {
+			const exists = await server.storagesService.doesStorageExist(req.body.name, req.body.room);
+			if (exists) {
+				return reply.code(400).send({ status: 'error', message: `Storage already exists` });
+			}
+
 			const name = await server.storagesService.createStorage(req.body);
 			return reply.code(201).send({ status: 'success', message: `Storage ${name} was created` });
 		} catch (err) {
