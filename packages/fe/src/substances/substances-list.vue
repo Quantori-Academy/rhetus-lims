@@ -202,7 +202,7 @@ onMounted(() => {
 					</el-button>
 				</template>
 			</el-table-column>
-			<el-table-column width="60">
+			<el-table-column v-if="!filters.deleted" width="60">
 				<template #default="{ row }">
 					<el-button type="danger" @click.stop="() => deleteSingleSubstance(row)">
 						<rh-icon color="white" name="remove" />
