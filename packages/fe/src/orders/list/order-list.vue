@@ -103,6 +103,7 @@ watch(paginationData.value, () => setOrders());
 watch(
 	filters,
 	() => {
+		paginationData.value.page = 1;
 		setOrders();
 	},
 	{ deep: true }

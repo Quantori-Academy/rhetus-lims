@@ -82,7 +82,14 @@ const setUsers = debounce(async () => {
 	}
 }, 200);
 
-watch(filters, () => setUsers(), { deep: true });
+watch(
+	filters,
+	() => {
+		pagination.value.page = 1;
+		setUsers();
+	},
+	{ deep: true }
+);
 
 onMounted(() => {
 	setUsers();

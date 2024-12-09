@@ -112,7 +112,14 @@ const handleSortChange = event => {
 	setSubstances();
 };
 
-watch(filters, () => setSubstances(), { deep: true });
+watch(
+	filters,
+	() => {
+		pagination.value.page = 1;
+		setSubstances();
+	},
+	{ deep: true }
+);
 
 onMounted(() => {
 	setSubstances();
