@@ -41,11 +41,13 @@ const form = ref({
 
 const rules = ref({
 	name: [requiredRule(__('Name'))],
+	catalogLink: [{ type: 'url' }],
 	quantityUnit: [requiredRule(__('Quantity unit'))],
 	quantity: [
 		requiredRule(__('Quantity')),
 		{ type: 'number', min: 1, message: __('Quantity cannot be zero'), trigger: ['blur', 'change'] }
 	],
+	expirationDate: [requiredRule(__('Expiration date'))],
 	storageId: [requiredRule(__('Storage location'))],
 	structure: [requiredRule(__('Structure'))]
 });
