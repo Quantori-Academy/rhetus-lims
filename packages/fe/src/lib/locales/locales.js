@@ -18,5 +18,9 @@ export const locales = [
 	{
 		value: 'uk',
 		label: 'Ukrainian'
+	},
+	{
+		value: 'ru',
+		label: 'Russian'
 	}
 ];
