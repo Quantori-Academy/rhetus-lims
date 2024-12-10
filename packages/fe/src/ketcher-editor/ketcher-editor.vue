@@ -8,9 +8,8 @@ const ketcherFrame = ref(null);
 const isSearching = ref(false);
 const smiles = defineModel('smiles', { type: String });
 const buttonRef = ref();
-
 const searchByStructure = async () => {
-	let ketcher = ketcherFrame.value.contentWindow.ketcher;
+	const ketcher = ketcherFrame.value.contentWindow.ketcher;
 	isSearching.value = true;
 	try {
 		smiles.value = await ketcher.getSmiles();
@@ -20,6 +19,11 @@ const searchByStructure = async () => {
 		isPopoverVisible.value = !isPopoverVisible.value;
 		isSearching.value = false;
 	}
+};
+
+const onPopoverShown = () => {
+	const ketcher = ketcherFrame.value.contentWindow.ketcher;
+	ketcher.setMolecule(smiles.value);
 };
 </script>
 
@@ -35,11 +39,13 @@ const searchByStructure = async () => {
 				trigger="click"
 				:width="600"
 				virtual-triggering
+				@show="onPopoverShown"
 			>
 				<div class="popover-content">
 					<div class="ketcher-container">
 						<div class="ketcher-editor">
 							<iframe
+								id="ketcherFrame"
 								ref="ketcherFrame"
 								src="/ketcher/index.html"
 								width="100%"
