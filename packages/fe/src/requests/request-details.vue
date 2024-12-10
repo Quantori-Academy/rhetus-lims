@@ -10,23 +10,26 @@ import {
 	ElSelect,
 	ElOption
 } from 'element-plus';
-import { computed, ref, onMounted, inject } from 'vue';
+import { computed, ref, onMounted, inject, useTemplateRef } from 'vue';
 import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg.js';
 import { $confirm } from '../lib/utils/feedback/confirm-msg.js';
 import { $api } from '../lib/api/index.js';
 import { $route, $router } from '../lib/router/router.js';
-import { emptyRequest, Statuses } from './constants.js';
+import { emptyRequest, rules, Statuses } from './constants.js';
 import { getButtonType } from '../orders/details/constants.js';
 import { quantityUnits } from '../lib/constants/quantity-units.js';
 import KetcherEditor from '../ketcher-editor/ketcher-editor.vue';
 import { __ } from '../lib/locales/index.js';
 import TimelineStatuses from '../timeline/timeline-statuses.vue';
 import { $promptInputBox } from '../lib/utils/feedback/prompt-box';
+import { $isFormValid } from '../lib/utils/form-validation/is-form-valid.js';
 const props = defineProps({ id: { type: String, default: null } });
 
 const { isOfficer } = inject('user');
 const loading = ref(false);
 const request = ref(emptyRequest);
+const formEl = useTemplateRef('form-ref');
+const formRules = ref(rules);
 const isEdit = computed(() => $route.value.name === 'request-details-edit');
 const user = inject('user');
 
@@ -51,10 +54,13 @@ async function setRequest(id) {
 }
 
 const cancelEdit = () => {
+	formEl.value.resetFields();
 	$router.push({ name: 'request-details', params: { id: request.value.id } });
+	setRequest(props.id);
 };
 
 const handleSubmit = async () => {
+	if (!(await $isFormValid(formEl))) return;
 	try {
 		const response = await $api.requests.updateRequest(request.value.id, request.value);
 		response &&
@@ -63,8 +69,8 @@ const handleSubmit = async () => {
 				message: __('Request has been updated'),
 				type: 'success'
 			});
-
 		$router.push({ name: 'request-details', params: { id: request.value.id } });
+		setRequest(props.id);
 	} catch (error) {
 		$notifyUserAboutError(error.message || __('Error updating request'));
 	}
@@ -150,6 +156,7 @@ onMounted(() => {
 			v-loading="loading"
 			label-position="top"
 			:model="request"
+			:rules="formRules"
 			@submit="handleSubmit"
 		>
 			<el-form-item :label="__('Reagent name')" prop="reagentName">
@@ -183,7 +190,7 @@ onMounted(() => {
 						<el-option v-for="unit of quantityUnits" :key="unit" :label="unit" :value="unit" />
 					</el-select>
 				</el-form-item>
-				<el-form-item :label="__('Amount')" prop="status">
+				<el-form-item :label="__('Amount')" prop="amount">
 					<el-input-number v-model="request.amount" :min="1" :disabled="!isEdit" />
 				</el-form-item>
 			</div>
@@ -216,8 +223,8 @@ onMounted(() => {
 				</el-form-item>
 			</div>
 			<div v-if="isEdit" class="btn-container">
-				<el-button type="primary" @click="handleSubmit">{{ __('Save') }}</el-button>
 				<el-button @click="cancelEdit">{{ __('Cancel') }}</el-button>
+				<el-button type="primary" @click="handleSubmit">{{ __('Save') }}</el-button>
 			</div>
 		</el-form>
 		<timeline-statuses
