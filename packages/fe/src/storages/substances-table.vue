@@ -172,11 +172,11 @@ onMounted(() => {
 					/>
 				</template>
 			</el-table-column>
-			<el-table-column prop="name" :label="__('Name')" sortable />
-			<el-table-column prop="category" :label="__('Category')" sortable />
-			<el-table-column prop="structure" :label="__('Structure')" sortable />
-			<el-table-column prop="description" :label="__('Description')" />
-			<el-table-column prop="quantityLeft" :label="__('Quantity left')">
+			<el-table-column prop="name" min-width="150" :label="__('Name')" sortable />
+			<el-table-column prop="category" min-width="120" :label="__('Category')" sortable />
+			<el-table-column prop="structure" min-width="120" :label="__('Structure')" sortable />
+			<el-table-column prop="description" min-width="160" :label="__('Description')" />
+			<el-table-column prop="quantityLeft" min-width="120" :label="__('Quantity left')">
 				<template #default="{ row }">{{ row.quantityLeft }} {{ row.quantityUnit }}</template>
 			</el-table-column>
 			<el-table-column width="380" :label="__('Storage location')">
