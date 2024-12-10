@@ -100,6 +100,7 @@ onMounted(() => {
 					<el-text>
 						{{ history.quantityUnit }}
 						{{ __('due to') }}
+						{{ ' ' }}
 					</el-text>
 					<el-text tag="i">
 						{{ history.changeReason }}
