@@ -32,7 +32,7 @@ const createSubstanceSchema = Substance.without(['id', 'storageLocation'])
 			.prop('casNumber', S.string().minLength(0))
 			.prop('producer', S.string().minLength(0))
 			.prop('catalogId', S.string().minLength(0))
-			.prop('catalogLink', S.string().format(S.FORMATS.URL).minLength(0))
+			.prop('catalogLink', S.string().minLength(0))
 			.prop('unitPrice', S.number().minimum(0)),
 		S.object()
 			.prop(
