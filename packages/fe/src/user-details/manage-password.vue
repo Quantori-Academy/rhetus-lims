@@ -4,7 +4,7 @@ import { computed, onMounted, useTemplateRef, ref, watch } from 'vue';
 import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg';
 import { $confirm } from '../lib/utils/feedback/confirm-msg.js/';
 import { $api } from '../lib/api/index.js';
-import { $route } from '../lib/router/router';
+import { $route, $router } from '../lib/router/router';
 import { $isFormValid } from '../lib/utils/form-validation/is-form-valid.js';
 import { emptyUser, passwordFormRules } from './constants';
 import { __ } from '../lib/locales/index.js';
@@ -60,6 +60,8 @@ const changePassword = async () => {
 			message: res.message,
 			type: 'success'
 		});
+		$router.push({ name: 'user-details', params: { id: user.value.id } });
+		setUser(props.id);
 		resetPassForm.value.resetFields();
 	} catch (error) {
 		if (!['cancel', 'close'].includes(error)) {
@@ -69,15 +71,16 @@ const changePassword = async () => {
 };
 
 watch(isEdit, () => {
-	resetPassForm.value.resetFields();
+	resetPassForm.value?.resetFields();
 });
 </script>
 
 <template>
-	<div class="wrapper">
+	<div v-if="user.hasPasswordResetRequests" class="wrapper">
 		<div class="section-header">{{ __('Manage password') }}</div>
 		<el-form
 			ref="reset-pass-form"
+			v-loading="loading"
 			:model="passwords"
 			label-position="top"
 			:rules="passwordRules"

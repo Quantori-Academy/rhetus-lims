@@ -29,3 +29,16 @@ export const passwordFormRules = passwords => ({
 		}
 	]
 });
+
+export const emptyProfile = {
+	id: null,
+	username: '',
+	firstName: '',
+	lastName: '',
+	email: '',
+	role: {
+		id: null,
+		name: ''
+	},
+	createdAt: ''
+};

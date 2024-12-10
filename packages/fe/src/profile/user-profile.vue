@@ -5,33 +5,38 @@ import { ElForm, ElFormItem, ElInput, ElButton, ElDivider, ElSelect, ElOption } 
 import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg';
 import { $confirm } from '../lib/utils/feedback/confirm-msg';
 import { $isFormValid } from '../lib/utils/form-validation/is-form-valid';
-import { passwordFormRules, profileFormRules } from './constants';
+import { passwordFormRules, profileFormRules, emptyProfile } from './constants';
 import { $route, $router } from '../lib/router/router';
 import { locales } from '../lib/locales/locales';
 import { __, languageCode } from '../lib/locales';
 import { setLocale } from '../lib/locales/set-locale.js';
 
 const editable = computed(() => $route.value.name === 'edit-user-profile');
-const profile = ref(null);
+const profile = ref(emptyProfile);
 const form = useTemplateRef('form');
 const language = ref(languageCode());
 const resetPassForm = useTemplateRef('reset-pass-form');
 const passwords = ref({ password: '', confirmPassword: '' });
-
+const loading = ref(true);
 const profileRules = ref(profileFormRules);
 const passwordRules = ref(passwordFormRules(passwords));
 
 const setProfile = async () => {
+	loading.value = true;
 	try {
 		profile.value = await $api.users.fetchCurrentUserInfo();
 	} catch (err) {
 		$notifyUserAboutError(err);
+	} finally {
+		loading.value = false;
 	}
 };
 
 const toggleEdit = async () => {
 	if (editable.value) {
 		resetPassForm.value.resetFields();
+		form.value.resetFields();
+		language.value = languageCode();
 		setProfile();
 	}
 	$router.push({
@@ -49,6 +54,10 @@ const editHandler = async () => {
 			message: 'Profile updated',
 			type: 'success'
 		});
+		resetPassForm.value.resetFields();
+		language.value = languageCode();
+		setProfile();
+		$router.push({ name: 'user-profile' });
 	} catch (err) {
 		$notifyUserAboutError(err);
 	}
@@ -61,7 +70,7 @@ const passwordChangeHandler = async () => {
 		await $confirm('Are you sure you want to reset your password?', 'Change password?', {
 			type: 'warning'
 		});
-		const res = await $api.auth.resetPassword(profile.value.id, {
+		const res = await $api.auth.resetPassword({
 			password: passwords.value.password
 		});
 		$notify({
@@ -70,6 +79,10 @@ const passwordChangeHandler = async () => {
 			type: 'success'
 		});
 		resetPassForm.value.resetFields();
+		language.value = languageCode();
+		form.value.resetFields();
+		$router.push({ name: 'user-profile' });
+		setProfile();
 	} catch (error) {
 		if (!['cancel', 'close'].includes(error)) {
 			this.$notifyUserAboutError(error);
@@ -78,6 +91,13 @@ const passwordChangeHandler = async () => {
 };
 const langChangeHandler = async () => {
 	try {
+		if (language.value === languageCode()) {
+			await $router.push({ name: 'user-profile' });
+			resetPassForm.value.resetFields();
+			form.value.resetFields();
+			setProfile();
+			return;
+		}
 		setLocale(language.value);
 		await $router.push({ name: 'user-profile' });
 		location.reload();
@@ -92,7 +112,7 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="wrapper">
+	<div v-loading="loading" class="wrapper">
 		<div class="editing-header">
 			{{ __('My Profile') }}
 			<el-button :type="editable ? 'default' : 'primary'" @click="toggleEdit">{{
