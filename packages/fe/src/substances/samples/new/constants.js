@@ -14,6 +14,18 @@ export const notEmptyArrayRule = {
 	},
 	trigger: ['submit']
 };
+const notPastDateRule = {
+	validator: (_, value) => {
+		const selectedDate = new Date(value);
+		const today = new Date();
+		today.setHours(0, 0, 0, 0);
+		if (selectedDate < today) {
+			return Promise.reject(new Error(__('The date cannot be past date')));
+		}
+		return Promise.resolve();
+	},
+	trigger: ['blur', 'change']
+};
 export const formRef = {
 	name: '',
 	components: [],
@@ -43,7 +55,7 @@ export const formRules = {
 			trigger: ['blur', 'change']
 		}
 	],
-	expirationDate: [requiredRule],
+	expirationDate: [requiredRule, notPastDateRule],
 	storageId: [requiredRule],
 	structure: [requiredRule]
 };

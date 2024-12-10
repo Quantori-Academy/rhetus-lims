@@ -17,8 +17,8 @@ import { $api } from '../../lib/api';
 import { quantityUnits } from '../../lib/constants/quantity-units.js';
 import RhIcon from '../../lib/components/rh-icon.vue';
 import KetcherEditor from '../../ketcher-editor/ketcher-editor.vue';
-import { requiredRule } from '../../lib/utils/form-validation/requiredRule.js';
 import { __ } from '../../lib/locales/index.js';
+import { newReagentRules } from './constants.js';
 
 const formEl = useTemplateRef('form-el');
 const isSaving = ref(false);
@@ -39,18 +39,7 @@ const form = ref({
 	description: ''
 });
 
-const rules = ref({
-	name: [requiredRule(__('Name'))],
-	catalogLink: [{ type: 'url' }],
-	quantityUnit: [requiredRule(__('Quantity unit'))],
-	quantity: [
-		requiredRule(__('Quantity')),
-		{ type: 'number', min: 1, message: __('Quantity cannot be zero'), trigger: ['blur', 'change'] }
-	],
-	expirationDate: [requiredRule(__('Expiration date'))],
-	storageId: [requiredRule(__('Storage location'))],
-	structure: [requiredRule(__('Structure'))]
-});
+const rules = ref(newReagentRules);
 
 onMounted(() => {
 	setStorages();
