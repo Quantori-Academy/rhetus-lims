@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, inject } from 'vue';
 import RhIcon from '../lib/components/rh-icon.vue';
 import { ElTable, ElTableColumn, ElButton, ElSelect, ElOption } from 'element-plus';
 import { $api } from '../lib/api/index';
@@ -19,10 +19,12 @@ const props = defineProps({
 	}
 });
 
+const { isOfficer } = inject('user');
 const filters = ref({
 	name: '',
 	expired: false,
-	smiles: ''
+	smiles: '',
+	deleted: false
 });
 const sortData = ref({});
 const substances = ref([]);
@@ -35,7 +37,7 @@ const paginationData = ref({
 });
 const setSubstances = debounce(async id => {
 	isLoading.value = true;
-	const { expired, ...rest } = filters.value;
+	const { expired, deleted, ...rest } = filters.value;
 	if (filters.value.smiles) {
 		sortData.value = { ...sortData.value, relevance: 'desc' };
 	}
@@ -45,7 +47,8 @@ const setSubstances = debounce(async id => {
 		options: {
 			...rest,
 			expirationDate: expired ? [new Date('0001-01-01T00:00:00.000Z'), new Date()] : [],
-			location: id
+			location: id,
+			deleted: deleted ? 'true' : 'false'
 		}
 	};
 	try {
@@ -78,8 +81,19 @@ const editSubstance = row => {
 };
 
 const viewSubstance = row => {
-	$router.push({ name: 'reagent-details', params: { id: row.id } });
+	$router.push({
+		name: row.category.toLowerCase() === 'reagent' ? 'reagent-details' : 'sample-details',
+		params: { id: row.id },
+		query: filters.value.deleted ? { deleted: filters.value.deleted } : {}
+	});
 };
+
+function orderReagent(row) {
+	$router.push({
+		name: 'new-order-substance',
+		query: { id: row.id }
+	});
+}
 
 const deleteSubstance = async row => {
 	try {
@@ -96,14 +110,8 @@ const deleteSubstance = async row => {
 		});
 		await setSubstances(props.id);
 	} catch (error) {
-		if (['cancel', 'close'].includes(error)) {
-			$notify({
-				title: 'Canceled',
-				message: 'Deletion canceled',
-				type: 'info'
-			});
-		} else {
-			$notifyUserAboutError(error.message || 'Substance delete canceled');
+		if (!['cancel', 'close'].includes(error)) {
+			$notifyUserAboutError(error);
 		}
 	}
 };
@@ -125,14 +133,8 @@ const changeStorage = async row => {
 			type: 'success'
 		});
 	} catch (error) {
-		if (['cancel', 'close'].includes(error)) {
-			$notify({
-				title: 'Canceled',
-				message: 'Storage update was canceled',
-				type: 'info'
-			});
-		} else {
-			$notifyUserAboutError(error.message || 'Storage update canceled');
+		if (!['cancel', 'close'].includes(error)) {
+			$notifyUserAboutError(error);
 		}
 	} finally {
 		setSubstances(props.id);
@@ -148,7 +150,14 @@ const handleSortChange = event => {
 	sortData.value = { [event.prop]: isDescending ? 'desc' : 'asc' };
 	setSubstances();
 };
-watch(filters, () => setSubstances(props.id), { deep: true });
+watch(
+	filters,
+	() => {
+		paginationData.value.page = 1;
+		setSubstances(props.id);
+	},
+	{ deep: true }
+);
 
 onMounted(() => {
 	setSubstances(props.id);
@@ -175,11 +184,10 @@ onMounted(() => {
 			<el-table-column prop="name" min-width="150" :label="__('Name')" sortable />
 			<el-table-column prop="category" min-width="120" :label="__('Category')" sortable />
 			<el-table-column prop="structure" min-width="120" :label="__('Structure')" sortable />
-			<el-table-column prop="description" min-width="160" :label="__('Description')" />
 			<el-table-column prop="quantityLeft" min-width="120" :label="__('Quantity left')">
 				<template #default="{ row }">{{ row.quantityLeft }} {{ row.quantityUnit }}</template>
 			</el-table-column>
-			<el-table-column width="380" :label="__('Storage location')">
+			<el-table-column v-if="!filters.deleted" width="380" :label="__('Storage location')">
 				<template #default="{ row }">
 					<el-select
 						v-model="row.storageLocationId"
@@ -197,14 +205,21 @@ onMounted(() => {
 					</el-select>
 				</template>
 			</el-table-column>
-			<el-table-column width="80">
+			<el-table-column v-if="isOfficer && !filters.deleted" width="60">
+				<template #default="{ row }">
+					<el-button type="primary" @click.stop="() => orderReagent(row)">
+						<rh-icon color="white" name="file-addition" />
+					</el-button>
+				</template>
+			</el-table-column>
+			<el-table-column v-if="!filters.deleted" width="60">
 				<template #default="{ row }">
 					<el-button @click.stop="() => editSubstance(row)">
 						<rh-icon name="pencil" />
 					</el-button>
 				</template>
 			</el-table-column>
-			<el-table-column width="80">
+			<el-table-column v-if="!filters.deleted" width="60">
 				<template #default="{ row }">
 					<el-button type="danger" @click.stop="() => deleteSubstance(row)">
 						<rh-icon color="white" name="remove" />

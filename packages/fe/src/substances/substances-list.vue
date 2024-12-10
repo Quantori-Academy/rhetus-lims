@@ -195,7 +195,7 @@ onMounted(() => {
 					>{{ row.storageLocation?.name }} {{ row.storageLocation?.room }}</template
 				>
 			</el-table-column>
-			<el-table-column v-if="isOfficer" width="60">
+			<el-table-column v-if="isOfficer && !filters.deleted" width="60">
 				<template #default="{ row }">
 					<el-button type="primary" @click.stop="() => orderReagent(row)">
 						<rh-icon color="white" name="file-addition" />
