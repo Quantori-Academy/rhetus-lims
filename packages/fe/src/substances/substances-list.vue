@@ -105,9 +105,16 @@ const setSubstances = debounce(async () => {
 			substancesData.map(async substance => {
 				const ketcher = ketcherFrame.value.contentWindow.ketcher;
 				const opts = { outputFormat: 'svg' };
-				const ketcherImage = substance.structure.length
-					? await ketcher.generateImage(substance.structure, opts)
-					: null;
+				let ketcherImage = null;
+
+				try {
+					if (substance.structure.length) {
+						ketcherImage = await ketcher.generateImage(substance.structure, opts);
+					}
+				} catch (error) {
+					ketcherImage = null;
+					console.log('Ketcher error', error);
+				}
 				return {
 					...substance,
 					imageUrl: ketcherImage ? URL.createObjectURL(ketcherImage) : ''
@@ -139,7 +146,11 @@ watch(
 );
 
 onMounted(() => {
-	setSubstances();
+	if (ketcherFrame.value) {
+		ketcherFrame.value.onload = () => {
+			setSubstances();
+		};
+	}
 });
 </script>
 
