@@ -74,7 +74,7 @@ const isOptionChosen = option => {
 			<div class="w-full">
 				<el-input-number
 					v-model="selectedQuantity"
-					:min="0"
+					:min="selectedOption ? 0.01 : 0"
 					:max="selectedOption && selectedOption.quantity"
 					:label="__('Quantity')"
 					:placeholder="__('Enter quantity')"
