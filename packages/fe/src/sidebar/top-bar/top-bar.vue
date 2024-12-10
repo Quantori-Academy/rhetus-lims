@@ -38,7 +38,7 @@ function handleCollapse() {
 	right: 200px;
 	left: var(--sidebar-width);
 
-	z-index: 10;
+	z-index: 4;
 	padding: 0 16px;
 	width: 100%;
 
@@ -55,6 +55,10 @@ function handleCollapse() {
 			0 0 0 1px var(--rh-color-page-white),
 			0 0 0 3px var(--rh-color-primary-600);
 		outline: none;
+	}
+
+	@media (max-width: 1200px) {
+		left: 0px;
 	}
 }
 
