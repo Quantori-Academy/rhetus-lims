@@ -106,7 +106,7 @@ const cancelHandler = () => {
 					show-password
 				></el-input>
 			</el-form-item>
-			<el-form-item :label="__('Role')" prop="roleId">
+			<el-form-item :label="__('Role')" prop="role">
 				<el-select v-model="form.roleId" :placeholder="__('Select role')">
 					<el-option
 						v-for="role of roles"
