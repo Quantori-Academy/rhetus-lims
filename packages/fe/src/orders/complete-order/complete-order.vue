@@ -65,7 +65,7 @@ const setSubstances = async () => {
 async function setStorages() {
 	loading.value = true;
 	try {
-		const data = await $api.storages.fetchStorages();
+		const data = await $api.storages.fetchStorages({ limit: 999 });
 		storages.value = data;
 	} catch (error) {
 		$notifyUserAboutError(error);

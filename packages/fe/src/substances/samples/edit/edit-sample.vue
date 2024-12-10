@@ -129,7 +129,7 @@ function cancelEdit() {
 async function setStorages() {
 	isLoading.value = true;
 	try {
-		storages.value = await $api.storages.fetchStorages();
+		storages.value = await $api.storages.fetchStorages({ limit: 999 });
 	} catch (error) {
 		$notifyUserAboutError(error);
 	} finally {

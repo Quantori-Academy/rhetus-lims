@@ -62,7 +62,7 @@ const setSubstances = debounce(async id => {
 async function fetchStorages() {
 	isLoading.value = true;
 	try {
-		storages.value = await $api.storages.fetchStorages();
+		storages.value = await $api.storages.fetchStorages({ limit: 999 });
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error getting storage locations');
 	} finally {

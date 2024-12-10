@@ -138,7 +138,7 @@ async function setComponents() {
 
 async function setStorages() {
 	try {
-		storages.value = await $api.storages.fetchStorages();
+		storages.value = await $api.storages.fetchStorages({ limit: 999 });
 	} catch (error) {
 		$notifyUserAboutError(error);
 	}
