@@ -1,17 +1,21 @@
 <script setup>
 import { ElForm, ElInput, ElButton, ElFormItem } from 'element-plus';
-import { ref } from 'vue';
+import { ref, useTemplateRef } from 'vue';
 import { $api } from '../lib/api/index.js';
 import { $router } from '../lib/router/router';
 import { $notifyUserAboutError, $notify } from '../lib/utils/feedback/notify-msg.js';
 import { __ } from '../lib/locales/';
+import { $isFormValid } from '../lib/utils/form-validation/is-form-valid.js';
 
 function createDefaultFormValues() {
 	return {
 		username: ''
 	};
 }
-
+const usernameRule = fieldName => {
+	return { required: true, message: `${fieldName} can't be empty`, trigger: 'submit' };
+};
+const formEl = useTemplateRef('formEl');
 const form = ref(createDefaultFormValues());
 const isLoading = ref(false);
 
@@ -25,15 +29,18 @@ async function resetPassword(form) {
 			message: response.message,
 			type: 'success'
 		});
+		formEl.value.resetFields();
 		$router.push({ name: 'login' });
 	} catch (error) {
-		$notifyUserAboutError(error);
+		const { data } = error;
+		$notifyUserAboutError(data.message);
 	} finally {
 		isLoading.value = false;
 	}
 }
 
-function onSubmit() {
+async function onSubmit() {
+	if (!(await $isFormValid(formEl))) return;
 	resetPassword(form.value);
 }
 </script>
@@ -46,14 +53,15 @@ function onSubmit() {
 
 	<div class="form-container">
 		<el-form
+			ref="formEl"
 			:model="form"
 			label-position="top"
 			class="form"
 			@submit.prevent
 			@keyup.enter="onSubmit"
 		>
-			<el-form-item :label="__('Username')">
-				<el-input v-model="form.username" class="input" />
+			<el-form-item :label="__('Username')" prop="username" :rules="usernameRule('Username')">
+				<el-input v-model="form.username" class="input" :placeholder="__('Enter username')" />
 			</el-form-item>
 			<el-form-item>
 				<el-button type="primary" @click="onSubmit">{{ __('Reset password') }}</el-button>
