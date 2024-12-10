@@ -21,15 +21,30 @@ const props = defineProps({
 		default: false
 	}
 });
+
 const loading = ref(false);
 const substanceHistory = ref(null);
+
+const filteredSubstanceHistory = substanceHistory => {
+	return substanceHistory.filter(history => {
+		if (history.actionType === 'storage-update') {
+			return history.prevStorageLocation && history.newStorageLocation;
+		}
+		if (history.actionType === 'quantity-update') {
+			return history.prevQuantityLeft && history.newQuantityLeft;
+		}
+		return history.actionType === 'delete';
+	});
+};
+
 const setSubstance = async () => {
 	loading.value = true;
 	try {
 		const data = await $api.substances.fetchSubstanceHistory(props.category, props.id, {
 			deleted: props.isDeleted
 		});
-		substanceHistory.value = data.histories;
+
+		substanceHistory.value = filteredSubstanceHistory(data.histories);
 	} catch (error) {
 		$notifyUserAboutError(error.message || 'Error getting history');
 	} finally {
