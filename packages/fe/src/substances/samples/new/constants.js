@@ -1,4 +1,5 @@
 import { __ } from '../../../lib/locales';
+import { notPastDateRule } from '../../constants';
 
 const requiredRule = {
 	required: true,
@@ -43,7 +44,7 @@ export const formRules = {
 			trigger: ['blur', 'change']
 		}
 	],
-	expirationDate: [requiredRule],
+	expirationDate: [requiredRule, notPastDateRule],
 	storageId: [requiredRule],
 	structure: [requiredRule]
 };

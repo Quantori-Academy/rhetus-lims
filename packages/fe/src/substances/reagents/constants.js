@@ -1,5 +1,6 @@
 import { $confirm } from '../../lib/utils/feedback/confirm-msg';
 import { __ } from '../../lib/locales';
+import { notPastDateRule } from '../constants';
 
 const requiredRule = fieldName => {
 	return {
@@ -8,7 +9,6 @@ const requiredRule = fieldName => {
 		trigger: ['blur', 'change']
 	};
 };
-
 export const formRules = {
 	quantityLeft: [
 		requiredRule(__('Quantity left')),
@@ -21,6 +21,19 @@ export const formRules = {
 	],
 	name: [requiredRule(__('Name'))],
 	storageId: [requiredRule(__('Storage location'))]
+};
+
+export const newReagentRules = {
+	name: [requiredRule(__('Name'))],
+	catalogLink: [{ type: 'url' }],
+	quantityUnit: [requiredRule(__('Quantity unit'))],
+	quantity: [
+		requiredRule(__('Quantity')),
+		{ type: 'number', min: 1, message: __('Quantity cannot be zero'), trigger: ['blur', 'change'] }
+	],
+	expirationDate: [requiredRule(__('Expiration date')), notPastDateRule],
+	storageId: [requiredRule(__('Storage location'))],
+	structure: [requiredRule(__('Structure'))]
 };
 
 export const emptyReagent = {

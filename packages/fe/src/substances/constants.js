@@ -1,3 +1,5 @@
+import { __ } from '../lib/locales';
+
 const fieldsToUpdate = {
 	name: 'name',
 	description: 'description',
@@ -28,4 +30,17 @@ export const checkEditedFields = (substanceFields, originalSubstance, updatedSub
 	});
 
 	return updatedSubstanceValues.value;
+};
+
+export const notPastDateRule = {
+	validator: (_, value) => {
+		const selectedDate = new Date(value);
+		const today = new Date();
+		today.setHours(0, 0, 0, 0);
+		if (selectedDate < today) {
+			return Promise.reject(new Error(__('The date cannot be past date')));
+		}
+		return Promise.resolve();
+	},
+	trigger: ['blur', 'change']
 };
