@@ -30,5 +30,8 @@ export default http => ({
 	},
 	async fetchStoragesNames() {
 		return await http('/storages/names');
+	},
+	async fetchStoragesRoomsNames() {
+		return await http('/storages/rooms-names');
 	}
 });
