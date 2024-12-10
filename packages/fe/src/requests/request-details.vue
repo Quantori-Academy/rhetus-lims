@@ -123,20 +123,15 @@ onMounted(() => {
 	<div class="wrapper">
 		<div class="editing-header">
 			<h2>
-				<span v-if="request.reagentName">
-					{{ `${isEdit ? __('Editing') + ' ' : ''}${request.reagentName}` }}
-					<el-tag :type="getButtonType(request.status)" round>
-						{{ request.status }}
-					</el-tag>
-				</span>
+				{{ `${isEdit ? __('Editing') + ' ' : ''}${request.reagentName}` }}
+				<el-tag :type="getButtonType(request.status)" round>
+					{{ request.status }}
+				</el-tag>
 			</h2>
 			<div v-if="!isEdit && request.status !== Statuses.CANCELED" class="top-button-container">
-				<el-button
-					type="primary"
-					:disabled="request.status !== Statuses.PENDING"
-					@click="toggleEdit"
-					>{{ __('Edit') }}</el-button
-				>
+				<el-button :disabled="request.status !== Statuses.PENDING" @click="toggleEdit">{{
+					__('Edit')
+				}}</el-button>
 				<el-button
 					v-if="isOfficer"
 					type="danger"
@@ -268,5 +263,18 @@ onMounted(() => {
 .el-button.el-button--primary.is-disabled:hover {
 	border-color: #92d6ee;
 	background-color: #92d6ee;
+}
+.editing-header {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	gap: 10px;
+}
+@media screen and (max-width: 680px) {
+	.editing-header {
+		flex-direction: column-reverse;
+		align-items: flex-end;
+		gap: 1rem;
+	}
 }
 </style>
