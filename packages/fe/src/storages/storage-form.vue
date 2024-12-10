@@ -156,9 +156,3 @@ onMounted(() => {
 		</el-form>
 	</div>
 </template>
-
-<style>
-.wrapper {
-	margin: 50px 0;
-}
-</style>
