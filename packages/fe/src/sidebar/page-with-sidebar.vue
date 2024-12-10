@@ -15,7 +15,7 @@ function handleToggle() {
 <template>
 	<div class="page-with-sidebar" :class="{ 'page-with-sidebar-collapsed': isSidebarCollapsed }">
 		<sidebar-menu @toggle-collapse="handleToggle" />
-
+		<div class="sidebar-overlay"></div>
 		<div class="content-wrapper">
 			<top-bar :is-sidebar-collapsed="isSidebarCollapsed" @toggle-collapse="handleToggle" />
 
@@ -38,8 +38,25 @@ function handleToggle() {
 	transition-duration: 200ms;
 	transition-timing-function: ease;
 
+	.sidebar-overlay {
+		display: none;
+	}
+
 	@media (min-width: 1200px) {
 		padding-left: var(--sidebar-width);
+	}
+
+	@media (max-width: 1200px) {
+		.sidebar-overlay {
+			position: fixed;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			z-index: 5;
+			display: block;
+			background-color: rgba(0, 0, 0, 0.185);
+		}
 	}
 }
 
@@ -48,6 +65,10 @@ function handleToggle() {
 
 	.sidebar {
 		transform: translate3d(-100%, 0, 0);
+	}
+
+	.sidebar-overlay {
+		display: none;
 	}
 
 	.top-bar-fixed {
