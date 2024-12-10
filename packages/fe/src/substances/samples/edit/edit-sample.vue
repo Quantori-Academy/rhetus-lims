@@ -39,6 +39,7 @@ const isSaving = ref(false);
 const originalSample = ref({});
 const updatedSampleValues = ref({ category: 'sample' });
 const isOutOfStock = computed(() => sample.value.quantityLeft === 0);
+const ketcherIFrame = ref(null);
 
 watch(
 	sample,
@@ -136,13 +137,33 @@ async function setStorages() {
 		isLoading.value = false;
 	}
 }
-async function setSample(id) {
+
+const generateImage = async structure => {
+	const ketcher = ketcherIFrame.value.contentWindow.ketcher;
+	let ketcherImage = null;
+	try {
+		ketcherImage = await ketcher.generateImage(structure, { outputFormat: 'svg' });
+	} catch (error) {
+		ketcherImage = null;
+		console.log('Ketcher error', error);
+	}
+	return ketcherImage;
+};
+
+const setSample = async id => {
 	isLoading.value = true;
 	try {
 		const res = !props.deleted
 			? await $api.substances.fetchSubstance('sample', id)
 			: await $api.substances.fetchDeletedSubstance('sample', id);
-		sample.value = { ...res, storageId: res.storageLocation.id };
+
+		const ketcherImage = res.structure ? await generateImage(res.structure) : null;
+
+		sample.value = {
+			...res,
+			storageId: res.storageLocation.id,
+			imageUrl: ketcherImage ? URL.createObjectURL(ketcherImage) : ''
+		};
 		originalSample.value = {
 			...sample.value
 		};
@@ -151,7 +172,7 @@ async function setSample(id) {
 	} finally {
 		isLoading.value = false;
 	}
-}
+};
 const componentTableData = computed(() =>
 	sample.value.components.map(x => ({
 		...x,
@@ -159,7 +180,11 @@ const componentTableData = computed(() =>
 	}))
 );
 onMounted(() => {
-	setSample(props.id);
+	if (ketcherIFrame.value) {
+		ketcherIFrame.value.onload = () => {
+			setSample(props.id);
+		};
+	}
 	setStorages();
 });
 watch(
@@ -179,9 +204,22 @@ watch(
 			}}</el-button>
 		</div>
 		<el-form ref="form-el" :model="sample" :rules="rules" label-position="top">
-			<el-form-item :label="__('Name')" prop="name">
-				<el-input v-model="sample.name" :disabled="!isEditing" />
-			</el-form-item>
+			<div class="align-horizontal">
+				<el-form-item :label="__('Name')" prop="name">
+					<el-input v-model="sample.name" :disabled="!isEditing" />
+				</el-form-item>
+				<el-form-item :label="__('Structure')" prop="structure">
+					<div class="structure-img">
+						<img
+							v-if="sample.imageUrl"
+							:src="sample.imageUrl"
+							alt="Structure Image"
+							width="120"
+							height="120"
+						/>
+					</div>
+				</el-form-item>
+			</div>
 			<substances-used :data="componentTableData" />
 			<div class="align-horizontal">
 				<el-form-item :label="__('Quantity unit')" prop="quantityUnit">
@@ -249,5 +287,27 @@ watch(
 			category="sample"
 			:is-deleted="props.deleted"
 		/>
+		<div class="ketcher-editor">
+			<iframe
+				ref="ketcherIFrame"
+				src="/ketcher/index.html"
+				width="100%"
+				height="100%"
+				frameborder="0"
+				allowfullscreen
+			></iframe>
+		</div>
 	</div>
 </template>
+
+<style scoped>
+.ketcher-editor {
+	display: none;
+}
+
+.structure-img {
+	display: flex;
+	justify-content: center;
+	width: 100%;
+}
+</style>

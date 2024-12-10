@@ -84,6 +84,18 @@ const deleteSingleSubstance = async row => {
 	}
 };
 
+const generateImage = async structure => {
+	const ketcher = ketcherFrame.value.contentWindow.ketcher;
+	let ketcherImage = null;
+	try {
+		ketcherImage = await ketcher.generateImage(structure, { outputFormat: 'svg' });
+	} catch (error) {
+		ketcherImage = null;
+		console.log('Ketcher error', error);
+	}
+	return ketcherImage;
+};
+
 const setSubstances = debounce(async () => {
 	isLoading.value = true;
 	const { expired, deleted, ...rest } = filters.value;
@@ -103,18 +115,7 @@ const setSubstances = debounce(async () => {
 		const { substances: substancesData, count } = await $api.substances.fetchSubstances(params);
 		substances.value = await Promise.all(
 			substancesData.map(async substance => {
-				const ketcher = ketcherFrame.value.contentWindow.ketcher;
-				const opts = { outputFormat: 'svg' };
-				let ketcherImage = null;
-
-				try {
-					if (substance.structure.length) {
-						ketcherImage = await ketcher.generateImage(substance.structure, opts);
-					}
-				} catch (error) {
-					ketcherImage = null;
-					console.log('Ketcher error', error);
-				}
+				const ketcherImage = substance.structure ? await generateImage(substance.structure) : null;
 				return {
 					...substance,
 					imageUrl: ketcherImage ? URL.createObjectURL(ketcherImage) : ''
@@ -187,7 +188,7 @@ onMounted(() => {
 			</el-table-column>
 			<el-table-column prop="name" min-width="150" :label="__('Name')" sortable />
 			<el-table-column prop="category" min-width="120" :label="__('Category')" sortable />
-			<el-table-column prop="structure" min-width="120" :label="__('Structure')" sortable>
+			<el-table-column prop="imageUrl" min-width="120" :label="__('Structure')" sortable>
 				<template #default="{ row }">
 					<img
 						v-if="row.imageUrl"

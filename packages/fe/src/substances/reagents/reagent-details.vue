@@ -41,6 +41,8 @@ const isOutOfStock = computed(() => reagent.value.quantityLeft === 0);
 const originalReagent = ref({});
 const rules = ref(formRules);
 const updatedReagentValues = ref({ category: 'reagent' });
+const ketcherIFrame = ref(null);
+
 watch(
 	reagent,
 	reagentFields => {
@@ -63,13 +65,33 @@ async function setStorages() {
 		loading.value = false;
 	}
 }
+
+const generateImage = async structure => {
+	const ketcher = ketcherIFrame.value.contentWindow.ketcher;
+	let ketcherImage = null;
+	try {
+		ketcherImage = await ketcher.generateImage(structure, { outputFormat: 'svg' });
+	} catch (error) {
+		ketcherImage = null;
+		console.log('Ketcher error', error);
+	}
+	return ketcherImage;
+};
+
 const setReagent = async () => {
 	loading.value = true;
 	try {
 		const data = !props.deleted
 			? await $api.substances.fetchSubstance('reagent', props.id)
 			: await $api.substances.fetchDeletedSubstance('reagent', props.id);
-		reagent.value = { ...data, storageId: data.storageLocation.id };
+
+		const ketcherImage = data.structure ? await generateImage(data.structure) : null;
+
+		reagent.value = {
+			...data,
+			storageId: data.storageLocation.id,
+			imageUrl: ketcherImage ? URL.createObjectURL(ketcherImage) : ''
+		};
 		originalReagent.value = { ...reagent.value };
 	} catch (error) {
 		$notifyUserAboutError(error.message || __('Error updating reagent'));
@@ -148,13 +170,17 @@ const deleteReagent = async () => {
 };
 
 onMounted(() => {
-	setReagent();
+	if (ketcherIFrame.value) {
+		ketcherIFrame.value.onload = () => {
+			setReagent();
+		};
+	}
 	setStorages();
 });
 </script>
 
 <template>
-	<div class="wrapper">
+	<div v-loading="loading" class="wrapper">
 		<div class="editing-header">
 			<div class="category-icons">
 				<rh-icon name="pod" />{{ `${isEdit ? __('Editing') + ' ' : ''}${reagent.name}` }}
@@ -163,15 +189,27 @@ onMounted(() => {
 		</div>
 		<el-form
 			ref="form-ref"
-			v-loading="loading"
 			label-position="top"
 			:model="reagent"
 			:rules="rules"
 			@submit="handleSubmit"
 		>
-			<el-form-item :label="__('Name')" prop="name">
-				<el-input v-model="reagent.name" :disabled="!isEdit" />
-			</el-form-item>
+			<div class="align-horizontal">
+				<el-form-item :label="__('Name')" prop="name">
+					<el-input v-model="reagent.name" :disabled="!isEdit" />
+				</el-form-item>
+				<el-form-item :label="__('Structure')" prop="structure">
+					<div class="structure-img">
+						<img
+							v-if="reagent.imageUrl"
+							:src="reagent.imageUrl"
+							alt="Structure Image"
+							width="120"
+							height="120"
+						/>
+					</div>
+				</el-form-item>
+			</div>
 			<div class="align-horizontal">
 				<el-form-item :label="__('CAS number')" prop="casNumber">
 					<el-input v-model="reagent.casNumber" :disabled="true" />
@@ -247,11 +285,31 @@ onMounted(() => {
 			category="reagent"
 			:is-deleted="props.deleted"
 		/>
+		<div class="ketcher-editor">
+			<iframe
+				ref="ketcherIFrame"
+				src="/ketcher/index.html"
+				width="100%"
+				height="100%"
+				frameborder="0"
+				allowfullscreen
+			></iframe>
+		</div>
 	</div>
 </template>
 
 <style scoped>
 :deep(.el-date-editor) {
+	width: 100%;
+}
+
+.ketcher-editor {
+	display: none;
+}
+
+.structure-img {
+	display: flex;
+	justify-content: center;
 	width: 100%;
 }
 </style>
