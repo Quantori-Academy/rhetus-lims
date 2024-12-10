@@ -30,13 +30,13 @@ const loading = ref(false);
 const request = ref(emptyRequest);
 const formEl = useTemplateRef('form-ref');
 const formRules = ref(rules);
+const statusesHistory = ref(null);
 const isEdit = computed(() => $route.value.name === 'request-details-edit');
 const user = inject('user');
 
 const showPoMessage = computed(
 	() => request.value.status === Statuses.CANCELED && request.value.poComment && !isEdit.value
 );
-const statusesHistory = ref(null);
 const toggleEdit = () => {
 	$router.push({ name: 'request-details-edit', params: { id: request.value.id } });
 };
@@ -124,7 +124,7 @@ onMounted(() => {
 		<div class="editing-header">
 			<h2>
 				<span v-if="request.reagentName">
-					{{ request.reagentName }}
+					{{ `${isEdit ? __('Editing') + ' ' : ''}${request.reagentName}` }}
 					<el-tag :type="getButtonType(request.status)" round>
 						{{ request.status }}
 					</el-tag>
