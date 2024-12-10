@@ -1,5 +1,6 @@
 import { $confirm } from '../../lib/utils/feedback/confirm-msg';
 import { __ } from '../../lib/locales';
+import { notPastDateRule } from '../constants';
 
 const requiredRule = fieldName => {
 	return {
@@ -7,18 +8,6 @@ const requiredRule = fieldName => {
 		message: `${fieldName} ${__("can't be empty")}`,
 		trigger: ['blur', 'change']
 	};
-};
-const notPastDateRule = {
-	validator: (_, value) => {
-		const selectedDate = new Date(value);
-		const today = new Date();
-		today.setHours(0, 0, 0, 0);
-		if (selectedDate < today) {
-			return Promise.reject(new Error(__('The date cannot be past date')));
-		}
-		return Promise.resolve();
-	},
-	trigger: ['blur', 'change']
 };
 export const formRules = {
 	quantityLeft: [

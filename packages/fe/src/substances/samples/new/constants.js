@@ -1,4 +1,5 @@
 import { __ } from '../../../lib/locales';
+import { notPastDateRule } from '../../constants';
 
 const requiredRule = {
 	required: true,
@@ -13,18 +14,6 @@ export const notEmptyArrayRule = {
 		return Promise.resolve();
 	},
 	trigger: ['submit']
-};
-const notPastDateRule = {
-	validator: (_, value) => {
-		const selectedDate = new Date(value);
-		const today = new Date();
-		today.setHours(0, 0, 0, 0);
-		if (selectedDate < today) {
-			return Promise.reject(new Error(__('The date cannot be past date')));
-		}
-		return Promise.resolve();
-	},
-	trigger: ['blur', 'change']
 };
 export const formRef = {
 	name: '',
