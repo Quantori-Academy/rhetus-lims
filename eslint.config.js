@@ -14,7 +14,8 @@ export default [
 			'packages/fe/src/lib/router/routes.js',
 			'packages/fe/public/ketcher',
 			'packages/fe/src/orders/details/order-details.vue',
-			'packages/fe/src/orders/new/add-new-order.vue'
+			'packages/fe/src/orders/new/add-new-order.vue',
+			'	packages/fe/src/requests/request-details.vue'
 		]
 	},
 	{ languageOptions: { globals: { ...globals.browser, ...globals.node } } },

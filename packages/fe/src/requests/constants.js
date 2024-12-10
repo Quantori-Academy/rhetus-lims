@@ -10,7 +10,7 @@ export const Statuses = {
 };
 
 export const rules = ref({
-	reagentName: [requiredRule('Reagent Name')],
+	reagentName: [requiredRule('Reagent name')],
 	quantityUnit: [requiredRule('Quantity unit')],
 	quantity: [requiredRule('Quantity')],
 	amount: [requiredRule('Amount')]
