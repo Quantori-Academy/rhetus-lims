@@ -3,6 +3,7 @@
 import LoginLayout from './layout/login-layout.vue';
 import { roles } from '../constants/roles.js';
 import Dashboard from '../../dashboard/main-dashboard.vue';
+import { __ } from '../../lib/locales';
 
 export const routes = [
 	{
@@ -10,8 +11,8 @@ export const routes = [
 		name: 'dashboard',
 		component: Dashboard,
 		meta: {
-			title: 'Dashboard',
-			breadcrumb: [{ name: 'Home', path: '/' }]
+			title: __('Dashboard'),
+			breadcrumb: [{ name: __('Home'), path: '/' }]
 		}
 	},
 	{
@@ -20,10 +21,10 @@ export const routes = [
 		component: () => import('../../users/list/user-list.vue'),
 		meta: {
 			roles: [roles.ADMIN],
-			title: 'Users List',
+			title: __('Users List'),
 			breadcrumb: [
-				{ name: 'Home', path: '/' },
-				{ name: 'Users', path: '/users/list' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Users'), path: '/users/list' }
 			]
 		}
 	},
@@ -33,11 +34,11 @@ export const routes = [
 		component: () => import('../../users/new/add-new-user.vue'),
 		meta: {
 			roles: [roles.ADMIN],
-			title: 'New User',
+			title: __('New User'),
 			breadcrumb: [
-				{ name: 'Home', path: '/' },
-				{ name: 'Users', path: '/users/list' },
-				{ name: 'New User', path: '' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Users'), path: '/users/list' },
+				{ name: __('New User'), path: '' }
 			]
 		}
 	},
@@ -64,11 +65,11 @@ export const routes = [
 		props: true,
 		meta: {
 			roles: [roles.ADMIN],
-			title: 'User Details',
+			title: __('User Details'),
 			breadcrumb: route => [
-				{ name: 'Home', path: '/' },
-				{ name: 'Users', path: '/users/list' },
-				{ name: 'User', path: '' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Users'), path: '/users/list' },
+				{ name: __('User'), path: '' }
 			]
 		}
 	},
@@ -79,11 +80,11 @@ export const routes = [
 		props: true,
 		meta: {
 			roles: [roles.ADMIN],
-			title: 'User Details',
+			title: __('User Details'),
 			breadcrumb: route => [
-				{ name: 'Home', path: '/' },
-				{ name: 'Users', path: '/users/list' },
-				{ name: 'User', path: '' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Users'), path: '/users/list' },
+				{ name: __('User'), path: '' }
 			]
 		}
 	},
@@ -92,10 +93,10 @@ export const routes = [
 		name: 'user-profile',
 		component: () => import('../../profile/user-profile.vue'),
 		meta: {
-			title: 'User Profile',
+			title: __('User Profile'),
 			breadcrumb: [
-				{ name: 'Home', path: '/' },
-				{ name: 'Profile', path: '/profile' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Profile'), path: '/profile' }
 			]
 		}
 	},
@@ -104,11 +105,11 @@ export const routes = [
 		name: 'edit-user-profile',
 		component: () => import('../../profile/user-profile.vue'),
 		meta: {
-			title: 'Edit User Profile',
+			title: __('Edit User Profile'),
 			breadcrumb: [
-				{ name: 'Home', path: '/' },
-				{ name: 'Profile', path: '/profile' },
-				{ name: 'Edit', path: '' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Profile'), path: '/profile' },
+				{ name: __('Edit'), path: '' }
 			]
 		}
 	},
@@ -117,11 +118,11 @@ export const routes = [
 		name: 'new-sample',
 		component: () => import('../../substances/samples/new/add-new-sample.vue'),
 		meta: {
-			title: 'New Sample',
+			title: __('New Sample'),
 			breadcrumb: [
-				{ name: 'Home', path: '/' },
-				{ name: 'Substances', path: '/substances/list' },
-				{ name: 'New Sample', path: '' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Substances'), path: '/substances/list' },
+				{ name: __('New Sample'), path: '' }
 			]
 		}
 	},
@@ -134,11 +135,11 @@ export const routes = [
 			deleted: route.query.deleted === 'true'
 		}),
 		meta: {
-			title: 'Sample Details',
+			title: __('Sample Details'),
 			breadcrumb: [
-				{ name: 'Home', path: '/' },
-				{ name: 'Substances', path: '/substances/list' },
-				{ name: 'Sample', path: '' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Substances'), path: '/substances/list' },
+				{ name: __('Sample'), path: '' }
 			]
 		}
 	},
@@ -148,11 +149,11 @@ export const routes = [
 		component: () => import('../../substances/samples/edit/edit-sample.vue'),
 		props: true,
 		meta: {
-			title: 'Edit Sample Details',
+			title: __('Edit Sample Details'),
 			breadcrumb: [
-				{ name: 'Home', path: '/' },
-				{ name: 'Substances', path: '/substances/list' },
-				{ name: 'Sample', path: '' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Substances'), path: '/substances/list' },
+				{ name: __('Sample'), path: '' }
 			]
 		}
 	},
@@ -161,10 +162,10 @@ export const routes = [
 		name: 'storages-list',
 		component: () => import('../../storages/list/storage-list.vue'),
 		meta: {
-			title: 'Storages List',
+			title: __('Storages List'),
 			breadcrumb: [
-				{ name: 'Home', path: '/' },
-				{ name: 'Storages', path: '/storages/list' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Storages'), path: '/storages/list' }
 			]
 		}
 	},
@@ -174,11 +175,11 @@ export const routes = [
 		component: () => import('../../storages/details/storage-details.vue'),
 		props: true,
 		meta: {
-			title: 'Storage Details',
+			title: __('Storage Details'),
 			breadcrumb: [
-				{ name: 'Home', path: '/' },
-				{ name: 'Storages', path: '/storages/list' },
-				{ name: 'Storage', path: '' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Storages'), path: '/storages/list' },
+				{ name: __('Storage'), path: '' }
 			]
 		}
 	},
@@ -189,11 +190,11 @@ export const routes = [
 		props: true,
 		meta: {
 			roles: [roles.ADMIN],
-			title: 'Edit Storage Details',
+			title: __('Edit Storage Details'),
 			breadcrumb: [
-				{ name: 'Home', path: '/' },
-				{ name: 'Storages', path: '/storages/list' },
-				{ name: 'Storage', path: '' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Storages'), path: '/storages/list' },
+				{ name: __('Storage'), path: '' }
 			]
 		}
 	},
@@ -203,11 +204,11 @@ export const routes = [
 		component: () => import('../../storages/add-new/storage-new.vue'),
 		meta: {
 			roles: [roles.ADMIN],
-			title: 'New Storage',
+			title: __('New Storage'),
 			breadcrumb: [
-				{ name: 'Home', path: '/' },
-				{ name: 'Storages', path: '/storages/list' },
-				{ name: 'New Storage', path: '' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Storages'), path: '/storages/list' },
+				{ name: __('New Storage'), path: '' }
 			]
 		}
 	},
@@ -216,10 +217,10 @@ export const routes = [
 		name: 'substances-list',
 		component: () => import('../../substances/substances-list.vue'),
 		meta: {
-			title: 'Substances List',
+			title: __('Substances List'),
 			breadcrumb: [
-				{ name: 'Home', path: '/' },
-				{ name: 'Substances', path: '/substances/list' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Substances'), path: '/substances/list' }
 			]
 		}
 	},
@@ -232,11 +233,11 @@ export const routes = [
 			deleted: route.query.deleted === 'true'
 		}),
 		meta: {
-			title: 'Reagent Details',
+			title: __('Reagent Details'),
 			breadcrumb: [
-				{ name: 'Home', path: '/' },
-				{ name: 'Substances', path: '/substances/list' },
-				{ name: 'Reagent', path: '' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Substances'), path: '/substances/list' },
+				{ name: __('Reagent'), path: '' }
 			]
 		}
 	},
@@ -246,11 +247,11 @@ export const routes = [
 		component: () => import('../../substances/reagents/reagent-details.vue'),
 		props: true,
 		meta: {
-			title: 'Edit Reagent Details',
+			title: __('Edit Reagent Details'),
 			breadcrumb: [
-				{ name: 'Home', path: '/' },
-				{ name: 'Substances', path: '/substances/list' },
-				{ name: 'Reagent', path: '' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Substances'), path: '/substances/list' },
+				{ name: __('Reagent'), path: '' }
 			]
 		}
 	},
@@ -259,11 +260,11 @@ export const routes = [
 		name: 'new-reagent',
 		component: () => import('../../substances/reagents/add-new-reagent.vue'),
 		meta: {
-			title: 'New Reagent',
+			title: __('New Reagent'),
 			breadcrumb: [
-				{ name: 'Home', path: '/' },
-				{ name: 'Substances', path: '/substances/list' },
-				{ name: 'New Reagent', path: '' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Substances'), path: '/substances/list' },
+				{ name: __('New Reagent'), path: '' }
 			]
 		}
 	},
@@ -273,7 +274,7 @@ export const routes = [
 		component: () => import('../../error-page/404-page.vue'),
 		meta: {
 			layout: LoginLayout,
-			title: 'Page Not Found'
+			title: __('Page Not Found')
 		}
 	},
 	{
@@ -286,10 +287,10 @@ export const routes = [
 		component: () => import('../../orders/list/order-list.vue'),
 		meta: {
 			roles: [roles.PROCUREMENT_OFFICER],
-			title: 'Orders List',
+			title: __('Orders List'),
 			breadcrumb: [
-				{ name: 'Home', path: '/' },
-				{ name: 'Orders', path: '/orders/list' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Orders'), path: '/orders/list' }
 			]
 		}
 	},
@@ -299,10 +300,10 @@ export const routes = [
 		name: 'requests-list',
 		component: () => import('../../requests/request-list.vue'),
 		meta: {
-			title: 'Reagent Requests List',
+			title: __('Reagent Requests List'),
 			breadcrumb: [
-				{ name: 'Home', path: '/' },
-				{ name: 'Requests', path: '/requests/list' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Requests'), path: '/requests/list' }
 			]
 		}
 	},
@@ -311,11 +312,11 @@ export const routes = [
 		name: 'new-request',
 		component: () => import('../../requests/add-new-request.vue'),
 		meta: {
-			title: 'New Reagent Request',
+			title: __('New Reagent Request'),
 			breadcrumb: [
-				{ name: 'Home', path: '/' },
-				{ name: 'Requests', path: '/requests/list' },
-				{ name: 'New Request', path: '' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Requests'), path: '/requests/list' },
+				{ name: __('New Request'), path: '' }
 			]
 		}
 	},
@@ -325,11 +326,11 @@ export const routes = [
 		component: () => import('../../requests/request-details.vue'),
 		props: true,
 		meta: {
-			title: 'Request Details',
+			title: __('Request Details'),
 			breadcrumb: [
-				{ name: 'Home', path: '/' },
-				{ name: 'Requests', path: '/requests/list' },
-				{ name: 'Request', path: '' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Requests'), path: '/requests/list' },
+				{ name: __('Request'), path: '' }
 			]
 		}
 	},
@@ -339,11 +340,11 @@ export const routes = [
 		component: () => import('../../requests/request-details.vue'),
 		props: true,
 		meta: {
-			title: 'Edit Request',
+			title: __('Edit Request'),
 			breadcrumb: [
-				{ name: 'Home', path: '/' },
-				{ name: 'Requests', path: '/requests/list' },
-				{ name: 'Request', path: '' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Requests'), path: '/requests/list' },
+				{ name: __('Request'), path: '' }
 			]
 		}
 	},
@@ -354,11 +355,11 @@ export const routes = [
 		props: true,
 		meta: {
 			roles: [roles.PROCUREMENT_OFFICER],
-			title: 'Order Details',
+			title: __('Order Details'),
 			breadcrumb: [
-				{ name: 'Home', path: '/' },
-				{ name: 'Orders', path: '/orders/list' },
-				{ name: 'Order', path: '' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Orders'), path: '/orders/list' },
+				{ name: __('Order'), path: '' }
 			]
 		}
 	},
@@ -368,11 +369,11 @@ export const routes = [
 		component: () => import('../../orders/new/add-new-order.vue'),
 		meta: {
 			roles: [roles.PROCUREMENT_OFFICER],
-			title: 'New Order',
+			title: __('New Order'),
 			breadcrumb: [
-				{ name: 'Home', path: '/' },
-				{ name: 'Orders', path: '/orders/list' },
-				{ name: 'New Order', path: '' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Orders'), path: '/orders/list' },
+				{ name: __('New Order'), path: '' }
 			]
 		}
 	},
@@ -383,11 +384,11 @@ export const routes = [
 		props: true,
 		meta: {
 			roles: [roles.PROCUREMENT_OFFICER],
-			title: 'Edit Order Details',
+			title: __('Edit Order Details'),
 			breadcrumb: [
-				{ name: 'Home', path: '/' },
-				{ name: 'Orders', path: '/orders/list' },
-				{ name: 'Order', path: '' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Orders'), path: '/orders/list' },
+				{ name: __('Order'), path: '' }
 			]
 		}
 	},
@@ -397,11 +398,11 @@ export const routes = [
 		component: () => import('../../orders/new/add-new-order.vue'),
 		meta: {
 			roles: [roles.PROCUREMENT_OFFICER],
-			title: 'New Order',
+			title: __('New Order'),
 			breadcrumb: [
-				{ name: 'Home', path: '/' },
-				{ name: 'Orders', path: '/orders/list' },
-				{ name: 'New Order', path: '' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Orders'), path: '/orders/list' },
+				{ name: __('New Order'), path: '' }
 			]
 		}
 	},
@@ -412,11 +413,11 @@ export const routes = [
 		component: () => import('../../orders/complete-order/complete-order.vue'),
 		meta: {
 			roles: [roles.PROCUREMENT_OFFICER],
-			title: 'Complete Order',
+			title: __('Complete Order'),
 			breadcrumb: [
-				{ name: 'Home', path: '/' },
-				{ name: 'Orders', path: '/orders/list' },
-				{ name: 'Complete Order', path: '' }
+				{ name: __('Home'), path: '/' },
+				{ name: __('Orders'), path: '/orders/list' },
+				{ name: __('Complete Order'), path: '' }
 			]
 		}
 	}
