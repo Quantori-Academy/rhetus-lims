@@ -204,6 +204,41 @@
 		"You have selected a component but did not add it, are you sure you want to proceed?": [
 			"Вы выбрали компонент, но не добавили его, вы уверены, что хотите продолжить?"
 		],
-		"Select a component to add": ["Выберите компонент для добавления"]
+		"Select a component to add": ["Выберите компонент для добавления"],
+		"Home": ["Главная"],
+	"Users": ["Пользователи"],
+	"Dashboard": ["Панель управления"],
+	"New User": ["Новый пользователь"],
+	"User": ["Пользователь"],
+	"New Sample": ["Новый образец"],
+	"Storages": ["Хранилища"],
+	"New Storage": ["Новое хранилище"],
+	"New Reagent": ["Новый реагент"],
+	"Orders": ["Заказы"],
+	"Requests": ["Запросы"],
+	"New Request": ["Новый запрос"],
+	"Request": ["Запрос"],
+	"Order": ["Заказ"],
+	"New Order": ["Новый заказ"],
+	"Users List": ["Список пользователей"],
+	"User Details": ["Данные пользователя"],
+	"User Profile": ["Профиль пользователя"],
+	"Edit User Profile": ["Редактировать профиль пользователя"],
+	"Sample Details": ["Детали образца"],
+	"Edit Sample Details": ["Редактировать детали образца"],
+	"Storages List": ["Список хранилищ"],
+	"Storage Details": ["Детали хранилища"],
+	"Edit Storage Details": ["Редактировать детали хранилища"],
+	"Substances List": ["Список веществ"],
+	"Reagent Details": ["Детали реагента"],
+	"Edit Reagent Details": ["Редактировать детали реагента"],
+	"Orders List": ["Список заказов"],
+	"Reagent Requests List": ["Список запросов на реагенты"],
+	"New Reagent Request": ["Новый запрос на реагент"],
+	"Request Details": ["Детали запроса"],
+	"Edit Request": ["Редактировать запрос"],
+	"Order Details": ["Детали заказа"],
+	"Edit Order Details": ["Редактировать детали заказа"]
+
 	}
 }
