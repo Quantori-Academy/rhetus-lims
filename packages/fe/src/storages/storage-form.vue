@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, useTemplateRef, computed } from 'vue';
+import { onMounted, ref, useTemplateRef, computed, inject } from 'vue';
 import { ElButton, ElForm, ElInput, ElFormItem, ElTooltip } from 'element-plus';
 import { $api } from '../lib/api/index';
 import { $confirm } from '../lib/utils/feedback/confirm-msg';
@@ -15,7 +15,7 @@ const props = defineProps({
 		default: null
 	}
 });
-
+const { isAdmin } = inject('user');
 const storage = ref(emptyStorage);
 const isLoading = ref(false);
 const formEl = useTemplateRef('form-ref');
@@ -108,7 +108,7 @@ onMounted(() => {
 	<div class="wrapper">
 		<div class="editing-header">
 			{{ __('Storage') }}
-			<el-button v-if="!isEdit" type="primary" @click="toggleEdit">{{
+			<el-button v-if="!isEdit && isAdmin" type="primary" @click="toggleEdit">{{
 				__('Edit storage')
 			}}</el-button>
 		</div>
