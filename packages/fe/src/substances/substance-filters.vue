@@ -44,7 +44,6 @@ const filters = defineModel('filters', { type: Object });
 <style scoped>
 .switch-filters {
 	display: flex;
-	flex-wrap: wrap;
 	gap: 10px;
 }
 </style>
