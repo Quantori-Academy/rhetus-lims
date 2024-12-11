@@ -106,9 +106,9 @@ onMounted(() => {
 
 <template>
 	<div class="wrapper">
-		<div v-if="isAdmin" class="editing-header">
+		<div class="editing-header">
 			{{ __('Storage') }}
-			<el-button v-if="!isEdit" type="primary" @click="toggleEdit">{{
+			<el-button v-if="!isEdit && isAdmin" type="primary" @click="toggleEdit">{{
 				__('Edit storage')
 			}}</el-button>
 		</div>
