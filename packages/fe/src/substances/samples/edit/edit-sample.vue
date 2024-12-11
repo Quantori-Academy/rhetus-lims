@@ -200,6 +200,7 @@ watch(
 						:placeholder="__('Enter amount')"
 						:disabled="!isEditing"
 						:min="0"
+						:step="sample.quantityLeft < 1 ? 0.01 : 1"
 					>
 						<template #suffix>
 							{{ sample.quantityUnit }}

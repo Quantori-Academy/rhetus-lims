@@ -201,6 +201,7 @@ onMounted(() => {
 						:placeholder="__('Enter amount')"
 						:disabled="!isEdit"
 						:min="0"
+						:step="reagent.quantityLeft < 1 ? 0.01 : 1"
 					>
 					</el-input-number>
 				</el-form-item>
