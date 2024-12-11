@@ -1,14 +1,6 @@
 const requiredRule = { required: true, message: 'Please enter a value', trigger: 'blur' };
 
 export const profileFormRules = {
-	firstName: [
-		requiredRule,
-		{ min: 3, message: 'Name must be at least 3 characters long', trigger: ['blur', 'change'] }
-	],
-	lastName: [
-		requiredRule,
-		{ min: 3, message: 'Last name must be at least 3 characters long', trigger: ['blur', 'change'] }
-	],
 	email: [
 		requiredRule,
 		{ type: 'email', message: 'Please input correct email address', trigger: 'blur' }
