@@ -1,7 +1,5 @@
 import { __ } from '../lib/locales';
 export const formRules = {
-	firstName: [{ required: true, message: __("First name can't be empty") }],
-	lastName: [{ required: true, message: __("Last name can't be empty"), trigger: 'change' }],
 	email: [
 		{ required: true, message: __("Email can't be empty") },
 		{ type: 'email', message: __('Please input a valid email address'), trigger: 'blur' }
