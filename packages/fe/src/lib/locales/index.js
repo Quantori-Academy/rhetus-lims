@@ -2,9 +2,9 @@ import Jed from 'jed';
 import { translations } from '../../../../../translations';
 import sprintf from './sprintf.js';
 import { ensureSingleLine } from './ensure-single-line.js';
-import { FALLBACK_LANGUAGE } from './set-locale.js';
+import { DEFAULT_LOCALE_KEY, FALLBACK_LANGUAGE } from './set-locale.js';
 
-const languageCode = () => document.querySelector('html').getAttribute('lang') || FALLBACK_LANGUAGE;
+const languageCode = () => localStorage.getItem(DEFAULT_LOCALE_KEY) || FALLBACK_LANGUAGE;
 
 /**
  * This file might be imported into a web worker indirectly, the `window` object
