@@ -15,7 +15,9 @@ export default [
 			'packages/fe/public/ketcher',
 			'packages/fe/src/orders/details/order-details.vue',
 			'packages/fe/src/orders/new/add-new-order.vue',
-			'	packages/fe/src/requests/request-details.vue'
+			'packages/fe/src/requests/request-details.vue',
+			'packages/fe/src/substances/reagents/reagent-details.vue',
+			'packages/fe/src/substances/samples/edit/edit-sample.vue'
 		]
 	},
 	{ languageOptions: { globals: { ...globals.browser, ...globals.node } } },
